@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Deb0xERC20.sol";
+import "./XENCrypto.sol";
 
 /**
  * Main deb0x protocol contract used to send messages,
@@ -17,6 +18,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * Initialized in constructor.
      */
     Deb0xERC20 public dbx;
+
+    XENCrypto public xen;
 
     /**
      * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
@@ -373,13 +376,14 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     /**
      * @param forwarder forwarder contract address.
      */
-    constructor(address forwarder) ERC2771Context(forwarder) {
+    constructor(address forwarder, address tokenToBurn) ERC2771Context(forwarder) {
         dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
         currentCycleReward = 10000 * 1e18;
         summedCycleStakes[0] = 10000 * 1e18;
         rewardPerCycle[0] = 10000 * 1e18;
+        xen = XENCrypto(tokenToBurn);
     }
 
     /**
