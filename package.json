@@ -1,0 +1,49 @@
+{
+    "name": "deb0x-proto-01",
+    "version": "1.0.0",
+    "description": "Decentralized Private Mail Protocol",
+    "main": "index.js",
+    "scripts": {
+        "build": "rollup -c",
+        "test": "npx hardhat test",
+        "upload": "npm run build && node scripts/upload.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/starfish-technologies-srl/deb0x-proto-01.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/starfish-technologies-srl/deb0x-proto-01/issues"
+    },
+    "homepage": "https://github.com/starfish-technologies-srl/deb0x-proto-01#readme",
+    "devDependencies": {
+        "@nomiclabs/hardhat-ethers": "^2.0.3",
+        "@nomiclabs/hardhat-solhint": "^2.0.1",
+        "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "@rollup/plugin-commonjs": "^17.1.0",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^11.1.1",
+        "builtin-modules": "^3.2.0",
+        "chai": "^4.3.4",
+        "defender-autotask-client": "^1.31.1",
+        "eth-sig-util": "^3.0.0",
+        "ethereum-waffle": "^3.4.0",
+        "ethereumjs-util": "^7.1.5",
+        "ethers": "^5.6.1",
+        "hardhat": "^2.8.0",
+        "hardhat-gas-reporter": "^1.0.9",
+        "react-error-overlay": "^6.0.9",
+        "rollup": "^2.38.5",
+        "solidity-coverage": "^0.8.2"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.7.3",
+        "defender-relay-client": "^1.31.1",
+        "dotenv": "^10.0.0",
+        "draftjs-to-html": "^0.9.1",
+        "solidity-coverage": "^0.8.2"
+    }
+}

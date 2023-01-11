@@ -1,0 +1,89 @@
+li.list-item {
+    color: #fff;
+    border: 1px solid #0ff;
+    box-shadow:0 0 10px #0ff;
+    border-radius: 4px;
+    margin-bottom: 35px
+}
+
+.message-heading {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 35px;
+}
+
+p {
+    margin: 0
+}
+
+ul.MuiList-padding {
+    padding-top: 25px;
+}
+
+li.list-item .list-item-btn {
+    box-shadow:
+        inset 0 0 12px #fff,      
+        inset 10px 0 40px #f0f,   
+        inset -10px 0 40px #0ff,  
+        inset 10px 0 150px #f0f, 
+        inset -10px 0 150px #0ff,
+        0 0 12px #fff,
+        -10px 0 40px #f0f,
+        10px 0 40px #0ff;
+}
+
+li.list-item div:nth-child(2) {
+    top: 0;
+    right: 0;
+}
+
+.pagination {
+    justify-content: space-between;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.pagination svg {
+    color: #fff;
+}
+
+.pagination button.MuiPaginationItem-page {
+    color: #fff;
+    box-shadow:
+        inset 0 0 12px #fff,      
+        inset 10px 0 40px #f0f,   
+        inset -10px 0 40px #0ff,  
+        inset 10px 0 150px #f0f, 
+        inset -10px 0 150px #0ff,
+        0 0 12px #fff,
+        -10px 0 40px #f0f,
+        10px 0 40px #0ff;
+}
+
+.spinner {
+    display: flex;
+    justify-content: center
+}
+
+.message-placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-shadow:
+        0 0 7px #000,
+        0 0 10px #000,
+        0 0 21px #fff,
+        0 0 42px #6145b3;
+    padding: 50px 0;
+}
+
+.message-placeholder div {
+    margin: 0;
+    font-size: 60px;
+}
+
+.message-placeholder svg {
+    font-size: 60px;
+}

@@ -1,0 +1,177 @@
+@import './theme.scss';
+
+.app-container {
+    @include themed() {
+        .content-box {
+            min-height: 65vh;
+            background: t('stake-bg');
+            box-shadow: t('box-shadow');
+            border-radius: 25px 10px 85px 25px;
+            margin-bottom: 35px;
+            .col {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                .heading-card {
+                    font-size: 3vh;
+                    border: 0;
+                    box-shadow: none;
+                    background: t('stake-bg');
+                    color: t('text');
+                    color: #D64933;
+                    padding: 25px 50px;
+                    h4 {
+                        .logo {
+                            padding-right: 15px;
+                        }
+                    }
+                }
+                .card-container {
+                    * {
+                        font-family: 'Karla';
+                    }
+                    background-color: t('card-color');
+                    color: t('text');
+                    border-radius: 25px;
+                    margin: 2vh 0;
+                    position: relative;
+                    overflow: unset;
+                    .data-height{
+                        min-height: 35px !important;
+                    }
+                    .tab-container {
+                        background: t('logo-bg');
+                        width: 100%;
+                        border-radius: 25px 25px 0px 0px;
+                        .tab-btn {
+                            width: 100%;
+                            border: 0;
+                            color: t('text');
+                            margin: 7px;
+                            &.Mui-selected {
+                                background-color: t('stake-unstake-bg');
+                                border-radius: 26px;
+                                width: 100%;
+                                color: #D64933;
+                            }
+                            &:hover {
+                                border-radius: 26px;
+                            }
+                        }
+                    }
+                    .button-container {
+                        margin-bottom: 2vh;
+                        span.text {
+                            padding-left: 1vh;
+                        }
+                    }
+                }
+                .submit-btn {
+                    font-size: 2vh;
+                    color: t('approve-stake-text');
+                    margin: 0 auto;
+                    background-color: t('card-color');
+                    border-radius: 4px;
+                    box-shadow: none;
+                }
+                .max-btn {
+                    padding: 2px 20px;
+                    border: 2px solid #91C499;
+                    background-color: t('card-color');
+                    color: t('text');
+                    font-size: 1.5vh;
+                    border-radius: 25px;
+                    margin-left: 10px;
+                    box-shadow: none;
+                }
+                .max-field {
+                    border-radius: 25px;
+                    label {
+                        color: t('text');
+                    }
+                    fieldset {
+                        border-color: t('text');
+                        border-radius: 50px;
+                    }
+                }
+                .collect-btn {
+                    font-size: 1.5vh;
+                    color: t('approve-stake-text');
+                    background-color: t('bg');
+                    border: 2px solid #F5B700;
+                    border-radius: 33px;
+                    box-shadow: none;
+                    padding: 10px 40px;
+                    white-space: nowrap;
+                    .MuiLoadingButton-loadingIndicator {
+                        color: #F5B700;
+                        margin: 0 5px 2px 0;
+                        .MuiCircularProgress-root {
+                            width: 20px !important;
+                            height: 20px !important;
+                        }
+                    }
+                }
+                .MuiLoadingButton-loadingIndicator {
+                    color: t('text');
+                    position: relative;
+                    left: 0;
+                    transform: none;
+                }
+                .collect-btn:disabled {
+                    border: 2px solid t('btn-disabled');
+                    color: t('btn-disabled');
+                }
+                .amount-row {
+                    align-items: center;
+                    margin: 5px 0 15px 0;
+                    padding: 0;
+                    fieldset {
+                        border-color: t('text');
+                        border-radius: 50px;
+                        .legend {
+                            display: none;
+                        }
+                    }
+                    input {
+                        padding: 5px 10px;
+                    }
+                    input,
+                    &::placeholder {
+                        color: t('text');
+                    }
+                }
+                .display-element {
+                    display: block;
+                    padding-bottom: 10px;
+                    margin-left: 1px;
+                }
+                .rewards {
+                    color: #D64933;
+                    font-size: 4vh;
+                }
+            }
+        }
+    }
+}
+
+.app-container {
+    @include themed() {
+        .main-container {
+            .content-box {
+                overflow-y: auto!important;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        border-radius: 25px;
+    }
+    .cards-grid {
+        height: 69vh;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+}

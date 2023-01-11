@@ -1,0 +1,104 @@
+@import './theme.scss';
+
+.app-container {
+    @include themed() {
+        .app-bar--top {
+            margin: 15px 45px 15px 15px;
+            height: 4vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .main-menu--right {
+                .MuiButton-contained {
+                    font-family: 'Karla';
+                    padding: 5px 25px;
+                    border-radius: 25px;
+                    background-color: t('bg');
+                    color: t('text');
+                    border: 1px solid t('text');
+                    svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+                }
+                button {
+                    margin: 0 5px;
+                }
+            }
+        }
+    }
+}
+
+.popper {
+    z-index: 1203;
+    width: 250px;
+    padding: 0 15px 15px 15px;
+    margin-top: 15px !important;
+    border-radius: 25px;
+    ul{
+        margin-top: 15px;
+        list-style: none;
+        padding-left: 0;
+        li {
+            padding: 10px 0;
+            border-bottom: 2px solid;
+            span {
+                float: right;
+                font-weight: normal
+            }
+        }
+        
+
+    }
+    &.classic {
+        background-color: #ffeee8;
+        box-shadow: 0px 3px 15px #1A152054;
+        ul {
+            color: #19141f;
+            li {
+                border-color: #f2e2dc;
+            }
+        }
+    }
+    &.dark {
+        background-color: #2b2235;
+        box-shadow: 0px 3px 15px #0f0b1373;
+        ul {
+            color: #fff;
+            li {
+                border-color: #1f1826;
+            }
+        }
+    }
+    background-color: transparent;
+    ul.MuiList-root{
+        padding-top: 0;
+    }
+    .theme-select {
+        .form-select {
+            font-size: 14px;
+            border: 1px solid #000;
+            padding: 0 15px;
+            background-position: right 0.4rem center;
+        }
+    }
+    .logout-btn, .add-token-btn, .copy-wallet-btn {
+        width: 100%;
+        padding: 5px 0px;
+        justify-content: left;
+        font-weight: bold;
+        text-transform: none;
+        text-align: left;
+        color: #CE4760;
+        border: none;
+        span {
+            margin-right: 10px;
+        }
+    }
+    .add-token-btn {
+        color: #7f9acd;
+    }
+    .copy-wallet-btn {
+        color: #91c499;
+    }
+}

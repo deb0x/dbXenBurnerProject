@@ -1,0 +1,70 @@
+@import './theme.scss';
+
+.main-container {
+    @include themed() {
+        .row.mint-header {
+            margin-bottom: 2vh;
+            margin-left: 0;
+            margin-right: 0;
+            max-width: 45vw;
+            align-self: center;
+
+            .count-btn {
+                font-size: 1.5vh;
+                color: t('approve-stake-text');
+                background-color: t('bg');
+                border: 2px solid #F5B700;
+                border-radius: 33px;
+                box-shadow: none;
+                padding: 7px 40px;
+                white-space: nowrap;
+                align-items: center;
+                justify-content: center;
+                max-width: 1vw;
+                width: 1.5vw;
+            }
+
+            .max-btn {
+                margin-left: 12px;
+            }
+
+            .input-col {
+                width: 10vw;
+                max-width: 10vw;
+                input {
+                    align-items: center;
+                    margin: auto 0;
+                    border-radius: 33px;
+                    padding: 7px 10px;
+                    background-color: t('bg');
+                    border: 1px solid #F2E9DC;
+                    color: t('text');
+                    text-align: center;
+                }
+    
+                input::-webkit-outer-spin-button,
+                input::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+    
+                input[type=number] {
+                    -moz-appearance: textfield;
+                }
+            }
+        }
+
+        textarea {
+            background-color: t('text-field-color');
+            color: t('text');
+            padding: 15px;
+            border-radius: 32px;
+            margin-bottom: 25px;
+            border: 1px solid #F2E9DC;
+        }
+
+        .form-bottom.mint-bottom {
+            justify-content: center!important;
+        }
+    }
+}

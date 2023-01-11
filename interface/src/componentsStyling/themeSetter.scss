@@ -1,0 +1,47 @@
+
+.app-container {
+    .theme-switcher {
+        transform: rotate(90deg);
+        padding: 9px;
+    }
+}
+
+.theme--classic {
+    .theme-switcher {
+        .MuiSwitch-switchBase {
+            color: #91C499;
+        }
+        .Mui-checked+.MuiSwitch-track{
+            background-color: #EBD1C8;
+        }
+    }
+    .theme-icon-dark {
+        width: 25px;
+    }
+    .theme-icon-light {
+        display: none;
+    }
+}
+
+.theme--dark {
+    .theme-switcher {
+        .MuiSwitch-switchBase {
+            color: #D64933;
+        }
+        .MuiSwitch-track {
+            background-color: #19141F;
+        }
+    }
+    .theme-icon-dark {
+        display: none;
+    }
+    .theme-icon-light {
+        width: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .theme-switcher {
+        margin-left: -15px;
+    }
+}

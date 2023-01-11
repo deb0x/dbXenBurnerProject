@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <g id="trophy" transform="translate(-1.125 -2.25)">
+    <path id="Path_30" data-name="Path 30" d="M6.75,2.25h20c-.99,6.934-1,20-10,20S7.74,9.184,6.75,2.25Zm0,30a2,2,0,0,1,2-2h16a2,2,0,0,1,2,2Zm4-2a2,2,0,0,1,2-2h8a2,2,0,0,1,2,2Z" transform="translate(-0.625)" fill="#d64933"/>
+    <path id="Path_31" data-name="Path 31" d="M25.125,6.5a4,4,0,1,0,4,4A4,4,0,0,0,25.125,6.5Zm-6,4a6,6,0,1,1,6,6,6,6,0,0,1-6-6Zm-12-4a4,4,0,1,0,4,4A4,4,0,0,0,7.125,6.5Zm-6,4a6,6,0,1,1,6,6,6,6,0,0,1-6-6Z" transform="translate(0 -0.25)" fill="#d64933" fill-rule="evenodd"/>
+    <path id="Path_32" data-name="Path 32" d="M15.75,22.5h4v8h-4Z" transform="translate(-1.625 -2.25)" fill="#d64933"/>
+    <path id="Path_33" data-name="Path 33" d="M21.5,24.5c0,1.1-1.79,2-4,2s-4-.9-4-2,1.79-2,4-2S21.5,23.4,21.5,24.5Z" transform="translate(-1.375 -2.25)" fill="#d64933"/>
+  </g>
+</svg>

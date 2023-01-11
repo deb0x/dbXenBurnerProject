@@ -1,0 +1,66 @@
+@import './theme.scss';
+
+.content-box.home {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    h4 {
+        font-size: 3vh;
+    }
+    p {
+        font-size: 2vh;
+    }
+    .tiles-container {
+        @include themed() {
+            .tile {
+                .tile-content {
+                    background-color: t('card-color');
+                    border-radius: 25px;
+                    min-height: 22vh;
+                    font-size: 2vh;
+                    padding: 2vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+                    .MuiButtonBase-root {
+                        text-transform: none;
+                        color: t('text');
+                        font-size: 2vh;
+                        justify-content: flex-start;
+                        white-space: nowrap;
+                        .MuiButton-startIcon {
+                            margin-bottom: 5px;
+                            margin-right: 15px;
+                            span.MuiIcon-root {
+                                height: auto;
+                                width: auto;
+                            }
+                        }
+                    }
+                    a {
+                        text-decoration: none;
+                        button {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .home-bottom {
+        a {
+            color: #3a5b9a;
+            margin-left: 5px;
+        }
+    }
+}
+
+.app-container {
+    .main-container {
+        .content-box.full-height.home {
+            align-items: flex-start;
+            overflow-y: auto;
+        }
+    }
+}

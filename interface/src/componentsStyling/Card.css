@@ -1,0 +1,170 @@
+@-webkit-keyframes rotate {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+  
+@keyframes rotate {
+    100% {
+        transform: rotate(1turn);
+    }
+}
+.card-container {
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 2rem;
+    box-shadow: 0 0 10px #f0f;
+    border: none;
+    min-height: 445px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: transparent;
+    color: #fff;
+}
+.card-container::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    background-color: #f0f;
+    background-repeat: no-repeat;
+    background-size: 50% 50%, 50% 50%;
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    background-image: linear-gradient(#26121e, #26121e), 
+        linear-gradient(#26121e, #6145b3), 
+        linear-gradient(#6145b3, rgba(255, 0, 255, 0.7)), 
+        linear-gradient(rgba(255, 0, 255, 0.7), rgba(255, 0, 255, 0.7));
+    -webkit-animation: rotate 8s linear infinite;
+            animation: rotate 8s linear infinite;
+}
+.card-container::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 3px;
+    top: 3px;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    background: #26121e;
+    border-radius: 5px;
+}
+
+div.heading-card {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: unset;
+    text-align: center;
+}
+
+div.heading-card h5 {
+    color: #fff;
+    text-shadow:
+        0 0 7px #000,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #6145b3,
+        0 0 82px #6145b3,
+        0 0 92px #6145b3,
+        0 0 102px #6145b3,
+        0 0 151px #6145b3;
+}
+
+.cards-grid {
+    justify-content: center;
+}
+
+.card-container .tab-container {
+    width: 100%;
+}
+
+.card-container .tab-container button {
+    width: 100%;
+}
+.card-container .tab-container button.Mui-selected {
+    border-color:#f0f;
+    box-shadow:0 0 10px #f0f;
+    color: inherit;
+    background-color: rgba(255, 0, 255, 0.1);
+}
+
+.card-container .tab-container button.tab-btn {
+    border-color: #f0f;
+    color: #fff;
+}
+
+button.submit-btn,
+button.submit-btn:hover {
+    width: 100%;
+    box-shadow:
+        inset 0 0 12px #fff,      
+        inset 10px 0 40px #f0f,   
+        inset -10px 0 40px #0ff,  
+        inset 10px 0 150px #f0f, 
+        inset -10px 0 150px #0ff,
+        0 0 12px #fff,
+        -10px 0 40px #f0f,
+        10px 0 40px #0ff;
+}
+
+button.submit-btn.Mui-disabled {
+    color: #fff;
+    box-shadow: none;
+    background-color: rgba(255, 0, 255, 0.12);
+}
+
+.max-btn-container {
+    display: flex;
+    align-items: center;
+}
+
+.max-btn-container .max-btn,
+.max-btn-container .max-btn:hover,
+button.approve-btn,
+button.approve-btn:hover {
+    background-color: rgba(97, 69, 179, 0.9);
+    border-color:#6145b3;
+    box-shadow:0 0 10px #6145b3;
+}
+
+button.decline-btn,
+button.decline-btn:hover {
+    background-color: rgba(211, 47, 47, 0.9);
+    border-color:#d32f2f;
+    box-shadow:0 0 10px #d32f2f;
+}
+
+button.submit-vote {
+    width: 100%;
+}
+
+.card-container input:focus,
+.card-container input {
+    border: 1px solid #fff;
+    box-shadow:0 0 10px #fff;
+}
+
+.card-container .css-9ddj71-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #fff;
+}
+
+.card-container label.Mui-focused {
+    color: #fff;
+}
+
+hr.divider-pink {
+    box-shadow: 1px 0 5px 1px rgba(255, 0, 255, 0.5);
+    border-color: rgba(255, 0, 255, 0.5)
+}
+
+.card-container input,
+.card-container label,
+.card-container div {
+    color: #fff;
+}

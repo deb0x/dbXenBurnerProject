@@ -1,0 +1,58 @@
+html {
+    /* background: linear-gradient( to bottom right, hsla(324, 36%, 11%, 1), hsla(324, 36%, 11%, 0.9), hsla(351, 75%, 45%, 0.9), hsla(255, 44%, 49%, 0.8), hsla(183, 91%, 49%, 1) ); */
+    /* background: linear-gradient( to bottom right,rgba(63,81,181,1) 0%, rgba(171,71,188 ,1) 70%); */
+}
+/* body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7)!important;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.home-page-box h1 {
+    color: #fff;
+    text-shadow:
+        0 0 7px #000,
+        0 0 10px #fff,
+        0 0 21px #fff,
+        0 0 42px #6145b3,
+        0 0 82px #6145b3,
+        0 0 92px #6145b3,
+        0 0 102px #6145b3,
+        0 0 151px #6145b3;
+}
+
+.home-page-box h3 {
+    color: #fff;
+    font-size: 35px;
+    animation: flicker 1.5s infinite alternate;
+}
+
+@keyframes flicker {
+    
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+        0 0 7px #000,
+        0 0 10px #000,
+        0 0 21px #fff,
+        0 0 42px #6145b3
+    
+    }
+    
+    20%, 24%, 55% {        
+        text-shadow: none;
+    }    
+}
+
+.css-1feh015 {
+    margin-left: 240px!important;
+} */

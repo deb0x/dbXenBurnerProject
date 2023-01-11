@@ -1,0 +1,34 @@
+@import './theme.scss';
+
+.main-container {
+    @include themed() {
+        .addresses-heading {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            p {
+                margin: 0;
+            }
+        }
+        .address-container {
+            background-color: t('bg');
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            justify-content: space-between;
+            border-radius: 25px;
+            .address {
+                padding-left: 10px;
+                color: t('text');
+            }
+            .copy-icon {
+                color: #78C3FB
+            }
+            .send-icon {
+                color: #809BCE;
+                transform: rotate(-35deg);
+            }
+        }
+    }
+}

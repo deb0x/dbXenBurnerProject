@@ -1,0 +1,81 @@
+@import './theme.scss';
+
+.stepper-box {
+    @include themed() {
+        .stepper {
+            padding-top: 25px;
+            .MuiStepLabel-label {
+                font-size: 18px;
+                color: t('text');
+                font-weight: 800;
+            }
+            svg {
+                width: 47px;
+                height: 47px;
+                color: transparent;
+                border: 1px solid #F5B700;
+                border-radius: 50%;
+                text {
+                    fill: #F5B700;
+                }
+            }
+            svg.Mui-active {
+                color: #F5B700;
+                border: none;
+                text {
+                    fill: #fff;
+                }
+            }
+            svg.Mui-completed {
+                color: #F5B700;
+                text {
+                    color: t('text');
+                }
+            }
+            .MuiStepConnector-root {
+                top: 24px;
+                left: calc(-50% + 30px);
+                right: calc(50% + 30px);
+                .MuiStepConnector-line {
+                    border-color: #F5B700;
+                }
+            }
+        }
+        .button-box {
+            display: block;
+            padding: 30px;
+            background-color: t('stake-bg');
+            border-radius: 25px;
+            margin-top: 25px;
+            &.left {
+                float: left;
+            }
+            &.right {
+                float: right;
+            }
+            .init-btn {
+                font-size: 16px;
+                color: t('text');
+                background-color: t('bg');
+                border: 2px solid #F5B700;
+                border-radius: 33px;
+                box-shadow: none;
+                padding: 10px 40px;
+                .MuiLoadingButton-loadingIndicator {
+                    color: #F5B700;
+                    margin: 0 5px 2px 0;
+                    .MuiCircularProgress-root {
+                        width: 20px !important;
+                        height: 20px !important;
+                    }
+                }
+            }
+            .MuiLoadingButton-loadingIndicator {
+                color: t('text');
+                position: relative;
+                left: 0;
+                transform: none;
+            }
+        }
+    }
+}

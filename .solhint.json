@@ -1,0 +1,6 @@
+{
+  "extends": "solhint:recommended",
+  "plugins": [],
+  "rules": {
+  }
+}
