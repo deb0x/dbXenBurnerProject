@@ -3,8 +3,8 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Deb0xERC20.sol";
-import "./XENCrypto.sol";
 
 /**
  * Main deb0x protocol contract used to send messages,
@@ -19,7 +19,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      */
     Deb0xERC20 public dbx;
 
-    XENCrypto public xen;
+    /**
+     * XEN Token contract.
+     * Initialized in constructor.
+     */
+    ERC20 public xen;
 
     /**
      * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
@@ -289,32 +293,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     );
 
     /**
-     * @dev Emitted when calling {send} in the current `cycle`,
-     * containing the message details such as which `sentId` it has,
-     * who the `feeReceiver` is and what `msgFee` it set, respectively
-     * any additional `nativeTokenFee` that was paid.
+     * @dev Emitted when calling {burn} function for
+     * `userAddress`  which burns `batchNumber` * 1000 tokens
      */
-    event SendEntryCreated(
-        uint256 indexed cycle,
-        uint256 indexed sentId,
-        address indexed feeReceiver,
-        uint256 msgFee,
-        uint256 nativeTokenFee
-    );
-
-    /**
-     * @dev Emitted when calling {send} containing the message 
-     * details such as `to` destination address, `from` sender
-     * address, `hash` of the content reference, `sentId`,
-     * `timestamp` and `content`.
-     */
-    event Sent(
-        address indexed to,
-        address indexed from,
-        bytes32 indexed hash,
-        uint256 sentId,
-        uint256 timestamp,
-        bytes32[] content
+    event Burn(
+        address indexed userAddress,
+        uint256 batchNumber
     );
     
     /**
@@ -375,15 +359,16 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
 
     /**
      * @param forwarder forwarder contract address.
+     * @param xenAddress XEN contract address.
      */
-    constructor(address forwarder, address tokenToBurn) ERC2771Context(forwarder) {
+    constructor(address forwarder, address xenAddress) ERC2771Context(forwarder) {
         dbx = new Deb0xERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
         currentCycleReward = 10000 * 1e18;
         summedCycleStakes[0] = 10000 * 1e18;
         rewardPerCycle[0] = 10000 * 1e18;
-        xen = XENCrypto(tokenToBurn);
+        xen = ERC20(xenAddress);
     }
 
     /**
@@ -397,20 +382,15 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
     }
 
     /**
-     * @dev Sends messages to multiple accounts. Triggers helper functions 
-     * used to update cycle, rewards and fees related state.
-     * Optionally may include extra reward token fee and native coin fees on-top of the default protocol fee. 
-     * These fees are set in the client user intarface the transaction sender interacts with.
+     * @dev Burn batchNumber * 1000 tokens 
      * 
-     * @param to account addresses to send messages to.
-     * @param crefs content references to the messages.
+     * @param batchNumber number of batches
      * @param feeReceiver client address.
      * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
      * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no native token fee applies.
      */
-    function send(
-        address[] memory to,
-        bytes32[][] memory crefs,
+    function burn(
+        uint256 batchNumber,
         address feeReceiver,
         uint256 msgFee,
         uint256 nativeTokenFee
@@ -420,25 +400,21 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         nonReentrant()
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
-
     {
         require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
-
-        uint256 _sentId = _send(to, crefs);
+        require(xen.balanceOf(msg.sender) >= batchNumber* 1000* (10**18), "Deb0x: You have insufficient funds to burn");
+        
+        for(uint256 i=0; i<batchNumber; i++) {
+             xen.transferFrom(msg.sender,0x000000000000000000000000000000000000dEaD, 1000* (10**18));
+        }
+      
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         setUpNewCycle();
         updateStats(_msgSender());
         updateClientStats(feeReceiver);
 
-        lastActiveCycle[_msgSender()] = currentCycle;
-        emit SendEntryCreated(
-            currentCycle,
-            _sentId,
-            feeReceiver,
-            msgFee,
-            nativeTokenFee
-        );
+        emit Burn(msg.sender, batchNumber);
     }
 
     /**
@@ -808,60 +784,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
                 }
             }
         }
-    }
-
-    /**
-     * @dev For each recipient emits events with correspondig cref.
-     * Lengths of recipients and crefs arrays must match.
-     * All crefs (content references) must be less than 8 bytes32 long and 
-     * are purposed to store pointers (e.g. HTTP urls, IPFS CIDs) to messages content.
-     * 
-     * @param recipients recipient addresses that messages are stored for.
-     * @param crefs content references to the messages.
-     */
-    function _send(address[] memory recipients, bytes32[][] memory crefs)
-        internal
-        returns (uint256)
-    {
-        require(recipients.length == crefs.length, "Deb0x: crefs and recipients lengths not equal");
-        require(recipients.length > 0, "Deb0x: recipients array empty");
-        for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
-            require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
-        }
-
-        for (uint256 idx = 0; idx < recipients.length - 1; idx++) {
-            bytes32 bodyHash = keccak256(abi.encode(crefs[idx]));
-     
-            emit Sent(
-                recipients[idx],
-                _msgSender(),
-                bodyHash,
-                sentId,
-                block.timestamp,
-                crefs[idx]
-            );
-        }
-
-        bytes32 selfBodyHash = keccak256(
-            abi.encode(crefs[recipients.length - 1])
-        );
-        require(crefs[recipients.length - 1].length > 0 , "Deb0x: empty cref");
-        require(crefs[recipients.length - 1].length <= 8 , "Deb0x: cref too long");
-
-        uint256 oldSentId = sentId;
-        sentId++;
-
-        emit Sent(
-            _msgSender(),
-            _msgSender(),
-            selfBodyHash,
-            oldSentId,
-            block.timestamp,
-            crefs[recipients.length - 1]
-        );
-
-        return oldSentId;
     }
 
     /**
