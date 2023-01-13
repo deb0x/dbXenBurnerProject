@@ -32,11 +32,6 @@ export default function ThemeSetter() {
         />
         <img className="theme-icon-dark" src={require('../photos/icons/theme-switch-dark.svg').default}/>
         <img className="theme-icon-light" src={require('../photos/icons/theme-switch-light.svg').default}/>
-    </>
-
-
-    
+    </> 
   );
 }
-
-const themeOptions = [{ value: "classic" }, { value: "dark" }];

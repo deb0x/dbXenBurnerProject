@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { injected } from '../../connectors';
@@ -7,16 +7,12 @@ import ThemeSetter from '../ThemeSetter';
 import { Spinner } from './Spinner';
 import { ethers } from 'ethers';
 import { useEagerConnect } from '../../hooks';
-import { id } from 'ethers/lib/utils';
 import formatAccountName from '../Common/AccountName';
 import Deb0x from "../../ethereum/deb0x"
 import Deb0xViews from "../../ethereum/deb0xViews";
 import Deb0xERC20 from "../../ethereum/deb0xerc20";
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import SnackbarNotification from './Snackbar';
 import '../../componentsStyling/appBar.scss';
 import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
@@ -260,8 +256,6 @@ export function AppBarComponent(props: any): any {
                                 </Button>
                         )
                     }) ()}
-                            
-                        <ThemeSetter />
                     </Box>
                 </div>
                 <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
