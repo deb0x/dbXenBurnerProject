@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 export const initialThemeState = {
-  theme: "classic",
+  theme: "dark",
   setTheme: (_value: string) => {}
 };
 

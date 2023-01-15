@@ -7,25 +7,18 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     font-family: 'Karla';
     src: url('../../src/fonts/Karla/Karla-Regular.ttf');
 }
-
-.theme--classic {
-    .img {
-        background-image: url('../photos/logo-dark.svg');
-    }
-}
 .theme--dark {
     .img {
-        background-image: url('../photos/logo-light.svg');
+        background-image: url('../photos/white_dbxen.svg');
     }
 }
 
 .theme {
     .img {
-        width: 100%;
+        width: 50%;
         height: 100%;
         background-repeat: no-repeat;
         background-position: center;
-        cursor: pointer;
     }
 }
 
@@ -46,6 +39,75 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 width: 100%;
             }
         }
+        .burn-container {
+            margin-bottom: 2vh;
+            margin-left: 0;
+            margin-right: 0;
+            max-width: 45vw;
+            align-self: center;
+            .row {
+                width: 100%;
+                padding-bottom: 10px;
+                p {
+                    color: t('text');
+                }
+            }
+
+            .count-btn {
+                font-size: 1.5vh;
+                color: t('approve-stake-text');
+                background-color: t('bg');
+                border: 2px solid #F5B700;
+                border-radius: 33px;
+                box-shadow: none;
+                padding: 7px 40px;
+                white-space: nowrap;
+                align-items: center;
+            }
+
+            .input-col {
+                padding: 0;
+                input {
+                    align-items: center;
+                    margin: auto 0;
+                    border-radius: 33px;
+                    padding: 7px 10px;
+                    background-color: t('bg');
+                    border: 1px solid #F2E9DC;
+                    color: t('text');
+                    text-align: center;
+                    width: 100%;
+                }
+    
+                input::-webkit-outer-spin-button,
+                input::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+    
+                input[type=number] {
+                    -moz-appearance: textfield;
+                }
+            }
+        }
+
+        .burn-btn {
+            font-size: 16px;
+            background-color:  #F5B700;
+            color: #000;
+            font-weight: bold;
+            border-radius: 25px;
+            width: 150px;
+            text-transform: none;
+            z-index: 9;
+            width: 100%;
+            margin-top: 25px;
+            .MuiLoadingButton-loadingIndicator {
+                color: black;
+                margin: 0 0 0 5px;
+            }
+            
+        }
     }
 }
 
@@ -55,16 +117,6 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             header {
                 padding: 5px;
                 justify-content: flex-end;
-                form {
-                    position: fixed;
-                    top: 55px;
-                    left: 0;
-                    width: 100%;
-                    display: flex;
-                    div {
-                        width: 100%;
-                    }
-                }
             }
             .image-container {
                 width: 50px;
@@ -168,184 +220,17 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                         .MuiTypography-root {
                             font-size: 18px;
                             font-family: 'Karla';    
-                        }
-                        .list-item.Mui-selected {
-                            background-color: #cccccc40;
-                            position: relative;
-                            &::before {
-                                content: '';
-                                width: 10px;
-                                height: 10px;
-                                border-radius: 50%;
-                                position: absolute;
-                                left: 15px;
-                            }
-                            &:first-child::before {
-                                background-color: #F5B700;
-                            }
-                            &:nth-child(2)::before {
-                                background-color: #91C499;
-                            }
-                            &:nth-child(3)::before {
-                                background-color: #D64933;
-                            }
-                            &:nth-child(4)::before {
-                                background-color: #809BCE;
-                            }
-                            .MuiTypography-root {
-                                font-weight: 800;
-                            }
-                        }
-                        .sent-icon-color {
-                            color: #809BCE;
-                        }
-                        .icon {
-                            img {
-                                max-width: 25px;
-                                width: 100%;
-                            }
-                        }
-                        .send-item {
-                            color: #F5B700;
-                            .icon {
-                                color: #F5B700;
-                            }
-                        }
-                        ul.menu-list {
-                            height: 50%;
-                            box-shadow: 4px 0px 11px #1A152036;
-                            padding-top: 0;
-                            overflow-y: auto;
-                            margin-bottom: 5px;
-                            .list-item {
-                                padding:  15px 10px 15px 35px;
-                                &:nth-child(2) {
-                                    color: #91C499;
-                                    .icon {
-                                        color: #91C499;
-                                    }
-                                }
-                                &:nth-child(3) {
-                                    color: #D64933;
-                                    .icon {
-                                        color: #D64933;
-                                    }
-                                }
-                                &:nth-child(4) {
-                                    color: #809BCE;
-                                    .icon {
-                                        color: #809BCE;
-                                    }
-                                }
-                                &:nth-child(5) {
-                                    color: #78C3FB;
-                                    .icon {
-                                        color: #78C3FB;
-                                    }
-                                }
-                                &:nth-child(6) {
-                                    color: #F5B700;
-                                }
-                            }
-                        }
-                        
+                        }                        
                     }
                 }
                 .side-menu--bottom {
                     display: flex;
-                    height: 35%;
+                    height: 100%;
+                    width: 100%;
                     align-items: center;
-                    justify-content: space-between;
                     flex-direction: column;
-                    .contacts {
-                        width: 100%;
-                        display: flex;
-                        justify-content: center;
-                        max-height: 75%;
-                        position: relative;
-                        flex-direction: column;
-                        ul {
-                            overflow-y: auto;
-                            padding-bottom: 0;
-                            padding-top: 0;
-                            width: 100%;
-                            text-align: center;
-                            .MuiTypography-root {
-                                font-size: 16px;
-                                color: t('text');
-                            }
-                        }
-                        .row.contact-item {
-                            width: 100%;
-                            margin-left: 0;
-                            padding: 0;
-                            .text {
-                                span {
-                                    overflow: hidden;
-                                    text-overflow: ellipsis;
-                                    font-size: 14px;
-                                }
-                            }
-                        }
-                        .buttons {
-                            display: flex;
-                            justify-content: flex-end;
-                            .send-icon {
-                                color: #809BCE;
-                                transform: rotate(-35deg);
-                            }
-                            .copy-icon {
-                                color: #78C3FB;
-                            }
-                            .delete-icon {
-                                color: #D64933;
-                            }
-                            svg {
-                                font-size: 14px;
-                            }
-                        }
-                        .add-new-all {
-                            display: flex;
-                            padding-left: 16px;
-                            justify-content: flex-start;
-                            border-radius: 0;
-                            font-family: 'Karla';
-                            svg {
-                                width: 16px;
-                                height: 16px;
-                            }
-                            .add-new {
-                                display: inline;
-                                color: #809BCE;
-                                padding-left: 10px;
-                                font-size: 16px;
-                                font-weight: 100;
-                            }
-                            .add-button {
-                                border-color: #809BCE;
-                                border-radius: 50%;
-                                background-color: #809BCE;
-                                display: flex;
-                                justify-content: flex-end;
-                            }
-                        }
-                    }
-                    .content {
-                        margin-top: 15px;
-                        display: flex;
-                        padding-bottom: 10px;
-                        align-items: center;
-                        flex-direction: column;
-                        .logo-text-color {
-                            color: t(git-hub-logo);
-                        }
-                        .social-media {
-                            flex-direction: row;
-                            a {
-                                margin-right: 10px;
-                            }
-                        }
-                    }
+                    justify-content: center;
+                    padding: 0 10px;
                 }
             }
         }
