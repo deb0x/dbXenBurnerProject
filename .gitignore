@@ -107,7 +107,7 @@ dist
 .tern-port
 
 # hardhat
-#artifacts/
+artifacts/
 cache/
 build/
 !interface/build/

@@ -4,14 +4,16 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./interfaces/IBurnRedeemable.sol";
 import "./Deb0xERC20.sol";
+import "./XENCrypto.sol";
 
 /**
  * Main deb0x protocol contract used to send messages,
  * store public keys, allocate token rewards,
  * distribute native token fees, stake and unstake.
  */
-contract Deb0x is ERC2771Context, ReentrancyGuard {
+contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
     /**
      * Deb0x Reward Token contract.
@@ -23,7 +25,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * XEN Token contract.
      * Initialized in constructor.
      */
-    ERC20 public xen;
+    XENCrypto public xen;
 
     /**
      * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
@@ -368,7 +370,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         currentCycleReward = 10000 * 1e18;
         summedCycleStakes[0] = 10000 * 1e18;
         rewardPerCycle[0] = 10000 * 1e18;
-        xen = ERC20(xenAddress);
+        xen = XENCrypto(xenAddress);
     }
 
     /**
@@ -381,6 +383,17 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         emit KeySet(_msgSender(), publicKey);
     }
 
+    function supportsInterface(bytes4 interfaceId) public view returns (bool) {
+        return
+            interfaceId == type(IBurnRedeemable).interfaceId;
+            // super.supportsInterface(interfaceId);
+
+    }
+
+    function onTokenBurned(address user, uint256 amount) external{
+        uint256 s;
+    }
+
     /**
      * @dev Burn batchNumber * 1000 tokens 
      * 
@@ -389,7 +402,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
      * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
      * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no native token fee applies.
      */
-    function burn(
+    function burnBatch(
         uint256 batchNumber,
         address feeReceiver,
         uint256 msgFee,
@@ -402,10 +415,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         gasUsed(feeReceiver, msgFee)
     {
         require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
-        require(xen.balanceOf(msg.sender) >= batchNumber* 1000* (10**18), "Deb0x: You have insufficient funds to burn");
+        require(xen.balanceOf(msg.sender) >= batchNumber* 1* (10**18), "Deb0x: You have insufficient funds to burn");
         
         for(uint256 i=0; i<batchNumber; i++) {
-             xen.transferFrom(msg.sender,0x000000000000000000000000000000000000dEaD, 1000* (10**18));
+                burn(msg.sender, 1* (10**18));
         }
       
         calculateCycle();
@@ -415,6 +428,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard {
         updateClientStats(feeReceiver);
 
         emit Burn(msg.sender, batchNumber);
+    }
+
+    function burn(address user, uint256 amount) public {
+        xen.burn(user,amount);
     }
 
     /**
