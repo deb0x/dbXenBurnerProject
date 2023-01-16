@@ -15,8 +15,8 @@ import { Spinner } from './Spinner';
 const { BigNumber } = require("ethers");
 
 
-const deb0xAddress = "0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42";
-const deb0xERC20Address = " 0x0A96bedb1d921DD7801e003E3a76be7e10D47d15";
+const deb0xAddress = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
+const deb0xERC20Address = " 0x62E6B821353eAe41859B52bDc885f9cfA70B2c80";
 const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 declare global {
@@ -82,7 +82,6 @@ export function PermanentDrawer(props: any): any {
                         severity: "success"
                     })
                     setLoading(false)
-
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -104,7 +103,7 @@ export function PermanentDrawer(props: any): any {
         setLoading(true)
         const signer = await library.getSigner(0)
         const deb0xContract = Deb0x(signer, deb0xAddress)
-
+        console.log(deb0xContract)
         let gasLimitIntervalValue = BigNumber.from("7000000");
         let firstValue =  "0.1";
 

@@ -50,6 +50,6 @@ npx hardhat run --network goerli scritps/deploy.js
 | Contract name    | Commit hash | Polygon Mainnet                            |
 | ---------------- | ----------- | ------------------------------------------ |
 | Forwarder        |  5f5f465    | 0x8F94c0193C3c63EFF990Ac386B855A396750032F |
-| Deb0x            |  4693a33    | 0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42 |
-| Deb0xERC20       |  158f325    | 0x0A96bedb1d921DD7801e003E3a76be7e10D47d15 |
+| Deb0x            |  4693a33    | 0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4 |
+| Deb0xERC20       |  158f325    | 0x62E6B821353eAe41859B52bDc885f9cfA70B2c80 |
 | Deb0xView        |  b80e9e8    | 0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6 | 

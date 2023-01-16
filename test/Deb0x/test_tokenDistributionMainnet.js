@@ -5,9 +5,9 @@ const { ContractFunctionVisibility } = require("hardhat/internal/hardhat-network
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-let DEBOX_ADDRESS = "0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42";
+let DEBOX_ADDRESS = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
 let DEBOXVIEW_ADDRESS = "0x65DC3F867535fc92669922Ea49aa9420A332e93f";
-let DBX_ADDRESS = "0x0A96bedb1d921DD7801e003E3a76be7e10D47d15"
+let DBX_ADDRESS = "0x62E6B821353eAe41859B52bDc885f9cfA70B2c80"
 let addresses = [
     "0x00611057ee8eff397c5007370cff5537ebf36eb3",
     "0x01eb619fde01ed6ef5c75b6111a9f019bf15c26a",
