@@ -352,7 +352,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 fee = ((startGas - gasleft() + 39700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
         require(
             msg.value - nativeTokenFee >= fee,
-            "Deb0x: value less than required protocol fee"
+            "DBXen: value less than required protocol fee"
         );
         
         cycleAccruedFees[currentCycle] += fee;
@@ -390,9 +390,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
     }
 
-    function onTokenBurned(address user, uint256 amount) external{
-        uint256 s;
-    }
+    function onTokenBurned(address user, uint256 amount) external{}
 
     /**
      * @dev Burn batchNumber * 1000 tokens 
@@ -414,11 +412,12 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
     {
-        require(msgFee <= MAX_BPS, "Deb0x: reward fees exceed 10000 bps");
-        require(xen.balanceOf(msg.sender) >= batchNumber* 1* (10**18), "Deb0x: You have insufficient funds to burn");
-        
+        require(msgFee <= MAX_BPS, "DBXen: reward fees exceed 10000 bps");
+        require(xen.balanceOf(msg.sender) >= batchNumber* 250000* (10**18), "DBXen: You have insufficient funds to burn");
+        require(batchNumber <= 2000, "DBXen: maxim batch number is 2000");
+       
         for(uint256 i=0; i<batchNumber; i++) {
-                burn(msg.sender, 1* (10**18));
+                burn(msg.sender, 250000* (10**18));
         }
       
         calculateCycle();
@@ -447,7 +446,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         updateStats(_msgSender());
         uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
 
-        require(reward > 0, "Deb0x: account has no rewards");
+        require(reward > 0, "DBXen: account has no rewards");
 
         accRewards[_msgSender()] -= reward;
         if (lastStartedCycle == currentStartedCycle) {
@@ -474,7 +473,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         updateClientStats(_msgSender());
 
         uint256 reward = clientRewards[_msgSender()];
-        require(reward > 0, "Deb0x: client has no rewards");
+        require(reward > 0, "DBXen: client has no rewards");
         clientRewards[_msgSender()] = 0;
 
         if (lastStartedCycle == currentStartedCycle) {
@@ -499,7 +498,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         updateStats(_msgSender());
 
         uint256 fees = accAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: amount is zero");
+        require(fees > 0, "DBXen: amount is zero");
 
         accAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -519,7 +518,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
         updateClientStats(_msgSender());
         uint256 fees = clientAccruedFees[_msgSender()];
-        require(fees > 0, "Deb0x: client has no accrued fees");
+        require(fees > 0, "DBXen: client has no accrued fees");
 
         clientAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
@@ -540,7 +539,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount > 0, "Deb0x: amount is zero");
+        require(amount > 0, "DBXen: amount is zero");
         pendingStake += amount;
         uint256 cycleToSet = currentCycle + 1;
 
@@ -578,11 +577,11 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         calculateCycle();
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
-        require(amount > 0, "Deb0x: amount is zero");
+        require(amount > 0, "DBXen: amount is zero");
 
         require(
             amount <= accWithdrawableStake[_msgSender()],
-            "Deb0x: amount greater than withdrawable stake"
+            "DBXen: amount greater than withdrawable stake"
         );
 
         if (lastStartedCycle == currentStartedCycle) {
@@ -811,6 +810,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      */
     function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
-        require(sent, "Deb0x: failed to send amount");
+        require(sent, "DBXen: failed to send amount");
     }
 }

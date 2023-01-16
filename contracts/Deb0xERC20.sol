@@ -20,8 +20,8 @@ contract Deb0xERC20 is ERC20Permit {
      * Sets the owner address. 
      * Called from within the Deb0x.sol constructor.
      */
-    constructor() ERC20("Deb0x Reward Token on Polygon", "pDBX")
-    ERC20Permit("Deb0x Reward Token on Polygon") {
+    constructor() ERC20("DBXen Reward Token on Polygon", "DBXen")
+    ERC20Permit("DBXen Reward Token on Polygon") {
         owner = msg.sender;
     }
 
@@ -34,8 +34,8 @@ contract Deb0xERC20 is ERC20Permit {
      * @param amount wei to be minted
      */
     function mintReward(address account, uint256 amount) external {
-        require(msg.sender == owner, "DBX: caller is not Deb0x contract.");
-        require(super.totalSupply() < 5010000000000000000000000, "DBX: max supply already minted");
+        require(msg.sender == owner, "DBXen: caller is not Deb0x contract.");
+        require(super.totalSupply() < 5010000000000000000000000, "DBXen: max supply already minted");
         _mint(account, amount);
     }
 }

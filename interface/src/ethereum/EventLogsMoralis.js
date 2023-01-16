@@ -3,7 +3,7 @@ import axios from 'axios';
 let { ethers } = require("ethers");
 const Web3 = require('web3');
 const web3 = new Web3();
-const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
+const deb0xAddress = "0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42";
 let { convertBytes32ToString } = require('./Converter.js')
 let moralisKey = process.env.REACT_APP_MORALIS_KEY;
 
@@ -353,7 +353,7 @@ export async function getInitializedAddresses() {
     events.result.forEach(element => {
         let data = element.topic1;
         let address = '0x' + data.slice(26);
-        if(!newEvents.includes(address))
+        if (!newEvents.includes(address))
             newEvents.push(address)
     })
     cursor = events.cursor;
@@ -363,7 +363,7 @@ export async function getInitializedAddresses() {
         events.result.forEach(element => {
             let data = element.topic1;
             let address = '0x' + data.slice(26);
-            if(!newEvents.includes(address))
+            if (!newEvents.includes(address))
                 newEvents.push(address)
         })
     }

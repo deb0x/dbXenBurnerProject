@@ -20,10 +20,10 @@ import disconnectIcon from '../../photos/icons/diconnect.svg';
 import { disconnect } from 'process';
 
 
-const deb0xAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
-const deb0xViewsAddress = "0x51CcBf6DA6c14b6A31Bc0FcA07056151fA003aBC";
-const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a"
-const tokenSymbol = 'DBX';
+const deb0xAddress = "0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42";
+const deb0xViewsAddress = "0x65DC3F867535fc92669922Ea49aa9420A332e93f";
+const deb0xERC20Address = "0x0A96bedb1d921DD7801e003E3a76be7e10D47d15"
+const tokenSymbol = 'DBXen';
 
 const tokenDecimals = 18;
 enum ConnectorNames { Injected = 'Injected' };

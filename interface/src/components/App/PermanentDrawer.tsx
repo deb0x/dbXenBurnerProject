@@ -15,8 +15,8 @@ import { Spinner } from './Spinner';
 const { BigNumber } = require("ethers");
 
 
-const deb0xAddress = "0xfDd1715C5ee0d16e8C1667CF56E8D37a77E8220F";
-const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a";
+const deb0xAddress = "0x0Fe0Dd6B2507fF5BD00915c1714bbd8A80C9fe42";
+const deb0xERC20Address = " 0x0A96bedb1d921DD7801e003E3a76be7e10D47d15";
 const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 declare global {
@@ -71,7 +71,7 @@ export function PermanentDrawer(props: any): any {
         setLoading(true);
         const signer = await library.getSigner(0)
         const xenContract = await XENCrypto(signer, xenCryptoAddress)
-        let totalAmountToBurn = value * 1;
+        let totalAmountToBurn = value * 250000;
         try {
             const tx = await xenContract.approve(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))
             tx.wait()
@@ -103,7 +103,6 @@ export function PermanentDrawer(props: any): any {
     async function burnXEN(){
         setLoading(true)
         const signer = await library.getSigner(0)
-        //250.000 per batch
         const deb0xContract = Deb0x(signer, deb0xAddress)
 
         let gasLimitIntervalValue = BigNumber.from("7000000");
@@ -153,6 +152,7 @@ export function PermanentDrawer(props: any): any {
                     setLoading(false)
                 })
             } catch (error: any) {
+                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Message was not sent.",
                     open: true,
