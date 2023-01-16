@@ -11,12 +11,13 @@ import "../../componentsStyling/permanentDrawer.scss";
 import ScreenSize from '../Common/ScreenSize';
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { Spinner } from './Spinner';
 const { BigNumber } = require("ethers");
 
 
 const deb0xAddress = "0xfDd1715C5ee0d16e8C1667CF56E8D37a77E8220F";
-const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 const deb0xERC20Address = "0x22c3f74d4AA7c7e11A7637d589026aa85c7AF88a";
+const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 declare global {
     interface Window {
@@ -28,19 +29,22 @@ export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
     const { connector, library, chainId, account } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
-    const [ensName, setEnsName] = useState<any>("");
-    const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
     const dimensions = ScreenSize();
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
     const [value, setValue] = useState(1);
     const [approveBrun, setApproveBurn] = useState<boolean>();
+    const [balanceGratherThanZero, checkBalance] = useState("");
 
     const [loading, setLoading] = useState(false)
 
-    if(library){
-        setUnstakedAmount();
-    }
+    useEffect(() => {
+        setApproveBurn(false)
+    }, [account]);
+
+    useEffect(() => {
+        setBalance()
+    }, [account,balanceGratherThanZero]);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -50,7 +54,21 @@ export function PermanentDrawer(props: any): any {
         }
     }, [activatingConnector, connector])
 
+    async function setBalance(){
+        setLoading(true);
+        const signer = await library.getSigner(0)
+        const xenContract = await XENCrypto(signer, xenCryptoAddress);
+        let number;
+
+        await xenContract.balanceOf(account).then((balance: any) => {
+            number = ethers.utils.formatEther(balance);
+            checkBalance(number.toString()) 
+            setLoading(false);
+        })
+    }
+
     async function setApproval() {
+        setLoading(true);
         const signer = await library.getSigner(0)
         const xenContract = await XENCrypto(signer, xenCryptoAddress)
         let totalAmountToBurn = value * 1;
@@ -60,25 +78,22 @@ export function PermanentDrawer(props: any): any {
                 .then((result: any) => {
                     setApproveBurn(true);
                     setNotificationState({
-                        message: "Your succesfully approved contract for staking.", open: true,
+                        message: "Your succesfully approved contract for burn.", open: true,
                         severity: "success"
                     })
                     setLoading(false)
 
                 })
                 .catch((error: any) => {
-                    console.log(error)
                     setNotificationState({
-                        message: "Contract couldn't be approved for staking!", open: true,
+                        message: "Contract couldn't be approved for burn!", open: true,
                         severity: "error"
                     })
                     setLoading(false)
                 })
         } catch (error) {
-            console.log(error)
-
             setNotificationState({
-                message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
+                message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
                 severity: "info"
             })
             setLoading(false)
@@ -86,31 +101,27 @@ export function PermanentDrawer(props: any): any {
     }
 
     async function burnXEN(){
+        setLoading(true)
         const signer = await library.getSigner(0)
-
+        //250.000 per batch
         const deb0xContract = Deb0x(signer, deb0xAddress)
 
-        let gasLimitIntervalValue = BigNumber.from("10000000");
+        let gasLimitIntervalValue = BigNumber.from("7000000");
         let firstValue =  "0.1";
 
-        if(value > 99 && value < 200){
-             gasLimitIntervalValue = BigNumber.from("20000000");
+        if(value > 500 && value < 1000){
+             gasLimitIntervalValue = BigNumber.from("1200000");
              firstValue =  "0.2";
         }
 
-        if(value > 199 && value < 300){
-            gasLimitIntervalValue = BigNumber.from("30000000");
+        if(value >= 1000 && value < 1500){
+            gasLimitIntervalValue = BigNumber.from("17000000");
             firstValue =  "0.3";
        }
 
-       if(value > 299 && value < 400){
-        gasLimitIntervalValue = BigNumber.from("40000000");
+       if(value >= 1500 && value <= 2000){
+        gasLimitIntervalValue = BigNumber.from("20000000");
         firstValue =  "0.4";
-        }
-
-        if(value > 399 && value < 513){
-            gasLimitIntervalValue = BigNumber.from("50000000");
-            firstValue =  "0.5";
         }
 
         try {
@@ -130,6 +141,7 @@ export function PermanentDrawer(props: any): any {
                         open: true,
                         severity: "success"
                     })
+                    setLoading(false)
                 })
                 .catch((error: any) => {
                     console.log(error)
@@ -138,29 +150,17 @@ export function PermanentDrawer(props: any): any {
                         open: true,
                         severity: "error"
                     })
+                    setLoading(false)
                 })
             } catch (error: any) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction. Message was not sent.",
                     open: true,
                     severity: "info"
                 })
+                setLoading(false)
             }
     }
-
-    
-    async function setUnstakedAmount() {
-        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
-        if(account){
-            const balance = await deb0xERC20Contract.balanceOf(account)
-            setUserUnstakedAmount(ethers.utils.formatEther(balance))
-        }
-    }
-
-    useEffect(() => {
-        setUnstakedAmount();
-    }, [userUnstakedAmount])
 
     useEffect(() => {
         setTimeout(() => {setNotificationState({})}, 2000)
@@ -223,11 +223,17 @@ export function PermanentDrawer(props: any): any {
                                 onClick={() => burnXEN()} >
                                     Burn XEN
                             </LoadingButton> :
+                           balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0' ? 
                             <LoadingButton className="burn-btn" 
-                                loading={loading} 
+                               loadingPosition="end"
+                               disabled={ balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0'}>
+                                   {loading ? <Spinner color={'black'} /> : "Your balance is 0!" }
+                            </LoadingButton> :
+                            <LoadingButton className="burn-btn" 
                                 loadingPosition="end"
+                                disabled={  balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0'}
                                 onClick={() => setApproval()} >
-                                    Approve Burn XEN
+                                    {loading ? <Spinner color={'black'} /> : "Approve Burn XEN" }
                             </LoadingButton>
                         }
                         

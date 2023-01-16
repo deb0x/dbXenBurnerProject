@@ -1429,11 +1429,11 @@
 			]
 		},
 		"contracts/Deb0x.sol": {
-			"keccak256": "0x58d5a86f450195c753a578c3158561ba91717f23af625c6b160f1b42a5884fff",
+			"keccak256": "0x5e29162dbb0776cbdccf19f7891f1cd0c964ff178b5ccd2dcd709610ca59aef6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a78dbda317921990e5e251a49b2997a872b1c54daf57b07afaa358f792444d7c",
-				"dweb:/ipfs/QmT998dU3coMhLmfPktmC24csMqyKcL1ajJrNJxaCN1gag"
+				"bzz-raw://af1424394e231d46663118c578c2e1b7d7044e9f6ca7c84b6090c26cd7411d4d",
+				"dweb:/ipfs/QmacbP5LncNoRWTo2JW9w9ipTFUpGe4wPEd3VriSPsq74Q"
 			]
 		},
 		"contracts/Deb0xERC20.sol": {
