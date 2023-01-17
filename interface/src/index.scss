@@ -20,10 +20,10 @@ $randomNumber: random(4);
         background-position: center;
     }
     & .theme--dark {
-        background-image: url('./photos/backgrounds/dark-bg-'+$randomNumber+'.png');
+        background-image: url('./photos/backgrounds/Fundal 4 – 1.png');
     }
     & .theme--classic {
-        background-image: url('./photos/backgrounds/light-bg-'+$randomNumber+'.png');
+        background-image: url('./photos/backgrounds/Fundal 4 – 1.png');
     }
 }
 .app-container {
@@ -67,11 +67,11 @@ $randomNumber: random(4);
                 justify-content: space-between;
             }
             .content-box {
-                background-color: t('logo-bg');
+                // background-color: t('logo-bg');
                 margin: 15px 15px 25px 15px;
                 padding: 0 15px;
-                box-shadow: t('box-shadow');
-                border-radius: 25px 10px 85px 25px;
+                // box-shadow: t('box-shadow');
+                // border-radius: 25px 10px 85px 25px;
                 overflow: hidden;
                 width: 100%;
                 &.full-height {
@@ -146,23 +146,16 @@ $randomNumber: random(4);
                 }
                 .img-content {
                     position: absolute;
-                    color: #91C499;
+                    color: #fff;
                     font-size: 2rem;
-                    font-weight: 800;
-                    top: 125px;
+                    font-weight: 400;
+                    top: 155px;
                     left: 28%;
                     width: 550px;
-                    p:first-child {
+                    p {
                         text-align: center;
                         font-size: 27px;
-                        margin-bottom: 5px;
-                    }
-                    p:nth-child(2),
-                    p:nth-child(3) {
-                        display: inline;
                         margin-bottom: 0;
-                        vertical-align: sub;
-                        font-size: 27px;
                     }
                     .content-logo {
                         display: inline;
@@ -170,15 +163,16 @@ $randomNumber: random(4);
                         margin: -15px 0 0 0;
                     }
                     .connect-button {
-                        background-color: #FFEEE8;
-                        color: #000;
-                        border: 1px solid #F5B700;
+                        background-color: #ECFCFC;
+                        color: #2B2235;
+                        border: 1px solid #19D2D2;
                         border-radius: 33px;
                         box-shadow: none;
                         margin-top: 50px;
                         padding: 10px 25px;
                         width: 235px;
                         height: 50px;
+                        font-weight: 800;
                     }
                 }
             }
@@ -186,8 +180,8 @@ $randomNumber: random(4);
                 @include themed() {
                     text-align: center;
                     img {
-                        margin: 200px 0 50px;
-                        width: 50%;
+                        margin: 35vh 0 50px;
+                        width: 55%;
                     }
                     * {
                         color: t('text');

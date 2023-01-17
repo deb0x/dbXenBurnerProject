@@ -176,10 +176,10 @@ function App() {
                         <div className="col-md-7 img-container mr-4">
                             <img className="image--left" src={elephant} />
                             <div className="img-content">
-                                <p>Let's get you started</p>
-                                
-                                <p>Connect your wallet & start using <img className="content-logo" src={deb0xen} /> {'\u00A0'}</p>
-                                
+                                <p>Connect your wallet</p>
+                                <p>Burn $XEN</p>
+                                <p>Earn rewards</p>
+                                  
                                 <div>
                                     { (() =>  {
                                         const currentConnector = connectorsByName[ConnectorNames.Injected]
@@ -202,7 +202,7 @@ function App() {
                                                 { activating ? 
                                                     <Spinner color={'black'} /> :
                                                     !connected ? 
-                                                        "Connect Wallet" :
+                                                        "Connect" :
                                                         <span>
                                                             {typeof window.ethereum === 'undefined' ? 
                                                                 `Check your prerequisites` : 
@@ -219,11 +219,7 @@ function App() {
                             <div className="text-container">
                                 <img className="dark-logo" src={deb0xen} />
                                 <p>
-                                    The End to End Encrypted Decentralized 
-                                    Email Protocol <br />
-                                    <span className="text-green">
-                                        Owned by its Users
-                                    </span>
+                                    New capped supply digital asset<br /> in XEN ecosystem
                                 </p>
                             </div>
                         </div>

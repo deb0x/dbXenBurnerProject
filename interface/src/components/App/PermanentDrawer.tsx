@@ -135,16 +135,17 @@ export function PermanentDrawer(props: any): any {
             await tx.wait()
                 .then((result: any) => {
                     setNotificationState({
-                        message: "Message was succesfully sent.",
+                        message: "Burn completed",
                         open: true,
                         severity: "success"
                     })
                     setLoading(false)
+                    setApproveBurn(false)
                 })
                 .catch((error: any) => {
                     console.log(error)
                     setNotificationState({
-                        message: "Message couldn't be sent!",
+                        message: "Something went wrong!",
                         open: true,
                         severity: "error"
                     })
@@ -153,7 +154,7 @@ export function PermanentDrawer(props: any): any {
             } catch (error: any) {
                 console.log(error)
                 setNotificationState({
-                    message: "You rejected the transaction. Message was not sent.",
+                    message: "You rejected the transaction.",
                     open: true,
                     severity: "info"
                 })
@@ -166,15 +167,15 @@ export function PermanentDrawer(props: any): any {
     }, [notificationState])
 
     const handleInputChange = (e: any)=>{
-        if(value > 1000000) {
-            setValue(1000000)
+        if(value > 20000000) {
+            setValue(20000000)
         } else {
             setValue(e.target.value);
         }
     }
 
     const incNum = () => {
-        if(value < 1000000)
+        if(value < 20000000)
             setValue(Number(value)+1);
     };
 
@@ -196,11 +197,7 @@ export function PermanentDrawer(props: any): any {
                     </div>
                     <div className="side-menu--bottom burn-container">
                         <div className="row">
-                            <p>
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, 
-                            when an unknown printer took a galley of type and scrambled it to make a type specimen book.  
-                            </p>
+                            <p className="text-center">Number of XEN batches waiting to be burned</p>
                         </div>
                         <div className="row">
                             <div className="col input-col">

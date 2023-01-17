@@ -106,6 +106,9 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 color: black;
                 margin: 0 0 0 5px;
             }
+            svg {
+                height: 28px;
+            }
             
         }
     }
@@ -198,7 +201,7 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     .MuiDrawer-paperAnchorLeft {
                         border-bottom-left-radius: 100px;
                         border-top-left-radius: 60px;
-                        background-color: t('bg');
+                        background-color: #040433;
                         position: static;
                         width: 100%;
                         height: 100%;

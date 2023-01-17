@@ -15,7 +15,7 @@
                     border-radius: 25px;
                     background-color: t('bg');
                     color: t('text');
-                    border: 1px solid t('text');
+                    border: 1px solid #19D2D2;
                     svg {
                         width: 18px;
                         height: 18px;
@@ -61,12 +61,12 @@
         }
     }
     &.dark {
-        background-color: #2b2235;
+        background-color: #051645;
         box-shadow: 0px 3px 15px #0f0b1373;
         ul {
             color: #fff;
             li {
-                border-color: #1f1826;
+                border-color: #19D2D2;
             }
         }
     }

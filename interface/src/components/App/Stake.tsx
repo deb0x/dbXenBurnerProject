@@ -19,7 +19,8 @@ import coinBagLight from "../../photos/icons/coin-bag-solid--light.svg";
 import coinBagDark from "../../photos/icons/coin-bag-solid--dark.svg";
 import walletLight from "../../photos/icons/wallet--light.svg";
 import walletDark from "../../photos/icons/wallet--dark.svg";
-import trophyRewards from "../../photos/icons/trophyRewards.svg";
+import fees from "../../photos/icons/fees.svg";
+import finance from "../../photos/icons/finance.svg";
 import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
@@ -165,7 +166,7 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-6 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            FEES
+                            Fees
                         </Typography>
                         <Typography >
                             Your unclaimed fees:
@@ -175,7 +176,7 @@ export function Stake(props: any): any {
                         </Typography>
                     </div>
                     <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
-                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
+                        <img src={fees} alt="trophyRewards" className="p-3"/>
                     </div>
                 </CardContent>
                 <CardActions className='button-container px-3'>
@@ -209,17 +210,11 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-12 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            DAILY STATS
+                            Daily stats
                         </Typography>
                         <Typography className="data-height">
                             Total amount of daily cycle tokens: <strong>{currentReward}</strong>
                         </Typography>
-                        {/* <Typography>
-                            Total amount of messages today: <strong>234</strong>
-                        </Typography>
-                        <Typography>
-                            You sent today: <strong>6 msg</strong>
-                        </Typography> */}
                     </div>
                 </CardContent>
             </Card>
@@ -381,7 +376,7 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-6 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            REWARDS
+                            Rewards
                         </Typography>
                         <Typography >
                             Your unclaimed rewards:
@@ -397,7 +392,7 @@ export function Stake(props: any): any {
                         </Typography>
                     </div>
                     <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
-                        <img src={trophyRewards} alt="trophyRewards" className="p-3"/>
+                        <img src={finance} alt="trophyRewards" className="p-3"/>
                     </div>
                 </CardContent>
                 <CardActions className='button-container px-3'>

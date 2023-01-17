@@ -4,8 +4,8 @@
     @include themed() {
         .content-box {
             min-height: 65vh;
-            background: t('stake-bg');
-            box-shadow: t('box-shadow');
+            // background: t('stake-bg');
+            // box-shadow: t('box-shadow');
             border-radius: 25px 10px 85px 25px;
             margin-bottom: 35px;
             .col {
@@ -49,10 +49,10 @@
                             color: t('text');
                             margin: 7px;
                             &.Mui-selected {
-                                background-color: t('stake-unstake-bg');
+                                background-color: #040433;
                                 border-radius: 26px;
                                 width: 100%;
-                                color: #D64933;
+                                color: #fff;
                             }
                             &:hover {
                                 border-radius: 26px;
@@ -76,7 +76,7 @@
                 }
                 .max-btn {
                     padding: 2px 20px;
-                    border: 2px solid #91C499;
+                    border: 2px solid #19D2D2;
                     background-color: t('card-color');
                     color: t('text');
                     font-size: 1.5vh;
@@ -147,7 +147,7 @@
                     margin-left: 1px;
                 }
                 .rewards {
-                    color: #D64933;
+                    color: #fff;
                     font-size: 4vh;
                 }
             }
