@@ -103,7 +103,6 @@ export function PermanentDrawer(props: any): any {
         setLoading(true)
         const signer = await library.getSigner(0)
         const deb0xContract = Deb0x(signer, deb0xAddress)
-        console.log(deb0xContract)
         let gasLimitIntervalValue = BigNumber.from("7000000");
         let firstValue =  "0.1";
 
@@ -143,7 +142,6 @@ export function PermanentDrawer(props: any): any {
                     setApproveBurn(false)
                 })
                 .catch((error: any) => {
-                    console.log(error)
                     setNotificationState({
                         message: "Something went wrong!",
                         open: true,
@@ -152,7 +150,6 @@ export function PermanentDrawer(props: any): any {
                     setLoading(false)
                 })
             } catch (error: any) {
-                console.log(error)
                 setNotificationState({
                     message: "You rejected the transaction.",
                     open: true,
@@ -214,10 +211,9 @@ export function PermanentDrawer(props: any): any {
                         </div>
                         {approveBrun ?
                             <LoadingButton className="burn-btn" 
-                                loading={loading} 
                                 loadingPosition="end"
                                 onClick={() => burnXEN()} >
-                                    Burn XEN
+                                    {loading ? <Spinner color={'black'} /> : "Burn XEN" }
                             </LoadingButton> :
                            balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0' ? 
                             <LoadingButton className="burn-btn" 

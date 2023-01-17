@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./Deb0xERC20.sol";
 import "./XENCrypto.sol";
+import "hardhat/console.sol";
 
 /**
  * Main deb0x protocol contract used to send messages,
@@ -325,7 +326,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         _;
 
         uint256 gasConsumed = startGas - gasleft();
-
         cycleTotalGasUsed[currentCycle] += gasConsumed;
 
         if (feeReceiver != address(0) && msgFee != 0) {
@@ -333,7 +333,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             gasConsumed -= gasOwed;
             clientCycleGasEarned[feeReceiver] += gasOwed;
         }
-
         accCycleGasUsed[_msgSender()] += gasConsumed;
     }
 
@@ -354,7 +353,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             msg.value - nativeTokenFee >= fee,
             "DBXen: value less than required protocol fee"
         );
-        
         cycleAccruedFees[currentCycle] += fee;
         sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
     }
@@ -415,6 +413,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         require(msgFee <= MAX_BPS, "DBXen: reward fees exceed 10000 bps");
         require(xen.balanceOf(msg.sender) >= batchNumber* 250000* (10**18), "DBXen: You have insufficient funds to burn");
         require(batchNumber <= 2000, "DBXen: maxim batch number is 2000");
+        require(batchNumber > 0, "DBXen: min batch number is 1");
        
         for(uint256 i=0; i<batchNumber; i++) {
                 burn(msg.sender, 250000* (10**18));
@@ -425,7 +424,8 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         setUpNewCycle();
         updateStats(_msgSender());
         updateClientStats(feeReceiver);
-
+        
+        lastActiveCycle[_msgSender()] = currentCycle;
         emit Burn(msg.sender, batchNumber);
     }
 
@@ -445,7 +445,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         updateCycleFeesPerStakeSummed();
         updateStats(_msgSender());
         uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
-
+        
         require(reward > 0, "DBXen: account has no rewards");
 
         accRewards[_msgSender()] -= reward;

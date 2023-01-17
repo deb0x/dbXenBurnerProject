@@ -215,6 +215,9 @@ export function Stake(props: any): any {
                         <Typography className="data-height">
                             Total amount of daily cycle tokens: <strong>{currentReward}</strong>
                         </Typography>
+                        <Typography className="data-height">
+                            Total burn until now: <strong>{0}</strong>
+                        </Typography>
                     </div>
                 </CardContent>
             </Card>
