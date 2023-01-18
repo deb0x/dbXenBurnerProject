@@ -178,7 +178,7 @@ function App() {
                             <div className="img-content">
                                 <p>Connect your wallet</p>
                                 <p>Burn $XEN</p>
-                                <p>Earn rewards</p>
+                                <p>Earn crypto</p>
                                   
                                 <div>
                                     { (() =>  {
@@ -219,7 +219,7 @@ function App() {
                             <div className="text-container">
                                 <img className="dark-logo" src={deb0xen} />
                                 <p>
-                                    New capped supply digital asset<br /> in XEN ecosystem
+                                    Community built crypto protocol <br/> contributing to XEN deflation
                                 </p>
                             </div>
                         </div>

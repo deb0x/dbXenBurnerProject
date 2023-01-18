@@ -169,7 +169,7 @@ export function Stake(props: any): any {
                             Fees
                         </Typography>
                         <Typography >
-                            Your unclaimed fees:
+                            Your unclaimed MATIC fees:
                         </Typography>
                         <Typography variant="h6" className="data-height">
                             <strong>{feesUnclaimed}</strong>
@@ -213,7 +213,7 @@ export function Stake(props: any): any {
                             Daily stats
                         </Typography>
                         <Typography className="data-height">
-                            Total amount of daily cycle tokens: <strong>{currentReward}</strong>
+                            Total amount of daily cycle DXN tokens: <strong>{currentReward}</strong>
                         </Typography>
                         <Typography className="data-height">
                             Total burn until now: <strong>{0}</strong>
@@ -382,16 +382,10 @@ export function Stake(props: any): any {
                             Rewards
                         </Typography>
                         <Typography >
-                            Your unclaimed rewards:
+                            Your unclaimed DXN rewards:
                         </Typography>
                         <Typography variant="h6" className="data-height">
                             <strong>{rewardsUnclaimed}</strong>
-                        </Typography>
-                        <Typography>
-                            Your share from fees:
-                        </Typography>
-                        <Typography variant="h6" className="data-height">
-                            <strong>{feeSharePercentage}</strong>
                         </Typography>
                     </div>
                     <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
@@ -564,7 +558,7 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your DBX should be unstaked shortly",
+                                message: "Your transaction is pending. Your DXN should be unstaked shortly",
                                 open: true,
                                 severity: "info"
                             })
@@ -635,7 +629,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. DBX were not unstaked.",
+                        message: "You rejected the transaction. DXN were not unstaked.",
                         open: true,
                         severity: "info"
                     })
@@ -660,12 +654,12 @@ export function Stake(props: any): any {
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
                             setNotificationState({
-                                message: "You succesfully staked your DBX.", open: true,
+                                message: "You succesfully staked your DXN.", open: true,
                                 severity: "success"
                             })
                         } else {
                             setNotificationState({
-                                message: "DBX couldn't be claimed!", open: true,
+                                message: "DXN couldn't be claimed!", open: true,
                                 severity: "error"
                             })
                             setLoading(false)
@@ -673,7 +667,7 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your DBX should be staked shortly",
+                                message: "Your transaction is pending. Your DXN should be staked shortly",
                                 open: true,
                                 severity: "info"
                             })
@@ -744,7 +738,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. DBX were not staked.",
+                        message: "You rejected the transaction. DXN were not staked.",
                         open: true,
                         severity: "info"
                     })
@@ -781,7 +775,7 @@ export function Stake(props: any): any {
                             Your staked amount:
                         </Typography>
                         <Typography variant="h6" className="p-0 data-height">
-                            <strong>{userStakedAmount} DBX</strong>
+                            <strong>{userStakedAmount} DXN</strong>
                         </Typography>
                     </div>
                     <div className="col-6 px-3">
@@ -790,7 +784,7 @@ export function Stake(props: any): any {
                             Your tokens in wallet:
                         </Typography>
                         <Typography variant="h6" className="p-0" data-height>
-                            <strong>{userUnstakedAmount} DBX</strong>
+                            <strong>{userUnstakedAmount} DXN</strong>
                         </Typography>
                     </div>
                     {approved && <Grid className="amount-row px-3" container>
@@ -824,7 +818,7 @@ export function Stake(props: any): any {
                                     Initialize Staking
                             </LoadingButton>
                             <span className="text">
-                                You first need to have tokens in your wallet before you can Initialize Staking.
+                                Make sure you have DXN tokens in your wallet before you can stake them.
                             </span>
                         </> 
                     }
@@ -840,7 +834,7 @@ export function Stake(props: any): any {
                             Available to unstake:
                         </Typography>
                         <Typography variant="h6" className="p-0">
-                            <strong>{tokensForUnstake} DBX</strong>
+                            <strong>{tokensForUnstake} DXN</strong>
                         </Typography>
                     </div>
                     <div className="col-6 px-3">
@@ -849,7 +843,7 @@ export function Stake(props: any): any {
                             Your actual stake:
                         </Typography>
                         <Typography variant="h6" className="p-0 data-height">
-                            <strong>{userStakedAmount} DBX</strong>
+                            <strong>{userStakedAmount} DXN</strong>
                         </Typography>
                     </div>
                   
@@ -914,7 +908,7 @@ export function Stake(props: any): any {
                     </Typography>
                     <Typography variant="h4">
                         <img className="logo" src={token} />
-                        {totalStaked} DBX
+                        {totalStaked} DXN
                     </Typography>
                 </CardContent>
             </Card>
@@ -929,10 +923,16 @@ export function Stake(props: any): any {
                     <div className='row'>
                         <Grid item className="col col-md-6 ">
                             <FeesPanel />
-                            <RewardsPanel />
                         </Grid>
                         <Grid item className="col col-md-6">
                             <CyclePanel />
+                        </Grid>
+                    </div>
+                    <div className='row'>
+                        <Grid item className="col col-md-6 ">
+                            <RewardsPanel />
+                        </Grid>
+                        <Grid item className="col col-md-6">
                             <StakeUnstake/>
                         </Grid>
                     </div>

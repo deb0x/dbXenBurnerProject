@@ -12,6 +12,9 @@ import ScreenSize from '../Common/ScreenSize';
 import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
+import document from "../../photos/icons/file-icon.svg";
 const { BigNumber } = require("ethers");
 
 
@@ -194,7 +197,8 @@ export function PermanentDrawer(props: any): any {
                     </div>
                     <div className="side-menu--bottom burn-container">
                         <div className="row">
-                            <p className="text-center">Number of XEN batches waiting to be burned</p>
+                            <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
+                            <p className="text-center">(1 batch = 250 000 XEN)</p>
                         </div>
                         <div className="row">
                             <div className="col input-col">
@@ -229,6 +233,19 @@ export function PermanentDrawer(props: any): any {
                             </LoadingButton>
                         }
                         
+                    </div>
+                    <div className="content">
+                        <div className="social-media">
+                            <a href="https://mobile.twitter.com/deb0xDAO" target="_blank" className="logo-text-color">
+                                <FontAwesomeIcon icon={faTwitter} size="xl"/>
+                            </a>
+                            <a href="https://dbxen.gitbook.io/dbxen-litepaper/" target="_blank" className="logo-text-color">
+                                <img src={document} />
+                            </a>
+                            <a href="https://github.com/deb0x" target="_blank" className="logo-text-color">
+                                <FontAwesomeIcon icon={faGithub} size="xl"/>
+                            </a>
+                        </div>
                     </div>
                 </Drawer>
             </Box>

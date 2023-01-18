@@ -118,7 +118,7 @@ export function AppBarComponent(props: any): any {
             setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
         }
         return (
-            <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
+            <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
         )
     }
 
@@ -262,15 +262,15 @@ export function AppBarComponent(props: any): any {
                     <ul>
                         <li>
                             Unclaimed rewards: <br/> 
-                            <b>{rewardsUnclaimed} <span>DBX</span></b>
+                            <b>{rewardsUnclaimed} <span>DXN</span></b>
                         </li>
                         <li>
                             Active stake: <br/> 
-                            <b>{userStakedAmount} <span>DBX</span></b>
+                            <b>{userStakedAmount} <span>DXN</span></b>
                         </li>
                         <li>
                             In wallet: <br/> 
-                            <b>{userUnstakedAmount} <span>DBX</span></b>
+                            <b>{userUnstakedAmount} <span>DXN</span></b>
                         </li>
                     </ul>
                     <Button 
