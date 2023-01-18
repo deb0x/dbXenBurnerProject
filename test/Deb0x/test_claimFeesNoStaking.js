@@ -42,38 +42,46 @@ describe("Test burn functionality", async function() {
 
     it.only(`Claim fees after apply 1% frontend fees`, async() => {
         await aliceInstance.claimRank(100);
+        await bobInstance.claimRank(100);
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
+        await bobInstance.claimMintReward();
+        await bobInstance.claimRank(100);
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
+        await bobInstance.claimMintReward();
 
         let actualBalance = await XENContract.balanceOf(alice.address);
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
+
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await DBXenContract.connect(bob).burnBatch(1, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
 
         // let balanceAfterBurn = await XENContract.balanceOf(alice.address);
         // let tokensForOneBatch = ethers.utils.parseEther("500000");
         // let expectedBalanceAfterBurn = BigNumber.from(actualBalance.toString()).sub(BigNumber.from(tokensForOneBatch));
         // expect(expectedBalanceAfterBurn).to.equal(balanceAfterBurn);
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 2 * 24])
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
         await hre.ethers.provider.send("evm_mine")
         console.log("****************************")
-        for (let i = 0; i < 210; i++) {
+        for (let i = 0; i < 203; i++) {
             console.log("CICLUC " + i);
-            console.log(await DBXenContract.connect(alice).cycleAccruedFees(i));
+            console.log(await DBXenContract.cycleAccruedFees(i));
         }
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 21 * 24])
-        await hre.ethers.provider.send("evm_mine")
         console.log("****************************")
         console.log()
         console.log()
-        console.log(await DBXenContract.connect(alice).cycleAccruedFees(202));
+        console.log(await DBXenContract.cycleAccruedFees(202));
+        console.log(await DBXENViewContract.getUnclaimedFees(alice.address));
+        console.log(await DBXENViewContract.getUnclaimedFees(bob.address));
         // await DBXENViewContract.getUnclaimedRewards(alice.address);
         console.log("avem de luat " + await DBXENViewContract.getUnclaimedFees(alice.address))
+        console.log("avem de luat " + await DBXENViewContract.getUnclaimedFees(bob.address))
         console.log()
         console.log()
 
