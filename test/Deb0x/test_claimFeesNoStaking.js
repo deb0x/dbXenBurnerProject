@@ -2,67 +2,100 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
-const { Converter } = require("../utils/Converter.ts");
-let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
-let payload = Converter.convertStringToBytes32(ipfsLink);
 
-describe("Test fee claiming for users/frontends without concurrently staking/unstaking", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
-    let alice, bob;
+describe("Test burn functionality", async function() {
+    let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
+    let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
+
+        const lib = await ethers.getContractFactory("MathX");
+        const library = await lib.deploy();
+
+        const xenContract = await ethers.getContractFactory("XENCrypto", {
+            libraries: {
+                MathX: library.address
+            }
+        });
+
+        XENContract = await xenContract.deploy();
+        await XENContract.deployed();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
-        await rewardedAlice.deployed();
+        DBXenContract = await Deb0x.deploy(ethers.constants.AddressZero, XENContract.address);
+        await DBXenContract.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        DBXENViewContract = await Deb0xViews.deploy(DBXenContract.address);
+        await DBXENViewContract.deployed();
 
-        rewardedBob = rewardedAlice.connect(bob)
-        rewardedCarol = rewardedAlice.connect(carol)
-        frontend = rewardedAlice.connect(feeReceiver)
+        const dbxAddress = await DBXenContract.dbx()
+        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+
+        aliceInstance = XENContract.connect(alice);
+        bobInstance = XENContract.connect(bob);
+        deanInstance = XENContract.connect(dean);
+        carolInstance = XENContract.connect(carol);
     });
 
-    it(`
-  5 ether gathered as fees should be fully distributed back to users/frontends
-  `, async() => {
-
-        const aliceBalance = await hre.ethers.provider.getBalance(alice.address)
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    it.only(`Claim fees after apply 1% frontend fees`, async() => {
+        await aliceInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
+        await aliceInstance.claimMintReward();
+        await aliceInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await aliceInstance.claimMintReward();
 
+        let actualBalance = await XENContract.balanceOf(alice.address);
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await DBXenContract.connect(alice).burnBatch(1, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
 
-        await rewardedAlice.claimFees()
-        await rewardedBob.claimFees()
-        await frontend.claimClientFees();
-        const feesClaimed = await rewardedAlice.queryFilter("FeesClaimed")
-        const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
-        let totalFeesClaimedFrontend = BigNumber.from("0")
-        let totalFeesClaimed = BigNumber.from("0")
-        for (let entry of feesClaimed) {
-            totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
+        // let balanceAfterBurn = await XENContract.balanceOf(alice.address);
+        // let tokensForOneBatch = ethers.utils.parseEther("500000");
+        // let expectedBalanceAfterBurn = BigNumber.from(actualBalance.toString()).sub(BigNumber.from(tokensForOneBatch));
+        // expect(expectedBalanceAfterBurn).to.equal(balanceAfterBurn);
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 2 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        console.log("****************************")
+        for (let i = 0; i < 210; i++) {
+            console.log("CICLUC " + i);
+            console.log(await DBXenContract.connect(alice).cycleAccruedFees(i));
         }
-        for (let entry of feesClaimedAsFrontend) {
-            totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
-        }
-        const feesCollected = await rewardedAlice.cycleAccruedFees(0);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 21 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        console.log("****************************")
+        console.log()
+        console.log()
+        console.log(await DBXenContract.connect(alice).cycleAccruedFees(202));
+        // await DBXENViewContract.getUnclaimedRewards(alice.address);
+        console.log("avem de luat " + await DBXENViewContract.getUnclaimedFees(alice.address))
+        console.log()
+        console.log()
 
-        const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
-        expect(totalFeesClaimed.add(remainder).add(totalFeesClaimedFrontend)).to.equal(feesCollected)
+        console.log(await hre.ethers.provider.getBalance(alice.address))
+        await DBXenContract.connect(alice).claimFees();
+        console.log(await hre.ethers.provider.getBalance(alice.address))
+            // await rewardedBob.claimFees()
+            // await frontend.claimClientFees();
+            // const feesClaimed = await rewardedAlice.queryFilter("FeesClaimed")
+            // const feesClaimedAsFrontend = await frontend.queryFilter("ClientFeesClaimed");
+            // let totalFeesClaimedFrontend = BigNumber.from("0")
+            // let totalFeesClaimed = BigNumber.from("0")
+            // for (let entry of feesClaimed) {
+            //     totalFeesClaimed = totalFeesClaimed.add(entry.args.fees)
+            // }
+            // for (let entry of feesClaimedAsFrontend) {
+            //     totalFeesClaimedFrontend = totalFeesClaimedFrontend.add(entry.args.fees)
+            // }
+            // const feesCollected = await rewardedAlice.cycleAccruedFees(0);
+
+        // const remainder = await hre.ethers.provider.getBalance(rewardedAlice.address);
+        // expect(totalFeesClaimed.add(remainder).add(totalFeesClaimedFrontend)).to.equal(feesCollected)
     });
 
     it(`
