@@ -2,29 +2,43 @@ const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
+const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Should check if the publicKey is stored in the correct format on Deb0x.sol", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
-    let alice, bob;
+describe.only("Test setKey function", async function() {
+    let DBXenContract, DBXENViewContract, DBXenERC20, XENContract;
+    let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
+
+        const lib = await ethers.getContractFactory("MathX");
+        const library = await lib.deploy();
+
+        const xenContract = await ethers.getContractFactory("XENCrypto", {
+            libraries: {
+                MathX: library.address
+            }
+        });
+
+        XENContract = await xenContract.deploy();
+        await XENContract.deployed();
 
         const Deb0x = await ethers.getContractFactory("Deb0x");
-        rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
-        await rewardedAlice.deployed();
+        DBXenContract = await Deb0x.deploy(ethers.constants.AddressZero, XENContract.address);
+        await DBXenContract.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
+        DBXENViewContract = await Deb0xViews.deploy(DBXenContract.address);
+        await DBXENViewContract.deployed();
 
-        rewardedBob = rewardedAlice.connect(bob)
-        rewardedCarol = rewardedAlice.connect(carol)
-        frontend = rewardedAlice.connect(feeReceiver)
+        const dbxAddress = await DBXenContract.dbx()
+        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
     });
 
     it("Only for check", async() => {
         let publicKey = "R2d/rObocjapTQdbm33pbqAeOhQ8VGD5E6jaBoLaGgE=";
-        await rewardedBob.setKey(Array.from(ethers.utils.base64.decode(publicKey)));
-        let val = await rewardedBob.publicKeys(bob.address);
+        await DBXenContract.connect(alice).setKey(Array.from(ethers.utils.base64.decode(publicKey)));
+        let val = await DBXenContract.connect(alice).publicKeys(alice.address);
         expect(publicKey).to.equal(ethers.utils.base64.encode(val))
     });
 

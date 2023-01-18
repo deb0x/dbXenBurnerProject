@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test burn functionality", async function() {
+describe.only("Test burn functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
@@ -169,15 +169,17 @@ describe("Test burn functionality", async function() {
         let expectedBalanceAfterFirstBurnAlice = BigNumber.from(actualBalanceAfterFirstBurnAlice.toString()).sub(BigNumber.from(tokensForThreeBatches));
         expect(expectedBalanceAfterFirstBurnAlice).to.equal(balanceAfterSecondBurnAlice);
         expect(await XENContract.userBurns(alice.address)).to.equal(BigNumber.from(tokensForThreeBatches).mul(BigNumber.from("2")))
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 1 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
     });
 
-    it.only("Claim fees after bunr action", async() => {
-        console.log("REWARD PE CICLUL CURENT 1   " + await DBXenContract.currentCycleReward());
+    it("Claim fees after bunr action", async() => {
         await aliceInstance.claimRank(100);
         await bobInstance.claimRank(100);
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 100 * 24])
         await hre.ethers.provider.send("evm_mine")
-        console.log("REWARD PE CICLUL CURENT 2   " + await DBXenContract.currentCycleReward());
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
         await bobInstance.claimMintReward();
@@ -187,11 +189,9 @@ describe("Test burn functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
         await bobInstance.claimMintReward();
-        console.log("REWARD PE CICLUL CURENT 3  " + await DBXenContract.currentCycleReward());
         let actualBalanceAlice = await XENContract.balanceOf(alice.address);
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
         await DBXenContract.connect(alice).burnBatch(1, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") });
-        console.log("REWARD PE CICLUL CURENT 4    " + await DBXenContract.currentCycleReward());
         // let balanceAfterBurnAlice = await XENContract.balanceOf(alice.address);
         // let tokensForThreeBatches = ethers.utils.parseEther("750000");
         // let expectedBalanceAfterBurnAlice = BigNumber.from(actualBalanceAlice.toString()).sub(BigNumber.from(tokensForThreeBatches));
@@ -206,24 +206,11 @@ describe("Test burn functionality", async function() {
         // let expectedBalanceAfterBurnBob = BigNumber.from(actualBalanceBob.toString()).sub(BigNumber.from(tokensForThreeBatches));
         // expect(expectedBalanceAfterBurnBob).to.equal(balanceAfterBurnBob);
         // expect(await XENContract.userBurns(bob.address)).to.equal(BigNumber.from(tokensForThreeBatches))
-        console.log("CICLUL CURENT " + await DBXenContract.getCurrentCycle());
-        console.log("REWARD PE CICLUL CURENT " + await DBXenContract.currentCycleReward());
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        console.log("CICLUL CURENT " + await DBXenContract.getCurrentCycle());
-        console.log(await DBXenERC20.balanceOf(alice.address));
-        console.log("after CLAIM " + await DBXenContract.accRewards(alice.address))
         await DBXenContract.connect(alice).claimRewards()
-        console.log(await DBXenERC20.balanceOf(alice.address));
-        console.log("*************************")
-        console.log(await DBXenERC20.balanceOf(bob.address));
-        console.log("after CLAIM " + await DBXenContract.accRewards(bob.address))
         await DBXenContract.connect(bob).claimRewards()
-        console.log(await DBXenERC20.balanceOf(bob.address));
-        console.log("CICLUL CURENT " + await DBXenContract.getCurrentCycle());
-        console.log("REWARD PE CICLUL CURENT " + await DBXenContract.currentCycleReward());
-        console.log(NumUtils.day(2))
     });
 
 })

@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./Deb0xERC20.sol";
 import "./XENCrypto.sol";
-import "hardhat/console.sol";
 
 /**
  * Main deb0x protocol contract used to send messages,
@@ -410,10 +409,10 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         gasWrapper(nativeTokenFee)
         gasUsed(feeReceiver, msgFee)
     {
-        require(msgFee <= MAX_BPS, "DBXen: reward fees exceed 10000 bps");
-        require(xen.balanceOf(msg.sender) >= batchNumber* 250000* (10**18), "DBXen: You have insufficient funds to burn");
         require(batchNumber <= 2000, "DBXen: maxim batch number is 2000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
+        require(msgFee <= MAX_BPS, "DBXen: reward fees exceed 10000 bps");
+        require(xen.balanceOf(msg.sender) >= batchNumber* 250000* (10**18), "DBXen: You have insufficient funds to burn");
        
         for(uint256 i=0; i<batchNumber; i++) {
                 burn(msg.sender, 250000* (10**18));
@@ -499,7 +498,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
         uint256 fees = accAccruedFees[_msgSender()];
         require(fees > 0, "DBXen: amount is zero");
-
         accAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
