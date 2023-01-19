@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="28.749" viewBox="0 0 30 28.749">
-  <g id="ios-compose" transform="translate(-4.5 -4.5)">
-    <path id="Path_34" data-name="Path 34" d="M19.5,24h-5V19l10-10H4.5V32.749h25V14Z" transform="translate(0 0.5)" fill="#f5b700"/>
-    <path id="Path_35" data-name="Path 35" d="M28.681,6.45,14.625,20.505v2.528h2.517L31.207,8.972Z" transform="translate(1.125 0.217)" fill="#f5b700"/>
-    <path id="Path_36" data-name="Path 36" d="M31.582,5.774,30.609,4.8a1.179,1.179,0,0,0-.782-.3,1.153,1.153,0,0,0-.776.3L28.1,5.75l.007.007.882.882,1.642,1.642.949-.949a1.147,1.147,0,0,0,.3-.776,1.17,1.17,0,0,0-.3-.781Z" transform="translate(2.621 0)" fill="#f5b700"/>
-  </g>
-</svg>
