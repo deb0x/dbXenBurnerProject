@@ -7,7 +7,7 @@ import "./Deb0xERC20.sol";
 /**
  * Helper contract used to optimize deb0x state queries made by clients.
  */
-contract Deb0xViews {
+contract DBXenViews {
 
     /**
      * Main deb0x contract address to get the data from.

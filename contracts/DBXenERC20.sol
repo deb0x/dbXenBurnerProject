@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
  * (Deb0x.sol - which is the owner of this contract)
  * directly to an account when it claims rewards.
  */
-contract Deb0xERC20 is ERC20Permit {
+contract DBXenERC20 is ERC20Permit {
 
     /**
      * The address of the Deb0x.sol contract instance.
