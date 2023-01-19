@@ -304,14 +304,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     );
     
     /**
-     * @dev Emitted when calling {setKey}, `to` being assigned this key `value`.
-     */
-    event KeySet(
-        address indexed to, 
-        bytes32 indexed value
-    );
-
-    /**
      * @dev Measures the amount of consummed gas.
      * In case a fee is applied, the corresponding percentage will be recorded 
      * as consumed by the feeReceiver instead of the caller.
@@ -368,16 +360,6 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         summedCycleStakes[0] = 10000 * 1e18;
         rewardPerCycle[0] = 10000 * 1e18;
         xen = XENCrypto(xenAddress);
-    }
-
-    /**
-     * @dev Stores the public key of the sender account.
-     * 
-     * @param publicKey as encoded by the client.
-     */
-    function setKey(bytes32 publicKey) external {
-        publicKeys[_msgSender()] = publicKey;
-        emit KeySet(_msgSender(), publicKey);
     }
 
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
