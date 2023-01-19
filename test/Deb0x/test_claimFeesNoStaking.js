@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe.only("Test claimFee", async function() {
+describe("Test claimFee", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance, frontend;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {

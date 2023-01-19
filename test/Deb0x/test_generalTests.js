@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe.only("Test burn functionality", async function() {
+describe("Test burn functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance, frontend;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
@@ -194,7 +194,6 @@ describe.only("Test burn functionality", async function() {
         }
 
     });
-
 
     it("Stake and unstake action", async() => {
         await aliceInstance.claimRank(100);
@@ -441,4 +440,52 @@ describe.only("Test burn functionality", async function() {
 
     });
 
+
+    it(`Test functionalities with local deploy for DBXen contract`, async() => {
+        await aliceInstance.claimRank(100);
+        await bobInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await aliceInstance.claimMintReward();
+        await aliceInstance.claimRank(100);
+        await bobInstance.claimMintReward();
+        await bobInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await bobInstance.claimMintReward();
+        await aliceInstance.claimMintReward();
+        await aliceInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await aliceInstance.claimMintReward();
+        await aliceInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        //claim client reward: inainte sa inceapa urmatorul ciclu
+        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
+        //ustake: 1. burn, claim reward stake, cu gap intre stake si unstake sa treaca un ciclu si unstake 
+
+
+
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") });
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await DBXenContract.connect(bob).burnBatch(1, feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") });
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        await frontend.claimClientRewards();
+
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") });
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await DBXenContract.connect(bob).burnBatch(1, feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") });
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await frontend.claimClientRewards();
+
+    });
 })
