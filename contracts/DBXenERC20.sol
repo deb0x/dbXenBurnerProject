@@ -20,7 +20,7 @@ contract DBXenERC20 is ERC20Permit {
      * Sets the owner address. 
      * Called from within the Deb0x.sol constructor.
      */
-    constructor() ERC20("DBXen Reward Token on Polygon", "DBXen")
+    constructor() ERC20("DBXen Reward Token on Polygon", "pDBXen")
     ERC20Permit("DBXen Reward Token on Polygon") {
         owner = msg.sender;
     }
