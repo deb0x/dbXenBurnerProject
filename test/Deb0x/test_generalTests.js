@@ -396,7 +396,6 @@ describe.only("Test burn functionality", async function() {
         await DBXenContract.connect(alice).stake(AliceStakeAmount.div(4));
     });
 
-
     it(`Test frontend recieve partial reward`, async() => {
         await aliceInstance.claimRank(100);
         await bobInstance.claimRank(100);
@@ -471,9 +470,6 @@ describe.only("Test burn functionality", async function() {
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
 
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
-        //ustake: 1. burn, claim reward stake, cu gap intre stake si unstake sa treaca un ciclu si unstake 
-
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
         await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 1000, 0, { value: ethers.utils.parseEther("1") });
         await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
@@ -512,8 +508,6 @@ describe.only("Test burn functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
-
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
@@ -546,7 +540,6 @@ describe.only("Test burn functionality", async function() {
         await DBXenContract.connect(alice).stake(AliceBalance.div(10));
         await DBXenContract.connect(alice).unstake(unstakeAmountForAlice2.div(5));
         await DBXenContract.connect(alice).unstake(unstakeAmountForAlice2.div(5));
-
     });
 
     it("Stake and unstake action in multiple cycle", async() => {
@@ -558,8 +551,6 @@ describe.only("Test burn functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
-
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
@@ -629,7 +620,6 @@ describe.only("Test burn functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
@@ -656,33 +646,61 @@ describe.only("Test burn functionality", async function() {
         await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
         await DBXenContract.connect(alice).stake(AliceBalance.div(10));
         await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 3 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 3 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-
-        // await DBXenContract.connect(alice).claimRewards();
-
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 10 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
     });
 
+    // Test all token distribution
+    // it("Local deployment for first cycle check", async() => {
+    //     for (let i = 0; i < 2000; i++) {
+    //         await aliceInstance.claimRank(100);
+    //         await bobInstance.claimRank(100);
+    //         await carolInstance.claimRank(100);
+    //         await deanInstance.claimRank(100);
+    //         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
+    //         await hre.ethers.provider.send("evm_mine")
+    //         await aliceInstance.claimMintReward();
+    //         await bobInstance.claimMintReward();
+    //         await carolInstance.claimMintReward();
+    //         await deanInstance.claimMintReward();
+    //     }
+
+    //     const lib = await ethers.getContractFactory("MathX");
+    //     const library = await lib.deploy();
+
+    //     const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
+    //         libraries: {
+    //             MathX: library.address
+    //         }
+    //     });
+
+    //     let XENContractLocal = await xenContractLocal.deploy();
+    //     await XENContractLocal.deployed();
+
+    //     const Deb0xLocal = await ethers.getContractFactory("Deb0x");
+    //     let DBXenContractLocal = await Deb0xLocal.deploy(ethers.constants.AddressZero, XENContract.address);
+    //     await DBXenContractLocal.deployed();
+
+    //     const Deb0xViewsLocal = await ethers.getContractFactory("Deb0xViews");
+    //     let DBXENViewContractLocal = await Deb0xViewsLocal.deploy(DBXenContract.address);
+    //     await DBXENViewContractLocal.deployed();
+
+    //     let bobBalance = await XENContract.balanceOf(bob.address);
+    //     await XENContract.connect(bob).transfer(alice.address, bobBalance);
+
+    //     let carolBalance = await XENContract.balanceOf(carol.address);
+    //     await XENContract.connect(carol).transfer(alice.address, carolBalance);
+
+    //     let deanBalance = await XENContract.balanceOf(dean.address);
+    //     await XENContract.connect(dean).transfer(alice.address, deanBalance);
+
+    //     console.log(await XENContract.balanceOf(alice.address))
+
+    //     for (let i = 0; i < 100; i++) {
+    //         await XENContract.connect(alice).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
+    //         await DBXenContractLocal.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
+    //         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    //         await hre.ethers.provider.send("evm_mine")
+    //     }
+    //     await DBXenContractLocal.connect(alice).claimRewards();
+    // });
 
 })
