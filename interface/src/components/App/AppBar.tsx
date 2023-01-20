@@ -8,7 +8,7 @@ import { Spinner } from './Spinner';
 import { ethers } from 'ethers';
 import { useEagerConnect } from '../../hooks';
 import formatAccountName from '../Common/AccountName';
-import DBXen from "../../ethereum/dbXen"
+import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/deb0xViews";
 import DBXenERC20 from "../../ethereum/deb0xerc20";
 import Popper from '@mui/material/Popper';

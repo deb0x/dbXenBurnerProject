@@ -9,7 +9,7 @@ import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
 /**
- * Main dbXen protocol contract used to send messages,
+ * Main dbxen protocol contract used to send messages,
  * store public keys, allocate token rewards,
  * distribute native token fees, stake and unstake.
  */

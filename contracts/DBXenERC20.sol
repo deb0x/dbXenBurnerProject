@@ -4,8 +4,8 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 /**
- * Reward token contract to be used by the dbXen protocol.
- * The entire amount is minted by the main dbXen contract 
+ * Reward token contract to be used by the dbxen protocol.
+ * The entire amount is minted by the main dbxen contract 
  * (DBXen.sol - which is the owner of this contract)
  * directly to an account when it claims rewards.
  */
@@ -27,7 +27,7 @@ contract DBXenERC20 is ERC20Permit {
 
     /**
      * The total supply is naturally capped by the distribution algorithm 
-     * implemented by the main dbXen contract, however an additional check 
+     * implemented by the main dbxen contract, however an additional check 
      * that will never be triggered is added to reassure the reader.
      * 
      * @param account the address of the reward token reciever

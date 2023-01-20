@@ -1,16 +1,16 @@
-# dbXen
+# dbxen
 Decentralized communication and storage protocol implementation with reward token incentives. Includes a private e-mail like web application that allows sending end-to-end encrypted messages to ethereum accounts.
 
 ### Links
-* [Website](https://dbXen.org)
-* [Fair Launch](https://mirror.xyz/dbXen.eth/oZZDpd9ME8oGMtw-YKKQRGSeyf4hhXLrFXw8JkQ9GDE)
-* [DApp](https://app.dbXen.org)
+* [Website](https://dbxen.org)
+* [Fair Launch](https://mirror.xyz/dbxen.eth/oZZDpd9ME8oGMtw-YKKQRGSeyf4hhXLrFXw8JkQ9GDE)
+* [DApp](https://app.dbxen.org)
 
 ### Prerequisites
 * npm 6.14+
 * node v14.17+
 * [Metamask.io](https://metamask.io) browser extension
-* (For Testnet) Get goerli ETH from a faucet (e.g. https://goerlifaucet.com/) and try it out on the [test enviroment](https://demo.dbXen.org).
+* (For Testnet) Get goerli ETH from a faucet (e.g. https://goerlifaucet.com/) and try it out on the [test enviroment](https://demo.dbxen.org).
 
 ### Steps to run the frontend
 

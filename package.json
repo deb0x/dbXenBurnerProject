@@ -1,5 +1,5 @@
 {
-    "name": "dbXen-proto-01",
+    "name": "dbxen-proto-01",
     "version": "1.0.0",
     "description": "Decentralized Private Mail Protocol",
     "main": "index.js",
@@ -10,15 +10,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/starfish-technologies-srl/dbXen-proto-01.git"
+        "url": "git+https://github.com/starfish-technologies-srl/dbxen-proto-01.git"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/starfish-technologies-srl/dbXen-proto-01/issues"
+        "url": "https://github.com/starfish-technologies-srl/dbxen-proto-01/issues"
     },
-    "homepage": "https://github.com/starfish-technologies-srl/dbXen-proto-01#readme",
+    "homepage": "https://github.com/starfish-technologies-srl/dbxen-proto-01#readme",
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.0.3",
         "@nomiclabs/hardhat-solhint": "^2.0.1",

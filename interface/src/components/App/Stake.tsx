@@ -8,7 +8,7 @@ import {
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import DBXen from "../../ethereum/dbXen"
+import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/deb0xViews";
 import DBXenERC20 from "../../ethereum/deb0xerc20"
 import SnackbarNotification from './Snackbar';

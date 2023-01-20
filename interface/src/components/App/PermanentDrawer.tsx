@@ -5,7 +5,7 @@ import Drawer from '@mui/material/Drawer';
 import { injected } from '../../connectors';
 import DBXenERC20 from "../../ethereum/deb0xerc20"
 import XENCrypto from '../../ethereum/XENCrypto';
-import DBXen from "../../ethereum/dbXen"
+import DBXen from "../../ethereum/dbxen"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
 import ScreenSize from '../Common/ScreenSize';
@@ -242,7 +242,7 @@ export function PermanentDrawer(props: any): any {
                             <a href="https://dbxen.gitbook.io/dbxen-litepaper/" target="_blank" className="logo-text-color">
                                 <img src={document} />
                             </a>
-                            <a href="https://github.com/dbXen" target="_blank" className="logo-text-color">
+                            <a href="https://github.com/dbxen" target="_blank" className="logo-text-color">
                                 <FontAwesomeIcon icon={faGithub} size="xl"/>
                             </a>
                         </div>
