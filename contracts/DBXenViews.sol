@@ -12,12 +12,12 @@ contract DBXenViews {
     /**
      * Main dbxen contract address to get the data from.
      */
-    DBXen dbxen;
+    DBXen public dbxen;
 
     /**
      * Reward token address.
      */
-    DBXenERC20 dxn;
+    DBXenERC20 public dxn;
 
     /**
      * @param _dbXen DBXen.sol contract address
