@@ -8,7 +8,7 @@ let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test unstake functionality", async function() {
-    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dxnERC20, deb0xViews;
+    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dxn, deb0xViews;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -21,8 +21,8 @@ describe("Test unstake functionality", async function() {
         deb0xViews = await DBXenViews.deploy(deb0xContract.address);
         await deb0xViews.deployed();
 
-        const dbxAddress = await deb0xContract.dbx()
-        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await deb0xContract.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         user1Reward = deb0xContract.connect(user1)
         user2Reward = deb0xContract.connect(user2)
@@ -41,16 +41,16 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user3Reward.claimRewards()
-        let user3Balance = await dxnERC20.balanceOf(user3.address);
+        let user3Balance = await dxn.balanceOf(user3.address);
         //User3balanceDiv 4 will be 12.5 (50/4)
         let user3BalanceDiv4 = BigNumber.from(user3Balance).div(BigNumber.from("4"));
         let balanceBigNumberFormat = BigNumber.from(user3BalanceDiv4.toString());
-        await dxnERC20.connect(user3).approve(deb0xContract.address, user3Balance)
+        await dxn.connect(user3).approve(deb0xContract.address, user3Balance)
         await user3Reward.stake(balanceBigNumberFormat)
 
-        //console.log("Balance account after first stake: " + ethers.utils.formatEther(await dxnERC20.balanceOf(user3.address)))
+        //console.log("Balance account after first stake: " + ethers.utils.formatEther(await dxn.balanceOf(user3.address)))
         await user3Reward.stake(balanceBigNumberFormat)
-            //console.log("Balance account after second stake: " + ethers.utils.formatEther(await dxnERC20.balanceOf(user3.address)))
+            //console.log("Balance account after second stake: " + ethers.utils.formatEther(await dxn.balanceOf(user3.address)))
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -60,7 +60,7 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await user3Reward.claimRewards();
         await user3Reward.stake(balanceBigNumberFormat)
-            //console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dxnERC20.balanceOf(user3.address)))
+            //console.log("Balance account after third stake but in second cycle: " + ethers.utils.formatEther(await dxn.balanceOf(user3.address)))
             //console.log("Acc  " + ethers.utils.formatEther(await deb0xViews.getAccWithdrawableStake(user3.address)))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -93,8 +93,8 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address);
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address);
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stake(user1Balance)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
@@ -102,7 +102,7 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.unstake(user1Balance)
         const user1accAccruedFees2 = await user1Reward.accAccruedFees(user1.address)
-        expect(await dxnERC20.balanceOf(user1.address)).to.equal(user1Balance)
+        expect(await dxn.balanceOf(user1.address)).to.equal(user1Balance)
         expect(user1accAccruedFees2).equal(user1accAccruedFees1)
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
@@ -144,8 +144,8 @@ describe("Test unstake functionality", async function() {
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stake(user1Balance.div(BigNumber.from("2")))
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
@@ -194,8 +194,8 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.claimRewards()
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stake(user1Balance.div(BigNumber.from("2")))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -236,8 +236,8 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.claimRewards()
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
         await user1Reward.stake(user1Balance.div(BigNumber.from("2")))
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -278,10 +278,10 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
         await user3Reward.claimRewards()
-        let user3Balance = await dxnERC20.balanceOf(user3.address);
+        let user3Balance = await dxn.balanceOf(user3.address);
         let user3BalanceDiv4 = user3Balance.div(4);
         let balanceBigNumberFormat = BigNumber.from(user3BalanceDiv4.toString());
-        await dxnERC20.connect(user3).approve(deb0xContract.address, user3Balance)
+        await dxn.connect(user3).approve(deb0xContract.address, user3Balance)
         await user3Reward.stake(balanceBigNumberFormat)
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -317,8 +317,8 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.claimRewards()
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
 
         await user1Reward.stake(user1Balance.div(BigNumber.from("2")))
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -339,8 +339,8 @@ describe("Test unstake functionality", async function() {
 
         await user1Reward.claimRewards()
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance)
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance)
 
         await user2Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
         await user1Reward.stake(user1Balance.div(BigNumber.from("2")))
@@ -360,8 +360,8 @@ describe("Test unstake functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await user1Reward.claimRewards()
-        let user1Balance = await dxnERC20.balanceOf(user1.address)
-        await dxnERC20.connect(user1).approve(deb0xContract.address, user1Balance.mul(BigNumber.from("10")))
+        let user1Balance = await dxn.balanceOf(user1.address)
+        await dxn.connect(user1).approve(deb0xContract.address, user1Balance.mul(BigNumber.from("10")))
         await user1Reward.stake(user1Balance.div(2))
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 

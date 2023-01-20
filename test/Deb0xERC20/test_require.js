@@ -9,7 +9,7 @@ let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Memory intensive tests: ERC20 supply limit", async function() {
 
-    let userReward, user1Reward, user2Reward, user3Reward, frontend, dxnERC20, totalMinted;
+    let userReward, user1Reward, user2Reward, user3Reward, frontend, dxn, totalMinted;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -18,8 +18,8 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
         userReward = await DBXen.deploy(ethers.constants.AddressZero);
         await userReward.deployed();
 
-        const dbxAddress = await userReward.dbx()
-        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await userReward.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         user1Reward = userReward.connect(user1)
         user2Reward = userReward.connect(user2)
@@ -44,8 +44,8 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 
         //console.log(`Last cycle:   ${await user1Reward.getCurrentCycle()}`);
         //console.log(`Last reward:  ${await user1Reward.calculateCycleReward()}`);
-        //console.log(`User balance: ${await dxnERC20.balanceOf(user1.address)}`);
-        //console.log(`Total supply: ${await dxnERC20.totalSupply()}`);
+        //console.log(`User balance: ${await dxn.balanceOf(user1.address)}`);
+        //console.log(`Total supply: ${await dxn.totalSupply()}`);
 
         //console.log("Rewards should be ended. Adding 10 more sends");
         for (let i = 0; i < 10; i++) {
@@ -58,8 +58,8 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let user1Balance = await dxnERC20.balanceOf(user1.address);
-        let totalSupply = await dxnERC20.totalSupply();
+        let user1Balance = await dxn.balanceOf(user1.address);
+        let totalSupply = await dxn.totalSupply();
         expect(user1Balance).to.equal(totalSupply);
     });
 

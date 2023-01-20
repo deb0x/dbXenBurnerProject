@@ -17,7 +17,7 @@ contract DBXenViews {
     /**
      * Reward token address.
      */
-    DBXenERC20 dxnERC20;
+    DBXenERC20 dxn;
 
     /**
      * @param _dbXen DBXen.sol contract address

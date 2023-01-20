@@ -8,7 +8,7 @@ let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test send messages and fetch functions", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dxnERC20;
+    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dxn;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -17,8 +17,8 @@ describe("Test send messages and fetch functions", async function() {
         rewardedAlice = await DBXen.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await rewardedAlice.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         rewardedBob = rewardedAlice.connect(bob)
         rewardedCarol = rewardedAlice.connect(carol)

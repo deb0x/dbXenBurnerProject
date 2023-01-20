@@ -9,7 +9,7 @@ let payload = Converter.convertStringToBytes32(ipfsLink);
 
 
 describe("Test permit function", async function() {
-    let rewardedAlice, dxnERC20, dbxERC20Relayer;
+    let rewardedAlice, dxn, dbxERC20Relayer;
     let alice;
     const chainId = 31337;
     const name = "DBXen Reward Token on Polygon";
@@ -28,9 +28,9 @@ describe("Test permit function", async function() {
         deb0xViews = await DBXenViews.deploy(rewardedAlice.address);
         await deb0xViews.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
-        dbxERC20Relayer = dxnERC20.connect(relayer)
+        const dbxAddress = await rewardedAlice.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        dbxERC20Relayer = dxn.connect(relayer)
     });
 
     it("Stake tokens after using the permit function", async function() {
@@ -40,9 +40,9 @@ describe("Test permit function", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedAlice.claimRewards();
-        const balance = await dxnERC20.balanceOf(alice.address);
+        const balance = await dxn.balanceOf(alice.address);
         const deadline = maxDeadline;
-        const domain = { name, version, chainId, verifyingContract: dxnERC20.address }
+        const domain = { name, version, chainId, verifyingContract: dxn.address }
         const types = { Permit }
         const value = { owner: alice.address, spender: rewardedAlice.address, value: balance, nonce, deadline }
         const signature = await alice._signTypedData(domain, types, value)
@@ -52,8 +52,8 @@ describe("Test permit function", async function() {
         await dbxERC20Relayer.permit(alice.address, rewardedAlice.address,
             balance, maxDeadline, expandedSig.v, expandedSig.r, expandedSig.s)
 
-        expect(await dxnERC20.nonces(alice.address)).to.equal('1');
-        expect(await dxnERC20.allowance(alice.address, rewardedAlice.address)).to.equal(balance);
+        expect(await dxn.nonces(alice.address)).to.equal('1');
+        expect(await dxn.allowance(alice.address, rewardedAlice.address)).to.equal(balance);
 
         await rewardedAlice.stake(balance)
 
@@ -63,6 +63,6 @@ describe("Test permit function", async function() {
         let unstakeAmount = await deb0xViews.getAccWithdrawableStake(alice.address)
         await rewardedAlice.unstake(unstakeAmount)
 
-        expect(await dxnERC20.balanceOf(alice.address)).to.equal(balance);
+        expect(await dxn.balanceOf(alice.address)).to.equal(balance);
     })
 })

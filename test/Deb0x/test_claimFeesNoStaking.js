@@ -31,7 +31,7 @@ describe.only("Test claimFee", async function() {
         DBXENViewContract = await DBXenViews.deploy(DBXenContract.address);
         await DBXENViewContract.deployed();
 
-        const dbxAddress = await DBXenContract.dbx()
+        const dbxAddress = await DBXenContract.dxn()
         DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         aliceInstance = XENContract.connect(alice);

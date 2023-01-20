@@ -7,7 +7,7 @@ let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test contract claimRewards", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, dxnERC20, deb0xViews;
+    let rewardedAlice, rewardedBob, rewardedCarol, dxn, deb0xViews;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -20,8 +20,8 @@ describe("Test contract claimRewards", async function() {
         deb0xViews = await DBXenViews.deploy(rewardedAlice.address);
         await deb0xViews.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await rewardedAlice.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         rewardedBob = rewardedAlice.connect(bob)
         rewardedCarol = rewardedAlice.connect(carol)
@@ -86,10 +86,10 @@ describe("Test contract claimRewards", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await rewardedAlice.claimRewards();
-        const balanceAlice = await dxnERC20.balanceOf(alice.address);
+        const balanceAlice = await dxn.balanceOf(alice.address);
 
         await rewardedBob.claimRewards();
-        const balanceBob = await dxnERC20.balanceOf(bob.address);
+        const balanceBob = await dxn.balanceOf(bob.address);
 
         const expected = NumUtils.ether(10000);
 
@@ -110,7 +110,7 @@ describe("Test contract claimRewards", async function() {
             feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
 
         await rewardedAlice.claimRewards();
-        let balanceAlice = await dxnERC20.balanceOf(alice.address);
+        let balanceAlice = await dxn.balanceOf(alice.address);
         let expected = NumUtils.ether(10000);
         expect(balanceAlice).to.equal(expected);
 
@@ -120,7 +120,7 @@ describe("Test contract claimRewards", async function() {
         let cycleRewards = await rewardedAlice.rewardPerCycle(1)
 
         await rewardedAlice.claimRewards();
-        balanceAlice = await dxnERC20.balanceOf(alice.address);
+        balanceAlice = await dxn.balanceOf(alice.address);
         expect(balanceAlice.sub(expected)).to.equal(cycleRewards);
     })
 
@@ -147,8 +147,8 @@ describe("Test contract claimRewards", async function() {
         await rewardedBob.claimRewards();
         let cycle1Rewards = await rewardedAlice.rewardPerCycle(1)
 
-        let balanceAlice = await dxnERC20.balanceOf(alice.address);
-        let balanceBob = await dxnERC20.balanceOf(bob.address);
+        let balanceAlice = await dxn.balanceOf(alice.address);
+        let balanceBob = await dxn.balanceOf(bob.address);
         let expectedCycle0 = NumUtils.ether(10000);
         expect(balanceAlice).to.equal(expectedCycle0.div(2).add(cycle1Rewards));
         expect(balanceBob).to.eq(expectedCycle0.div(2));

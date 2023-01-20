@@ -19,7 +19,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * DBXen Reward Token contract.
      * Initialized in constructor.
      */
-    DBXenERC20 public dbx;
+    DBXenERC20 public dxn;
 
     /**
      * XEN Token contract.
@@ -353,7 +353,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * @param xenAddress XEN contract address.
      */
     constructor(address forwarder, address xenAddress) ERC2771Context(forwarder) {
-        dbx = new DBXenERC20();
+        dxn = new DBXenERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
         currentCycleReward = 10000 * 1e18;
@@ -436,7 +436,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
-        dbx.mintReward(_msgSender(), reward);
+        dxn.mintReward(_msgSender(), reward);
         emit RewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
@@ -463,7 +463,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
         }
 
-        dbx.mintReward(_msgSender(), reward);
+        dxn.mintReward(_msgSender(), reward);
         emit ClientRewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
@@ -540,7 +540,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
         accStakeCycle[_msgSender()][cycleToSet] += amount;
 
-        dbx.transferFrom(_msgSender(), address(this), amount);
+        dxn.transferFrom(_msgSender(), address(this), amount);
         emit Staked(cycleToSet, _msgSender(), amount);
     }
 
@@ -573,7 +573,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         accWithdrawableStake[_msgSender()] -= amount;
         accRewards[_msgSender()] -= amount;
 
-        dbx.transfer(_msgSender(), amount);
+        dxn.transfer(_msgSender(), amount);
         emit Unstaked(currentCycle, _msgSender(), amount);
     }
 
