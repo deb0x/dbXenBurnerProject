@@ -5,21 +5,21 @@ import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IBurnRedeemable.sol";
-import "./Deb0xERC20.sol";
+import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
 /**
- * Main deb0x protocol contract used to send messages,
+ * Main dbXen protocol contract used to send messages,
  * store public keys, allocate token rewards,
  * distribute native token fees, stake and unstake.
  */
-contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
+contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
     /**
-     * Deb0x Reward Token contract.
+     * DBXen Reward Token contract.
      * Initialized in constructor.
      */
-    Deb0xERC20 public dbx;
+    DBXenERC20 public dbx;
 
     /**
      * XEN Token contract.
@@ -353,7 +353,7 @@ contract Deb0x is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * @param xenAddress XEN contract address.
      */
     constructor(address forwarder, address xenAddress) ERC2771Context(forwarder) {
-        dbx = new Deb0xERC20();
+        dbx = new DBXenERC20();
         i_initialTimestamp = block.timestamp;
         i_periodDuration = 1 days;
         currentCycleReward = 10000 * 1e18;

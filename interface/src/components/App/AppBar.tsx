@@ -8,9 +8,9 @@ import { Spinner } from './Spinner';
 import { ethers } from 'ethers';
 import { useEagerConnect } from '../../hooks';
 import formatAccountName from '../Common/AccountName';
-import Deb0x from "../../ethereum/deb0x"
-import Deb0xViews from "../../ethereum/deb0xViews";
-import Deb0xERC20 from "../../ethereum/deb0xerc20";
+import DBXen from "../../ethereum/dbXen"
+import DBXenViews from "../../ethereum/deb0xViews";
+import DBXenERC20 from "../../ethereum/deb0xerc20";
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import '../../componentsStyling/appBar.scss';
@@ -67,7 +67,7 @@ export function AppBarComponent(props: any): any {
     }, [activatingConnector, connector]);
 
     async function setUnstakedAmount() {
-        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
+        const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
         if(account){
             const balance = await deb0xERC20Contract.balanceOf(account)
             setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
@@ -75,7 +75,7 @@ export function AppBarComponent(props: any): any {
     }
 
     useEffect(() => {
-        const deb0xERC20Contract = Deb0xERC20(library, deb0xERC20Address)
+        const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
         const filterFrom = deb0xERC20Contract.filters.Transfer(account)
         const filterTo =  deb0xERC20Contract.filters.Transfer(null, account)
         deb0xERC20Contract.on(filterFrom, () => {
@@ -110,7 +110,7 @@ export function AppBarComponent(props: any): any {
             totalAmountStaked()
         }, [totalStaked]);
         async function totalAmountStaked() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xContract = await DBXen(library, deb0xAddress)
             const currentCycle= await deb0xContract.currentStartedCycle()
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
             const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
@@ -173,13 +173,13 @@ export function AppBarComponent(props: any): any {
     }
 
     async function rewardsAccrued() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+        const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
         const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
         setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(unclaimedRewards)))
     }
 
     async function setStakedAmount() {
-        const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
+        const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
         const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
         setUserStakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
     }

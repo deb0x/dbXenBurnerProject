@@ -1,40 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "./Deb0x.sol";
-import "./Deb0xERC20.sol";
+import "./DBXen.sol";
+import "./DBXenERC20.sol";
 
 /**
- * Helper contract used to optimize deb0x state queries made by clients.
+ * Helper contract used to optimize dbXen state queries made by clients.
  */
 contract DBXenViews {
 
     /**
-     * Main deb0x contract address to get the data from.
+     * Main dbXen contract address to get the data from.
      */
-    Deb0x deb0x;
+    DBXen dbXen;
 
     /**
      * Reward token address.
      */
-    Deb0xERC20 dbxERC20;
+    DBXenERC20 dxnERC20;
 
     /**
-     * @param _deb0x Deb0x.sol contract address
+     * @param _dbXen DBXen.sol contract address
      */
-    constructor(Deb0x _deb0x) {
-        deb0x = _deb0x;
+    constructor(DBXen _dbXen) {
+        dbXen = _dbXen;
     }
 
     /**
-     * @return main deb0x contract native coin balance
+     * @return main dbXen contract native coin balance
      */
     function deb0xContractBalance() external view returns (uint256) {
-        return address(deb0x).balance;
+        return address(dbXen).balance;
     }
 
     /**
-     * @dev Withdrawable stake is the amount of deb0x reward tokens that are currently 
+     * @dev Withdrawable stake is the amount of dbXen reward tokens that are currently 
      * 'unlocked' and can be unstaked by a given account.
      * 
      * @param staker the address to query the withdrawable stake for
@@ -45,30 +45,30 @@ contract DBXenViews {
         view
         returns (uint256)
     {
-        uint256 calculatedCycle = deb0x.getCurrentCycle();
+        uint256 calculatedCycle = dbXen.getCurrentCycle();
         uint256 unlockedStake = 0;
 
         if (
-            deb0x.accFirstStake(staker) != 0 &&
-            calculatedCycle > deb0x.accFirstStake(staker)
+            dbXen.accFirstStake(staker) != 0 &&
+            calculatedCycle > dbXen.accFirstStake(staker)
         ) {
-            unlockedStake += deb0x.accStakeCycle(
+            unlockedStake += dbXen.accStakeCycle(
                 staker,
-                deb0x.accFirstStake(staker)
+                dbXen.accFirstStake(staker)
             );
 
             if (
-                deb0x.accSecondStake(staker) != 0 &&
-                calculatedCycle > deb0x.accSecondStake(staker)
+                dbXen.accSecondStake(staker) != 0 &&
+                calculatedCycle > dbXen.accSecondStake(staker)
             ) {
-                unlockedStake += deb0x.accStakeCycle(
+                unlockedStake += dbXen.accStakeCycle(
                     staker,
-                    deb0x.accSecondStake(staker)
+                    dbXen.accSecondStake(staker)
                 );
             }
         }
 
-        return deb0x.accWithdrawableStake(staker) + unlockedStake;
+        return dbXen.accWithdrawableStake(staker) + unlockedStake;
     }
 
     /**
@@ -79,35 +79,35 @@ contract DBXenViews {
      * @return the amount in wei
      */
     function getUnclaimedFees(address account) external view returns (uint256) {
-        uint256 calculatedCycle = deb0x.getCurrentCycle();
-        uint256 currentAccruedFees = deb0x.accAccruedFees(account);
+        uint256 calculatedCycle = dbXen.getCurrentCycle();
+        uint256 currentAccruedFees = dbXen.accAccruedFees(account);
         uint256 currentCycleFeesPerStakeSummed;
-        uint256 previousStartedCycleTemp = deb0x.previousStartedCycle();
-        uint256 lastStartedCycleTemp = deb0x.lastStartedCycle();
+        uint256 previousStartedCycleTemp = dbXen.previousStartedCycle();
+        uint256 lastStartedCycleTemp = dbXen.lastStartedCycle();
 
-        if (calculatedCycle != deb0x.currentStartedCycle()) {
+        if (calculatedCycle != dbXen.currentStartedCycle()) {
             previousStartedCycleTemp = lastStartedCycleTemp + 1;
-            lastStartedCycleTemp = deb0x.currentStartedCycle();
+            lastStartedCycleTemp = dbXen.currentStartedCycle();
         }
 
         if (
             calculatedCycle > lastStartedCycleTemp &&
-            deb0x.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
+            dbXen.cycleFeesPerStakeSummed(lastStartedCycleTemp + 1) == 0
         ) {
             uint256 feePerStake = 0;
-            if(deb0x.summedCycleStakes(lastStartedCycleTemp) != 0){
-                feePerStake = ((deb0x.cycleAccruedFees(
+            if(dbXen.summedCycleStakes(lastStartedCycleTemp) != 0){
+                feePerStake = ((dbXen.cycleAccruedFees(
                 lastStartedCycleTemp
-            ) + deb0x.pendingFees()) * deb0x.SCALING_FACTOR()) /
-                deb0x.summedCycleStakes(lastStartedCycleTemp);
+            ) + dbXen.pendingFees()) * dbXen.SCALING_FACTOR()) /
+                dbXen.summedCycleStakes(lastStartedCycleTemp);
             }
 
             currentCycleFeesPerStakeSummed =
-                deb0x.cycleFeesPerStakeSummed(previousStartedCycleTemp) +
+                dbXen.cycleFeesPerStakeSummed(previousStartedCycleTemp) +
                 feePerStake;
         } else {
-            currentCycleFeesPerStakeSummed = deb0x.cycleFeesPerStakeSummed(
-                deb0x.previousStartedCycle()
+            currentCycleFeesPerStakeSummed = dbXen.cycleFeesPerStakeSummed(
+                dbXen.previousStartedCycle()
             );
         }
 
@@ -115,47 +115,47 @@ contract DBXenViews {
 
         if (
             calculatedCycle > lastStartedCycleTemp &&
-            deb0x.lastFeeUpdateCycle(account) != lastStartedCycleTemp + 1
+            dbXen.lastFeeUpdateCycle(account) != lastStartedCycleTemp + 1
         ) {
             currentAccruedFees +=
                 (
                     (currentRewards *
                         (currentCycleFeesPerStakeSummed -
-                            deb0x.cycleFeesPerStakeSummed(
-                                deb0x.lastFeeUpdateCycle(account)
+                            dbXen.cycleFeesPerStakeSummed(
+                                dbXen.lastFeeUpdateCycle(account)
                             )))
                 ) /
-                deb0x.SCALING_FACTOR();
+                dbXen.SCALING_FACTOR();
         }
 
         if (
-            deb0x.accFirstStake(account) != 0 &&
-            calculatedCycle > deb0x.accFirstStake(account) &&
-            lastStartedCycleTemp + 1 > deb0x.accFirstStake(account)
+            dbXen.accFirstStake(account) != 0 &&
+            calculatedCycle > dbXen.accFirstStake(account) &&
+            lastStartedCycleTemp + 1 > dbXen.accFirstStake(account)
         ) {
             currentAccruedFees +=
                 (
-                    (deb0x.accStakeCycle(account, deb0x.accFirstStake(account)) *
-                        (currentCycleFeesPerStakeSummed - deb0x.cycleFeesPerStakeSummed(deb0x.accFirstStake(account)
+                    (dbXen.accStakeCycle(account, dbXen.accFirstStake(account)) *
+                        (currentCycleFeesPerStakeSummed - dbXen.cycleFeesPerStakeSummed(dbXen.accFirstStake(account)
                             )))
                 ) /
-                deb0x.SCALING_FACTOR();
+                dbXen.SCALING_FACTOR();
 
             if (
-                deb0x.accSecondStake(account) != 0 &&
-                calculatedCycle > deb0x.accSecondStake(account) &&
-                lastStartedCycleTemp + 1 > deb0x.accSecondStake(account)
+                dbXen.accSecondStake(account) != 0 &&
+                calculatedCycle > dbXen.accSecondStake(account) &&
+                lastStartedCycleTemp + 1 > dbXen.accSecondStake(account)
             ) {
                 currentAccruedFees +=
                     (
-                        (deb0x.accStakeCycle(account, deb0x.accSecondStake(account)
+                        (dbXen.accStakeCycle(account, dbXen.accSecondStake(account)
                         ) *
                             (currentCycleFeesPerStakeSummed -
-                                deb0x.cycleFeesPerStakeSummed(
-                                    deb0x.accSecondStake(account)
+                                dbXen.cycleFeesPerStakeSummed(
+                                    dbXen.accSecondStake(account)
                                 )))
                     ) /
-                    deb0x.SCALING_FACTOR();
+                    dbXen.SCALING_FACTOR();
             }
         }
 
@@ -166,11 +166,11 @@ contract DBXenViews {
      * @return the reward token amount allocated for the current cycle
      */
     function calculateCycleReward() public view returns (uint256) {
-        return (deb0x.lastCycleReward() * 10000) / 10020;
+        return (dbXen.lastCycleReward() * 10000) / 10020;
     }
 
     /**
-     * @dev Unclaimed rewards represent the amount of deb0x reward tokens 
+     * @dev Unclaimed rewards represent the amount of dbXen reward tokens 
      * that were allocated but were not withdrawn by a given account.
      * 
      * @param account the address to query the unclaimed rewards for
@@ -181,16 +181,16 @@ contract DBXenViews {
         view
         returns (uint256)
     {
-        uint256 currentRewards = deb0x.accRewards(account) -  deb0x.accWithdrawableStake(account);
-        uint256 calculatedCycle = deb0x.getCurrentCycle();
+        uint256 currentRewards = dbXen.accRewards(account) -  dbXen.accWithdrawableStake(account);
+        uint256 calculatedCycle = dbXen.getCurrentCycle();
 
        if (
-            calculatedCycle > deb0x.lastActiveCycle(account) &&
-            deb0x.accCycleGasUsed(account) != 0
+            calculatedCycle > dbXen.lastActiveCycle(account) &&
+            dbXen.accCycleGasUsed(account) != 0
         ) {
-            uint256 lastCycleAccReward = (deb0x.accCycleGasUsed(account) *
-                deb0x.rewardPerCycle(deb0x.lastActiveCycle(account))) /
-                deb0x.cycleTotalGasUsed(deb0x.lastActiveCycle(account));
+            uint256 lastCycleAccReward = (dbXen.accCycleGasUsed(account) *
+                dbXen.rewardPerCycle(dbXen.lastActiveCycle(account))) /
+                dbXen.cycleTotalGasUsed(dbXen.lastActiveCycle(account));
 
             currentRewards += lastCycleAccReward;
         }

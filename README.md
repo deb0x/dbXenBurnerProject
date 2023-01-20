@@ -1,16 +1,16 @@
-# deb0x
+# dbXen
 Decentralized communication and storage protocol implementation with reward token incentives. Includes a private e-mail like web application that allows sending end-to-end encrypted messages to ethereum accounts.
 
 ### Links
-* [Website](https://deb0x.org)
-* [Fair Launch](https://mirror.xyz/deb0x.eth/oZZDpd9ME8oGMtw-YKKQRGSeyf4hhXLrFXw8JkQ9GDE)
-* [DApp](https://app.deb0x.org)
+* [Website](https://dbXen.org)
+* [Fair Launch](https://mirror.xyz/dbXen.eth/oZZDpd9ME8oGMtw-YKKQRGSeyf4hhXLrFXw8JkQ9GDE)
+* [DApp](https://app.dbXen.org)
 
 ### Prerequisites
 * npm 6.14+
 * node v14.17+
 * [Metamask.io](https://metamask.io) browser extension
-* (For Testnet) Get goerli ETH from a faucet (e.g. https://goerlifaucet.com/) and try it out on the [test enviroment](https://demo.deb0x.org).
+* (For Testnet) Get goerli ETH from a faucet (e.g. https://goerlifaucet.com/) and try it out on the [test enviroment](https://demo.dbXen.org).
 
 ### Steps to run the frontend
 
@@ -40,8 +40,8 @@ npx hardhat run --network goerli scritps/deploy.js
 | Contract name    | Commit hash | Testnet Goerli                              | Staging Polygon                            |
 | ---------------- | ----------- | ------------------------------------------- | ------------------------------------------ |
 | Forwarder        |  006a9ec    | -                                           | 0x30782c020FE90614f08a863B41CbB07A2D2D94fF |
-| Deb0x            |  bd754ce    | 0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A  | 0x3A274DD833726D9CfDb6cBc23534B2cF5e892347 |
-| Deb0xERC20       |  6662672    | 0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b  | 0x58EE92DaDdF00334da39fb4Fab164c8662C794AD |
+| DBXen            |  bd754ce    | 0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A  | 0x3A274DD833726D9CfDb6cBc23534B2cF5e892347 |
+| DBXenERC20       |  6662672    | 0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b  | 0x58EE92DaDdF00334da39fb4Fab164c8662C794AD |
 | Deb0xView        |  69a94fa    | 0xf4661D0776Ee5171956b25417F7E320fE365C21E  | 0x3a6B3Aff418C7E50eE9F852D0bc7119296cc3644 | 
 
 
@@ -50,6 +50,6 @@ npx hardhat run --network goerli scritps/deploy.js
 | Contract name    | Commit hash | Polygon Mainnet                            |
 | ---------------- | ----------- | ------------------------------------------ |
 | Forwarder        |  5f5f465    | 0x8F94c0193C3c63EFF990Ac386B855A396750032F |
-| Deb0x            |  4693a33    | 0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4 |
-| Deb0xERC20       |  158f325    | 0x62E6B821353eAe41859B52bDc885f9cfA70B2c80 |
+| DBXen            |  4693a33    | 0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4 |
+| DBXenERC20       |  158f325    | 0x62E6B821353eAe41859B52bDc885f9cfA70B2c80 |
 | Deb0xView        |  b80e9e8    | 0xf6AbCBe192789D0c5322C64abaC3E4DC507E90E6 | 

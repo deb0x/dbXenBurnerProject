@@ -3,9 +3,9 @@ import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { injected } from '../../connectors';
-import Deb0xERC20 from "../../ethereum/deb0xerc20"
+import DBXenERC20 from "../../ethereum/deb0xerc20"
 import XENCrypto from '../../ethereum/XENCrypto';
-import Deb0x from "../../ethereum/deb0x"
+import DBXen from "../../ethereum/dbXen"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
 import ScreenSize from '../Common/ScreenSize';
@@ -105,7 +105,7 @@ export function PermanentDrawer(props: any): any {
     async function burnXEN(){
         setLoading(true)
         const signer = await library.getSigner(0)
-        const deb0xContract = Deb0x(signer, deb0xAddress)
+        const deb0xContract = DBXen(signer, deb0xAddress)
         let gasLimitIntervalValue = BigNumber.from("7000000");
         let firstValue =  "0.1";
 
@@ -242,7 +242,7 @@ export function PermanentDrawer(props: any): any {
                             <a href="https://dbxen.gitbook.io/dbxen-litepaper/" target="_blank" className="logo-text-color">
                                 <img src={document} />
                             </a>
-                            <a href="https://github.com/deb0x" target="_blank" className="logo-text-color">
+                            <a href="https://github.com/dbXen" target="_blank" className="logo-text-color">
                                 <FontAwesomeIcon icon={faGithub} size="xl"/>
                             </a>
                         </div>

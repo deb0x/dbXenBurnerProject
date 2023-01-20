@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
@@ -23,12 +23,12 @@ describe.only("Test setKey function", async function() {
         XENContract = await xenContract.deploy();
         await XENContract.deployed();
 
-        const Deb0x = await ethers.getContractFactory("Deb0x");
-        DBXenContract = await Deb0x.deploy(ethers.constants.AddressZero, XENContract.address);
+        const DBXen = await ethers.getContractFactory("DBXen");
+        DBXenContract = await DBXen.deploy(ethers.constants.AddressZero, XENContract.address);
         await DBXenContract.deployed();
 
-        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
-        DBXENViewContract = await Deb0xViews.deploy(DBXenContract.address);
+        const DBXenViews = await ethers.getContractFactory("DBXenViews");
+        DBXENViewContract = await DBXenViews.deploy(DBXenContract.address);
         await DBXENViewContract.deployed();
 
         const dbxAddress = await DBXenContract.dbx()

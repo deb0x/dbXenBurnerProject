@@ -1,24 +1,24 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 const { Converter } = require("../utils/Converter.ts");
 let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test send functionality", async function() {
-    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dbxERC20;
+    let deb0xContract, user1Reward, user2Reward, user3Reward, frontend, dxnERC20;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const Deb0x = await ethers.getContractFactory("Deb0x");
-        deb0xContract = await Deb0x.deploy(ethers.constants.AddressZero);
+        const DBXen = await ethers.getContractFactory("DBXen");
+        deb0xContract = await DBXen.deploy(ethers.constants.AddressZero);
         await deb0xContract.deployed();
 
         const dbxAddress = await deb0xContract.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         user1Reward = deb0xContract.connect(user1)
         user2Reward = deb0xContract.connect(user2)
@@ -44,17 +44,17 @@ describe("Test send functionality", async function() {
 
         let cycle1User1Reward = NumUtils.day(1).mul(user1GasUsed).div(cycleTotalGasUsed)
         await user1Reward.claimRewards()
-        let user1Balance = await dbxERC20.balanceOf(user1.address);
+        let user1Balance = await dxnERC20.balanceOf(user1.address);
         expect(cycle1User1Reward).to.equal(user1Balance);
 
         let cycle1User2Reward = NumUtils.day(1).mul(user2GasUsed).div(cycleTotalGasUsed)
         await user2Reward.claimRewards()
-        let user2Balance = await dbxERC20.balanceOf(user2.address);
+        let user2Balance = await dxnERC20.balanceOf(user2.address);
         expect(cycle1User2Reward).to.equal(user2Balance);
 
         let cycle1User3Reward = NumUtils.day(1).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
-        let user3Balance = await dbxERC20.balanceOf(user3.address);
+        let user3Balance = await dxnERC20.balanceOf(user3.address);
         expect(cycle1User3Reward).to.equal(user3Balance);
 
         await user3Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -69,7 +69,7 @@ describe("Test send functionality", async function() {
 
         let cycle2User3Reward = NumUtils.day(2).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
-        let user3BalanceScondCycle = await dbxERC20.balanceOf(user3.address);
+        let user3BalanceScondCycle = await dxnERC20.balanceOf(user3.address);
         expect(cycle2User3Reward.add(cycle1User3Reward)).to.equal(user3BalanceScondCycle);
 
         await user1Reward["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
@@ -84,7 +84,7 @@ describe("Test send functionality", async function() {
 
         let cycle3User3Reward = NumUtils.day(3).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
-        let user3BalanceThirdCycle = await dbxERC20.balanceOf(user3.address);
+        let user3BalanceThirdCycle = await dxnERC20.balanceOf(user3.address);
         expect(cycle3User3Reward.add(cycle2User3Reward)
             .add(cycle1User3Reward)).to.equal(user3BalanceThirdCycle);
 
@@ -102,7 +102,7 @@ describe("Test send functionality", async function() {
         //In 102 cycle user will recieve reward from cycle 4 
         let cycle4User3Reward = NumUtils.day(4).mul(user3GasUsed).div(cycleTotalGasUsed)
         await user3Reward.claimRewards()
-        let user3BalanceHundredTenCycle = await dbxERC20.balanceOf(user3.address);
+        let user3BalanceHundredTenCycle = await dxnERC20.balanceOf(user3.address);
         expect(cycle4User3Reward
             .add(cycle3User3Reward).add(cycle2User3Reward)
             .add(cycle1User3Reward)).to.equal(user3BalanceHundredTenCycle);
@@ -115,7 +115,7 @@ describe("Test send functionality", async function() {
     beforeEach("Set enviroment", async() => {
         [deployer, add1, add2, add3, add4, add5, add6, add7] = await ethers.getSigners();
 
-        const Deb0xCore = await ethers.getContractFactory("Deb0x");
+        const Deb0xCore = await ethers.getContractFactory("DBXen");
         deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
     });

@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 const { Converter } = require("../utils/Converter.ts");
 let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
@@ -9,17 +9,17 @@ let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Memory intensive tests: ERC20 supply limit", async function() {
 
-    let userReward, user1Reward, user2Reward, user3Reward, frontend, dbxERC20, totalMinted;
+    let userReward, user1Reward, user2Reward, user3Reward, frontend, dxnERC20, totalMinted;
     let user1, user2;
     beforeEach("Set enviroment", async() => {
         [user1, user2, user3, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const Deb0x = await ethers.getContractFactory("Deb0x");
-        userReward = await Deb0x.deploy(ethers.constants.AddressZero);
+        const DBXen = await ethers.getContractFactory("DBXen");
+        userReward = await DBXen.deploy(ethers.constants.AddressZero);
         await userReward.deployed();
 
         const dbxAddress = await userReward.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        dxnERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         user1Reward = userReward.connect(user1)
         user2Reward = userReward.connect(user2)
@@ -44,8 +44,8 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 
         //console.log(`Last cycle:   ${await user1Reward.getCurrentCycle()}`);
         //console.log(`Last reward:  ${await user1Reward.calculateCycleReward()}`);
-        //console.log(`User balance: ${await dbxERC20.balanceOf(user1.address)}`);
-        //console.log(`Total supply: ${await dbxERC20.totalSupply()}`);
+        //console.log(`User balance: ${await dxnERC20.balanceOf(user1.address)}`);
+        //console.log(`Total supply: ${await dxnERC20.totalSupply()}`);
 
         //console.log("Rewards should be ended. Adding 10 more sends");
         for (let i = 0; i < 10; i++) {
@@ -58,12 +58,12 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        let user1Balance = await dbxERC20.balanceOf(user1.address);
-        let totalSupply = await dbxERC20.totalSupply();
+        let user1Balance = await dxnERC20.balanceOf(user1.address);
+        let totalSupply = await dxnERC20.totalSupply();
         expect(user1Balance).to.equal(totalSupply);
     });
 
-    //This test can be use to test require in Deb0xERC20 contract. Require condition must be modified with a value lower than total supply
+    //This test can be use to test require in DBXenERC20 contract. Require condition must be modified with a value lower than total supply
     it.ignore(`Should test require`, async() => {
         try {
             for (let i = 0; i < 15000; i++) {
@@ -105,13 +105,13 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 // ·············|················|·············|·············|···········|···············|··············
 // |  Contract  ·  Method        ·  Min        ·  Max        ·  Avg      ·  # calls      ·  usd (avg)  │
 // ·············|················|·············|·············|···········|···············|··············
-// |  Deb0x     ·  claimRewards  ·     143195  ·     245795  ·   143200  ·        22532  ·          -  │
+// |  DBXen     ·  claimRewards  ·     143195  ·     245795  ·   143200  ·        22532  ·          -  │
 // ·············|················|·············|·············|···········|···············|··············
-// |  Deb0x     ·  send          ·     129856  ·     329601  ·   229799  ·        22533  ·          -  │
+// |  DBXen     ·  send          ·     129856  ·     329601  ·   229799  ·        22533  ·          -  │
 // ·············|················|·············|·············|···········|···············|··············
 // |  Deployments                ·                                       ·  % of limit   ·             │
 // ······························|·············|·············|···········|···············|··············
-// |  Deb0x                      ·          -  ·          -  ·  6067644  ·       20.2 %  ·          -  │
+// |  DBXen                      ·          -  ·          -  ·  6067644  ·       20.2 %  ·          -  │
 // ·-----------------------------|-------------|-------------|-----------|---------------|-------------·
 // 
 //   0 passing (29m)
@@ -120,8 +120,8 @@ describe("Memory intensive tests: ERC20 supply limit", async function() {
 //   1) Memory intensive tests: ERC20 supply limit
 //        Should test require:
 //      Error: VM Exception while processing transaction: reverted with panic code 0x12 (Division or modulo division by zero)
-//       at Deb0x.updateCycleFeesPerStakeSummed (contracts/Deb0x.sol:185)
-//       at Deb0x.send (contracts/Deb0x.sol:361)
+//       at DBXen.updateCycleFeesPerStakeSummed (contracts/DBXen.sol:185)
+//       at DBXen.send (contracts/DBXen.sol:361)
 //       at runMicrotasks (<anonymous>)
 //       at processTicksAndRejections (internal/process/task_queues.js:95:5)
 //       at runNextTicks (internal/process/task_queues.js:64:3)
