@@ -3,7 +3,6 @@ import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { injected } from '../../connectors';
-import DBXenERC20 from "../../ethereum/deb0xerc20"
 import XENCrypto from '../../ethereum/XENCrypto';
 import DBXen from "../../ethereum/dbxen"
 import { ethers } from "ethers";

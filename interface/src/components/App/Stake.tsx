@@ -9,8 +9,8 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import DBXen from "../../ethereum/dbxen"
-import DBXenViews from "../../ethereum/deb0xViews";
-import DBXenERC20 from "../../ethereum/deb0xerc20"
+import DBXenViews from "../../ethereum/dbxenViews";
+import DBXenERC20 from "../../ethereum/dbxenerc20"
 import SnackbarNotification from './Snackbar';
 import { BigNumber, ethers } from "ethers";
 import "../../componentsStyling/stake.scss";

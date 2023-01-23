@@ -9,8 +9,8 @@ import { ethers } from 'ethers';
 import { useEagerConnect } from '../../hooks';
 import formatAccountName from '../Common/AccountName';
 import DBXen from "../../ethereum/dbxen"
-import DBXenViews from "../../ethereum/deb0xViews";
-import DBXenERC20 from "../../ethereum/deb0xerc20";
+import DBXenViews from "../../ethereum/dbxenViews";
+import DBXenERC20 from "../../ethereum/dbxenerc20"
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import '../../componentsStyling/appBar.scss';
