@@ -62,76 +62,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "ClientFeesClaimed",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "uint256",
-						"name": "cycle",
-						"type": "uint256"
-					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "ClientRewardsClaimed",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "uint256",
-						"name": "cycle",
-						"type": "uint256"
-					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "fees",
-						"type": "uint256"
-					}
-				],
 				"name": "FeesClaimed",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "to",
-						"type": "address"
-					},
-					{
-						"indexed": true,
-						"internalType": "bytes32",
-						"name": "value",
-						"type": "bytes32"
-					}
-				],
-				"name": "KeySet",
 				"type": "event"
 			},
 			{
@@ -286,7 +217,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "PROTOCOL_FEE",
+				"name": "PROTOCOL_FEE1",
 				"outputs": [
 					{
 						"internalType": "uint16",
@@ -311,14 +242,8 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "accAccruedFees",
+				"inputs": [],
+				"name": "XEN_BATCH_AMOUNT",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -337,7 +262,7 @@
 						"type": "address"
 					}
 				],
-				"name": "accCycleGasOwed",
+				"name": "accAccruedFees",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -468,6 +393,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "amountTotalBurn",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -491,40 +429,11 @@
 						"internalType": "uint256",
 						"name": "batchNumber",
 						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "feeReceiver",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "msgFee",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "nativeTokenFee",
-						"type": "uint256"
 					}
 				],
 				"name": "burnBatch",
 				"outputs": [],
 				"stateMutability": "payable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "claimClientFees",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "claimClientRewards",
-				"outputs": [],
-				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -539,101 +448,6 @@
 				"name": "claimRewards",
 				"outputs": [],
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "clientAccruedFees",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "clientCycleGasEarned",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "clientLastFeeUpdate",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "clientLastRewardUpdate",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "clientRewards",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -991,19 +805,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "bytes32",
-						"name": "publicKey",
-						"type": "bytes32"
-					}
-				],
-				"name": "setKey",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "uint256",
 						"name": "amount",
 						"type": "uint256"
@@ -1084,17 +885,8 @@
 				"Burn(address,uint256)": {
 					"details": "Emitted when calling {burn} function for `userAddress`  which burns `batchNumber` * 1000 tokens"
 				},
-				"ClientFeesClaimed(uint256,address,uint256)": {
-					"details": "Emitted when the client operating `account` claims an amount of `fees`  in native token through {claimClientFees} in `cycle`."
-				},
-				"ClientRewardsClaimed(uint256,address,uint256)": {
-					"details": "Emitted when client operating `account` claims `amount` DBX  token rewards through {claimRewards} in `cycle`."
-				},
 				"FeesClaimed(uint256,address,uint256)": {
 					"details": "Emitted when `account` claims an amount of `fees` in native token through {claimFees} in `cycle`."
-				},
-				"KeySet(address,bytes32)": {
-					"details": "Emitted when calling {setKey}, `to` being assigned this key `value`."
 				},
 				"NewCycleStarted(uint256,uint256,uint256)": {
 					"details": "Emitted when calling {send} marking the new current `cycle`, `calculatedCycleReward` and `summedCycleStakes`."
@@ -1111,20 +903,11 @@
 			},
 			"kind": "dev",
 			"methods": {
-				"burnBatch(uint256,address,uint256,uint256)": {
+				"burnBatch(uint256)": {
 					"details": "Burn batchNumber * 1000 tokens  ",
 					"params": {
-						"batchNumber": "number of batches",
-						"feeReceiver": "client address.",
-						"msgFee": "on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.",
-						"nativeTokenFee": "on-top native coin fee charged by the client. If 0, no native token fee applies."
+						"batchNumber": "number of batches"
 					}
-				},
-				"claimClientFees()": {
-					"details": "Transfers newly accrued client fee share and transfers  the entire amount to caller address."
-				},
-				"claimClientRewards()": {
-					"details": "Mints newly accrued client rewards share and transfers the entire  allocated amount to the transaction sender address."
 				},
 				"claimFees()": {
 					"details": "Transfers newly accrued fees to sender's address."
@@ -1140,12 +923,6 @@
 				},
 				"getCurrentCycle()": {
 					"details": "Returns the index of the cycle at the current block time."
-				},
-				"setKey(bytes32)": {
-					"details": "Stores the public key of the sender account. ",
-					"params": {
-						"publicKey": "as encoded by the client."
-					}
 				},
 				"stake(uint256)": {
 					"details": "Stakes the given amount and increases the share of the daily allocated fees. The tokens are transfered from sender account to this contract. To receive the tokens back, the unstake function must be called by the same account address. ",
@@ -1168,7 +945,7 @@
 				"MAX_BPS()": {
 					"notice": "Basis points representation of 100 percent."
 				},
-				"PROTOCOL_FEE()": {
+				"PROTOCOL_FEE1()": {
 					"notice": "Basis points (bps) representation of the protocol fee (i.e. 10 percent). Calls to send function charge 1000 bps of transaction cost."
 				},
 				"SCALING_FACTOR()": {
@@ -1176,9 +953,6 @@
 				},
 				"accAccruedFees(address)": {
 					"notice": "The fee amount the account can withdraw."
-				},
-				"accCycleGasOwed(address)": {
-					"notice": "The amount of gas an account owes towards clients."
 				},
 				"accCycleGasUsed(address)": {
 					"notice": "The amount of gas an account has spent sending messages. Resets during a new cycle when an account performs an action that updates its stats."
@@ -1197,21 +971,6 @@
 				},
 				"accWithdrawableStake(address)": {
 					"notice": "Stake amount an account can currently withdraw."
-				},
-				"clientAccruedFees(address)": {
-					"notice": "The fee amount the client can withdraw."
-				},
-				"clientCycleGasEarned(address)": {
-					"notice": "The amount of gas a client has received from owed account gas."
-				},
-				"clientLastFeeUpdate(address)": {
-					"notice": "The last cycle in which the client had its earned fees updated."
-				},
-				"clientLastRewardUpdate(address)": {
-					"notice": "The last cycle in which the client had its reward updated."
-				},
-				"clientRewards(address)": {
-					"notice": "Current unclaimed rewards per client."
 				},
 				"currentCycle()": {
 					"notice": "Index (0-based) of the current cycle.  Updated upon cycle setup that is triggered by contract interraction  (account sends message, claims fees, claims rewards, stakes or unstakes)."
@@ -1429,19 +1188,19 @@
 			]
 		},
 		"contracts/Deb0x.sol": {
-			"keccak256": "0x5e29162dbb0776cbdccf19f7891f1cd0c964ff178b5ccd2dcd709610ca59aef6",
+			"keccak256": "0x7e17554319072b7a6eef28755d6f65422a866d1e70b6985c3b71fdc1f8dc74f4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://af1424394e231d46663118c578c2e1b7d7044e9f6ca7c84b6090c26cd7411d4d",
-				"dweb:/ipfs/QmacbP5LncNoRWTo2JW9w9ipTFUpGe4wPEd3VriSPsq74Q"
+				"bzz-raw://02e2a97314953345f69f2da5f5c738fc03891e9a10e0bed7f77f07ef79b8c1ae",
+				"dweb:/ipfs/QmNmPUK9ZXUfdCoc1qMCKTEPQzSGc114a8AoLdhJs32EQJ"
 			]
 		},
 		"contracts/Deb0xERC20.sol": {
-			"keccak256": "0xf59e2f1f6f4362550895d41a99108f6e72b004ce5ace908aabe6a68190b5eb67",
+			"keccak256": "0x4e0411f36f820654592d799ea5103502c815d89b9628a3e563375257a83d67c0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://357e0e1d50717960c918b9a001bac93b3fe7013ab848d72dcd5d6ac2ae9b270d",
-				"dweb:/ipfs/QmZzxsWuh598YEiPAjwm4fexfZNrB7KvNEys2ZSTkXwi2s"
+				"bzz-raw://13e8f3426a18287dd119239080c45c7b7c8aea93677af34e8072289f33e62542",
+				"dweb:/ipfs/QmTyCVN8rUM9WDKZt835WGKYzySayshhqn4Agf6ErwZ8ZQ"
 			]
 		},
 		"contracts/MathX.sol": {

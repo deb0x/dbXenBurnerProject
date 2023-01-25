@@ -128,11 +128,7 @@ export function PermanentDrawer(props: any): any {
             const overrides = 
                 { value: ethers.utils.parseUnits(firstValue, "ether"),
                     gasLimit:gasLimitIntervalValue }
-            const tx = await deb0xContract["burnBatch(uint256,address,uint256,uint256)"](value,
-                ethers.constants.AddressZero,
-                0,
-                0,
-                overrides)
+            const tx = await deb0xContract["burnBatch(uint256)"](value,overrides)
 
             await tx.wait()
                 .then((result: any) => {
@@ -153,6 +149,7 @@ export function PermanentDrawer(props: any): any {
                     setLoading(false)
                 })
             } catch (error: any) {
+                console.log(error.message)
                 setNotificationState({
                     message: "You rejected the transaction.",
                     open: true,
