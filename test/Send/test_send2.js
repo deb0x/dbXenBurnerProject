@@ -1,24 +1,24 @@
 const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
     // const { abiDBXCore } = require("../../artifacts/contracts/Deb0xCore.sol/Deb0xCore.json")
 const { Converter } = require("../utils/Converter.ts");
 let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test send messages and fetch functions", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20;
+    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dxn;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const Deb0x = await ethers.getContractFactory("Deb0x");
-        rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
+        const DBXen = await ethers.getContractFactory("DBXen");
+        rewardedAlice = await DBXen.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await rewardedAlice.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         rewardedBob = rewardedAlice.connect(bob)
         rewardedCarol = rewardedAlice.connect(carol)
@@ -216,7 +216,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, ).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: value less than required protocol fee")
+            expect(err.message).to.contain("DBXen: value less than required protocol fee")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {
@@ -239,7 +239,7 @@ describe("Test send messages and fetch functions", async function() {
             feeReceiver.address, 200, 0, { value: 20 }).then(res => {
             assert.fail("must throw err");
         }).catch(err => {
-            expect(err.message).to.contain("Deb0x: value less than required protocol fee")
+            expect(err.message).to.contain("DBXen: value less than required protocol fee")
         })
         let totalNumberOfMessagesSentByAlice = 0;
         if (sendMessage != undefined) {
@@ -277,7 +277,7 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include("Deb0x: crefs and recipients lengths not equal");
+            expect(error.message).to.include("DBXen: crefs and recipients lengths not equal");
         }
     });
 
@@ -294,7 +294,7 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include("Deb0x: recipients array empty");
+            expect(error.message).to.include("DBXen: recipients array empty");
         }
     });
 
@@ -306,7 +306,7 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([address], [cref],
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include('Deb0x: cref too long')
+            expect(error.message).to.include('DBXen: cref too long')
         }
     });
 
@@ -319,7 +319,7 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, crefs,
                 feeReceiver.address, 100, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include('Deb0x: cref too long')
+            expect(error.message).to.include('DBXen: cref too long')
         }
     });
 
@@ -348,7 +348,7 @@ describe("Test send messages and fetch functions", async function() {
             await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"](address, payloads,
                 feeReceiver.address, 10002, 0, { value: ethers.utils.parseEther("1") })
         } catch (error) {
-            expect(error.message).to.include("Deb0x: reward fees exceed 10000 bps");
+            expect(error.message).to.include("DBXen: reward fees exceed 10000 bps");
         }
     });
 

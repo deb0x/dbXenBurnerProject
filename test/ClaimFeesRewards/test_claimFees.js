@@ -1,27 +1,27 @@
 const { expect, assert } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { Converter } = require("../utils/Converter.ts");
 let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
 let payload = Converter.convertStringToBytes32(ipfsLink);
 
 describe("Test fee claiming for users/frontends", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dbxERC20, deb0xViews;
+    let rewardedAlice, rewardedBob, rewardedCarol, frontend, dxn, deb0xViews;
     let alice, bob;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const Deb0x = await ethers.getContractFactory("Deb0x");
-        rewardedAlice = await Deb0x.deploy(ethers.constants.AddressZero);
+        const DBXen = await ethers.getContractFactory("DBXen");
+        rewardedAlice = await DBXen.deploy(ethers.constants.AddressZero);
         await rewardedAlice.deployed();
 
-        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
-        deb0xViews = await Deb0xViews.deploy(rewardedAlice.address);
+        const DBXenViews = await ethers.getContractFactory("DBXenViews");
+        deb0xViews = await DBXenViews.deploy(rewardedAlice.address);
         await deb0xViews.deployed();
 
-        const dbxAddress = await rewardedAlice.dbx()
-        dbxERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        const dbxAddress = await rewardedAlice.dxn()
+        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
         rewardedBob = rewardedAlice.connect(bob)
         rewardedCarol = rewardedAlice.connect(carol)
@@ -116,9 +116,9 @@ describe("Test fee claiming for users/frontends", async function() {
         await frontend.claimClientFees();
 
         // tesing rewards 
-        let frontDBX = await dbxERC20.balanceOf(feeReceiver.address);
+        let frontDBX = await dxn.balanceOf(feeReceiver.address);
         await frontend.claimClientRewards();
-        frontDBX = await dbxERC20.balanceOf(feeReceiver.address);
+        frontDBX = await dxn.balanceOf(feeReceiver.address);
 
         const feesClaimed = await rewardedAlice.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
@@ -209,8 +209,8 @@ describe("Test fee claiming for users/frontends", async function() {
         await rewardedAlice.claimRewards();
         await rewardedBob.claimRewards();
 
-        let aliceBal = await dbxERC20.balanceOf(alice.address);
-        let bobBal = await dbxERC20.balanceOf(bob.address);
+        let aliceBal = await dxn.balanceOf(alice.address);
+        let bobBal = await dxn.balanceOf(bob.address);
 
         // difference of 1 
         expect(aliceBal.add(bobBal)).to.eq(ethers.utils.parseEther("10000").sub(1));

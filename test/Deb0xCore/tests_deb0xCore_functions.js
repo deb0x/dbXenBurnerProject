@@ -10,12 +10,12 @@ describe("Test Deb0xCore contract", async function() {
     beforeEach("Set enviroment", async() => {
         [deployer, add1, add2, add3, add4, add5] = await ethers.getSigners();
 
-        const Deb0xCore = await ethers.getContractFactory("Deb0x");
+        const Deb0xCore = await ethers.getContractFactory("DBXen");
         deboxCore = await Deb0xCore.deploy(ethers.constants.AddressZero);
         await deboxCore.deployed();
 
-        const Deb0xViews = await ethers.getContractFactory("Deb0xViews");
-        deb0xViews = await Deb0xViews.deploy(deboxCore.address);
+        const DBXenViews = await ethers.getContractFactory("DBXenViews");
+        deb0xViews = await DBXenViews.deploy(deboxCore.address);
         await deb0xViews.deployed();
     });
 
@@ -119,7 +119,7 @@ describe("Test Deb0xCore contract", async function() {
             await deboxCore.send(addresses, cids, ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
         } catch (error) {
-            expect(error.message).to.include("Deb0x: empty cref");
+            expect(error.message).to.include("DBXen: empty cref");
         }
 
     });

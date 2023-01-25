@@ -1,15 +1,15 @@
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 
-describe("Test Deb0xERC20 contract", async function() {
+describe("Test DBXenERC20 contract", async function() {
     let user1, user1InstanceContract;
     beforeEach("Set enviroment", async() => {
         [deployer, user1] = await ethers.getSigners();
 
-        const Deb0xERC20 = await ethers.getContractFactory("Deb0xERC20");
-        erc20 = await Deb0xERC20.deploy();
+        const DBXenERC20 = await ethers.getContractFactory("DBXenERC20");
+        erc20 = await DBXenERC20.deploy();
         await erc20.deployed();
 
         user1InstanceContract = erc20.connect(user1)
@@ -24,7 +24,7 @@ describe("Test Deb0xERC20 contract", async function() {
         try {
             await user1InstanceContract.mintReward(deployer.address, ethers.utils.parseEther("100"));
         } catch (error) {
-            expect(error.message).to.include("DBX: caller is not Deb0x contract.");
+            expect(error.message).to.include("DBX: caller is not DBXen contract.");
         }
     })
 
