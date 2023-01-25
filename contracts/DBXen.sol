@@ -31,12 +31,17 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
      * Calls to send function charge 1000 bps of transaction cost.
      */
-    uint16 public constant PROTOCOL_FEE = 1000;
+    uint16 public constant PROTOCOL_FEE1 = 1000;
 
     /**
      * Basis points representation of 100 percent.
      */
     uint16 public constant MAX_BPS = 10000;
+
+    /**
+     * Amount of XEN tokens per batch
+     */
+    uint256 public constant XEN_BATCH_AMOUNT = 1;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -118,17 +123,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     mapping(address => bytes32) public publicKeys;
 
     /**
-     * The amount of gas an account owes towards clients.
-     */
-    mapping(address => uint256) public accCycleGasOwed;
-
-    /**
-     * The amount of gas a client has received from owed
-     * account gas.
-     */
-    mapping(address => uint256) public clientCycleGasEarned;
-
-    /**
      * The amount of gas an account has spent sending messages.
      * Resets during a new cycle when an account performs an action
      * that updates its stats.
@@ -147,21 +141,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     mapping(address => uint256) public lastActiveCycle;
 
     /**
-     * The last cycle in which the client had its reward updated.
-     */
-    mapping(address => uint256) public clientLastRewardUpdate;
-
-    /**
-     * The last cycle in which the client had its earned fees updated.
-     */
-    mapping(address => uint256) public clientLastFeeUpdate;
-
-    /**
-     * The fee amount the client can withdraw.
-     */
-    mapping(address => uint256) public clientAccruedFees;
-
-    /**
      * Current unclaimed rewards and staked amounts per account.
      */
     mapping(address => uint256) public accRewards;
@@ -170,11 +149,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * The fee amount the account can withdraw.
      */
     mapping(address => uint256) public accAccruedFees;
-
-    /**
-     * Current unclaimed rewards per client.
-     */
-    mapping(address => uint256) public clientRewards;
 
     /**
      * Total token rewards allocated per cycle.
@@ -225,16 +199,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     mapping(address => uint256) public accSecondStake;
 
     /**
-     * @dev Emitted when the client operating `account` claims an amount of `fees` 
-     * in native token through {claimClientFees} in `cycle`.
-     */
-    event ClientFeesClaimed(
-        uint256 indexed cycle,
-        address indexed account,
-        uint256 fees
-    );
-
-    /**
      * @dev Emitted when `account` claims an amount of `fees` in native token
      * through {claimFees} in `cycle`.
      */
@@ -259,16 +223,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * {unstake} in `cycle`.
      */
     event Unstaked(
-        uint256 indexed cycle,
-        address indexed account,
-        uint256 amount
-    );
-
-    /**
-     * @dev Emitted when client operating `account` claims `amount` DBX 
-     * token rewards through {claimRewards} in `cycle`.
-     */
-    event ClientRewardsClaimed(
         uint256 indexed cycle,
         address indexed account,
         uint256 amount
@@ -302,50 +256,22 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         address indexed userAddress,
         uint256 batchNumber
     );
-    
-    /**
-     * @dev Measures the amount of consummed gas.
-     * In case a fee is applied, the corresponding percentage will be recorded 
-     * as consumed by the feeReceiver instead of the caller.
-     * 
-     * @param feeReceiver the address of the fee receiver (client).
-     * @param msgFee fee percentage expressed in basis points.
-     */
-    modifier gasUsed(address feeReceiver, uint256 msgFee) {
-        uint256 startGas = gasleft();
-
-        _;
-
-        uint256 gasConsumed = startGas - gasleft();
-        cycleTotalGasUsed[currentCycle] += gasConsumed;
-
-        if (feeReceiver != address(0) && msgFee != 0) {
-            uint256 gasOwed = (gasConsumed * msgFee) / MAX_BPS;
-            gasConsumed -= gasOwed;
-            clientCycleGasEarned[feeReceiver] += gasOwed;
-        }
-        accCycleGasUsed[_msgSender()] += gasConsumed;
-    }
 
     /**
      * @dev Checks that the caller has sent an amount that is equal or greater 
      * than the sum of the protocol fee and the client's native token fee. 
      * The change is sent back to the caller.
      * 
-     * @param nativeTokenFee the amount charged by the client.
      */
-    modifier gasWrapper(uint256 nativeTokenFee) {
+    modifier gasWrapper(uint256 batchNumber) {
         uint256 startGas = gasleft();
-
         _;
-
-        uint256 fee = ((startGas - gasleft() + 39700) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS;
-        require(
-            msg.value - nativeTokenFee >= fee,
-            "DBXen: value less than required protocol fee"
-        );
+        cycleTotalGasUsed[currentCycle] += batchNumber;
+        accCycleGasUsed[_msgSender()] +=  batchNumber;
+        uint256 PROTOCOL_FEE = (batchNumber * (1000000 - 50 * batchNumber));
+        uint256 fee = ((startGas - gasleft() + 39400) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS / 100;
         cycleAccruedFees[currentCycle] += fee;
-        sendViaCall(payable(msg.sender), msg.value - fee - nativeTokenFee);
+        sendViaCall(payable(msg.sender), msg.value - fee);
     }
 
     /**
@@ -362,56 +288,59 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         xen = XENCrypto(xenAddress);
     }
 
+    /**
+        @dev confirms support for IBurnRedeemable interfaces
+     */
     function supportsInterface(bytes4 interfaceId) public view returns (bool) {
         return
             interfaceId == type(IBurnRedeemable).interfaceId;
-            // super.supportsInterface(interfaceId);
-
     }
 
-    function onTokenBurned(address user, uint256 amount) external{}
+    // IBurnRedeemable IMPLEMENTATION
 
     /**
-     * @dev Burn batchNumber * 1000 tokens 
+        @dev implements IBurnRedeemable interface for burning XEN and completing update for state
+     */
+
+    function onTokenBurned(address user, uint256 amount) external{
+        require(msg.sender == address(xen), "DBXen: illegal callback caller");
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        setUpNewCycle();
+        updateStats(user);
+        lastActiveCycle[user] = currentCycle;
+        emit Burn(user, amount);
+    }
+
+    /**
+     * @dev Burn batchNumber * 10.000.000 tokens 
      * 
      * @param batchNumber number of batches
-     * @param feeReceiver client address.
-     * @param msgFee on-top reward token fee charged by the client (in basis points). If 0, no reward token fee applies.
-     * @param nativeTokenFee on-top native coin fee charged by the client. If 0, no native token fee applies.
      */
     function burnBatch(
-        uint256 batchNumber,
-        address feeReceiver,
-        uint256 msgFee,
-        uint256 nativeTokenFee
+        uint256 batchNumber
     )
         external
         payable
         nonReentrant()
-        gasWrapper(nativeTokenFee)
-        gasUsed(feeReceiver, msgFee)
+        gasWrapper(batchNumber)
     {
-        require(batchNumber <= 2000, "DBXen: maxim batch number is 2000");
+        require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(msgFee <= MAX_BPS, "DBXen: reward fees exceed 10000 bps");
-        require(xen.balanceOf(msg.sender) >= batchNumber* 250000* (10**18), "DBXen: You have insufficient funds to burn");
-       
-        for(uint256 i=0; i<batchNumber; i++) {
-                burn(msg.sender, 250000* (10**18));
-        }
+        require(xen.balanceOf(msg.sender) >= batchNumber* XEN_BATCH_AMOUNT* (10**18), "DBXen: You have insufficient funds to burn");
       
-        calculateCycle();
-        updateCycleFeesPerStakeSummed();
-        setUpNewCycle();
-        updateStats(_msgSender());
-        updateClientStats(feeReceiver);
-        
-        lastActiveCycle[_msgSender()] = currentCycle;
-        emit Burn(msg.sender, batchNumber);
+        burn(msg.sender, batchNumber * XEN_BATCH_AMOUNT* (10**18));
     }
 
-    function burn(address user, uint256 amount) public {
-        xen.burn(user,amount);
+    /**
+     * @dev Call burn function from XENCrypto
+     *
+     */  
+    function burn(address user, uint256 amount) internal{
+        require(user != address(0), "DBXen: illegal owner address");
+        require(amount > 0, "DBXen: illegal amount");
+
+        IBurnableToken(xen).burn(user, amount);
     }
 
     /**
@@ -441,33 +370,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     }
 
     /**
-     * @dev Mints newly accrued client rewards share and transfers the entire 
-     * allocated amount to the transaction sender address.
-     */
-    function claimClientRewards()
-        external
-        nonReentrant()
-    {
-        calculateCycle();
-        updateCycleFeesPerStakeSummed();
-
-        updateClientStats(_msgSender());
-
-        uint256 reward = clientRewards[_msgSender()];
-        require(reward > 0, "DBXen: client has no rewards");
-        clientRewards[_msgSender()] = 0;
-
-        if (lastStartedCycle == currentStartedCycle) {
-            pendingStakeWithdrawal += reward;
-        } else {
-            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - reward;
-        }
-
-        dxn.mintReward(_msgSender(), reward);
-        emit ClientRewardsClaimed(currentCycle, _msgSender(), reward);
-    }
-
-    /**
      * @dev Transfers newly accrued fees to sender's address.
      */
     function claimFees()
@@ -483,26 +385,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         accAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
-    }
-
-    /**
-     * @dev Transfers newly accrued client fee share and transfers 
-     * the entire amount to caller address.
-     */
-    function claimClientFees()
-        external
-        nonReentrant()
-    {
-        calculateCycle();
-        updateCycleFeesPerStakeSummed();
-
-        updateClientStats(_msgSender());
-        uint256 fees = clientAccruedFees[_msgSender()];
-        require(fees > 0, "DBXen: client has no accrued fees");
-
-        clientAccruedFees[_msgSender()] = 0;
-        sendViaCall(payable(_msgSender()), fees);
-        emit ClientFeesClaimed(getCurrentCycle(), _msgSender(), fees);
     }
 
     /**
@@ -582,45 +464,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      */
     function getCurrentCycle() public view returns (uint256) {
         return (block.timestamp - i_initialTimestamp) / i_periodDuration;
-    }
-
-    /**
-     * @dev Updates various helper state variables used to compute token rewards 
-     * and fees distribution for a given client.
-     * 
-     * @param client the address of the client to make the updates for.
-     */
-    function updateClientStats(address client) internal {
-        if (currentCycle > clientLastRewardUpdate[client]) {
-            uint256 lastUpdatedCycle = clientLastRewardUpdate[client];
-
-            if (
-                clientCycleGasEarned[client] != 0 &&
-                cycleTotalGasUsed[lastUpdatedCycle] != 0
-            ) {
-                uint256 clientRewardsEarned = (clientCycleGasEarned[client] * rewardPerCycle[lastUpdatedCycle]) / 
-                    cycleTotalGasUsed[lastUpdatedCycle];
-                clientRewards[client] += clientRewardsEarned;
-                clientCycleGasEarned[client] = 0;
-            }
-
-            clientLastRewardUpdate[client] = currentCycle;
-        }
-
-        if (
-            currentCycle > lastStartedCycle &&
-            clientLastFeeUpdate[client] != lastStartedCycle + 1
-        ) {
-            clientAccruedFees[client] += (
-                clientRewards[client] * 
-                    (cycleFeesPerStakeSummed[lastStartedCycle + 1] - 
-                        cycleFeesPerStakeSummed[clientLastFeeUpdate[client]]
-                    )
-            ) /
-            SCALING_FACTOR;
-
-            clientLastFeeUpdate[client] = lastStartedCycle + 1;
-        }
     }
 
     /**
@@ -709,7 +552,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
                 cycleTotalGasUsed[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
-         
             accCycleGasUsed[account] = 0;
         }
 
@@ -756,7 +598,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
             if (accSecondStake[account] != 0) {
                 if (currentCycle > accSecondStake[account]) {
                     uint256 unlockedSecondStake = accStakeCycle[account][accSecondStake[account]];
-
                     accRewards[account] += unlockedSecondStake;
                     accWithdrawableStake[account] += unlockedSecondStake;
                     
