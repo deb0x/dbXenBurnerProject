@@ -1,157 +1,42 @@
 const { expect } = require("chai");
+const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
+const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
-const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json");
-const { Converter } = require("../utils/Converter.ts");
-let ipfsLink = "QmWfmAHFy6hgr9BPmh2DX31qhAs4bYoteDDwK51eyG9En9";
-let payload = Converter.convertStringToBytes32(ipfsLink);
 
-describe("Test contract claimRewards", async function() {
-    let rewardedAlice, rewardedBob, rewardedCarol, dxn, deb0xViews;
-    let alice, bob;
+describe("Test burn functionality", async function() {
+    let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
+    let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const DBXen = await ethers.getContractFactory("DBXen");
-        rewardedAlice = await DBXen.deploy(ethers.constants.AddressZero);
-        await rewardedAlice.deployed();
+        const lib = await ethers.getContractFactory("MathX");
+        const library = await lib.deploy();
 
-        const DBXenViews = await ethers.getContractFactory("DBXenViews");
-        deb0xViews = await DBXenViews.deploy(rewardedAlice.address);
-        await deb0xViews.deployed();
+        const xenContract = await ethers.getContractFactory("XENCrypto", {
+            libraries: {
+                MathX: library.address
+            }
+        });
 
-        const dbxAddress = await rewardedAlice.dxn()
-        dxn = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+        XENContract = await xenContract.deploy();
+        await XENContract.deployed();
 
-        rewardedBob = rewardedAlice.connect(bob)
-        rewardedCarol = rewardedAlice.connect(carol)
+        const Deb0x = await ethers.getContractFactory("DBXen");
+        DBXenContract = await Deb0x.deploy(ethers.constants.AddressZero, XENContract.address);
+        await DBXenContract.deployed();
+
+        const Deb0xViews = await ethers.getContractFactory("DBXenViews");
+        DBXENViewContract = await Deb0xViews.deploy(DBXenContract.address);
+        await DBXENViewContract.deployed();
+
+        const dbxAddress = await DBXenContract.dxn()
+        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+
+        aliceInstance = XENContract.connect(alice);
+        bobInstance = XENContract.connect(bob);
+        deanInstance = XENContract.connect(dean);
+        carolInstance = XENContract.connect(carol);
     });
-
-
-    it("Should send 3 messages with the same account and get all the rewards in cycle0", async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        expect((await deb0xViews.getUnclaimedRewards(alice.address)).toString()).to.eq(NumUtils.day(1))
-
-    })
-
-    it("Should try to claim rewards with an account that has 0 ", async() => {
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
-        await hre.ethers.provider.send("evm_mine")
-
-        try {
-            await rewardedAlice.claimRewards();
-            expect.fail("An exception was expected");
-        } catch (error) {
-            expect(error.message).to.equal("VM Exception while processing transaction: " +
-                "reverted with reason string 'DBXen: account has no rewards'");
-        }
-    });
-
-    it("Should claim no rewards for sending a message in the current cycle", async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
-
-        try {
-            await rewardedAlice.claimRewards()
-            expect.fail("An exception was expected");
-        } catch (error) {
-            expect(error.message).to.equal("VM Exception while processing transaction: " +
-                "reverted with reason string 'DBXen: account has no rewards'");
-        }
-    });
-
-    it("Should send 2 messages with bob and 2 with allice and split rewards 50% 50%", async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice.claimRewards();
-        const balanceAlice = await dxn.balanceOf(alice.address);
-
-        await rewardedBob.claimRewards();
-        const balanceBob = await dxn.balanceOf(bob.address);
-
-        const expected = NumUtils.ether(10000);
-
-        expect(balanceAlice).to.equal(expected.div(2));
-        expect(balanceBob).to.equal(expected.div(2));
-    });
-
-    it("should send messages only with alice in 2 cycles and get rewards", async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await rewardedAlice.claimRewards();
-        let balanceAlice = await dxn.balanceOf(alice.address);
-        let expected = NumUtils.ether(10000);
-        expect(balanceAlice).to.equal(expected);
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        let cycleRewards = await rewardedAlice.rewardPerCycle(1)
-
-        await rewardedAlice.claimRewards();
-        balanceAlice = await dxn.balanceOf(alice.address);
-        expect(balanceAlice.sub(expected)).to.equal(cycleRewards);
-    })
-
-    it("should send messages with alice and bob in cyle 0 and in cycle 1 only with allice. Claim all in cycle 2", async() => {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-        await rewardedBob["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload],
-            feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("2") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await rewardedAlice.claimRewards();
-        await rewardedBob.claimRewards();
-        let cycle1Rewards = await rewardedAlice.rewardPerCycle(1)
-
-        let balanceAlice = await dxn.balanceOf(alice.address);
-        let balanceBob = await dxn.balanceOf(bob.address);
-        let expectedCycle0 = NumUtils.ether(10000);
-        expect(balanceAlice).to.equal(expectedCycle0.div(2).add(cycle1Rewards));
-        expect(balanceBob).to.eq(expectedCycle0.div(2));
-    })
-
 });

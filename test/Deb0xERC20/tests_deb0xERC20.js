@@ -24,7 +24,7 @@ describe("Test DBXenERC20 contract", async function() {
         try {
             await user1InstanceContract.mintReward(deployer.address, ethers.utils.parseEther("100"));
         } catch (error) {
-            expect(error.message).to.include("DBX: caller is not DBXen contract.");
+            expect(error.message).to.include("DBXen: caller is not DBXen contract");
         }
     })
 

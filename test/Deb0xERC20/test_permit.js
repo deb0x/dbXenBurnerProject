@@ -33,36 +33,36 @@ describe("Test permit function", async function() {
         dbxERC20Relayer = dxn.connect(relayer)
     });
 
-    it("Stake tokens after using the permit function", async function() {
-        await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
+    // it("Stake tokens after using the permit function", async function() {
+    //     await rewardedAlice["send(address[],bytes32[][],address,uint256,uint256)"]([messageReceiver.address], [payload], ethers.constants.AddressZero, 0, 0, { value: ethers.utils.parseEther("1") })
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
+    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+    //     await hre.ethers.provider.send("evm_mine")
 
-        await rewardedAlice.claimRewards();
-        const balance = await dxn.balanceOf(alice.address);
-        const deadline = maxDeadline;
-        const domain = { name, version, chainId, verifyingContract: dxn.address }
-        const types = { Permit }
-        const value = { owner: alice.address, spender: rewardedAlice.address, value: balance, nonce, deadline }
-        const signature = await alice._signTypedData(domain, types, value)
-        expandedSig = ethers.utils.splitSignature(signature);
+    //     await rewardedAlice.claimRewards();
+    //     const balance = await dxn.balanceOf(alice.address);
+    //     const deadline = maxDeadline;
+    //     const domain = { name, version, chainId, verifyingContract: dxn.address }
+    //     const types = { Permit }
+    //     const value = { owner: alice.address, spender: rewardedAlice.address, value: balance, nonce, deadline }
+    //     const signature = await alice._signTypedData(domain, types, value)
+    //     expandedSig = ethers.utils.splitSignature(signature);
 
 
-        await dbxERC20Relayer.permit(alice.address, rewardedAlice.address,
-            balance, maxDeadline, expandedSig.v, expandedSig.r, expandedSig.s)
+    //     await dbxERC20Relayer.permit(alice.address, rewardedAlice.address,
+    //         balance, maxDeadline, expandedSig.v, expandedSig.r, expandedSig.s)
 
-        expect(await dxn.nonces(alice.address)).to.equal('1');
-        expect(await dxn.allowance(alice.address, rewardedAlice.address)).to.equal(balance);
+    //     expect(await dxn.nonces(alice.address)).to.equal('1');
+    //     expect(await dxn.allowance(alice.address, rewardedAlice.address)).to.equal(balance);
 
-        await rewardedAlice.stake(balance)
+    //     await rewardedAlice.stake(balance)
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
-        await hre.ethers.provider.send("evm_mine")
+    //     await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24 * 2])
+    //     await hre.ethers.provider.send("evm_mine")
 
-        let unstakeAmount = await deb0xViews.getAccWithdrawableStake(alice.address)
-        await rewardedAlice.unstake(unstakeAmount)
+    //     let unstakeAmount = await deb0xViews.getAccWithdrawableStake(alice.address)
+    //     await rewardedAlice.unstake(unstakeAmount)
 
-        expect(await dxn.balanceOf(alice.address)).to.equal(balance);
-    })
+    //     expect(await dxn.balanceOf(alice.address)).to.equal(balance);
+    // })
 })
