@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const { abi } = require("../../artifacts/contracts/Deb0xERC20.sol/Deb0xERC20.json")
+const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.json")
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
@@ -61,7 +61,7 @@ describe("Test burn", async function() {
         expect(aliceDBXenBalace).to.equal(NumUtils.day(2));
     });
 
-    it.only(`Test claimRewards for two person`, async() => {
+    it(`Test claimRewards for two person`, async() => {
         for (let i = 0; i < 10; i++) {
             await aliceInstance.claimRank(100);
             await bobInstance.claimRank(100);
