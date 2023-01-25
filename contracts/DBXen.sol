@@ -26,13 +26,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Initialized in constructor.
      */
     XENCrypto public xen;
-
-    /**
-     * Basis points (bps) representation of the protocol fee (i.e. 10 percent).
-     * Calls to send function charge 1000 bps of transaction cost.
-     */
-    uint16 public constant PROTOCOL_FEE1 = 1000;
-
     /**
      * Basis points representation of 100 percent.
      */
@@ -327,20 +320,9 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     {
         require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(xen.balanceOf(msg.sender) >= batchNumber* XEN_BATCH_AMOUNT* (10**18), "DBXen: You have insufficient funds to burn");
-      
-        burn(msg.sender, batchNumber * XEN_BATCH_AMOUNT* (10**18));
-    }
+        require(msg.sender != address(0), "DBXen: illegal owner address");
 
-    /**
-     * @dev Call burn function from XENCrypto
-     *
-     */  
-    function burn(address user, uint256 amount) internal{
-        require(user != address(0), "DBXen: illegal owner address");
-        require(amount > 0, "DBXen: illegal amount");
-
-        IBurnableToken(xen).burn(user, amount);
+        IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT * (10**18));
     }
 
     /**
