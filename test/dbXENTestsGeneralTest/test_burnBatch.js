@@ -174,7 +174,7 @@ describe("Test burn functionality", async function() {
 
     });
 
-    it("Claim fees after bunr action", async() => {
+    it("Claim fees after burn action", async() => {
         await aliceInstance.claimRank(100);
         await bobInstance.claimRank(100);
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 100 * 24])

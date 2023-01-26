@@ -60,32 +60,5 @@ describe("Test burn functionality", async function() {
         expect(aliceDBXenBalace).to.equal(NumUtils.day(2));
     });
 
-    it(`Test claimRewards for two person`, async() => {
-        for (let i = 0; i < 10; i++) {
-            await aliceInstance.claimRank(100);
-            await bobInstance.claimRank(100);
-            await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-            await hre.ethers.provider.send("evm_mine")
-            await aliceInstance.claimMintReward();
-            await bobInstance.claimMintReward();
-        }
-
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        await DBXenContract.connect(alice).burnBatch(5000, { value: ethers.utils.parseEther("100") })
-
-        // await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(bob).burnBatch(1, { value: ethers.utils.parseEther("1") })
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-
-        // await DBXenContract.connect(alice).claimRewards();
-        // await DBXenContract.connect(bob).claimRewards();
-        // let aliceDBXenBalace = await DBXenERC20.balanceOf(alice.address);
-        // let bobDBXenBalace = await DBXenERC20.balanceOf(bob.address);
-
-        // console.log(aliceDBXenBalace);
-        // console.log(bobDBXenBalace)
-    });
 
 });

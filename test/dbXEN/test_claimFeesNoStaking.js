@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test burn functionality", async function() {
+describe("Test claim fee without staking functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
