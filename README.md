@@ -2,15 +2,13 @@
 DBXen is a project that proposes a new tokenomics philosophy and distribution algorithm that aims to contribute to XEN deflation while bringing a new $DXN digital asset in the XEN ecosystem. $DXN is a capped token which can solely be minted through burning $XEN.
 
 ### Links
-* [Website](https://dbxen.org)
-* [Fair Launch](https://mirror.xyz/dbxen.eth/oZZDpd9ME8oGMtw-YKKQRGSeyf4hhXLrFXw8JkQ9GDE)
 * [DApp](https://app.dbxen.org)
+* [Litepaper](https://dbxen.gitbook.io/dbxen-litepaper/) 
 
 ### Prerequisites
 * npm 6.14+
 * node v14.17+
 * [Metamask.io](https://metamask.io) browser extension
-* (For Testnet) Get goerli ETH from a faucet (e.g. https://goerlifaucet.com/) and try it out on the [test enviroment](https://demo.dbxen.org).
 
 ### Steps to run the frontend
 
