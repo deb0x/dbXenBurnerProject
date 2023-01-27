@@ -1,5 +1,5 @@
 # dbxen
-Decentralized communication and storage protocol implementation with reward token incentives. Includes a private e-mail like web application that allows sending end-to-end encrypted messages to ethereum accounts.
+DBXen is a project that proposes a new tokenomics philosophy and distribution algorithm that aims to contribute to XEN deflation while bringing a new $DXN digital asset in the XEN ecosystem. $DXN is a capped token which can solely be minted through burning $XEN.
 
 ### Links
 * [Website](https://dbxen.org)
