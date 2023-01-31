@@ -130,7 +130,7 @@ describe("Test claim fee with staking functionality", async function() {
         expect(totalFeesClaimed.add(remainder)).to.equal(feesCollected);
     });
 
-    it.only("Multiple stake with unclaimed fee action", async() => {
+    it("Multiple stake with unclaimed fee action", async() => {
         const lib = await ethers.getContractFactory("MathX");
         const libraryLocal = await lib.deploy();
 
