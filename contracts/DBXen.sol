@@ -110,11 +110,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     uint256 public sentId = 1;
 
     /**
-     * Stores the public keys of accounts.
-     */
-    mapping(address => bytes32) public publicKeys;
-
-    /**
      * The amount of gas an account has spent sending messages.
      * Resets during a new cycle when an account performs an action
      * that updates its stats.
