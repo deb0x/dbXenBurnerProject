@@ -252,8 +252,8 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
         require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
 
-        cycleTotalGasUsed[currentCycle] += batchNumber;
-        accCycleGasUsed[_msgSender()] +=  batchNumber;
+        cycleTotalBatchesBurned[currentCycle] += batchNumber;
+        accCycleBatchesBurned[_msgSender()] +=  batchNumber;
         cycleAccruedFees[currentCycle] += protocolFee;
 
         sendViaCall(payable(msg.sender), msg.value - protocolFee);
