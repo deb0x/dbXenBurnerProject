@@ -275,14 +275,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         xen = XENCrypto(xenAddress);
     }
 
-    /**
-        @dev confirms support for IBurnRedeemable interfaces
-     */
-    function supportsInterface(bytes4 interfaceId) public view returns (bool) {
-        return
-            interfaceId == type(IBurnRedeemable).interfaceId;
-    }
-
     // IBurnRedeemable IMPLEMENTATION
 
     /**
@@ -608,5 +600,13 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "DBXen: failed to send amount");
+    }
+
+    /**
+        @dev confirms support for IBurnRedeemable interfaces
+    */
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+        return
+            interfaceId == type(IBurnRedeemable).interfaceId;
     }
 }
