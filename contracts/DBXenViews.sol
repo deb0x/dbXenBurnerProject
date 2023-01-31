@@ -186,11 +186,11 @@ contract DBXenViews {
 
        if (
             calculatedCycle > dbxen.lastActiveCycle(account) &&
-            dbxen.accCycleGasUsed(account) != 0
+            dbxen.accCycleBatchesBurned(account) != 0
         ) {
-            uint256 lastCycleAccReward = (dbxen.accCycleGasUsed(account) *
+            uint256 lastCycleAccReward = (dbxen.accCycleBatchesBurned(account) *
                 dbxen.rewardPerCycle(dbxen.lastActiveCycle(account))) /
-                dbxen.cycleTotalGasUsed(dbxen.lastActiveCycle(account));
+                dbxen.cycleTotalBatchesBurned(dbxen.lastActiveCycle(account));
 
             currentRewards += lastCycleAccReward;
         }

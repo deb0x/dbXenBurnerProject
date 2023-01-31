@@ -9,8 +9,8 @@ import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
 /**
- * Main dbxen protocol contract used to burn xen tokens,
- * allocate token rewards, distribute native token fees, stake and unstake.
+ * Main DBXen protocol contract used to burn xen tokens,
+ * allocate DBXen token rewards, distribute native token fees, stake and unstake.
  */
 contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
@@ -34,7 +34,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
+    uint256 public constant XEN_BATCH_AMOUNT = 1;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -110,15 +110,15 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Resets during a new cycle when an account performs an action
      * that updates its stats.
      */
-    mapping(address => uint256) public accCycleGasUsed;
+    mapping(address => uint256) public accCycleBatchesBurned;
 
     /**
      * The total amount of batches all accounts have burned per cycle.
      */
-    mapping(uint256 => uint256) public cycleTotalGasUsed;
+    mapping(uint256 => uint256) public cycleTotalBatchesBurned;
 
     /**
-     * The last cycle in which an account has sent messages.
+     * The last cycle in which an account has burned.
      */
     mapping(address => uint256) public lastActiveCycle;
 
@@ -221,7 +221,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     );
 
     /**
-     * @dev Emitted when calling {send} marking the new current `cycle`,
+     * @dev Emitted when calling {burnBatch} marking the new current `cycle`,
      * `calculatedCycleReward` and `summedCycleStakes`.
      */
     event NewCycleStarted(
@@ -231,8 +231,8 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     );
 
     /**
-     * @dev Emitted when calling {burn} function for
-     * `userAddress`  which burns `batchNumber` * 1000 tokens
+     * @dev Emitted when calling {burnBatch} function for
+     * `userAddress`  which burns `batchNumber` * 2500000 tokens
      */
     event Burn(
         address indexed userAddress,
@@ -241,15 +241,15 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
     /**
      * @dev Checks that the caller has sent an amount that is equal or greater 
-     * than the sum of the protocol fee and the client's native token fee. 
+     * than the sum of the protocol fee 
      * The change is sent back to the caller.
      * 
      */
     modifier gasWrapper(uint256 batchNumber) {
         uint256 startGas = gasleft();
         _;
-        cycleTotalGasUsed[currentCycle] += batchNumber;
-        accCycleGasUsed[_msgSender()] +=  batchNumber;
+        cycleTotalBatchesBurned[currentCycle] += batchNumber;
+        accCycleBatchesBurned[_msgSender()] +=  batchNumber;
         uint256 PROTOCOL_FEE = (batchNumber * (1000000 - 50 * batchNumber));
         uint256 fee = ((startGas - gasleft() + 39400) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS / 100;
         cycleAccruedFees[currentCycle] += fee;
@@ -518,12 +518,12 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     function updateStats(address account) internal {
          if (	
             currentCycle > lastActiveCycle[account] &&	
-            accCycleGasUsed[account] != 0	
+            accCycleBatchesBurned[account] != 0	
         ) {	
-            uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
-                cycleTotalGasUsed[lastActiveCycle[account]];	
+            uint256 lastCycleAccReward = (accCycleBatchesBurned[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
+                cycleTotalBatchesBurned[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
-            accCycleGasUsed[account] = 0;
+            accCycleBatchesBurned[account] = 0;
         }
 
         if (

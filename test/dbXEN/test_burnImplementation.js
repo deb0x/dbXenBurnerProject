@@ -94,7 +94,7 @@ describe("Test burn functionality", async function() {
         expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("121"));
     });
 
-    it.only(`Test burn functionality with Xen contract and multiple users`, async() => {
+    it(`Test burn functionality with Xen contract and multiple users`, async() => {
         const lib = await ethers.getContractFactory("MathX");
         const libraryLocal = await lib.deploy();
 
