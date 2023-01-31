@@ -306,7 +306,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     {
         require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(msg.sender != address(0), "DBXen: illegal owner address");
 
         IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT * (10**18));
     }
