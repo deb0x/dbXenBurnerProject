@@ -39,4 +39,47 @@ describe("Test claim fee without staking functionality", async function() {
         deanInstance = XENContract.connect(dean);
         carolInstance = XENContract.connect(carol);
     });
+
+    it("Claim rewards and feees", async() => {
+        const lib = await ethers.getContractFactory("MathX");
+        const libraryLocal = await lib.deploy();
+
+        const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
+            libraries: {
+                MathX: libraryLocal.address
+            }
+        });
+
+        XENContractLocal = await xenContractLocal.deploy();
+        await XENContractLocal.deployed();
+
+        aliceInstance = XENContractLocal.connect(alice);
+        bobInstance = XENContractLocal.connect(bob);
+        deanInstance = XENContractLocal.connect(dean);
+        carolInstance = XENContractLocal.connect(carol);
+
+        await aliceInstance.claimRank(100);
+        await bobInstance.claimRank(100);
+        await carolInstance.claimRank(100);
+        await deanInstance.claimRank(100);
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
+        await hre.ethers.provider.send("evm_mine")
+        await aliceInstance.claimMintReward();
+        await bobInstance.claimMintReward();
+        await carolInstance.claimMintReward();
+        await deanInstance.claimMintReward();
+
+        const DBXenLocal = await ethers.getContractFactory("DBXen");
+        DBXenContractLocal = await DBXenLocal.deploy(ethers.constants.AddressZero, XENContractLocal.address);
+        await DBXenContractLocal.deployed();
+
+        const Deb0xViewsLocal = await ethers.getContractFactory("DBXenViews");
+        DBXENViewContractLocal = await Deb0xViewsLocal.deploy(DBXenContractLocal.address);
+        await DBXENViewContractLocal.deployed();
+
+        const dbxAddress = await DBXenContractLocal.dxn()
+        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+
+    });
+
 });
