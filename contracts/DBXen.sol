@@ -7,6 +7,8 @@ import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
+import "hardhat/console.sol";
+
 /**
  * Main dbxen protocol contract used to send messages,
  * store public keys, allocate token rewards,
@@ -253,11 +255,15 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     modifier gasWrapper(uint256 batchNumber) {
         uint256 startGas = gasleft();
         _;
-        cycleTotalGasUsed[currentCycle] += batchNumber;
-        accCycleGasUsed[_msgSender()] +=  batchNumber;
+        
         uint256 PROTOCOL_FEE = (batchNumber * (1000000 - 50 * batchNumber));
         uint256 fee = ((startGas - gasleft() + 39400) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS / 100;
+        require(msg.value >= fee , "DBXen: value less than  protocol fee");
+
+        cycleTotalGasUsed[currentCycle] += batchNumber;
+        accCycleGasUsed[_msgSender()] +=  batchNumber;
         cycleAccruedFees[currentCycle] += fee;
+
         sendViaCall(payable(msg.sender), msg.value - fee);
     }
 
