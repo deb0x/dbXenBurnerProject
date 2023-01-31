@@ -9,9 +9,8 @@ import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
 /**
- * Main dbxen protocol contract used to send messages,
- * store public keys, allocate token rewards,
- * distribute native token fees, stake and unstake.
+ * Main dbxen protocol contract used to burn xen tokens,
+ * allocate token rewards, distribute native token fees, stake and unstake.
  */
 contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
@@ -26,6 +25,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Initialized in constructor.
      */
     XENCrypto public xen;
+
     /**
      * Basis points representation of 100 percent.
      */
@@ -72,7 +72,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Index (0-based) of the current cycle.
      * 
      * Updated upon cycle setup that is triggered by contract interraction 
-     * (account sends message, claims fees, claims rewards, stakes or unstakes).
+     * (account burn tokens, claims fees, claims rewards, stakes or unstakes).
      */
     uint256 public currentCycle;
 
@@ -106,25 +106,14 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     uint256 public pendingFees;
 
     /**
-     * Message ID that is incremented every time a message is sent.
-     */
-    uint256 public sentId = 1;
-
-    /**
-     * Stores the public keys of accounts.
-     */
-    mapping(address => bytes32) public publicKeys;
-
-    /**
-     * The amount of gas an account has spent sending messages.
+     * The amount of batches an account has burned.
      * Resets during a new cycle when an account performs an action
      * that updates its stats.
      */
     mapping(address => uint256) public accCycleGasUsed;
 
     /**
-     * The total amount of gas all accounts have spent sending
-     * messages per cycle.
+     * The total amount of batches all accounts have burned per cycle.
      */
     mapping(uint256 => uint256) public cycleTotalGasUsed;
 
