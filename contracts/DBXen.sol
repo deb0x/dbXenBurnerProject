@@ -7,8 +7,6 @@ import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
-import "hardhat/console.sol";
-
 /**
  * Main dbxen protocol contract used to send messages,
  * store public keys, allocate token rewards,
@@ -35,7 +33,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 1;
+    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -258,7 +256,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         
         uint256 discount = (batchNumber * (1000000 - 50 * batchNumber));
         uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
-        require(msg.value >= protocolFee , "DBXen: value less than  protocol fee");
+        require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
 
         cycleTotalGasUsed[currentCycle] += batchNumber;
         accCycleGasUsed[_msgSender()] +=  batchNumber;
@@ -286,7 +284,6 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
         @dev implements IBurnRedeemable interface for burning XEN and completing update for state
      */
-
     function onTokenBurned(address user, uint256 amount) external{
         require(msg.sender == address(xen), "DBXen: illegal callback caller");
         calculateCycle();
