@@ -8,9 +8,8 @@ import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
 
 /**
- * Main dbxen protocol contract used to send messages,
- * store public keys, allocate token rewards,
- * distribute native token fees, stake and unstake.
+ * Main DBXen protocol contract used to burn xen tokens,
+ * allocate DBXen token rewards, distribute native token fees, stake and unstake.
  */
 contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
@@ -25,6 +24,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Initialized in constructor.
      */
     XENCrypto public xen;
+
     /**
      * Basis points representation of 100 percent.
      */
@@ -71,7 +71,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * Index (0-based) of the current cycle.
      * 
      * Updated upon cycle setup that is triggered by contract interraction 
-     * (account sends message, claims fees, claims rewards, stakes or unstakes).
+     * (account burn tokens, claims fees, claims rewards, stakes or unstakes).
      */
     uint256 public currentCycle;
 
@@ -105,25 +105,19 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     uint256 public pendingFees;
 
     /**
-     * Message ID that is incremented every time a message is sent.
-     */
-    uint256 public sentId = 1;
-
-    /**
-     * The amount of gas an account has spent sending messages.
+     * The amount of batches an account has burned.
      * Resets during a new cycle when an account performs an action
      * that updates its stats.
      */
-    mapping(address => uint256) public accCycleGasUsed;
+    mapping(address => uint256) public accCycleBatchesBurned;
 
     /**
-     * The total amount of gas all accounts have spent sending
-     * messages per cycle.
+     * The total amount of batches all accounts have burned per cycle.
      */
-    mapping(uint256 => uint256) public cycleTotalGasUsed;
+    mapping(uint256 => uint256) public cycleTotalBatchesBurned;
 
     /**
-     * The last cycle in which an account has sent messages.
+     * The last cycle in which an account has burned.
      */
     mapping(address => uint256) public lastActiveCycle;
 
@@ -226,7 +220,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     );
 
     /**
-     * @dev Emitted when calling {send} marking the new current `cycle`,
+     * @dev Emitted when calling {burnBatch} marking the new current `cycle`,
      * `calculatedCycleReward` and `summedCycleStakes`.
      */
     event NewCycleStarted(
@@ -236,8 +230,8 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     );
 
     /**
-     * @dev Emitted when calling {burn} function for
-     * `userAddress`  which burns `batchNumber` * 1000 tokens
+     * @dev Emitted when calling {burnBatch} function for
+     * `userAddress`  which burns `batchNumber` * 2500000 tokens
      */
     event Burn(
         address indexed userAddress,
@@ -246,7 +240,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
     /**
      * @dev Checks that the caller has sent an amount that is equal or greater 
-     * than the sum of the protocol fee and the client's native token fee. 
+     * than the sum of the protocol fee 
      * The change is sent back to the caller.
      * 
      */
@@ -518,12 +512,12 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     function updateStats(address account) internal {
          if (	
             currentCycle > lastActiveCycle[account] &&	
-            accCycleGasUsed[account] != 0	
+            accCycleBatchesBurned[account] != 0	
         ) {	
-            uint256 lastCycleAccReward = (accCycleGasUsed[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
-                cycleTotalGasUsed[lastActiveCycle[account]];	
+            uint256 lastCycleAccReward = (accCycleBatchesBurned[account] * rewardPerCycle[lastActiveCycle[account]]) / 	
+                cycleTotalBatchesBurned[lastActiveCycle[account]];	
             accRewards[account] += lastCycleAccReward;	
-            accCycleGasUsed[account] = 0;
+            accCycleBatchesBurned[account] = 0;
         }
 
         if (

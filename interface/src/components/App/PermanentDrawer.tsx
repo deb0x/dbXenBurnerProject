@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useDebugValue } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -14,6 +14,8 @@ import { Spinner } from './Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
 import document from "../../photos/icons/file-icon.svg";
+import axios, { Method } from 'axios';
+import web3 from 'web3';
 const { BigNumber } = require("ethers");
 
 
@@ -36,9 +38,15 @@ export function PermanentDrawer(props: any): any {
     const [networkName, setNetworkName] = useState<any>();
     const [value, setValue] = useState(1);
     const [approveBrun, setApproveBurn] = useState<boolean>();
+    const [gasPrice, setGas] = useState<any>();
     const [balanceGratherThanZero, checkBalance] = useState("");
 
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        estimationValue();
+        setGas(0);
+    }, [account]);
 
     useEffect(() => {
         setApproveBurn(false)
@@ -56,6 +64,7 @@ export function PermanentDrawer(props: any): any {
         }
     }, [activatingConnector, connector])
 
+    
     async function setBalance(){
         setLoading(true);
         const signer = await library.getSigner(0)
@@ -69,6 +78,36 @@ export function PermanentDrawer(props: any): any {
         })
     }
 
+    async function getCurrentPrice(){
+        
+        let method: Method = 'POST';
+        const options = {
+            method: method,
+            url: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3 ',
+            port: 443,
+            headers: {
+                'Content-Type': 'application/json'
+              },
+            data: JSON.stringify({
+                "jsonrpc":"2.0","method":"eth_gasPrice","params": [],"id":1
+              })
+        };
+
+        let requestValue = await axios.request(options)
+       console.log(web3.utils.fromWei(requestValue.data.result.toString(), "Gwei"))
+        return web3.utils.fromWei(requestValue.data.result.toString(), "Gwei")
+    
+    }
+
+    function estimationValue(){
+        let price = Number(getCurrentPrice());
+        console.log(price)
+        let protocol_fee = value *(1-0.0000*value);
+        console.log(protocol_fee);
+        let fee = 130000 * price * protocol_fee;
+        console.log(fee);
+    }
+    
     async function setApproval() {
         setLoading(true);
         const signer = await library.getSigner(0)

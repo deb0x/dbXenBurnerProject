@@ -386,9 +386,6 @@ describe("Test general functionality", async function() {
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
 
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
-        //ustake: 1. burn, claim reward stake, cu gap intre stake si unstake sa treaca un ciclu si unstake 
-
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
         await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
@@ -418,8 +415,6 @@ describe("Test general functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
-
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
@@ -464,8 +459,6 @@ describe("Test general functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
-
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
@@ -534,7 +527,6 @@ describe("Test general functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
         await aliceInstance.claimMintReward();
         await aliceInstance.claimRank(100);
-        //stake: burn stake in ciclul 2, si in ciclul 3 burn si stake 
 
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
@@ -561,32 +553,6 @@ describe("Test general functionality", async function() {
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
         await DBXenContract.connect(alice).stake(AliceBalance.div(10));
         await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 3 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 3 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-
-        // await DBXenContract.connect(alice).claimRewards();
-
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-
-        // await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 10 * 24])
-        // await hre.ethers.provider.send("evm_mine")
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await DBXenContract.connect(alice).stake(AliceBalance.div(10));
-        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
-        // await DBXenContract.connect(alice).burnBatch(1, feeReceiver.address, 0, 0, { value: ethers.utils.parseEther("1") });
     });
 
 
