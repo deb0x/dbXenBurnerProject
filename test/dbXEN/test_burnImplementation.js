@@ -49,7 +49,7 @@ describe("Test burn functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("1"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
