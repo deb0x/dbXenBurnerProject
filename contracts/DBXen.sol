@@ -3,7 +3,6 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
@@ -248,12 +247,16 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     modifier gasWrapper(uint256 batchNumber) {
         uint256 startGas = gasleft();
         _;
-        cycleTotalBatchesBurned[currentCycle] += batchNumber;
-        accCycleBatchesBurned[_msgSender()] +=  batchNumber;
-        uint256 PROTOCOL_FEE = (batchNumber * (1000000 - 50 * batchNumber));
-        uint256 fee = ((startGas - gasleft() + 39400) * tx.gasprice * PROTOCOL_FEE) / MAX_BPS / 100;
-        cycleAccruedFees[currentCycle] += fee;
-        sendViaCall(payable(msg.sender), msg.value - fee);
+        
+        uint256 discount = (batchNumber * (1000000 - 50 * batchNumber));
+        uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
+        require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
+
+        cycleTotalGasUsed[currentCycle] += batchNumber;
+        accCycleGasUsed[_msgSender()] +=  batchNumber;
+        cycleAccruedFees[currentCycle] += protocolFee;
+
+        sendViaCall(payable(msg.sender), msg.value - protocolFee);
     }
 
     /**
@@ -270,20 +273,11 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         xen = XENCrypto(xenAddress);
     }
 
-    /**
-        @dev confirms support for IBurnRedeemable interfaces
-     */
-    function supportsInterface(bytes4 interfaceId) public view returns (bool) {
-        return
-            interfaceId == type(IBurnRedeemable).interfaceId;
-    }
-
     // IBurnRedeemable IMPLEMENTATION
 
     /**
         @dev implements IBurnRedeemable interface for burning XEN and completing update for state
      */
-
     function onTokenBurned(address user, uint256 amount) external{
         require(msg.sender == address(xen), "DBXen: illegal callback caller");
         calculateCycle();
@@ -309,7 +303,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     {
         require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(msg.sender != address(0), "DBXen: illegal owner address");
+        require(xen.balanceOf(msg.sender) >= batchNumber * XEN_BATCH_AMOUNT * (10**18), "DBXen: not enough tokens for burn");
 
         IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT * (10**18));
     }
@@ -603,5 +597,13 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     function sendViaCall(address payable to, uint256 amount) internal {
         (bool sent, ) = to.call{value: amount}("");
         require(sent, "DBXen: failed to send amount");
+    }
+
+    /**
+        @dev confirms support for IBurnRedeemable interfaces
+    */
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+        return
+            interfaceId == type(IBurnRedeemable).interfaceId;
     }
 }
