@@ -34,7 +34,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 1;
+    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
