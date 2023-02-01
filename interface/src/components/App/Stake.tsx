@@ -27,15 +27,17 @@ import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
-const deb0xViewsAddress = "0x65DC3F867535fc92669922Ea49aa9420A332e93f";
-const deb0xERC20Address = "0x62E6B821353eAe41859B52bDc885f9cfA70B2c80";
+const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
+const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A";
 
 export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
+    const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
@@ -44,6 +46,41 @@ export function Stake(props: any): any {
         useEffect(() => {
             feesAccrued()
         }, [feesUnclaimed]);
+
+        useEffect(() => {
+            const totalXenBurned = async () =>{
+                setTotalXENBurned(await getTotalXenBurned())
+            }
+            totalXenBurned();
+        },[]);
+
+        useEffect(() => {
+            const totalXenBurnedPreviousCycle = async () =>{
+                setPreviousCycleXENBurned(await getTotalXenBurnedInPreviusCycle())
+            }
+            totalXenBurnedPreviousCycle();
+        },[]);
+
+        async function getTotalXenBurned(){
+            const signer = await library.getSigner(0)
+            const deb0xContract = DBXen(signer, deb0xAddress)
+            let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+            let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+            return batchBurned * 2500000;
+        }
+    
+        async function getTotalXenBurnedInPreviusCycle(){
+            const signer = await library.getSigner(0)
+            const deb0xContract = DBXen(signer, deb0xAddress)
+            let currentCycle = await deb0xContract.getCurrentCycle();
+            if(currentCycle != 0){
+                 let numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
+                 let batchBurned = numberBatchesBurnedInCurrentCycle.toNumber();
+                 return batchBurned * 2500000;
+            }
+            return 0;
+        }
+
 
         async function feesAccrued() {
             const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
@@ -216,7 +253,10 @@ export function Stake(props: any): any {
                             Total amount of daily cycle DXN tokens: <strong>{currentReward}</strong>
                         </Typography>
                         <Typography className="data-height">
-                            Total burn until now: <strong>{0}</strong>
+                            Total XEN burned until now: <strong>{totalXENBurned}</strong>
+                        </Typography>
+                        <Typography className="data-height">
+                            Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
                         </Typography>
                     </div>
                 </CardContent>

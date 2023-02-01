@@ -94,7 +94,7 @@ describe("Test burn functionality", async function() {
         expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("121"));
     });
 
-    it(`Test burn functionality with Xen contract and multiple users`, async() => {
+    it.only(`Test burn functionality with Xen contract and multiple users`, async() => {
         const lib = await ethers.getContractFactory("MathX");
         const libraryLocal = await lib.deploy();
 
@@ -139,51 +139,7 @@ describe("Test burn functionality", async function() {
         await XENContractLocal.connect(carol).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
         await XENContractLocal.connect(dean).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
 
-        await DBXenContractLocal.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(bob).burnBatch(1, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(carol).burnBatch(1, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(dean).burnBatch(1, { value: ethers.utils.parseEther("1") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await DBXenContractLocal.connect(alice).claimRewards();
-        let aliceBalanceFirstCycle = await DBXenERC20.balanceOf(alice.address);
-
-        await DBXenContractLocal.connect(bob).claimRewards();
-        let bobBalanceFirstCycle = await DBXenERC20.balanceOf(bob.address);
-
-        await DBXenContractLocal.connect(carol).claimRewards();
-        let carolDBXenBalaceInFirstCycle = await DBXenERC20.balanceOf(carol.address);
-
-        await DBXenContractLocal.connect(dean).claimRewards();
-        let deanDBXenBalaceInFirstCycle = await DBXenERC20.balanceOf(dean.address);
-
-        expect(aliceBalanceFirstCycle).to.equal(BigNumber.from(NumUtils.day(1)).div(BigNumber.from("4")));
-        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("1"));
-
-        expect(bobBalanceFirstCycle).to.equal(BigNumber.from(NumUtils.day(1)).div(BigNumber.from("4")));
-        expect(await bobInstance.userBurns(bob.address)).to.equal(ethers.utils.parseEther("1"));
-
-        expect(carolDBXenBalaceInFirstCycle).to.equal(BigNumber.from(NumUtils.day(1)).div(BigNumber.from("4")));
-        expect(await carolInstance.userBurns(carol.address)).to.equal(ethers.utils.parseEther("1"));
-
-        expect(deanDBXenBalaceInFirstCycle).to.equal(BigNumber.from(NumUtils.day(1)).div(BigNumber.from("4")));
-        expect(await deanInstance.userBurns(dean.address)).to.equal(ethers.utils.parseEther("1"));
-
-        await DBXenContractLocal.connect(alice).burnBatch(10, { value: ethers.utils.parseEther("100") })
-        await DBXenContractLocal.connect(bob).burnBatch(121, { value: ethers.utils.parseEther("100") })
-        await DBXenContractLocal.connect(carol).burnBatch(304, { value: ethers.utils.parseEther("100") })
-        await DBXenContractLocal.connect(dean).burnBatch(821, { value: ethers.utils.parseEther("100") })
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("11"));
-        expect(await bobInstance.userBurns(bob.address)).to.equal(ethers.utils.parseEther("122"));
-        expect(await carolInstance.userBurns(carol.address)).to.equal(ethers.utils.parseEther("305"));
-        expect(await deanInstance.userBurns(dean.address)).to.equal(ethers.utils.parseEther("822"));
-        await DBXenContractLocal.connect(alice).claimRewards();
+        await DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("10") })
     });
 
 

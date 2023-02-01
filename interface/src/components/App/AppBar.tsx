@@ -20,9 +20,9 @@ import disconnectIcon from '../../photos/icons/diconnect.svg';
 import { disconnect } from 'process';
 
 
-const deb0xAddress = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
-const deb0xViewsAddress = "0x65DC3F867535fc92669922Ea49aa9420A332e93f";
-const deb0xERC20Address = "0x62E6B821353eAe41859B52bDc885f9cfA70B2c80"
+const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
+const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A"
 const tokenSymbol = 'DBXen';
 
 const tokenDecimals = 18;

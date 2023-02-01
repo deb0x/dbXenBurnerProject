@@ -19,8 +19,8 @@ import web3 from 'web3';
 const { BigNumber } = require("ethers");
 
 
-const deb0xAddress = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
-const deb0xERC20Address = " 0x62E6B821353eAe41859B52bDc885f9cfA70B2c80";
+const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xERC20Address = " 0x196383703b9910f38e25528858E67E63362ad68A";
 const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 declare global {
@@ -38,20 +38,28 @@ export function PermanentDrawer(props: any): any {
     const [networkName, setNetworkName] = useState<any>();
     const [value, setValue] = useState(1);
     const [approveBrun, setApproveBurn] = useState<boolean>();
-    const [gasPrice, setGas] = useState<any>();
     const [balanceGratherThanZero, checkBalance] = useState("");
-
+    const [maticValue, setMaticValue] = useState<any>();
+    const [totalAmountOfXEN, setXENAmount] = useState<any>();
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        estimationValue();
-        setGas(0);
-    }, [account]);
-
-    useEffect(() => {
+    useEffect( () => {
         setApproveBurn(false)
     }, [account]);
 
+    useEffect( () => {
+        const val = async () =>{
+            let val = await getCurrentGasLimit();
+            setMaticValue(await estimationValue(val));
+        }
+        val();
+    },[value]);
+
+    useEffect( () => {
+        setXENAmount(value*2500000);
+    },[value]);
+
+    
     useEffect(() => {
         setBalance()
     }, [account,balanceGratherThanZero]);
@@ -94,25 +102,36 @@ export function PermanentDrawer(props: any): any {
         };
 
         let requestValue = await axios.request(options)
-       console.log(web3.utils.fromWei(requestValue.data.result.toString(), "Gwei"))
         return web3.utils.fromWei(requestValue.data.result.toString(), "Gwei")
-    
     }
 
-    function estimationValue(){
-        let price = Number(getCurrentPrice());
-        console.log(price)
-        let protocol_fee = value *(1-0.0000*value);
-        console.log(protocol_fee);
-        let fee = 130000 * price * protocol_fee;
-        console.log(fee);
+  async  function estimationValue(gasLimitIntervalValue: number){
+        let price = Number(await getCurrentPrice());
+        let protocol_fee = value *(1 - 0.00005*value) ;
+        let fee = gasLimitIntervalValue * price * protocol_fee / 1000000000;
+        return fee;
     }
     
+    async function getCurrentGasLimit(){
+        const signer = await library.getSigner(0)
+        const deb0xContract = DBXen(signer, deb0xAddress)
+        let currentCycle = await deb0xContract.getCurrentCycle();
+        let numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
+        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        let gasLimitIntervalValue;
+            if(batchBurned != 0)
+                gasLimitIntervalValue = BigNumber.from("115000");
+                    else
+                gasLimitIntervalValue = BigNumber.from("185000");
+
+        return gasLimitIntervalValue;
+    }
+
     async function setApproval() {
         setLoading(true);
         const signer = await library.getSigner(0)
         const xenContract = await XENCrypto(signer, xenCryptoAddress)
-        let totalAmountToBurn = value * 250000;
+        let totalAmountToBurn = value * 2500000;
         try {
             const tx = await xenContract.approve(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))
             tx.wait()
@@ -144,27 +163,11 @@ export function PermanentDrawer(props: any): any {
         setLoading(true)
         const signer = await library.getSigner(0)
         const deb0xContract = DBXen(signer, deb0xAddress)
-        let gasLimitIntervalValue = BigNumber.from("7000000");
-        let firstValue =  "0.1";
-
-        if(value > 500 && value < 1000){
-             gasLimitIntervalValue = BigNumber.from("1200000");
-             firstValue =  "0.2";
-        }
-
-        if(value >= 1000 && value < 1500){
-            gasLimitIntervalValue = BigNumber.from("17000000");
-            firstValue =  "0.3";
-       }
-
-       if(value >= 1500 && value <= 2000){
-        gasLimitIntervalValue = BigNumber.from("20000000");
-        firstValue =  "0.4";
-        }
-
+        let gasLimitIntervalValue = await getCurrentGasLimit();
+        let currentValue = await estimationValue(gasLimitIntervalValue);
         try {
             const overrides = 
-                { value: ethers.utils.parseUnits(firstValue, "ether"),
+                { value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
                     gasLimit:gasLimitIntervalValue }
             const tx = await deb0xContract["burnBatch(uint256)"](value,overrides)
 
@@ -202,15 +205,15 @@ export function PermanentDrawer(props: any): any {
     }, [notificationState])
 
     const handleInputChange = (e: any)=>{
-        if(value > 20000000) {
-            setValue(20000000)
+        if(value > 10000) {
+            setValue(10000)
         } else {
             setValue(e.target.value);
         }
     }
 
     const incNum = () => {
-        if(value < 20000000)
+        if(value < 10000)
             setValue(Number(value)+1);
     };
 
@@ -233,7 +236,7 @@ export function PermanentDrawer(props: any): any {
                     <div className="side-menu--bottom burn-container">
                         <div className="row">
                             <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
-                            <p className="text-center">(1 batch = 250 000 XEN)</p>
+                            <p className="text-center">(1 batch = 2 500 000 XEN)</p>
                         </div>
                         <div className="row">
                             <div className="col input-col">
@@ -267,7 +270,12 @@ export function PermanentDrawer(props: any): any {
                                     {loading ? <Spinner color={'black'} /> : "Approve Burn XEN" }
                             </LoadingButton>
                         }
-                        
+                        <div className="row">
+                            <p className="text-center mb-0">Aproximative matic value: {maticValue}</p>
+                        </div>
+                        <div className="row">
+                            <p className="text-center mb-0">The total amount of xen that will be burned: {totalAmountOfXEN}</p>
+                        </div>
                     </div>
                     <div className="content">
                         <div className="social-media">

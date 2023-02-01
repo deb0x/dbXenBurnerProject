@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
+import "hardhat/console.sol";
 
 /**
  * Main DBXen protocol contract used to burn xen tokens,
@@ -103,6 +104,11 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * active cycle.
      */
     uint256 public pendingFees;
+
+      /**
+     * Total amount of batches burned
+     */
+    uint256 public totalNumberOfBatchesBurned;
 
     /**
      * The amount of batches an account has burned.
@@ -251,11 +257,10 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 discount = (batchNumber * (1000000 - 50 * batchNumber));
         uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
         require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
-
+        totalNumberOfBatchesBurned += batchNumber;
         cycleTotalBatchesBurned[currentCycle] += batchNumber;
         accCycleBatchesBurned[_msgSender()] +=  batchNumber;
         cycleAccruedFees[currentCycle] += protocolFee;
-
         sendViaCall(payable(msg.sender), msg.value - protocolFee);
     }
 
