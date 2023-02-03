@@ -116,8 +116,14 @@ export function PermanentDrawer(props: any): any {
         const signer = await library.getSigner(0)
         const deb0xContract = DBXen(signer, deb0xAddress)
         let currentCycle = await deb0xContract.getCurrentCycle();
-        let numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
-        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        let numberBatchesBurnedInCurrentCycle;
+        let batchBurned = 0;
+
+         if(currentCycle>=1){
+            numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
+            batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+         } 
+         
         let gasLimitIntervalValue;
             if(batchBurned != 0)
                 gasLimitIntervalValue = BigNumber.from("115000");
