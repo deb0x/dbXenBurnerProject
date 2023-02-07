@@ -40,6 +40,7 @@ export function PermanentDrawer(props: any): any {
     const [approveBrun, setApproveBurn] = useState<boolean>();
     const [balanceGratherThanZero, checkBalance] = useState("");
     const [maticValue, setMaticValue] = useState<any>();
+    const [totalCost, setTotalCost] = useState<any>();
     const [totalAmountOfXEN, setXENAmount] = useState<any>();
     const [loading, setLoading] = useState(false)
 
@@ -48,18 +49,27 @@ export function PermanentDrawer(props: any): any {
     }, [account]);
 
     useEffect( () => {
-        const val = async () =>{
-            let val = await getCurrentGasLimit();
-            setMaticValue(await estimationValue(val));
+        setApproveBurn(false);
+        const set = async () =>{
+            let gasValue = await getCurrentGasLimit();
+            setMaticValue((await estimationValue(gasValue)).fee);
         }
-        val();
+        set();
+    },[value]);
+
+    useEffect( () => {
+        setApproveBurn(false);
+        const set = async () =>{
+            let gasValue = await getCurrentGasLimit();
+            setTotalCost((await estimationValue(gasValue)).total);
+        }
+        set();
     },[value]);
 
     useEffect( () => {
         setXENAmount(value*2500000);
     },[value]);
 
-    
     useEffect(() => {
         setBalance()
     }, [account,balanceGratherThanZero]);
@@ -72,7 +82,6 @@ export function PermanentDrawer(props: any): any {
         }
     }, [activatingConnector, connector])
 
-    
     async function setBalance(){
         setLoading(true);
         const signer = await library.getSigner(0)
@@ -87,7 +96,6 @@ export function PermanentDrawer(props: any): any {
     }
 
     async function getCurrentPrice(){
-        
         let method: Method = 'POST';
         const options = {
             method: method,
@@ -109,7 +117,9 @@ export function PermanentDrawer(props: any): any {
         let price = Number(await getCurrentPrice());
         let protocol_fee = value *(1 - 0.00005*value) ;
         let fee = gasLimitIntervalValue * price * protocol_fee / 1000000000;
-        return fee;
+        let totalValue = fee +(fee /((1- 0.00005*value) * value));
+        let obj = {fee:fee.toFixed(4), total:totalValue.toFixed(4)}
+        return obj;
     }
     
     async function getCurrentGasLimit(){
@@ -119,17 +129,14 @@ export function PermanentDrawer(props: any): any {
         let numberBatchesBurnedInCurrentCycle;
         let batchBurned = 0;
 
-         if(currentCycle>=1){
-            numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
-            batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
-         } 
-         
+        numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
+        batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        
         let gasLimitIntervalValue;
             if(batchBurned != 0)
-                gasLimitIntervalValue = BigNumber.from("115000");
+                gasLimitIntervalValue = BigNumber.from("130000");
                     else
-                gasLimitIntervalValue = BigNumber.from("185000");
-
+                gasLimitIntervalValue = BigNumber.from("200000");
         return gasLimitIntervalValue;
     }
 
@@ -170,7 +177,7 @@ export function PermanentDrawer(props: any): any {
         const signer = await library.getSigner(0)
         const deb0xContract = DBXen(signer, deb0xAddress)
         let gasLimitIntervalValue = await getCurrentGasLimit();
-        let currentValue = await estimationValue(gasLimitIntervalValue);
+        let currentValue = (await estimationValue(gasLimitIntervalValue)).fee;
         try {
             const overrides = 
                 { value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
@@ -277,10 +284,13 @@ export function PermanentDrawer(props: any): any {
                             </LoadingButton>
                         }
                         <div className="row">
-                            <p className="text-center mb-0">Aproximative matic value: {maticValue}</p>
+                            <p className="text-center mb-0">Protocol Fee: ~{maticValue} MATIC</p>
                         </div>
                         <div className="row">
-                            <p className="text-center mb-0">The total amount of xen that will be burned: {totalAmountOfXEN}</p>
+                            <p className="text-center mb-0">Total transaction cost: ~{totalCost} MATIC</p>
+                        </div>
+                        <div className="row">
+                            <p className="text-center mb-0">Total XEN burned: {totalAmountOfXEN} XEN</p>
                         </div>
                     </div>
                     <div className="content">
