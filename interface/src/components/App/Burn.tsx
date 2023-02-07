@@ -231,6 +231,20 @@ export function Burn(): any {
                     <button className="btn count-btn max-btn col" type="button" 
                         onClick={() => setValue(1000000)}>MAX</button>
                 </div>
+                <div className="values-container">
+                    <div className="value-content">
+                        <p>Protocol Fee:</p>
+                        <p> ~{maticValue} MATIC</p>
+                    </div>
+                    <div className="value-content">
+                        <p>Total transaction cost:</p>
+                        <p> ~{totalCost} MATIC</p>
+                    </div>
+                    <div className="value-content">
+                        <p>Total XEN burned:</p>
+                        <p> {totalAmountOfXEN} XEN</p>
+                    </div>
+                </div>
                 {approveBrun ?
                     <LoadingButton className="burn-btn" 
                         loadingPosition="end"
@@ -250,15 +264,6 @@ export function Burn(): any {
                             {loading ? <Spinner color={'black'} /> : "Approve Burn XEN" }
                     </LoadingButton>
                 }
-                <div className="row">
-                    <p className="text-center mb-0">Protocol Fee: ~{maticValue} MATIC</p>
-                </div>
-                <div className="row">
-                    <p className="text-center mb-0">Total transaction cost: ~{totalCost} MATIC</p>
-                </div>
-                <div className="row">
-                    <p className="text-center mb-0">Total XEN burned: {totalAmountOfXEN} XEN</p>
-                </div>
             </div>
         </>
     )

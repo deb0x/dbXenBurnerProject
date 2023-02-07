@@ -89,6 +89,21 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     -moz-appearance: textfield;
                 }
             }
+
+            .values-container {
+                width: 100%;
+                .value-content {
+                    display: flex;
+                    justify-content: space-between;
+                    color: #fff;
+                    font-size: 1.5vh;
+                    border-bottom: 1px solid #B7B7CE;
+                    p {
+                        color: #B7B7CE;
+                        margin: 5px 0;
+                    }
+                }
+            }
         }
 
         .burn-btn {
@@ -171,7 +186,6 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                 width: 100%;
                 max-width: 100%;
                 overflow-y: auto;
-                height: 80vh;
                 .row {
                     margin: 0 auto;
                 }

@@ -193,7 +193,7 @@ export function AppBarComponent(props: any): any {
                 <div className="app-bar--top">
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
-                        <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
+                        <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
                     </Box>
                     <Box className="main-menu--right">
                     
