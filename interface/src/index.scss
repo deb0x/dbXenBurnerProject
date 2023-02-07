@@ -127,6 +127,11 @@ $randomNumber: random(4);
         .editor span {
             color: t('text') !important;
         }
+
+        .navigation-mobile,
+        .connect-mobile {
+            display: none;
+        }
     }
     .initial-page {
         height: 100%;
@@ -210,64 +215,9 @@ $randomNumber: random(4);
         }
 
         @media (max-width: 768px) {
-            display: none !important;
-
-            .row {
-                overflow-y: scroll;
-                padding: 0;
-                margin: 0 -9px 0 0;
-            }
-
-            .col-md-5 {
-                display: none;
-            }
-
-            .img-container {
-                height: auto;
-            }
-
-            .image--left,
-            .img-content {
-                position: relative !important;
-            }
-
-            .image--left {
-                height: 100px !important;
-                display: none;
-            }
-
-            .img-content {
-                width: 100% !important;
-                left: 0 !important;
-                padding: 20px;
-                text-align: center;
-
-                button {
-                    width: 100% !important;
-                    margin: 50px auto 0 !important;
-                    left: 0;
-                }
-            }
-        }
-    }
-
-    .mobile-message {
-        display: none;
-        font-size: 27px;
-        line-height: 27px;
-        color: #809bce;
-        font-weight: 800;
-        padding: 100px 50px;
-        .dark-logo {
-            width: 50%;
-            margin-bottom: 25px;
-        }
-        .elephant-img {
-            margin-top: 25px;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            display: block;
+            // .main-container {
+            //     overflow-y: inherit;
+            // }
         }
     }
 }
@@ -496,7 +446,7 @@ $randomNumber: random(4);
             min-height: 100vh;
             padding: 25px 10px;
             .app-container {
-                height: 98%;
+                height: 94vh;
                 border-radius: 25px;
                 header {
                     background-color: transparent;
@@ -507,12 +457,13 @@ $randomNumber: random(4);
                     height: auto;
                 }
                 .main-container {
-                    height: 80vh;
+                    height: 69vh;
                     margin-top: 0;
+                    overflow-y: inherit;
                     .content-box {
                         height: auto;
                         border-radius: 25px;
-                        margin: 15px;
+                        margin: 0;
                         border-radius: 25px;
 
                     }
@@ -532,6 +483,63 @@ $randomNumber: random(4);
                         }
                     }
                 }
+                .navigation-mobile {
+                    display: flex;
+                    position: fixed;
+                    left: 0;
+                    width: 100%;
+                    bottom: 0;
+                    justify-content: space-around;
+                    height: 10vh;
+                    font-size: 3vh;
+                    background-color: #051645;
+                    .navigation-item {
+                        width: 100%;
+                        text-align: center;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        &.active{
+                            color: #19D2D2;
+                        }
+                    }
+                    div:first-child {
+                        border-right: 2px solid #030328;
+                    }
+                }
+                .initial-page {
+                    .img-container {
+                        display: none;
+                    }
+                    .text-container {
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        .dark-logo {
+                            margin: 15px;
+                        }
+                    }
+                    .connect-mobile {
+                        display: block;
+                        .connect-button {
+                            background-color: #ECFCFC;
+                            color: #2B2235;
+                            border: 1px solid #19D2D2;
+                            border-radius: 33px;
+                            box-shadow: none;
+                            margin-top: 50px;
+                            padding: 10px 25px;
+                            width: 235px;
+                            height: 50px;
+                            font-weight: 400;
+                            font-size: 2.5vh;
+                        }
+                    }
+                }
+                
             }
         }
     }
