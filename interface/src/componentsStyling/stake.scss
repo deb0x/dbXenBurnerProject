@@ -65,6 +65,12 @@
                             padding-left: 1vh;
                         }
                     }
+
+                    @media (max-width: 768px) {
+                        .card-container {
+                            background-color: transparent;
+                        }
+                    }
                 }
                 .submit-btn {
                     font-size: 2vh;

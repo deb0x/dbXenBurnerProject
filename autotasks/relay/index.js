@@ -3,7 +3,7 @@ const { DefenderRelaySigner, DefenderRelayProvider } = require('defender-relay-c
 
 const { ForwarderAbi } = require('../../src/forwarder');
 const ForwarderAddress = require('../../interface/src/deploy.json').Forwarder;
-const Deb0xAddress = require('../../interface/src/deploy.json').Deb0x;
+const Deb0xAddress = require('../../interface/src/deploy.json').DBXen;
 const { whitelist } = require('../../interface/src/constants.json')
 
 async function relay(forwarder, typeHash, domainSeparator, request, signature) {

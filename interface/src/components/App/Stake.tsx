@@ -8,9 +8,9 @@ import {
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
-import Deb0x from "../../ethereum/deb0x"
-import Deb0xViews from "../../ethereum/deb0xViews";
-import Deb0xERC20 from "../../ethereum/deb0xerc20"
+import DBXen from "../../ethereum/dbxen"
+import DBXenViews from "../../ethereum/dbxenViews";
+import DBXenERC20 from "../../ethereum/dbxenerc20"
 import SnackbarNotification from './Snackbar';
 import { BigNumber, ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
@@ -27,15 +27,17 @@ import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0xD6F478aa29c8c5Dc233D846D85F064DE30170aD4";
-const deb0xViewsAddress = "0x65DC3F867535fc92669922Ea49aa9420A332e93f";
-const deb0xERC20Address = "0x62E6B821353eAe41859B52bDc885f9cfA70B2c80";
+const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
+const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A";
 
 export function Stake(props: any): any {
 
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
+    const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
@@ -45,8 +47,43 @@ export function Stake(props: any): any {
             feesAccrued()
         }, [feesUnclaimed]);
 
+        useEffect(() => {
+            const totalXenBurned = async () =>{
+                setTotalXENBurned(await getTotalXenBurned())
+            }
+            totalXenBurned();
+        },[]);
+
+        useEffect(() => {
+            const totalXenBurnedPreviousCycle = async () =>{
+                setPreviousCycleXENBurned(await getTotalXenBurnedInPreviusCycle())
+            }
+            totalXenBurnedPreviousCycle();
+        },[]);
+
+        async function getTotalXenBurned(){
+            const signer = await library.getSigner(0)
+            const deb0xContract = DBXen(signer, deb0xAddress)
+            let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+            let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+            return batchBurned * 2500000;
+        }
+    
+        async function getTotalXenBurnedInPreviusCycle(){
+            const signer = await library.getSigner(0)
+            const deb0xContract = DBXen(signer, deb0xAddress)
+            let currentCycle = await deb0xContract.getCurrentCycle();
+            if(currentCycle != 0){
+                 let numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
+                 let batchBurned = numberBatchesBurnedInCurrentCycle.toNumber();
+                 return batchBurned * 2500000;
+            }
+            return 0;
+        }
+
+
         async function feesAccrued() {
-            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
             
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedFees(account);
 
@@ -129,7 +166,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = Deb0x(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, deb0xAddress)
 
             
             const from = await signer.getAddress();
@@ -200,7 +237,7 @@ export function Stake(props: any): any {
             cycleReward()
         }, [currentReward]);
         async function cycleReward() {
-            const deb0xContract = await Deb0x(library, deb0xAddress);
+            const deb0xContract = await DBXen(library, deb0xAddress);
             const currentReward = await deb0xContract.currentCycleReward();
             setCurrentReward(ethers.utils.formatEther(currentReward))
         }
@@ -216,7 +253,10 @@ export function Stake(props: any): any {
                             Total amount of daily cycle DXN tokens: <strong>{currentReward}</strong>
                         </Typography>
                         <Typography className="data-height">
-                            Total burn until now: <strong>{0}</strong>
+                            Total XEN burned until now: <strong>{totalXENBurned}</strong>
+                        </Typography>
+                        <Typography className="data-height">
+                            Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
                         </Typography>
                     </div>
                 </CardContent>
@@ -240,7 +280,7 @@ export function Stake(props: any): any {
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
-            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
          
@@ -248,9 +288,9 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
-            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
 
-            const deb0xContract = await Deb0x(library, deb0xAddress);
+            const deb0xContract = await DBXen(library, deb0xAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
@@ -342,7 +382,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = Deb0x(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, deb0xAddress)
 
             
             const from = await signer.getAddress();
@@ -452,8 +492,8 @@ export function Stake(props: any): any {
         }, [approved]);
 
         async function setStakedAmount() {
-            const deb0xContract = await Deb0x(library, deb0xAddress)
-            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
+            const deb0xContract = await DBXen(library, deb0xAddress)
+            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
             let firstStakeCycle = await deb0xContract.accFirstStake(account)
             let secondStakeCycle =  await deb0xContract.accSecondStake(account)
@@ -465,20 +505,20 @@ export function Stake(props: any): any {
         }
 
         async function setTokensForUntakedAmount() {
-            const deb0xViewsContract = await Deb0xViews(library, deb0xViewsAddress)
+            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
             setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
         }
 
         async function setUnstakedAmount() {
-            const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
+            const deb0xERC20Contract = await DBXenERC20(library, deb0xERC20Address)
             const balance = await deb0xERC20Contract.balanceOf(account)
             let number = ethers.utils.formatEther(balance);
             setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) +3)).toString()) 
         }
 
         async function setApproval() {
-            const deb0xERC20Contract = await Deb0xERC20(library, deb0xERC20Address)
+            const deb0xERC20Contract = await DBXenERC20(library, deb0xERC20Address)
 
             const allowance = await deb0xERC20Contract.allowance(account, deb0xAddress)
             allowance > 0 ? setApproved(true) : setApproved(false)
@@ -486,7 +526,7 @@ export function Stake(props: any): any {
 
         async function totalAmountStaked() {
 
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xContract = await DBXen(library, deb0xAddress)
 
             const currentCycle = await deb0xContract.currentStartedCycle()
 
@@ -499,7 +539,7 @@ export function Stake(props: any): any {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-            const deb0xERC20Contract = await Deb0xERC20(signer, deb0xERC20Address)
+            const deb0xERC20Contract = await DBXenERC20(signer, deb0xERC20Address)
 
             try {
                 const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("5010000"))
@@ -611,7 +651,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = Deb0x(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, deb0xAddress)
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)) {
@@ -719,7 +759,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = Deb0x(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, deb0xAddress)
             
             const from = await signer.getAddress();
             if(whitelist.includes(from)){
@@ -886,7 +926,7 @@ export function Stake(props: any): any {
     
         async function totalAmountStaked() {
     
-            const deb0xContract = await Deb0x(library, deb0xAddress)
+            const deb0xContract = await DBXen(library, deb0xAddress)
 
             const currentCycle= await deb0xContract.currentStartedCycle()
 
@@ -921,18 +961,18 @@ export function Stake(props: any): any {
             <Box className="content-box stake-content">
                 <div className="cards-grid">
                     <div className='row'>
-                        <Grid item className="col col-md-6 ">
+                        <Grid item className="col col-12 col-md-6 ">
                             <FeesPanel />
                         </Grid>
-                        <Grid item className="col col-md-6">
+                        <Grid item className="col col-12 col-md-6">
                             <CyclePanel />
                         </Grid>
                     </div>
                     <div className='row'>
-                        <Grid item className="col col-md-6 ">
+                        <Grid item className="col col-12 col-md-6 ">
                             <RewardsPanel />
                         </Grid>
-                        <Grid item className="col col-md-6">
+                        <Grid item className="col col-12 col-md-6">
                             <StakeUnstake/>
                         </Grid>
                     </div>

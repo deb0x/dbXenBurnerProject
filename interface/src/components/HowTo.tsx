@@ -53,7 +53,7 @@ export default function HowTo(props: any) {
                                 <h4>Connect your <span>wallet</span></h4>
                             </li>
                         </ul>
-                        <h4>After all these steps, you should be ready to use app.deb0x.org <img src={iconParty} /></h4>
+                        <h4>After all these steps, you should be ready to use app.dbxen.org <img src={iconParty} /></h4>
                    </div>
                 </Box>
             </Modal>
