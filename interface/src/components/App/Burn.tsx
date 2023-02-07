@@ -208,6 +208,15 @@ export function Burn(): any {
         if(value > 1)
             setValue(value - 1);
     }
+
+    useEffect(() => {
+        if (value > 10000) {
+            setValue(10000)
+        }
+        if (value < 0 ) {
+            setValue(1)
+        }
+    }, [value])
     
     return (
         <>
@@ -220,7 +229,7 @@ export function Burn(): any {
                 </div>
                 <div className="row">
                     <div className="col input-col">
-                        <input type="number" value={value} max="1000000" onChange={handleInputChange}/>
+                        <input type="number" value={value} max="10000" onChange={handleInputChange}/>
                     </div>
                 </div>
                 <div className="row">
@@ -229,7 +238,7 @@ export function Burn(): any {
                 </div>
                 <div className="row">
                     <button className="btn count-btn max-btn col" type="button" 
-                        onClick={() => setValue(1000000)}>MAX</button>
+                        onClick={() => setValue(10000)}>MAX</button>
                 </div>
                 <div className="values-container">
                     <div className="value-content">
