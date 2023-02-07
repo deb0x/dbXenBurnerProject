@@ -50,20 +50,20 @@ export function PermanentDrawer(props: any): any {
 
     useEffect( () => {
         setApproveBurn(false);
-        const set = async () =>{
-            let gasValue = await getCurrentGasLimit();
-            setMaticValue((await estimationValue(gasValue)).fee);
-        }
-        set();
+         getCurrentGasLimit().then(async (data) => {
+                 estimationValue(data).then(async (resut) =>{
+                    setMaticValue(resut.fee);
+                 })
+        })
     },[value]);
 
     useEffect( () => {
         setApproveBurn(false);
-        const set = async () =>{
-            let gasValue = await getCurrentGasLimit();
-            setTotalCost((await estimationValue(gasValue)).total);
-        }
-        set();
+        getCurrentGasLimit().then(async (data) => {
+            estimationValue(data).then(async (resut) =>{
+                setTotalCost(resut.total);
+            })
+        })
     },[value]);
 
     useEffect( () => {
@@ -136,7 +136,7 @@ export function PermanentDrawer(props: any): any {
             if(batchBurned != 0)
                 gasLimitIntervalValue = BigNumber.from("130000");
                     else
-                gasLimitIntervalValue = BigNumber.from("200000");
+                gasLimitIntervalValue = BigNumber.from("400000");
         return gasLimitIntervalValue;
     }
 
@@ -253,7 +253,7 @@ export function PermanentDrawer(props: any): any {
                         </div>
                         <div className="row">
                             <div className="col input-col">
-                                <input type="number" value={value} max="1000000" onChange={handleInputChange}/>
+                                <input type="number" value={value} max="10000" onChange={handleInputChange}/>
                             </div>
                         </div>
                         <div className="row">
@@ -262,7 +262,7 @@ export function PermanentDrawer(props: any): any {
                         </div>
                         <div className="row">
                             <button className="btn count-btn max-btn col" type="button" 
-                                onClick={() => setValue(1000000)}>MAX</button>
+                                onClick={() => setValue(10000)}>MAX</button>
                         </div>
                         {approveBrun ?
                             <LoadingButton className="burn-btn" 
