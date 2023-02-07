@@ -961,18 +961,18 @@ export function Stake(props: any): any {
             <Box className="content-box stake-content">
                 <div className="cards-grid">
                     <div className='row'>
-                        <Grid item className="col col-md-6 ">
+                        <Grid item className="col col-12 col-md-6 ">
                             <FeesPanel />
                         </Grid>
-                        <Grid item className="col col-md-6">
+                        <Grid item className="col col-12 col-md-6">
                             <CyclePanel />
                         </Grid>
                     </div>
                     <div className='row'>
-                        <Grid item className="col col-md-6 ">
+                        <Grid item className="col col-12 col-md-6 ">
                             <RewardsPanel />
                         </Grid>
-                        <Grid item className="col col-md-6">
+                        <Grid item className="col col-12 col-md-6">
                             <StakeUnstake/>
                         </Grid>
                     </div>

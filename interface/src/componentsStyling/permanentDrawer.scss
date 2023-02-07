@@ -166,6 +166,16 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                     }
                 }
             }
+
+            .burn-container {
+                width: 100%;
+                max-width: 100%;
+                overflow-y: auto;
+                height: 80vh;
+                .row {
+                    margin: 0 auto;
+                }
+            }
         }
     }
 }

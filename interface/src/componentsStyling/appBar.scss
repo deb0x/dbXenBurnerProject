@@ -8,6 +8,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            .logo {
+                display: none;
+            }
             .main-menu--right {
                 .MuiButton-contained {
                     font-family: 'Karla';
@@ -23,6 +26,23 @@
                 }
                 button {
                     margin: 0 5px;
+                }
+            }
+        }
+        @media (max-width: 768px) {
+            .app-bar--top {
+                height: auto;
+                margin: 15px;
+                flex-direction: column;
+                .logo {
+                    display: block;
+                    width: 25vw;
+                }
+                .main-menu--right {
+                    width: 100%;
+                    .MuiButton-contained {
+                        width: 100%;
+                    }
                 }
             }
         }

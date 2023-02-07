@@ -3,10 +3,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { injected } from '../../connectors';
 import { useWeb3React } from '@web3-react/core';
-import ThemeSetter from '../ThemeSetter';
 import { Spinner } from './Spinner';
 import { ethers } from 'ethers';
-import { useEagerConnect } from '../../hooks';
 import formatAccountName from '../Common/AccountName';
 import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/dbxenViews";
@@ -17,8 +15,7 @@ import '../../componentsStyling/appBar.scss';
 import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
-import { disconnect } from 'process';
-
+import logo from "../../photos/white_dbxen.svg";
 
 const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
 const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
@@ -34,18 +31,19 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
 
 export function AppBarComponent(props: any): any {
     const context = useWeb3React();
-    const { connector, library, chainId, account, activate, deactivate, active, error } = context
+    const { connector, library, chainId, account, activate, deactivate } = context
     const [activatingConnector, setActivatingConnector] = useState<any>();
     const [networkName, setNetworkName] = useState<any>();
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
-    const triedEager = useEagerConnect();
     const [ensName, setEnsName] = useState<any>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [notificationState, setNotificationState] = useState({})
+    const [, setNotificationState] = useState({})
     const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
     const [userStakedAmount, setUserStakedAmount] = useState("")
     const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
     const [open, setOpen] = useState<any>();
+    const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress)
+    const [totalStaked, setTotalStaked] = useState("")
 
     const id = open ? 'simple-popper' : undefined;
 
@@ -55,8 +53,12 @@ export function AppBarComponent(props: any): any {
     }
 
     useEffect(() => {
+        totalAmountStaked()
+    }, [totalAmountStaked]);
+
+    useEffect(() => {
         setTheme(localStorage.getItem('globalTheme'));
-    });
+    }, []);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -69,8 +71,9 @@ export function AppBarComponent(props: any): any {
     async function setUnstakedAmount() {
         const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
         if(account){
-            const balance = await deb0xERC20Contract.balanceOf(account)
-            setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
+            await deb0xERC20Contract.balanceOf(account).then((result: any) => 
+                setUserUnstakedAmount(floorPrecised(ethers.utils.formatEther(result)))
+            )
         }
     }
 
@@ -90,12 +93,8 @@ export function AppBarComponent(props: any): any {
         }
     },[])
 
-    useEffect(() => {
-        setUnstakedAmount();
-    },[userUnstakedAmount])
-
     async function checkENS(){
-        if(chainId !=137){
+        if(chainId !== 137){
             var name = await library.lookupAddress(account);
             if(name !== null)
             {   
@@ -104,27 +103,18 @@ export function AppBarComponent(props: any): any {
         }
        
     }
-    function TotalStaked() {
-        const [totalStaked, setTotalStaked] = useState("")
-        useEffect(() => {
-            totalAmountStaked()
-        }, [totalStaked]);
-        async function totalAmountStaked() {
-            const deb0xContract = await DBXen(library, deb0xAddress)
-            const currentCycle= await deb0xContract.currentStartedCycle()
-            const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
-            const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-            // setTotalStaked(ethers.utils.formatEther(currentStake))
-            setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
-        }
-        return (
-            <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
-        )
-    }
 
     function floorPrecised(number:any) {
         var power = Math.pow(10, 2);
         return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
+
+    async function totalAmountStaked() {
+        const deb0xContract = DBXen(library, deb0xAddress)
+        const currentCycle= await deb0xContract.currentStartedCycle()
+        const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+        const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
+        setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
     }
 
     async function addToken() {
@@ -173,50 +163,37 @@ export function AppBarComponent(props: any): any {
     }
 
     async function rewardsAccrued() {
-        const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
-        const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
-        setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(unclaimedRewards)))
+        await deb0xViewsContract.getUnclaimedRewards(account).then((result: any) => 
+            setRewardsUnclaimed(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
     async function setStakedAmount() {
-        const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
-        const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
-        setUserStakedAmount(floorPrecised(ethers.utils.formatEther(balance)))
+        await deb0xViewsContract.getAccWithdrawableStake(account).then((result: any) => 
+            setUserStakedAmount(floorPrecised(ethers.utils.formatEther(result)))
+        )
     }
 
-    useEffect(() => {
-        rewardsAccrued()
-    }, [rewardsUnclaimed]);
-
-    useEffect(() => {
-        setStakedAmount()
-    }, [userStakedAmount]);
-
-
     const handleClick = (event: any) => {
+        rewardsAccrued();
+        setStakedAmount();
+        setUnstakedAmount();
         const { currentTarget } = event;
         setAnchorEl(currentTarget)
         setOpen(!open)
       };
 
-     const handleClickAway = () => {
+    const handleClickAway = () => {
         setOpen(false)
-      };
-
-
-    function handleChange(text: any, index: any) {
-        // setSelectedIndex(index)
-        // props.onChange(text)
-        if(index !== 0)
-            localStorage.removeItem('input')
-    }
+    };
     
     return (
         <ClickAwayListener onClickAway={handleClickAway}>
             <div>
                 <div className="app-bar--top">
+                    <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
-                        <TotalStaked/>
+                        <p className="mb-0">Total tokens staked: {totalStaked} DBX</p>
                     </Box>
                     <Box className="main-menu--right">
                     
@@ -224,36 +201,35 @@ export function AppBarComponent(props: any): any {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
                         const connected = currentConnector === connector
-                        const disabled = !triedEager || !!activatingConnector || connected || !!error
 
                         return (
-                                <Button variant="contained"
-                                    key={ConnectorNames.Injected}
-                                    aria-describedby={id}
-                                    onClick={!connected ? 
-                                        () => {
-                                            setActivatingConnector(currentConnector)
-                                            activate(currentConnector)
-                                        } : 
-                                        handleClick
-                                    }>
-                                    
-                                    { activating ? 
-                                        <Spinner color={'black'} /> :
-                                        !connected ? 
-                                            "Connect Wallet" :
-                                            <span>
-                                                {account === undefined ? 
-                                                    `Unsupported Network. Switch to ${networkName}` : 
-                                                    account ? 
-                                                        ensName === "" ? 
-                                                            `${formatAccountName(account)}` :
-                                                            `${ensName.toLowerCase()} 
-                                                            (${formatAccountName(account)})`
-                                                    : ''}
-                                            </span>
-                                    }
-                                </Button>
+                            <Button variant="contained"
+                                key={ConnectorNames.Injected}
+                                aria-describedby={id}
+                                onClick={!connected ? 
+                                    () => {
+                                        setActivatingConnector(currentConnector)
+                                        activate(currentConnector)
+                                    } : 
+                                    handleClick
+                                }>
+                                
+                                { activating ? 
+                                    <Spinner color={'black'} /> :
+                                    !connected ? 
+                                        "Connect Wallet" :
+                                        <span>
+                                            {account === undefined ? 
+                                                `Unsupported Network. Switch to ${networkName}` : 
+                                                account ? 
+                                                    ensName === "" ? 
+                                                        `${formatAccountName(account)}` :
+                                                        `${ensName.toLowerCase()} 
+                                                        (${formatAccountName(account)})`
+                                                : ''}
+                                        </span>
+                                }
+                            </Button>
                         )
                     }) ()}
                     </Box>
@@ -278,14 +254,14 @@ export function AppBarComponent(props: any): any {
                             copyWalletID()
                         }}
                         className="copy-wallet-btn">
-                        <span><img src={copyIcon} /></span>Copy wallet ID
+                        <span><img src={copyIcon} alt="copy" /></span>Copy wallet ID
                     </Button>
                     <Button
                         onClick={(event: any) => {
                             addToken()
                         }}
                         className="add-token-btn">
-                         <span><img src={walletIcon}/></span>Add token to wallet
+                         <span><img src={walletIcon} alt="wallet"/></span>Add token to wallet
                     </Button>
                     <Button 
                         onClick={(event: any) => {
@@ -293,7 +269,7 @@ export function AppBarComponent(props: any): any {
                             deactivate()
                         }}
                             className="logout-btn">
-                             <span><img src={disconnectIcon}/></span>Disconnect wallet
+                             <span><img src={disconnectIcon} alt="disconnect"/></span>Disconnect wallet
                     </Button>  
 
                 </Popper>

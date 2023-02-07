@@ -2,13 +2,8 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { 
     Web3ReactProvider,
-    useWeb3React,
-    UnsupportedChainIdError
+    useWeb3React
 } from '@web3-react/core';
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected
-} from '@web3-react/injected-connector'
 import { ethers } from "ethers";
 import { useEagerConnect, useInactiveListener } from './hooks'
 import { PermanentDrawer } from './components/App/PermanentDrawer'
@@ -22,6 +17,8 @@ import deb0xen from './photos/white_dbxen.svg';
 import maintenanceImg from './photos/empty.png';
 import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
+import { Burn } from './components/App/Burn';
+import ScreenSize from './components/Common/ScreenSize';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -33,24 +30,6 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.Network]: network
 }
 
-function getErrorMessage(error: Error) {
-    let networkName;
-
-    injected.supportedChainIds?.forEach(chainId => networkName = (ethers.providers.getNetwork(chainId)).name)
-    if (error instanceof NoEthereumProviderError) {
-        return 'No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.'
-    } else if (error instanceof UnsupportedChainIdError) {
-        return `You're connected to an unsupported network. Switch to ${networkName}`
-    } else if (
-        error instanceof UserRejectedRequestErrorInjected
-    ) {
-        return 'Please authorize this website to access your Ethereum account.'
-    } else {
-        console.error(error)
-        return 'An unknown error occurred. Check the console for more details.'
-    }
-}
-
 function getLibrary(provider: any): ethers.providers.Web3Provider {
   const library = new ethers.providers.Web3Provider(provider)
 
@@ -58,7 +37,7 @@ function getLibrary(provider: any): ethers.providers.Web3Provider {
   return library
 }
 
-export default function () {
+export default function web3App() {
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
       <App />
@@ -68,14 +47,15 @@ export default function () {
 
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
-    const { connector, library, chainId, account, active, error, activate } = context
-
+    const { connector, account, activate } = context
+    const [selectedIndex, setSelectedIndex] = useState<any>(0);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
-
+    const dimensions = ScreenSize();
+    
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
             setNetworkName((ethers.providers.getNetwork(chainId).name)));
@@ -151,30 +131,47 @@ function App() {
         <ThemeProvider>
         { account ? 
             <div className="app-container container-fluid">
-                { maintenance == "true" ?
+                { maintenance === "true" ?
                     <div className="row main-row maintenance-mode">
-                        <img className="maintenance-img" src={maintenanceImg} />
+                        <img className="maintenance-img" src={maintenanceImg} alt="maintenance" />
                         <h1>Maintenance Mode</h1>
                         <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
                     </div> :
                     <div className="row main-row">
-                        <div className="col col-md-3 col-sm-12 p-0 side-menu-container">
+                        <div className="col col-lg-3 col-12 p-0 side-menu-container">
                             <PermanentDrawer />
                         </div>
-                        <div className="col col-md-9 col-sm-12">
+                        <div className="col col-lg-9 col-12">
                             <AppBarComponent />
+                            
                             <Box className="main-container" sx={{marginTop: 12}}>
-                                <Stake />
+                            {dimensions.width > 768 ? 
+                                <Stake /> :
+                                <>
+                                    {selectedIndex === 0 && <Burn /> }
+                                    {selectedIndex === 1 && <Stake /> }
+                                </>
+                            }
                             </Box>
                         </div>
                     </div>
                 }
+                <div className="navigation-mobile">
+                    <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
+                        onClick={() => setSelectedIndex(0)}>
+                            Mint
+                    </div>
+                    <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
+                        onClick={() => setSelectedIndex(1)}>
+                            Fees
+                    </div>
+                </div>
             </div> :
             <div className="app-container p-0 ">
                 <div className="initial-page">
                     <div className="row">
-                        <div className="col-md-7 img-container mr-4">
-                            <img className="image--left" src={elephant} />
+                        <div className="col-lg-7 img-container mr-4">
+                            <img className="image--left" src={elephant} alt="elephant" />
                             <div className="img-content">
                                 <p>Connect your wallet</p>
                                 <p>Burn $XEN</p>
@@ -185,7 +182,6 @@ function App() {
                                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                                         const activating = currentConnector === activatingConnector
                                         const connected = currentConnector === connector
-                                        const disabled = !triedEager || !!activatingConnector || connected || !!error
 
                                         return (
                                             <Button variant="contained"
@@ -215,20 +211,47 @@ function App() {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-md-5 text-center">
+                        <div className="col-12 col-lg-5 text-center">
                             <div className="text-container">
-                                <img className="dark-logo" src={deb0xen} />
+                                <img className="dark-logo" src={deb0xen} alt="logo" />
                                 <p>
                                     Community built crypto protocol <br/> contributing to XEN deflation
                                 </p>
+                                <div className="connect-mobile">
+                                    { (() =>  {
+                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                        const activating = currentConnector === activatingConnector
+                                        const connected = currentConnector === connector
+
+                                        return (
+                                            <Button variant="contained"
+                                                key={ConnectorNames.Injected}
+                                                // aria-describedby={id}
+                                                onClick={!connected ? 
+                                                    () => {
+                                                        setActivatingConnector(currentConnector)
+                                                        activate(currentConnector)
+                                                    } : 
+                                                    handleClick}
+                                                    className="connect-button">
+                                                
+                                                { activating ? 
+                                                    <Spinner color={'black'} /> :
+                                                    !connected ? 
+                                                        "Connect" :
+                                                        <span>
+                                                            {typeof window.ethereum === 'undefined' ? 
+                                                                `Check your prerequisites` : 
+                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                        </span>
+                                                }
+                                            </Button>
+                                        )
+                                    }) ()}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="mobile-message">
-                    <img className="dark-logo" src={deb0xen} />
-                    <p>In order to use the app please log in from Desktop</p>
-                    <img className="elephant-img" src={elephant} />
                 </div>
             </div>
         }
