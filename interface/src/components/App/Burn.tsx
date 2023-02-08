@@ -213,7 +213,7 @@ export function Burn(): any {
         if (value > 10000) {
             setValue(10000)
         }
-        if (value < 0 ) {
+        if (value <= 0 ) {
             setValue(1)
         }
     }, [value])
