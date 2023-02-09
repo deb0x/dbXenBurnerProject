@@ -48,5 +48,10 @@ module.exports = {
     gasReporter: {
         currency: 'USD',
         gasPrice: 21
+    },
+    etherscan: {
+        // Your API key for Etherscan
+        // Obtain one at https://etherscan.io/
+        apiKey: "YOUR_ETHERSCAN_API_KEY"
     }
 };
