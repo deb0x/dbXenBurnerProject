@@ -6,7 +6,7 @@ pragma abicoder v2;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-import "./IForwarder.sol";
+import "./interfaces/IForwarder.sol";
 
 /**
  * @title The Forwarder Implementation

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import XENCrypto from '../../ethereum/XENCrypto';
+import MockXENCrypto from '../../ethereum/MockXENCrypto';
 import DBXen from "../../ethereum/dbxen"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
@@ -59,7 +59,7 @@ export function Burn(): any {
     async function setBalance(){
         setLoading(true);
         const signer = await library.getSigner(0)
-        const xenContract = await XENCrypto(signer, xenCryptoAddress);
+        const xenContract = await MockXENCrypto(signer, xenCryptoAddress);
         let number;
 
         await xenContract.balanceOf(account).then((balance: any) => {
@@ -117,7 +117,7 @@ export function Burn(): any {
     async function setApproval() {
         setLoading(true);
         const signer = await library.getSigner(0)
-        const xenContract = await XENCrypto(signer, xenCryptoAddress)
+        const xenContract = await MockXENCrypto(signer, xenCryptoAddress)
         let totalAmountToBurn = value * 2500000;
         try {
             const tx = await xenContract.approve(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))

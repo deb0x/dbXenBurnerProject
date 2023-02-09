@@ -14,7 +14,7 @@ describe("Test claim fee functionality", async function() {
         const lib = await ethers.getContractFactory("MathX");
         const library = await lib.deploy();
 
-        const xenContract = await ethers.getContractFactory("XENCrypto", {
+        const xenContract = await ethers.getContractFactory("MockXENCrypto", {
             libraries: {
                 MathX: library.address
             }
@@ -44,7 +44,7 @@ describe("Test claim fee functionality", async function() {
         const lib = await ethers.getContractFactory("MathX");
         const libraryLocal = await lib.deploy();
 
-        const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
+        const xenContractLocal = await ethers.getContractFactory("MockXENCrypto", {
             libraries: {
                 MathX: libraryLocal.address
             }

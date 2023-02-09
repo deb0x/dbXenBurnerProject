@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
-import "./XENCrypto.sol";
+import "./MockXENCrypto.sol";
 import "hardhat/console.sol";
 
 /**
@@ -24,7 +24,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
      * XEN Token contract.
      * Initialized in constructor.
      */
-    XENCrypto public xen;
+    MockXENCrypto public xen;
 
     /**
      * Basis points representation of 100 percent.
@@ -34,7 +34,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
+    uint256 public constant XEN_BATCH_AMOUNT = 1;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -275,7 +275,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         currentCycleReward = 10000 * 1e18;
         summedCycleStakes[0] = 10000 * 1e18;
         rewardPerCycle[0] = 10000 * 1e18;
-        xen = XENCrypto(xenAddress);
+        xen = MockXENCrypto(xenAddress);
     }
 
     // IBurnRedeemable IMPLEMENTATION

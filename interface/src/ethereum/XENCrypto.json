@@ -1,7 +1,7 @@
 {
     "_format": "hh-sol-artifact-1",
-    "contractName": "XENCrypto",
-    "sourceName": "contracts/XENCrypto.sol",
+    "contractName": "MockXENCrypto",
+    "sourceName": "contracts/MockXENCrypto.sol",
     "abi": [{
             "inputs": [],
             "stateMutability": "nonpayable",
@@ -677,7 +677,7 @@
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct XENCrypto.MintInfo",
+                "internalType": "struct MockXENCrypto.MintInfo",
                 "name": "",
                 "type": "tuple"
             }],
@@ -709,7 +709,7 @@
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct XENCrypto.StakeInfo",
+                "internalType": "struct MockXENCrypto.StakeInfo",
                 "name": "",
                 "type": "tuple"
             }],
