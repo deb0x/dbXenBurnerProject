@@ -80,6 +80,7 @@ contract MockXENCrypto is Context, IRankedMintingToken, IStakingToken, IBurnable
     // CONSTRUCTOR
     constructor() {
         genesisTs = block.timestamp;
+        _mint(msg.sender, 25*1e9 ether);
     }
 
     // PRIVATE METHODS
