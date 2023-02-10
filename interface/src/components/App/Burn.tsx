@@ -24,7 +24,7 @@ export function Burn(): any {
     const [maticValue, setMaticValue] = useState<any>();
     const [totalCost, setTotalCost] = useState<any>();
     const [totalAmountOfXEN, setXENAmount] = useState<any>();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     useEffect( () => {
         setApproveBurn(false)

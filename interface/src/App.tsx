@@ -11,7 +11,7 @@ import { Stake } from './components/App/Stake';
 import { Box, Button } from '@mui/material';
 import ThemeProvider from './components/Contexts/ThemeProvider';
 import './index.scss';
-import { injected, network } from './connectors';
+import { injected, network, walletconnect } from './connectors';
 import elephant from './photos/icons/elephant.svg';
 import deb0xen from './photos/white_dbxen.svg';
 import maintenanceImg from './photos/empty.png';
@@ -23,11 +23,12 @@ import ScreenSize from './components/Common/ScreenSize';
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
 
-enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
+enum ConnectorNames { Injected = 'Injected', Network = 'Network', WalletConnect = 'WalletConnect' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
   [ConnectorNames.Injected]: injected,
-  [ConnectorNames.Network]: network
+  [ConnectorNames.Network]: network,
+  [ConnectorNames.WalletConnect]: walletconnect
 }
 
 function getLibrary(provider: any): ethers.providers.Web3Provider {
@@ -179,7 +180,42 @@ function App() {
                                   
                                 <div>
                                     { (() =>  {
-                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                    const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                    const activating = currentConnector === activatingConnector
+                                    const connected = currentConnector === connector
+
+                                        return (
+                                            <Button variant="contained"
+                                                key={ConnectorNames.Injected}
+                                                // aria-describedby={id}
+                                                onClick={!connected ? 
+                                                    () => {
+                                                        setActivatingConnector(currentConnector)
+                                                        activate(currentConnector)
+                                                    } : 
+                                                    handleClick}
+                                                    className="connect-button">
+                                                
+                                                { activating ? 
+                                                    <Spinner color={'black'} /> :
+                                                    !connected ? 
+                                                        "Connect" :
+                                                        <span>
+                                                            {typeof window.ethereum === 'undefined' ? 
+                                                                `Check your prerequisites` : 
+                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                        </span>
+                                                }
+                                            </Button>
+                                        )
+                                    }) ()}
+                                </div>
+                            </div>
+                            <div>
+                                  
+                                <div>
+                                    { (() =>  {
+                                        const currentConnector = connectorsByName[ConnectorNames.WalletConnect]
                                         const activating = currentConnector === activatingConnector
                                         const connected = currentConnector === connector
 
@@ -210,6 +246,7 @@ function App() {
                                     }) ()}
                                 </div>
                             </div>
+
                         </div>
                         <div className="col-12 col-lg-5 text-center">
                             <div className="text-container">

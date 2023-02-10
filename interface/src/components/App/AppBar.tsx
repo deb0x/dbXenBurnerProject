@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { injected } from '../../connectors';
+import { injected, walletconnect } from '../../connectors';
 import { useWeb3React } from '@web3-react/core';
 import { Spinner } from './Spinner';
 import { ethers } from 'ethers';
@@ -23,12 +23,14 @@ const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A"
 const tokenSymbol = 'DBXen';
 
 const tokenDecimals = 18;
-enum ConnectorNames { Injected = 'Injected' };
+enum ConnectorNames { Injected = 'Injected', WalletConnect = 'WalletConnect' };
 
 const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-    [ConnectorNames.Injected]: injected
+    [ConnectorNames.Injected]: injected,
+    [ConnectorNames.WalletConnect]: walletconnect
 }
 
+  
 export function AppBarComponent(props: any): any {
     const context = useWeb3React();
     const { connector, library, chainId, account, activate, deactivate } = context
@@ -198,13 +200,13 @@ export function AppBarComponent(props: any): any {
                     <Box className="main-menu--right">
                     
                     { (() =>  {
-                        const currentConnector = connectorsByName[ConnectorNames.Injected]
+                        const currentConnector = connectorsByName[ConnectorNames.WalletConnect]
                         const activating = currentConnector === activatingConnector
                         const connected = currentConnector === connector
 
                         return (
                             <Button variant="contained"
-                                key={ConnectorNames.Injected}
+                                key={ConnectorNames.WalletConnect}
                                 aria-describedby={id}
                                 onClick={!connected ? 
                                     () => {
