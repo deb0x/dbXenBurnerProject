@@ -200,13 +200,13 @@ export function AppBarComponent(props: any): any {
                     <Box className="main-menu--right">
                     
                     { (() =>  {
-                        const currentConnector = connectorsByName[ConnectorNames.WalletConnect]
+                        const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
                         const connected = currentConnector === connector
 
                         return (
                             <Button variant="contained"
-                                key={ConnectorNames.WalletConnect}
+                                key={ConnectorNames.Injected}
                                 aria-describedby={id}
                                 onClick={!connected ? 
                                     () => {
