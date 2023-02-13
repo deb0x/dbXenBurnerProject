@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
-import "hardhat/console.sol";
 
 /**
  * Main DBXen protocol contract used to burn xen tokens,
