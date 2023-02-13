@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
@@ -13,6 +14,7 @@ import "hardhat/console.sol";
  * allocate DBXen token rewards, distribute native token fees, stake and unstake.
  */
 contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
+    using SafeERC20 for DBXenERC20;
 
     /**
      * DBXen Reward Token contract.
@@ -392,7 +394,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
         accStakeCycle[_msgSender()][cycleToSet] += amount;
 
-        dxn.transferFrom(_msgSender(), address(this), amount);
+        dxn.safeTransferFrom(_msgSender(), address(this), amount);
         emit Staked(cycleToSet, _msgSender(), amount);
     }
 
@@ -425,7 +427,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         accWithdrawableStake[_msgSender()] -= amount;
         accRewards[_msgSender()] -= amount;
 
-        dxn.transfer(_msgSender(), amount);
+        dxn.safeTransfer(_msgSender(), amount);
         emit Unstaked(currentCycle, _msgSender(), amount);
     }
 
