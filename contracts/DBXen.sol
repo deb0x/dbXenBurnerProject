@@ -34,7 +34,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
+    uint256 public constant XEN_BATCH_AMOUNT = 2_500_000 ether;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -308,9 +308,9 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     {
         require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(xen.balanceOf(msg.sender) >= batchNumber * XEN_BATCH_AMOUNT * (10**18), "DBXen: not enough tokens for burn");
+        require(xen.balanceOf(msg.sender) >= batchNumber * XEN_BATCH_AMOUNT, "DBXen: not enough tokens for burn");
 
-        IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT * (10**18));
+        IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT);
     }
 
     /**
