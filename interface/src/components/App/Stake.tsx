@@ -253,7 +253,7 @@ export function Stake(props: any): any {
                             Total amount of daily cycle DXN tokens: <strong>{currentReward}</strong>
                         </Typography>
                         <Typography className="data-height">
-                            Total XEN burned until now: <strong>{totalXENBurned}</strong>
+                            Total XEN burned: <strong>{totalXENBurned}</strong>
                         </Typography>
                         <Typography className="data-height">
                             Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
