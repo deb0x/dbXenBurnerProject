@@ -376,7 +376,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 cycleToSet = currentCycle + 1;
 
         if (lastStartedCycle == currentStartedCycle) {
-            cycleToSet = currentCycle;
+            cycleToSet = lastStartedCycle + 1;
         }
 
         if (
