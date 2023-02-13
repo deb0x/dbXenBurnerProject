@@ -31,7 +31,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Basis points representation of 100 percent.
      */
-    uint16 public constant MAX_BPS = 10000;
+    uint256 public constant MAX_BPS = 100_000;
 
     /**
      * Amount of XEN tokens per batch
@@ -256,8 +256,8 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 startGas = gasleft();
         _;
         
-        uint256 discount = (batchNumber * (1000000 - 50 * batchNumber));
-        uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
+        uint256 discount = (batchNumber * (MAX_BPS - 5* batchNumber));
+        uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS;
         require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
         totalNumberOfBatchesBurned += batchNumber;
         cycleTotalBatchesBurned[currentCycle] += batchNumber;
