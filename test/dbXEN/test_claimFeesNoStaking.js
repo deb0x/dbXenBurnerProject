@@ -41,7 +41,7 @@ describe("Test claim fee without staking functionality", async function() {
         carolInstance = XENContract.connect(carol);
     });
 
-    it.only("Multiple accounts claim rewards and fees", async() => {
+    it("Multiple accounts claim rewards and fees", async() => {
         const lib = await ethers.getContractFactory("MathX");
         const libraryLocal = await lib.deploy();
 
