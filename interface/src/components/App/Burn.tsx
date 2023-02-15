@@ -9,6 +9,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import axios, { Method } from 'axios';
 import web3 from 'web3';
+import { useTranslation } from "react-i18next";
 const { BigNumber } = require("ethers");
 
 const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
@@ -25,6 +26,7 @@ export function Burn(): any {
     const [totalCost, setTotalCost] = useState<any>();
     const [totalAmountOfXEN, setXENAmount] = useState<any>();
     const [loading, setLoading] = useState(false)
+    const { t } = useTranslation();
 
     useEffect( () => {
         setApproveBurn(false)
@@ -224,7 +226,7 @@ export function Burn(): any {
                     setNotificationState={setNotificationState} />
             <div className="side-menu--bottom burn-container">
                 <div className="row">
-                    <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
+                    <p className="text-center mb-0">{t("burn")}</p>
                     <p className="text-center">(1 batch = 2 500 000 XEN)</p>
                 </div>
                 <div className="row">

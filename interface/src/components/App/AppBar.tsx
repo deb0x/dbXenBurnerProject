@@ -16,6 +16,8 @@ import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
+import DropdownLanguage from '../DropdownLanguage';
+import "i18next";
 
 const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
 const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
@@ -196,7 +198,7 @@ export function AppBarComponent(props: any): any {
                         <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
                     </Box>
                     <Box className="main-menu--right">
-                    
+                    <DropdownLanguage />
                     { (() =>  {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
