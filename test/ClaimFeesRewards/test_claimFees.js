@@ -212,8 +212,9 @@ describe("Test claim fee functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         await DBXenContractLocal.connect(alice).claimRewards();
-
-
+        await DBXenContractLocal.connect(alice).claimFees()
+        
+        
         const aliceBalance = await DBXenERC20.balanceOf(alice.address)
         await DBXenERC20.connect(alice).transfer(bob.address, 
         aliceBalance.div(BigNumber.from("2")))
@@ -250,14 +251,15 @@ describe("Test claim fee functionality", async function() {
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
         //@note increase one day to cycle 2
         await hre.ethers.provider.send("evm_mine")
+        console.log("5th cycle accrued fees:", await DBXenContractLocal.cycleAccruedFees(4))
         console.log("Bob fee claim:");
         DBXenContractLocal.connect(bob).claimFees();
 
         console.log("Carol fee claim:");
         await DBXenContractLocal.connect(carol).claimFees();
-
-        // console.log("Alice fee claim:");
-        // await DBXenContractLocal.connect(alice).claimFees(); // alice cannot claim
+        
+        console.log("Alice fee claim:");
+        await DBXenContractLocal.connect(alice).claimFees(); // alice cannot claim
     });
 
 
