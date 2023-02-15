@@ -16,6 +16,8 @@ import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
+import DropdownLanguage from '../DropdownLanguage';
+import "i18next";
 import ChainProvider from '../Contexts/ChainProvider';
 import ChainSetter from '../Contexts/ChainSetter';
 import ChainContext from '../Contexts/ChainContext';
@@ -225,7 +227,7 @@ export function AppBarComponent(props: any): any {
                     <Box className="main-menu--right d-flex">
                         <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
-                            <div>
+                            <div><DropdownLanguage />
                                 { (() =>  {
                                     const currentConnector = connectorsByName[ConnectorNames.Injected]
                                     const activating = currentConnector === activatingConnector

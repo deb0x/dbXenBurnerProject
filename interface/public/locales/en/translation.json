@@ -1,0 +1,67 @@
+{
+    "home": {
+        "connect_text": "Connect your wallet",
+        "burn_text": "Burn $XEN",
+        "earn_text": "Earn crypto",
+        "connect_button": "Connect",
+        "community_text": "Community built crypto protocol",
+        "contributing_text": "contributing to XEN deflation"
+    },
+    "burn": {
+        "label": "Choose the number of XEN batches you want to burn",
+        "batch": "1 batch = 2 500 000 XEN",
+        "max": "MAX",
+        "protocol_fee": "Protocol Fee",
+        "transaction_cost": "Total transaction cost",
+        "xen_burned": "Total XEN burned",
+        "approve_button": "Approve Burn XEN",
+        "burn_button": "Burn XEN"
+    },
+    "app_bar": {
+        "tokens_staked": "Total tokens staked",
+        "xen_burned": "Total XEN burned",
+        "rewards": "Unclaimed rewards",
+        "stake": "Active stake",
+        "wallet": "In wallet",
+        "wallet_id": "Copy wallet ID",
+        "add_token": "Add token to wallet",
+        "disconnect": "Disconnect wallet"
+    },
+    "fees": {
+        "title": "Your daily native coin share",
+        "unclaimed_fees": "Your unclaimed fees",
+        "counter": "Get rewards in",
+        "collect": "Collect"
+    },
+    "daily_stats": {
+        "title": "Daily stats",
+        "total_amount": "Total amount of daily cycle DXN tokens",
+        "this_cycle": "Total XEN burned in this cycle"
+    },
+    "rewards": {
+        "title": "Your rewards",
+        "unclaimed_rewards": "Your unclaimed DXN rewards",
+        "counter": "Get rewards in",
+        "claim": "Claim"
+    },
+    "stake": {
+        "stake": "Stake",
+        "staked_amount": "Your staked amount",
+        "wallet": "Your tokens in wallet",
+        "init_text": "Make sure you have DXN tokens in your wallet before you can stake them.",
+        "init_button": "Initialize staking",
+        "amount_to_stake": "Amount to stake",
+        "max": "MAX"
+    },
+    "unstake": {
+        "unstake": "Unstake",
+        "available": "Available to unstake",
+        "actual": "Your actual stake",
+        "amount_to_unstake": "Amount to unstake",
+        "max": "MAX"
+    },
+    "mobile": {
+        "mint": "Mint",
+        "fees": "Fees"
+    }
+}

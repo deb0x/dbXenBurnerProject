@@ -10,6 +10,7 @@ import { Spinner } from './Spinner';
 import axios, { Method } from 'axios';
 import web3 from 'web3';
 import ChainContext from '../Contexts/ChainContext';
+import { useTranslation } from "react-i18next";
 const { BigNumber } = require("ethers");
 
 export function Burn(): any {
@@ -28,6 +29,7 @@ export function Burn(): any {
     const [totalBatchApproved, setBatchApproved] = useState<number>();
     const [maxAvailableBatch, setMaxBatch] = useState<number>(0);
     const { chain }  = useContext(ChainContext)
+    const { t } = useTranslation();
 
     useEffect(() => {
         getAllowanceForAccount();
@@ -243,7 +245,7 @@ export function Burn(): any {
                 setNotificationState={setNotificationState} />
             <div className="side-menu--bottom burn-container">
                 <div className="row">
-                    <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
+                    <p className="text-center mb-0">{t("burn")}</p>
                     <p className="text-center">(1 batch = 2,500,000 XEN)</p>
                 </div>
                 <div className="row">
