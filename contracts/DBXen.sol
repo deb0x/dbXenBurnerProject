@@ -2,17 +2,18 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/IBurnRedeemable.sol";
 import "./DBXenERC20.sol";
 import "./XENCrypto.sol";
-import "hardhat/console.sol";
 
 /**
  * Main DBXen protocol contract used to burn xen tokens,
  * allocate DBXen token rewards, distribute native token fees, stake and unstake.
  */
 contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
+    using SafeERC20 for DBXenERC20;
 
     /**
      * DBXen Reward Token contract.
@@ -29,12 +30,12 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     /**
      * Basis points representation of 100 percent.
      */
-    uint16 public constant MAX_BPS = 10000;
+    uint256 public constant MAX_BPS = 100_000;
 
     /**
      * Amount of XEN tokens per batch
      */
-    uint256 public constant XEN_BATCH_AMOUNT = 2500000;
+    uint256 public constant XEN_BATCH_AMOUNT = 2_500_000 ether;
 
     /**
      * Used to minimise division remainder when earned fees are calculated.
@@ -254,8 +255,8 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 startGas = gasleft();
         _;
         
-        uint256 discount = (batchNumber * (1000000 - 50 * batchNumber));
-        uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS / 100;
+        uint256 discount = (batchNumber * (MAX_BPS - 5 * batchNumber));
+        uint256 protocolFee = ((startGas - gasleft() + 39400) * tx.gasprice * discount) / MAX_BPS;
         require(msg.value >= protocolFee , "DBXen: value less than protocol fee");
         totalNumberOfBatchesBurned += batchNumber;
         cycleTotalBatchesBurned[currentCycle] += batchNumber;
@@ -308,9 +309,9 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
     {
         require(batchNumber <= 10000, "DBXen: maxim batch number is 10000");
         require(batchNumber > 0, "DBXen: min batch number is 1");
-        require(xen.balanceOf(msg.sender) >= batchNumber * XEN_BATCH_AMOUNT * (10**18), "DBXen: not enough tokens for burn");
+        require(xen.balanceOf(msg.sender) >= batchNumber * XEN_BATCH_AMOUNT, "DBXen: not enough tokens for burn");
 
-        IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT * (10**18));
+        IBurnableToken(xen).burn(msg.sender , batchNumber * XEN_BATCH_AMOUNT);
     }
 
     /**
@@ -376,7 +377,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         uint256 cycleToSet = currentCycle + 1;
 
         if (lastStartedCycle == currentStartedCycle) {
-            cycleToSet = currentCycle;
+            cycleToSet = lastStartedCycle + 1;
         }
 
         if (
@@ -392,7 +393,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
 
         accStakeCycle[_msgSender()][cycleToSet] += amount;
 
-        dxn.transferFrom(_msgSender(), address(this), amount);
+        dxn.safeTransferFrom(_msgSender(), address(this), amount);
         emit Staked(cycleToSet, _msgSender(), amount);
     }
 
@@ -425,7 +426,7 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         accWithdrawableStake[_msgSender()] -= amount;
         accRewards[_msgSender()] -= amount;
 
-        dxn.transfer(_msgSender(), amount);
+        dxn.safeTransfer(_msgSender(), amount);
         emit Unstaked(currentCycle, _msgSender(), amount);
     }
 
