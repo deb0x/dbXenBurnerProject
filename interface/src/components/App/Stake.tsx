@@ -25,11 +25,12 @@ import { signMetaTxRequest } from '../../ethereum/signer';
 import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
+import Countdown, { zeroPad } from "react-countdown";
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0XBC7FB353CCEB4DCAD1DEA187BC443EACA3360B76";
-const deb0xViewsAddress = "0X07F38CCDDC4ADE1D0EA6DC97AB0687470CC1CB15";
-const deb0xERC20Address = "0X196383703B9910F38E25528858E67E63362AD68A";
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
+const deb0xViewsAddress = "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E";
+const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729";
 
 export function Stake(props: any): any {
 
@@ -37,6 +38,23 @@ export function Stake(props: any): any {
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
+    const date:any = new Date(Date.UTC(2023, 2, 17, 14, 0, 0, 0));
+    const now: any = Date.now()
+    let endDate = date.getTime() - now;
+
+    const renderer = ({ hours, minutes, seconds, completed }: any) => {
+        if (completed) {
+          // Render a complete state
+          return ;
+        } else {
+          // Render a countdown
+          return (
+                <span>
+                    ~ {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                </span>
+          );
+        }
+    };
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
@@ -194,7 +212,7 @@ export function Stake(props: any): any {
                             Your unclaimed MATIC fees: <strong>{feesUnclaimed}</strong>
                         </Typography>
                         <p className='my-2 counter'>
-                            Get next fees in:
+                            Get next fees in <Countdown date={Date.now() + endDate} renderer={renderer} />
                         </p>
                     </div>
                     <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
@@ -407,7 +425,7 @@ export function Stake(props: any): any {
                             Your unclaimed DXN rewards: <strong>{rewardsUnclaimed}</strong>
                         </Typography>
                         <p className='my-2 counter'>
-                            Get next rewards in:
+                            Get next rewards in <Countdown date={Date.now() + endDate} renderer={renderer} />
                         </p>
                     </div>
                     <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
