@@ -82,7 +82,7 @@ export function PermanentDrawer(props: any): any {
                             <a href="https://dbxen.gitbook.io/dbxen-litepaper/" target="_blank" className="logo-text-color">
                                 <img src={document} />
                             </a>
-                            <a href="https://github.com/dbxen" target="_blank" className="logo-text-color">
+                            <a href="https://github.com/deb0x/dbXenBurnerProject" target="_blank" className="logo-text-color">
                                 <FontAwesomeIcon icon={faGithub} size="xl"/>
                             </a>
                         </div>
