@@ -17,9 +17,9 @@ import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
 
-const deb0xAddress = "0XBC7FB353CCEB4DCAD1DEA187BC443EACA3360B76";
-const deb0xViewsAddress = "0X07F38CCDDC4ADE1D0EA6DC97AB0687470CC1CB15";
-const deb0xERC20Address = "0X196383703B9910F38E25528858E67E63362AD68A"
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
+const deb0xViewsAddress = "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E";
+const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729"
 const tokenSymbol = 'DBXen';
 
 const tokenDecimals = 18;

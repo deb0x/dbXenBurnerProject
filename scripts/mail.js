@@ -14,7 +14,7 @@ async function main() {
     console.log(add1.address);
     console.log(add2.address)
     const DBXen = await ethers.getContractFactory("DBXen");
-    dbxen = new ethers.Contract("0XBC7FB353CCEB4DCAD1DEA187BC443EACA3360B76", abi, hre.ethers.provider);
+    dbxen = new ethers.Contract("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462", abi, hre.ethers.provider);
     const depS = dbxen.connect(deployer)
 
     for (let i = 0; i < 7; i++) {

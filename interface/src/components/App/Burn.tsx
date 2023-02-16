@@ -11,7 +11,7 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 const { BigNumber } = require("ethers");
 
-const deb0xAddress = "0XBC7FB353CCEB4DCAD1DEA187BC443EACA3360B76";
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
 const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 export function Burn(): any {
