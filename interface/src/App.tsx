@@ -46,7 +46,8 @@ export default function web3App(): any {
 
   return (
         <Web3ReactProvider getLibrary={getLibrary}>
-            <Countdown date={Date.now() + endDate} renderer={renderer} />
+            {/* <Countdown date={Date.now() + endDate} renderer={renderer} /> */}
+            <ContractsDeployed />
             {/* <App /> */}
         </Web3ReactProvider>
     )
