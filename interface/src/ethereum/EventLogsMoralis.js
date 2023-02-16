@@ -3,7 +3,7 @@ import axios from 'axios';
 let { ethers } = require("ethers");
 const Web3 = require('web3');
 const web3 = new Web3();
-const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
 let { convertBytes32ToString } = require('./Converter.js')
 let moralisKey = process.env.REACT_APP_MORALIS_KEY;
 

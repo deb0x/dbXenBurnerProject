@@ -10,7 +10,7 @@ const blockchainChainId = '137'
 const sentEventTopic = '0xa33bc9a10d8f3a335b59663beb6a02681748ac0b3db1251c7bb08f3e99dd0bb4';
 const startBlock = '36051352';
 const endBlock = 'latest';
-const contractAddress = '0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76';
+const contractAddress = '0x4F3ce26D9749C0f36012C9AbB41BF9938476c462';
 
 async function getEvents(secondaryTopicsData, pageNumber) {
     const pageSize = 100;

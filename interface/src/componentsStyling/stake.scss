@@ -36,6 +36,7 @@
                     margin: 2vh 0;
                     position: relative;
                     overflow: unset;
+                    height: 100%;
                     .data-height{
                         min-height: 35px !important;
                     }
@@ -64,6 +65,10 @@
                         span.text {
                             padding-left: 1vh;
                         }
+                    }
+
+                    img.medium-img {
+                        width: 10vh;
                     }
 
                     @media (max-width: 768px) {
@@ -155,6 +160,9 @@
                 .rewards {
                     color: #fff;
                     font-size: 4vh;
+                }
+                .MuiTypography-h4 {
+                    font-size: 2.5vh;
                 }
             }
         }

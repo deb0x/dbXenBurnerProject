@@ -17,9 +17,9 @@ import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
 
-const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
-const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
-const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A"
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
+const deb0xViewsAddress = "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E";
+const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729"
 const tokenSymbol = 'DBXen';
 
 const tokenDecimals = 18;
@@ -44,6 +44,7 @@ export function AppBarComponent(props: any): any {
     const [open, setOpen] = useState<any>();
     const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress)
     const [totalStaked, setTotalStaked] = useState("")
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
 
     const id = open ? 'simple-popper' : undefined;
 
@@ -67,6 +68,21 @@ export function AppBarComponent(props: any): any {
             setActivatingConnector(undefined)
         }
     }, [activatingConnector, connector]);
+
+    useEffect(() => {
+        const totalXenBurned = async () =>{
+            setTotalXENBurned(await getTotalXenBurned())
+        }
+        totalXenBurned();
+    },[]);
+
+    async function getTotalXenBurned(){
+        const signer = await library.getSigner(0)
+        const deb0xContract = DBXen(signer, deb0xAddress)
+        let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        return batchBurned * 2500000;
+    }
 
     async function setUnstakedAmount() {
         const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
@@ -194,6 +210,9 @@ export function AppBarComponent(props: any): any {
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
                         <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
+                        <p className="mb-0">
+                            Total XEN burned: {totalXENBurned}
+                        </p>
                     </Box>
                     <Box className="main-menu--right">
                     
