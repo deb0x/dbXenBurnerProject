@@ -108,7 +108,7 @@ export function Burn(): any {
         
         let gasLimitIntervalValue;
             if(batchBurned != 0)
-                gasLimitIntervalValue = BigNumber.from("130000");
+                gasLimitIntervalValue = BigNumber.from("250000");
                     else
                 gasLimitIntervalValue = BigNumber.from("400000");
         return gasLimitIntervalValue;
