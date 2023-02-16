@@ -41,7 +41,6 @@ function getLibrary(provider: any): ethers.providers.Web3Provider {
 
 export default function web3App(): any {
     const date:any = new Date(Date.UTC(2023, 2, 16, 13, 55, 0, 0));
-    console.log(date)
     const now: any = Date.now()
     let endDate = date.getTime() - now
 
