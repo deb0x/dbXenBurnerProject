@@ -70,11 +70,14 @@ export function AppBarComponent(props: any): any {
     }, [activatingConnector, connector]);
 
     useEffect(() => {
-        const totalXenBurned = async () =>{
-            setTotalXENBurned(await getTotalXenBurned())
-        }
-        totalXenBurned();
+        xenBurned();
     },[]);
+
+    const xenBurned = async () => {
+        await getTotalXenBurned().then((result: any) => {
+            setTotalXENBurned(result.toLocaleString('fr'));
+        })
+    }
 
     async function getTotalXenBurned(){
         const signer = await library.getSigner(0)
