@@ -44,6 +44,7 @@ export function AppBarComponent(props: any): any {
     const [open, setOpen] = useState<any>();
     const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress)
     const [totalStaked, setTotalStaked] = useState("")
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
 
     const id = open ? 'simple-popper' : undefined;
 
@@ -67,6 +68,21 @@ export function AppBarComponent(props: any): any {
             setActivatingConnector(undefined)
         }
     }, [activatingConnector, connector]);
+
+    useEffect(() => {
+        const totalXenBurned = async () =>{
+            setTotalXENBurned(await getTotalXenBurned())
+        }
+        totalXenBurned();
+    },[]);
+
+    async function getTotalXenBurned(){
+        const signer = await library.getSigner(0)
+        const deb0xContract = DBXen(signer, deb0xAddress)
+        let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        return batchBurned * 2500000;
+    }
 
     async function setUnstakedAmount() {
         const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
@@ -194,6 +210,9 @@ export function AppBarComponent(props: any): any {
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
                         <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
+                        <p className="mb-0">
+                            Total XEN burned: {totalXENBurned}
+                        </p>
                     </Box>
                     <Box className="main-menu--right">
                     

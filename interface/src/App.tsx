@@ -13,12 +13,14 @@ import ThemeProvider from './components/Contexts/ThemeProvider';
 import './index.scss';
 import { injected, network } from './connectors';
 import elephant from './photos/icons/elephant.svg';
+import elephantWithText from './photos/icons/elephant.png';
 import deb0xen from './photos/white_dbxen.svg';
 import maintenanceImg from './photos/empty.png';
 import { Spinner } from './components/App/Spinner';
 import { AppBarComponent } from './components/App/AppBar';
 import { Burn } from './components/App/Burn';
 import ScreenSize from './components/Common/ScreenSize';
+import Countdown, { zeroPad } from "react-countdown";
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -37,12 +39,58 @@ function getLibrary(provider: any): ethers.providers.Web3Provider {
   return library
 }
 
-export default function web3App() {
+export default function web3App(): any {
+    const date:any = new Date(Date.UTC(2023, 2, 16, 14, 55, 0, 0));
+    const now: any = Date.now()
+    let endDate = date.getTime() - now
+
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <App />
-    </Web3ReactProvider>
-  )
+        <Web3ReactProvider getLibrary={getLibrary}>
+            <Countdown date={Date.now() + endDate} renderer={renderer} />
+            {/* <App /> */}
+        </Web3ReactProvider>
+    )
+}
+
+const renderer = ({ hours, minutes, seconds, completed }: any) => {
+    if (completed) {
+      // Render a complete state
+      return <ContractsDeployed />;
+    } else {
+      // Render a countdown
+      return (
+        <ThemeProvider>
+            <div className="app-container p-0 ">
+                <div className="initial-page contracts">
+                    <div className="row">
+                        <div className="col-12 img-container mr-4">
+                            <p>DBXen time in:</p>
+                            <p>
+                                {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ThemeProvider>
+      );
+    }
+};
+
+function ContractsDeployed() {
+    return (
+        <ThemeProvider>
+            <div className="app-container p-0 ">
+                <div className="initial-page contracts">
+                    <div className="row">
+                        <div className="col-12 img-container mr-4">
+                            <img className="image--left" src={elephantWithText} alt="elephant" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ThemeProvider>
+    )
 }
 
 function App() {

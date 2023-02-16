@@ -36,7 +36,6 @@ export function Stake(props: any): any {
     const { account, library } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
-    const [totalXENBurned, setTotalXENBurned] = useState<any>();
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
 
     function FeesPanel() {
@@ -47,12 +46,6 @@ export function Stake(props: any): any {
             feesAccrued()
         }, [feesUnclaimed]);
 
-        useEffect(() => {
-            const totalXenBurned = async () =>{
-                setTotalXENBurned(await getTotalXenBurned())
-            }
-            totalXenBurned();
-        },[]);
 
         useEffect(() => {
             const totalXenBurnedPreviousCycle = async () =>{
@@ -60,14 +53,6 @@ export function Stake(props: any): any {
             }
             totalXenBurnedPreviousCycle();
         },[]);
-
-        async function getTotalXenBurned(){
-            const signer = await library.getSigner(0)
-            const deb0xContract = DBXen(signer, deb0xAddress)
-            let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
-            let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
-            return batchBurned * 2500000;
-        }
     
         async function getTotalXenBurnedInPreviusCycle(){
             const signer = await library.getSigner(0)
@@ -201,19 +186,19 @@ export function Stake(props: any): any {
             <>
             <Card variant="outlined" className="card-container">
                 <CardContent className="row">
-                    <div className="col-12 col-md-6 mb-2">
+                    <div className="col-12 col-md-8 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            Fees
+                            Your protocol fee share
                         </Typography>
                         <Typography >
-                            Your unclaimed MATIC fees:
+                            Your unclaimed MATIC fees: <strong>{feesUnclaimed}</strong>
                         </Typography>
-                        <Typography variant="h6" className="data-height">
-                            <strong>{feesUnclaimed}</strong>
-                        </Typography>
+                        <p className='my-2 counter'>
+                            Get next fees in:
+                        </p>
                     </div>
-                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
-                        <img src={fees} alt="trophyRewards" className="p-3"/>
+                    <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
+                        <img src={fees} alt="trophyRewards" className="p-3 medium-img"/>
                     </div>
                 </CardContent>
                 <CardActions className='button-container px-3'>
@@ -250,14 +235,11 @@ export function Stake(props: any): any {
                             Daily stats
                         </Typography>
                         <Typography className="data-height">
-                            Total amount of daily cycle DXN tokens: <strong>{currentReward}</strong>
+                            This cycle mints: <strong>{Number(currentReward).toFixed(2)}</strong> DXN
                         </Typography>
-                        <Typography className="data-height">
-                            Total XEN burned: <strong>{totalXENBurned}</strong>
-                        </Typography>
-                        <Typography className="data-height">
+                        {/* <Typography className="data-height">
                             Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
-                        </Typography>
+                        </Typography> */}
                     </div>
                 </CardContent>
             </Card>
@@ -417,23 +399,24 @@ export function Stake(props: any): any {
             <>
             <Card variant="outlined" className="card-container">
                 <CardContent className="row">
-                    <div className="col-12 col-md-6 mb-2">
+                    <div className="col-12 col-md-10 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            Rewards
+                            Your rewards
                         </Typography>
                         <Typography >
-                            Your unclaimed DXN rewards:
+                            Your unclaimed DXN rewards: <strong>{rewardsUnclaimed}</strong>
                         </Typography>
-                        <Typography variant="h6" className="data-height">
-                            <strong>{rewardsUnclaimed}</strong>
-                        </Typography>
+                        <p className='my-2 counter'>
+                            Get next rewards in:
+                        </p>
                     </div>
-                    <div className='col-12 col-md-6 d-flex justify-content-end align-items-start'>
-                        <img src={finance} alt="trophyRewards" className="p-3"/>
+                    <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
+                        <img src={finance} alt="trophyRewards" className="p-3 medium-img"/>
                     </div>
                 </CardContent>
                 <CardActions className='button-container px-3'>
                     <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
+                    <span className="text">Unclaimed DXN is considered automatically staked. Only claim when you want to trade.</span>
                 </CardActions>
             </Card>
             </>
@@ -821,7 +804,7 @@ export function Stake(props: any): any {
                     <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                         <Typography className="p-0">
-                            Your tokens in wallet:
+                            Available DXN in your wallet:
                         </Typography>
                         <Typography variant="h6" className="p-0" data-height>
                             <strong>{userUnstakedAmount} DXN</strong>
@@ -877,7 +860,7 @@ export function Stake(props: any): any {
                             <strong>{tokensForUnstake} DXN</strong>
                         </Typography>
                     </div>
-                    <div className="col-6 px-3">
+                    {/* <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                         <Typography className="p-0">
                             Your actual stake:
@@ -885,7 +868,7 @@ export function Stake(props: any): any {
                         <Typography variant="h6" className="p-0 data-height">
                             <strong>{userStakedAmount} DXN</strong>
                         </Typography>
-                    </div>
+                    </div> */}
                   
 
                     <Grid className="amount-row px-3" container>

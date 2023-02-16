@@ -56,7 +56,7 @@ $randomNumber: random(4);
         .main-container {
             margin-top: 0;
             display: flex;
-            height: 80vh;
+            // height: 80vh;
             overflow-y: auto;
             .floating-btn {
                 position: fixed;
@@ -218,6 +218,22 @@ $randomNumber: random(4);
             // .main-container {
             //     overflow-y: inherit;
             // }
+        }
+    }
+    .initial-page.contracts {
+        .img-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            .image--left {
+                position: relative;
+                top: unset;
+                left: unset;
+            }
+            p {
+                font-size: 60px;
+            }
         }
     }
 }
@@ -457,7 +473,7 @@ $randomNumber: random(4);
                     height: auto;
                 }
                 .main-container {
-                    height: 69vh;
+                    height: 75vh;
                     margin-top: 0;
                     overflow-y: inherit;
                     .content-box {
@@ -539,7 +555,27 @@ $randomNumber: random(4);
                         }
                     }
                 }
-                
+                .initial-page.contracts {
+                    .img-container {
+                        display: flex;
+                        width: 100%;
+                        align-items: center;
+                        .image--left {
+                            position: relative;
+                            left: unset;
+                            top: unset;
+                            max-width: 752px;
+                            max-height: 652px;
+                            width: 100%;
+                            height: auto;
+                        }
+                    }
+                    .img-content {
+                        left: 50%;
+                        transform: translate(-50%, -40%);
+                        top: 40%;
+                    }
+                }
             }
         }
     }
