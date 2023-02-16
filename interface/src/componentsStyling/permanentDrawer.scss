@@ -278,6 +278,17 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
                             margin-right: 10px;
                         }
                     }
+                    .contracts {
+                        padding-top: 10px;
+                        .row {
+                            display: flex;
+                        }
+                        span, a {
+                            color: #B7B7CE;
+                            font-size: 12px;
+                            display: flex;
+                        }
+                    }
                 }
             }
         }
