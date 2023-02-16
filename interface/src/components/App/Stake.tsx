@@ -28,9 +28,9 @@ import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import Countdown, { zeroPad } from "react-countdown";
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
-const deb0xViewsAddress = "0x07f38CCDdC4ADE1d0eA6DC97ab0687470Cc1CB15";
-const deb0xERC20Address = "0x196383703b9910f38e25528858E67E63362ad68A";
+const deb0xAddress = "0XBC7FB353CCEB4DCAD1DEA187BC443EACA3360B76";
+const deb0xViewsAddress = "0X07F38CCDDC4ADE1D0EA6DC97AB0687470CC1CB15";
+const deb0xERC20Address = "0X196383703B9910F38E25528858E67E63362AD68A";
 
 export function Stake(props: any): any {
 
