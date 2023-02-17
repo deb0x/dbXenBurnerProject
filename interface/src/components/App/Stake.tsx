@@ -209,7 +209,13 @@ export function Stake(props: any): any {
                             Your protocol fee share
                         </Typography>
                         <Typography >
-                            Your unclaimed MATIC fees: <strong>{feesUnclaimed}</strong>
+                            Your unclaimed MATIC fees:&nbsp;
+                                <strong>
+                                    {Number(feesUnclaimed).toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}
+                                </strong>
                         </Typography>
                         <p className='my-2 counter'>
                             Get next fees in <Countdown date={Date.now() + endDate} renderer={renderer} />
@@ -253,7 +259,13 @@ export function Stake(props: any): any {
                             Daily stats
                         </Typography>
                         <Typography className="data-height">
-                            This cycle mints: <strong>{Number(currentReward).toFixed(2)}</strong> DXN
+                            This cycle mints:&nbsp; 
+                            <strong>
+                                {Number(currentReward).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </strong> DXN
                         </Typography>
                         {/* <Typography className="data-height">
                             Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
@@ -422,7 +434,13 @@ export function Stake(props: any): any {
                             Your rewards
                         </Typography>
                         <Typography >
-                            Your unclaimed DXN rewards: <strong>{rewardsUnclaimed}</strong>
+                            Your unclaimed DXN rewards:&nbsp;
+                                <strong>
+                                    {Number(rewardsUnclaimed).toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}
+                                </strong>
                         </Typography>
                         <p className='my-2 counter'>
                             Get next rewards in <Countdown date={Date.now() + endDate} renderer={renderer} />
@@ -816,7 +834,11 @@ export function Stake(props: any): any {
                             Your staked amount:
                         </Typography>
                         <Typography variant="h6" className="p-0 data-height">
-                            <strong>{userStakedAmount} DXN</strong>
+                            <strong>
+                                {Number(userStakedAmount).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</strong>
                         </Typography>
                     </div>
                     <div className="col-6 px-3">
@@ -825,7 +847,11 @@ export function Stake(props: any): any {
                             Available DXN in your wallet:
                         </Typography>
                         <Typography variant="h6" className="p-0" data-height>
-                            <strong>{userUnstakedAmount} DXN</strong>
+                            <strong>
+                                {Number(userUnstakedAmount).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</strong>
                         </Typography>
                     </div>
                     {approved && <Grid className="amount-row px-3" container>
@@ -875,7 +901,10 @@ export function Stake(props: any): any {
                             Available to unstake:
                         </Typography>
                         <Typography variant="h6" className="p-0">
-                            <strong>{tokensForUnstake} DXN</strong>
+                            <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</strong>
                         </Typography>
                     </div>
                     {/* <div className="col-6 px-3">

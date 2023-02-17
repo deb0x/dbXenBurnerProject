@@ -75,7 +75,7 @@ export function AppBarComponent(props: any): any {
 
     const xenBurned = async () => {
         await getTotalXenBurned().then((result: any) => {
-            setTotalXENBurned(result.toLocaleString('fr'));
+            setTotalXENBurned(result.toLocaleString('en-US'));
         })
     }
 
@@ -212,7 +212,11 @@ export function AppBarComponent(props: any): any {
                 <div className="app-bar--top">
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
-                        <p className="mb-0">Total tokens staked: {totalStaked} DXN</p>
+                        <p className="mb-0">Total tokens staked:&nbsp; 
+                            {Number(totalStaked).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} DXN</p>
                         <p className="mb-0">
                             Total XEN burned: {totalXENBurned}
                         </p>
@@ -260,15 +264,27 @@ export function AppBarComponent(props: any): any {
                     <ul>
                         <li>
                             Unclaimed rewards: <br/> 
-                            <b>{rewardsUnclaimed} <span>DXN</span></b>
+                            {Number(rewardsUnclaimed).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} 
+                            <span>DXN</span>
                         </li>
                         <li>
-                            Active stake: <br/> 
-                            <b>{userStakedAmount} <span>DXN</span></b>
+                            Active stake: <br/>
+                            {Number(userStakedAmount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} 
+                            <span>DXN</span>
                         </li>
                         <li>
                             In wallet: <br/> 
-                            <b>{userUnstakedAmount} <span>DXN</span></b>
+                            {Number(userUnstakedAmount).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} 
+                            <span>DXN</span>
                         </li>
                     </ul>
                     <Button 

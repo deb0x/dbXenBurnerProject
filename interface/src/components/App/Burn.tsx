@@ -19,7 +19,7 @@ export function Burn(): any {
     const { library, account } = context
     const [notificationState, setNotificationState] = useState({});
     const [value, setValue] = useState(1);
-    const [approveBrun, setApproveBurn] = useState<boolean>();
+    const [approveBrun, setApproveBurn] = useState<boolean>(false);
     const [balanceGratherThanZero, checkBalance] = useState("");
     const [maticValue, setMaticValue] = useState<any>();
     const [totalCost, setTotalCost] = useState<any>();
@@ -251,7 +251,11 @@ export function Burn(): any {
                     </div>
                     <div className="value-content">
                         <p>Total XEN burned:</p>
-                        <p> {totalAmountOfXEN} XEN</p>
+                        <p>
+                            {Number(totalAmountOfXEN).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} XEN</p>
                     </div>
                 </div>
                 {approveBrun ?

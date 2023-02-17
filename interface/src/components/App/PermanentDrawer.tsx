@@ -12,7 +12,7 @@ import SnackbarNotification from './Snackbar';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTwitter, faGithub } from "@fortawesome/free-brands-svg-icons";
+import { faTwitter, faGithub, faTelegram } from "@fortawesome/free-brands-svg-icons";
 import document from "../../photos/icons/file-icon.svg";
 import axios, { Method } from 'axios';
 import web3 from 'web3';
@@ -85,6 +85,9 @@ export function PermanentDrawer(props: any): any {
                             </a>
                             <a href="https://github.com/deb0x/dbXenBurnerProject" target="_blank" className="logo-text-color">
                                 <FontAwesomeIcon icon={faGithub} size="xl"/>
+                            </a>
+                            <a href="https://t.me/+_Q3prZI35gJkZmI0" target="_blank" className="logo-text-color">
+                                <FontAwesomeIcon icon={faTelegram} size="xl"/>
                             </a>
                         </div>
                         <div className="contracts">
