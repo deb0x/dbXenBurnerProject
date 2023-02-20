@@ -245,7 +245,7 @@ export function Burn(): any {
                 setNotificationState={setNotificationState} />
             <div className="side-menu--bottom burn-container">
                 <div className="row">
-                    <p className="text-center mb-0">{t("burn")}</p>
+                    <p className="text-center mb-0">{t("burn.label")}</p>
                     <p className="text-center">(1 batch = 2,500,000 XEN)</p>
                 </div>
                 <div className="row">
@@ -259,19 +259,19 @@ export function Burn(): any {
                 </div>
                 <div className="row">
                     <button className="btn count-btn max-btn col" type="button"
-                        onClick={() => setValue(10000)}>MAX</button>
+                        onClick={() => setValue(10000)}>{t("burn.max")}</button>
                 </div>
                 <div className="values-container">
                     <div className="value-content">
-                        <p>Protocol Fee:</p>
+                        <p>{t("burn.protocol_fee")}:</p>
                         <p> ~{maticValue} {chain.currency}</p>
                     </div>
                     <div className="value-content">
-                        <p>Total transaction cost:</p>
+                        <p>{t("burn.transaction_cost")}:</p>
                         <p> ~{totalCost} {chain.currency}</p>
                     </div>
                     <div className="value-content">
-                        <p>Total XEN burned:</p>
+                        <p>{t("burn.xen_burned")}:</p>
                         <p>
                             {Number(totalAmountOfXEN).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
@@ -289,19 +289,19 @@ export function Burn(): any {
                     <LoadingButton className="burn-btn"
                         loadingPosition="end"
                         onClick={() => burnXEN()} >
-                        {loading ? <Spinner color={'black'} /> : "Burn XEN"}
+                        {loading ? <Spinner color={'black'} /> : t("burn.burn_button")}
                     </LoadingButton> :
                     balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0' ?
                         <LoadingButton className="burn-btn"
                             loadingPosition="end"
                             disabled={balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0'}>
-                            {loading ? <Spinner color={'black'} /> : "Your balance is 0!"}
+                            {loading ? <Spinner color={'black'} /> : t("burn.balance")}
                         </LoadingButton> :
                         <LoadingButton className="burn-btn"
                             loadingPosition="end"
                             disabled={balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0'}
                             onClick={() => setApproval()} >
-                            {loading ? <Spinner color={'black'} /> : "Approve Burn XEN"}
+                            {loading ? <Spinner color={'black'} /> : t("burn.approve_button")}
                         </LoadingButton>
                 }
             </div>
