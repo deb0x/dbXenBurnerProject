@@ -142,6 +142,38 @@ describe("Test burn functionality", async function() {
         await DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("10") })
     });
 
+    it.only("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
 
+        const xenContractLocal = await ethers.getContractFactory("XENCryptoMock");
+
+        XENContractLocal = await xenContractLocal.deploy();
+        await XENContractLocal.deployed();
+
+        aliceInstance = XENContractLocal.connect(alice);
+
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
+        await hre.ethers.provider.send("evm_mine")
+
+        const DBXenLocal = await ethers.getContractFactory("DBXen");
+        DBXenContractLocal = await DBXenLocal.deploy(ethers.constants.AddressZero, XENContractLocal.address);
+        await DBXenContractLocal.deployed();
+
+        const Deb0xViewsLocal = await ethers.getContractFactory("DBXenViews");
+        DBXENViewContractLocal = await Deb0xViewsLocal.deploy(DBXenContractLocal.address);
+        await DBXENViewContractLocal.deployed();
+
+        const dbxAddress = await DBXenContractLocal.dxn()
+        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
+
+        await XENContractLocal.connect(alice).approve(DBXenContractLocal.address, BigNumber.from("0xffffffffffffffffffffffffffffffffffffffff"))
+
+        await expect(DBXenContractLocal.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("0.0001") }))
+            .to.be.revertedWith("DBXen: value less than protocol fee")
+        await DBXenContractLocal.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("0.0002") })
+
+        await expect(DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("0.5") }))
+            .to.be.revertedWith("DBXen: value less than protocol fee")
+        await DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("0.6") })
+    })
 
 });

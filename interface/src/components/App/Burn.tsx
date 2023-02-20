@@ -12,7 +12,7 @@ import web3 from 'web3';
 import { useTranslation } from "react-i18next";
 const { BigNumber } = require("ethers");
 
-const deb0xAddress = "0xBc7FB353cCeb4dCad1dea187BC443EAca3360B76";
+const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
 const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 export function Burn(): any {
@@ -20,7 +20,7 @@ export function Burn(): any {
     const { library, account } = context
     const [notificationState, setNotificationState] = useState({});
     const [value, setValue] = useState(1);
-    const [approveBrun, setApproveBurn] = useState<boolean>();
+    const [approveBrun, setApproveBurn] = useState<boolean>(false);
     const [balanceGratherThanZero, checkBalance] = useState("");
     const [maticValue, setMaticValue] = useState<any>();
     const [totalCost, setTotalCost] = useState<any>();
@@ -110,7 +110,7 @@ export function Burn(): any {
         
         let gasLimitIntervalValue;
             if(batchBurned != 0)
-                gasLimitIntervalValue = BigNumber.from("130000");
+                gasLimitIntervalValue = BigNumber.from("250000");
                     else
                 gasLimitIntervalValue = BigNumber.from("400000");
         return gasLimitIntervalValue;
@@ -253,7 +253,11 @@ export function Burn(): any {
                     </div>
                     <div className="value-content">
                         <p>Total XEN burned:</p>
-                        <p> {totalAmountOfXEN} XEN</p>
+                        <p>
+                            {Number(totalAmountOfXEN).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} XEN</p>
                     </div>
                 </div>
                 {approveBrun ?

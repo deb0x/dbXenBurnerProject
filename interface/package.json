@@ -36,6 +36,7 @@
     "js-ipfs-fetch": "^3.3.0",
     "node-sass": "^7.0.3",
     "react": "^17.0.2",
+    "react-countdown": "^2.3.5",
     "react-dom": "^17.0.2",
     "react-draft-wysiwyg": "^1.14.7",
     "react-ga": "^3.3.1",
