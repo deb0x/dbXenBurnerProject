@@ -38,7 +38,7 @@ export function Stake(props: any): any {
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
-    const date: any = new Date(Date.UTC(2023, 2, 17, 14, 0, 0, 0));
+    const date: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
     const now: any = Date.now()
     let endDate = date.getTime() - now;
 
@@ -758,6 +758,9 @@ export function Stake(props: any): any {
                             message: "Your tokens were succesfully staked.", open: true,
                             severity: "success"
                         })
+                        //
+                        let tokensInWallet = Number(userUnstakedAmount) - Number(amountToStake);
+                        setUserUnstakedAmount(tokensInWallet.toString())
                         //setLoading(false)
 
                     })

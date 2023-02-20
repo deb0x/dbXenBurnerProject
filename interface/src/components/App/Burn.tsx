@@ -46,13 +46,11 @@ export function Burn(): any {
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)
         const xenContract = XENCrypto(signer, xenCryptoAddress);
-        await xenContract.allowance(account, deb0xAddress).then((amount: any) => {
-            if (Number(ethers.utils.formatEther(amount)) < value * 2500000) {
-                setApproveBurn(false);
-            } else {
-                setApproveBurn(true);
-            }
-        })
+        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>
+            Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
+                setApproveBurn(false) :
+                setApproveBurn(true)
+        )
     }
 
     async function setBalance() {
@@ -102,8 +100,8 @@ export function Burn(): any {
                         let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
 
                         setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
-                        setMaticValue(fee);
-                        setTotalCost(totalValue);
+                        setMaticValue(fee.toFixed(4));
+                        setTotalCost(totalValue.toFixed(4));
                     })
                 }
             )
