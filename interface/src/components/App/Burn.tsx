@@ -25,51 +25,49 @@ export function Burn(): any {
     const [totalCost, setTotalCost] = useState<any>();
     const [totalAmountOfXEN, setXENAmount] = useState<any>();
     const [loading, setLoading] = useState(false)
+    const [gasLimit, setCurrentGasLimit] = useState<number>();
+    const [valueAndFee, setValueAndFee] = useState<any>();
 
-    useEffect( () => {
-        setApproveBurn(false)
+    useEffect(() => {
+        getAllowanceForAccount();
+        estimationValues();
     }, [account]);
 
-    useEffect( () => {
-        setApproveBurn(false);
-        getCurrentGasLimit().then(async (data) => {
-            estimationValue(data).then(async (resut) =>{
-            setMaticValue(resut.fee);
-            })
-        })
-    },[value]);
-
-    useEffect( () => {
-        setApproveBurn(false);
-        getCurrentGasLimit().then(async (data) => {
-            estimationValue(data).then(async (resut) =>{
-                setTotalCost(resut.total);
-            })
-        })
-    },[value]);
-
-    useEffect( () => {
-        setXENAmount(value*2500000);
-    },[value]);
+    useEffect(() => {
+        getAllowanceForAccount();
+        setXENAmount(value * 2500000);
+        estimationValues();
+    }, [value]);
 
     useEffect(() => {
         setBalance()
-    }, [account,balanceGratherThanZero]);
+    }, [account, balanceGratherThanZero]);
 
-    async function setBalance(){
+    async function getAllowanceForAccount() {
+        const signer = library.getSigner(0)
+        const xenContract = XENCrypto(signer, xenCryptoAddress);
+        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>
+            Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
+                setApproveBurn(false) :
+                setApproveBurn(true)
+        )
+    }
+
+    async function setBalance() {
         setLoading(true);
-        const signer = await library.getSigner(0)
-        const xenContract = await XENCrypto(signer, xenCryptoAddress);
+        const signer = library.getSigner(0)
+        const xenContract = XENCrypto(signer, xenCryptoAddress);
         let number;
 
         await xenContract.balanceOf(account).then((balance: any) => {
             number = ethers.utils.formatEther(balance);
-            checkBalance(number.toString()) 
+            checkBalance(number.toString())
             setLoading(false);
         })
     }
 
-    async function getCurrentPrice(){
+    async function estimationValues() {
+
         let method: Method = 'POST';
         const options = {
             method: method,
@@ -77,41 +75,37 @@ export function Burn(): any {
             port: 443,
             headers: {
                 'Content-Type': 'application/json'
-              },
+            },
             data: JSON.stringify({
-                "jsonrpc":"2.0","method":"eth_gasPrice","params": [],"id":1
-              })
+                "jsonrpc": "2.0", "method": "eth_gasPrice", "params": [], "id": 1
+            })
         };
 
-        let requestValue = await axios.request(options)
-        return web3.utils.fromWei(requestValue.data.result.toString(), "Gwei")
-    }
-
-    async  function estimationValue(gasLimitIntervalValue: number){
-        let price = Number(await getCurrentPrice());
-        let protocol_fee = value *(1 - 0.00005*value) ;
-        let fee = gasLimitIntervalValue * price * protocol_fee / 1000000000;
-        let totalValue = fee +(fee /((1- 0.00005*value) * value));
-        let obj = {fee:fee.toFixed(4), total:totalValue.toFixed(4)}
-        return obj;
-    }
-    
-    async function getCurrentGasLimit(){
-        const signer = await library.getSigner(0)
+        const signer = library.getSigner(0)
         const deb0xContract = DBXen(signer, deb0xAddress)
-        let currentCycle = await deb0xContract.getCurrentCycle();
-        let numberBatchesBurnedInCurrentCycle;
-        let batchBurned = 0;
+        await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
+            await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
+                async (numberBatchesBurnedInCurrentCycle: any) => {
+                    await axios.request(options).then((result) => {
+                        let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
+                        let protocol_fee = value * (1 - 0.00005 * value);
+                        let gasLimitVal = 0;
 
-        numberBatchesBurnedInCurrentCycle = await deb0xContract.cycleTotalBatchesBurned(currentCycle);
-        batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
-        
-        let gasLimitIntervalValue;
-            if(batchBurned != 0)
-                gasLimitIntervalValue = BigNumber.from("250000");
-                    else
-                gasLimitIntervalValue = BigNumber.from("400000");
-        return gasLimitIntervalValue;
+                        numberBatchesBurnedInCurrentCycle != 0 ?
+                            gasLimitVal = (BigNumber.from("250000")) :
+                            gasLimitVal = (BigNumber.from("400000"))
+
+                        setCurrentGasLimit(gasLimitVal);
+                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+
+                        setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                        setMaticValue(fee.toFixed(4));
+                        setTotalCost(totalValue.toFixed(4));
+                    })
+                }
+            )
+        })
     }
 
     async function setApproval() {
@@ -120,10 +114,10 @@ export function Burn(): any {
         const xenContract = await XENCrypto(signer, xenCryptoAddress)
         let totalAmountToBurn = value * 2500000;
         try {
-            const tx = await xenContract.approve(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))
+            const tx = await xenContract.increaseAllowance(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))
             tx.wait()
                 .then((result: any) => {
-                    setApproveBurn(true);
+                    getAllowanceForAccount();
                     setNotificationState({
                         message: "Your succesfully approved contract for burn.", open: true,
                         severity: "success"
@@ -146,17 +140,20 @@ export function Burn(): any {
         }
     }
 
-    async function burnXEN(){
+    async function burnXEN() {
         setLoading(true)
         const signer = await library.getSigner(0)
         const deb0xContract = DBXen(signer, deb0xAddress)
-        let gasLimitIntervalValue = await getCurrentGasLimit();
-        let currentValue = (await estimationValue(gasLimitIntervalValue)).fee;
+        let gasLimitIntervalValue = gasLimit
+        let currentValue = valueAndFee.fee;
+
         try {
-            const overrides = 
-                { value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
-                    gasLimit:gasLimitIntervalValue }
-            const tx = await deb0xContract["burnBatch(uint256)"](value,overrides)
+            const overrides =
+            {
+                value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
+                gasLimit: gasLimitIntervalValue
+            }
+            const tx = await deb0xContract["burnBatch(uint256)"](value, overrides)
 
             await tx.wait()
                 .then((result: any) => {
@@ -165,8 +162,8 @@ export function Burn(): any {
                         open: true,
                         severity: "success"
                     })
+                    getAllowanceForAccount();
                     setLoading(false)
-                    setApproveBurn(false)
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -176,23 +173,23 @@ export function Burn(): any {
                     })
                     setLoading(false)
                 })
-            } catch (error: any) {
-                console.log(error.message)
-                setNotificationState({
-                    message: "You rejected the transaction.",
-                    open: true,
-                    severity: "info"
-                })
-                setLoading(false)
-            }
+        } catch (error: any) {
+            console.log(error.message)
+            setNotificationState({
+                message: "You rejected the transaction.",
+                open: true,
+                severity: "info"
+            })
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
-        setTimeout(() => {setNotificationState({})}, 2000)
+        setTimeout(() => { setNotificationState({}) }, 2000)
     }, [notificationState])
 
-    const handleInputChange = (e: any)=>{
-        if(value > 10000) {
+    const handleInputChange = (e: any) => {
+        if (value > 10000) {
             setValue(10000)
         } else {
             setValue(e.target.value);
@@ -200,12 +197,12 @@ export function Burn(): any {
     }
 
     const incNum = () => {
-        if(value < 10000)
-            setValue(Number(value)+1);
+        if (value < 10000)
+            setValue(Number(value) + 1);
     };
 
     const decNum = () => {
-        if(value > 1)
+        if (value > 1)
             setValue(value - 1);
     }
 
@@ -213,15 +210,15 @@ export function Burn(): any {
         if (value > 10000) {
             setValue(10000)
         }
-        if (value <= 0 ) {
+        if (value <= 0) {
             setValue(1)
         }
     }, [value])
-    
+
     return (
         <>
-            <SnackbarNotification state={notificationState} 
-                    setNotificationState={setNotificationState} />
+            <SnackbarNotification state={notificationState}
+                setNotificationState={setNotificationState} />
             <div className="side-menu--bottom burn-container">
                 <div className="row">
                     <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
@@ -229,7 +226,7 @@ export function Burn(): any {
                 </div>
                 <div className="row">
                     <div className="col input-col">
-                        <input type="number" value={value} max="10000" onChange={handleInputChange}/>
+                        <input type="number" value={value} max="10000" onChange={handleInputChange} />
                     </div>
                 </div>
                 <div className="row">
@@ -237,7 +234,7 @@ export function Burn(): any {
                     <button className="btn count-btn col" type="button" onClick={incNum}>+</button>
                 </div>
                 <div className="row">
-                    <button className="btn count-btn max-btn col" type="button" 
+                    <button className="btn count-btn max-btn col" type="button"
                         onClick={() => setValue(10000)}>MAX</button>
                 </div>
                 <div className="values-container">
@@ -259,23 +256,23 @@ export function Burn(): any {
                     </div>
                 </div>
                 {approveBrun ?
-                    <LoadingButton className="burn-btn" 
+                    <LoadingButton className="burn-btn"
                         loadingPosition="end"
                         onClick={() => burnXEN()} >
-                            {loading ? <Spinner color={'black'} /> : "Burn XEN" }
+                        {loading ? <Spinner color={'black'} /> : "Burn XEN"}
                     </LoadingButton> :
-                    balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0' ? 
-                    <LoadingButton className="burn-btn" 
-                        loadingPosition="end"
-                        disabled={ balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0'}>
-                            {loading ? <Spinner color={'black'} /> : "Your balance is 0!" }
-                    </LoadingButton> :
-                    <LoadingButton className="burn-btn" 
-                        loadingPosition="end"
-                        disabled={  balanceGratherThanZero === '0.0' ||  balanceGratherThanZero === '0'}
-                        onClick={() => setApproval()} >
-                            {loading ? <Spinner color={'black'} /> : "Approve Burn XEN" }
-                    </LoadingButton>
+                    balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0' ?
+                        <LoadingButton className="burn-btn"
+                            loadingPosition="end"
+                            disabled={balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0'}>
+                            {loading ? <Spinner color={'black'} /> : "Your balance is 0!"}
+                        </LoadingButton> :
+                        <LoadingButton className="burn-btn"
+                            loadingPosition="end"
+                            disabled={balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0'}
+                            onClick={() => setApproval()} >
+                            {loading ? <Spinner color={'black'} /> : "Approve Burn XEN"}
+                        </LoadingButton>
                 }
             </div>
         </>
