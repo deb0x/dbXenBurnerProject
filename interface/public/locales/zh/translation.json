@@ -1,4 +1,67 @@
 {
-    "fees": "",
-    "home": "Home"
+    "home": {
+        "connect_text": "连接你的钱包",
+        "burn_text": "燃烧 $XEN",
+        "earn_text": "赚取更多加密货币",
+        "connect_button": "连接",
+        "community_text": "由社区驱动的去中心化协议，",
+        "contributing_text": "助力于XEN代币的通缩。"
+    },
+    "burn": {
+        "label": "请选择销毁XEN的批次数量",
+        "batch": "1 批次 = 2 500 000 XEN",
+        "max": "最大",
+        "protocol_fee": "协议费",
+        "transaction_cost": "总交易费",
+        "xen_burned": "XEN销毁量",
+        "approve_button": "授权XEN代币",
+        "burn_button": "销毁XEN",
+        "balance": ""
+    },
+    "app_bar": {
+        "tokens_staked": "当前总质押",
+        "xen_burned": "XEN销毁总量",
+        "rewards": "未领取奖励",
+        "stake": "当前质押",
+        "wallet": "钱包余额",
+        "wallet_id": "复制钱包ID",
+        "add_token": "一键添加DXN",
+        "disconnect": "断开连接"
+    },
+    "fees": {
+        "title": "协议费用奖励",
+        "unclaimed_fees": "未领取Matic",
+        "counter": "下次奖励",
+        "collect": "领取"
+    },
+    "daily_stats": {
+        "title": "每日数据",
+        "this_cycle": "本轮铸造"
+    },
+    "rewards": {
+        "title": "代币奖励",
+        "unclaimed_rewards": "未领取DXN",
+        "counter": "下次奖励",
+        "claim": "领取",
+        "claim_description": "未领取的DXN将被自动质押并持续捕获收入,您可以随时领取。"
+    },
+    "stake": {
+        "stake": "质押",
+        "staked_amount": "已质押金额",
+        "wallet": "钱包中可用余额",
+        "init_text": "质押前请确保您钱包中有足够的DXN余额。",
+        "init_button": "授权质押",
+        "amount_to_stake": "输入质押数量",
+        "max": "最大"
+    },
+    "unstake": {
+        "unstake": "取出",
+        "available": "可取出",
+        "amount_to_unstake": "输入取出数量",
+        "max": "最大"
+    },
+    "mobile": {
+        "mint": "铸造",
+        "fees": "收入"
+    }
 }

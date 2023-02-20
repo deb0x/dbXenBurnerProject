@@ -6,8 +6,8 @@ i18n
     .use(Backend)
     .use(initReactI18next)
     .init({
-        lng: "en",
-        fallbackLng: "zh",
+        lng: JSON.parse(localStorage.getItem('language')),
+        fallbackLng: "en",
         interpolation: {
             escapeValue: false
         }
