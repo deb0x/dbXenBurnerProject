@@ -27,6 +27,7 @@ export function Burn(): any {
     const [loading, setLoading] = useState(false)
     const [gasLimit, setCurrentGasLimit] = useState<number>();
     const [valueAndFee, setValueAndFee] = useState<any>();
+    const [totalBatchApproved, setBatchApproved] = useState<number>();
 
     useEffect(() => {
         getAllowanceForAccount();
@@ -46,11 +47,13 @@ export function Burn(): any {
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)
         const xenContract = XENCrypto(signer, xenCryptoAddress);
-        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>
+        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>{
+            let batchApproved = Number(ethers.utils.formatEther(amount)) / 2500000;
+            setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
                 setApproveBurn(false) :
                 setApproveBurn(true)
-        )
+            })
     }
 
     async function setBalance() {
@@ -110,11 +113,16 @@ export function Burn(): any {
 
     async function setApproval() {
         setLoading(true);
-        const signer = await library.getSigner(0)
-        const xenContract = await XENCrypto(signer, xenCryptoAddress)
-        let totalAmountToBurn = value * 2500000;
+        const signer = library.getSigner(0)
+        const xenContract = XENCrypto(signer, xenCryptoAddress)
+        let amountToApprove = 0;
+            if(totalBatchApproved != undefined){
+                if(value > totalBatchApproved){
+                    amountToApprove = value - totalBatchApproved;
+                }
+            }
         try {
-            const tx = await xenContract.increaseAllowance(deb0xAddress, ethers.utils.parseEther(totalAmountToBurn.toString()))
+            const tx = await xenContract.increaseAllowance(deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
             tx.wait()
                 .then((result: any) => {
                     getAllowanceForAccount();
