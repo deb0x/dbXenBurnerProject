@@ -76,7 +76,7 @@ export function Stake(props: any): any {
         }
 
         async function getTotalXenBurnedInPreviusCycle() {
-            const signer = library.getSigner(0)
+            const signer = await library.getSigner(0)
             const deb0xContract = DBXen(signer, deb0xAddress)
 
             await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
@@ -171,7 +171,7 @@ export function Stake(props: any): any {
         async function claimFees() {
             setLoading(true)
 
-            const signer = library.getSigner(0)
+            const signer = await library.getSigner(0)
 
             const deb0xContract = DBXen(signer, deb0xAddress)
 
@@ -305,9 +305,9 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
-            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress);
 
-            const deb0xContract = await DBXen(library, deb0xAddress);
+            const deb0xContract = DBXen(library, deb0xAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
@@ -529,41 +529,45 @@ export function Stake(props: any): any {
         }
 
         async function setTokensForUntakedAmount() {
-            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
-            const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
-            setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
+            const deb0xViewsContract =  DBXenViews(library, deb0xViewsAddress)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account).then((balance:any) =>{
+                setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
+            })
         }
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await DBXenERC20(library, deb0xERC20Address)
-            const balance = await deb0xERC20Contract.balanceOf(account)
-            let number = ethers.utils.formatEther(balance);
-            setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
+            const balance = await deb0xERC20Contract.balanceOf(account).then((balance:any) =>{
+                let number = ethers.utils.formatEther(balance);
+                setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
+            })
         }
 
         async function setApproval() {
-            const deb0xERC20Contract = await DBXenERC20(library, deb0xERC20Address)
+            const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
 
-            const allowance = await deb0xERC20Contract.allowance(account, deb0xAddress)
-            allowance > 0 ? setApproved(true) : setApproved(false)
+            await deb0xERC20Contract.allowance(account, deb0xAddress).then((allowance:any) =>
+                 allowance > 0 ? setApproved(true) : setApproved(false)
+            )
         }
 
         async function totalAmountStaked() {
 
-            const deb0xContract = await DBXen(library, deb0xAddress)
+            const deb0xContract = DBXen(library, deb0xAddress)
 
-            const currentCycle = await deb0xContract.currentStartedCycle()
+           await deb0xContract.currentStartedCycle().then(async (currentCycle:any) =>{
+                await deb0xContract.summedCycleStakes(currentCycle).then((totalSupply:any) => {
+                    setTotalStaked(ethers.utils.formatEther(totalSupply))
+                })
+            })
 
-            const totalSupply = await deb0xContract.summedCycleStakes(currentCycle)
-
-            setTotalStaked(ethers.utils.formatEther(totalSupply))
         }
 
         async function approveStaking() {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-            const deb0xERC20Contract = await DBXenERC20(signer, deb0xERC20Address)
+            const deb0xERC20Contract = DBXenERC20(signer, deb0xERC20Address)
 
             try {
                 const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("5010000"))
@@ -964,14 +968,14 @@ export function Stake(props: any): any {
 
         async function totalAmountStaked() {
 
-            const deb0xContract = await DBXen(library, deb0xAddress)
+            const deb0xContract = DBXen(library, deb0xAddress)
 
             const currentCycle = await deb0xContract.currentStartedCycle()
 
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
 
             const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-
+            
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
             setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
