@@ -34,6 +34,17 @@ $randomNumber: random(4);
     .side-menu-container {
         height: 100%;
     }
+    .language-switcher {
+        font-family: "Karla";
+        padding: 5px 25px;
+        border-radius: 25px;
+        background-color: #030328;
+        color: #F2E9DC;
+        border: 1px solid #19D2D2;
+        option {
+            font-size: 12px;
+        }
+    }
     @include themed() {
         color: t('text');
         background: t('bg');
@@ -135,6 +146,12 @@ $randomNumber: random(4);
     }
     .initial-page {
         height: 100%;
+        position: relative;
+        .language-switcher {
+            position: absolute;
+            right: 75px;
+            top: 20px;
+        }
         .row {
             height: 100%;
             overflow: hidden;

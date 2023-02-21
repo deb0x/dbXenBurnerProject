@@ -227,7 +227,7 @@ export function Burn(): any {
             <div className="side-menu--bottom burn-container">
                 <div className="row">
                     <p className="text-center mb-0">{t("burn.label")}</p>
-                    <p className="text-center">(1 batch = 2 500 000 XEN)</p>
+                    <p className="text-center">(1 batch = 2,500,000 XEN)</p>
                 </div>
                 <div className="row">
                     <div className="col input-col">

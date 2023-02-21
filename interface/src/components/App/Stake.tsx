@@ -26,6 +26,7 @@ import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import Countdown, { zeroPad } from "react-countdown";
+import { useTranslation } from 'react-i18next';
 
 const { whitelist } = dataFromWhitelist;
 const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
@@ -41,6 +42,7 @@ export function Stake(props: any): any {
     const date:any = new Date(Date.UTC(2023, 2, 17, 14, 0, 0, 0));
     const now: any = Date.now()
     let endDate = date.getTime() - now;
+    const { t } = useTranslation();
 
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
@@ -105,12 +107,12 @@ export function Stake(props: any): any {
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
                             setNotificationState({
-                                message: "You succesfully claimed your fees.", open: true,
+                                message: t("fees.toastify.success"), open: true,
                                 severity: "success"
                             })
                         } else {
                             setNotificationState({
-                                message: "Fees couldn't be claimed!", open: true,
+                                message: t("fees.toastify.error"), open: true,
                                 severity: "error"
                             })
                             setLoading(false)
@@ -118,13 +120,13 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your fees should arrive shortly",
+                                message: t("fees.toastify.info"),
                                 open: true,
                                 severity: "info"
                             })
                         } else if(data.status == "error") {
                             setNotificationState({
-                                message: "Transaction relayer error. Please try again",
+                                message: t("fees.toastify.transaction_error"),
                                 open: true,
                                 severity: "error"
                             })
@@ -141,7 +143,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: "You succesfully claimed your fees.", open: true,
+                            message: t("fees.toastify.success"), open: true,
                             severity: "success"
                         })
                         //setLoading(false)
@@ -149,14 +151,14 @@ export function Stake(props: any): any {
                     })
                     .catch((error: any) => {
                         setNotificationState({
-                            message: "Fees couldn't be claimed!", open: true,
+                            message: t("fees.toastify.error"), open: true,
                             severity: "error"
                         })
                         setLoading(false)
                     })
             } catch (error: any) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your fees haven't been claimed.",
+                    message: t("fees.toastify.rejected"),
                     open: true,
                     severity: "info"
                 })
@@ -188,7 +190,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. Fees were not claimed.",
+                        message: t("fees.toastify.rejected"),
                         open: true,
                         severity: "info"
                     })
@@ -206,10 +208,10 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-8 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            Your protocol fee share
+                            {t("fees.title")}
                         </Typography>
                         <Typography >
-                            Your unclaimed MATIC fees:&nbsp;
+                            {t("fees.unclaimed_fees")}:&nbsp;
                                 <strong>
                                     {Number(feesUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,
@@ -218,7 +220,7 @@ export function Stake(props: any): any {
                                 </strong>
                         </Typography>
                         <p className='my-2 counter'>
-                            Get next fees in <Countdown date={Date.now() + endDate} renderer={renderer} />
+                            {t("fees.counter")} <Countdown date={Date.now() + endDate} renderer={renderer} />
                         </p>
                     </div>
                     <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
@@ -232,7 +234,7 @@ export function Stake(props: any): any {
                         loading={loading}
                         variant="contained"
                         onClick={claimFees}>
-                            Collect
+                            {t("fees.collect")}
                     </LoadingButton>
                 </CardActions>
             </Card>
@@ -256,10 +258,10 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-12 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            Daily stats
+                            {t("daily_stats.title")}
                         </Typography>
                         <Typography className="data-height">
-                            This cycle mints:&nbsp; 
+                            {t("daily_stats.this_cycle")}:&nbsp; 
                             <strong>
                                 {Number(currentReward).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,
@@ -330,12 +332,12 @@ export function Stake(props: any): any {
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
                             setNotificationState({
-                                message: "You succesfully claimed your rewards.", open: true,
+                                message: t("rewards.toastify.success"), open: true,
                                 severity: "success"
                             })
                         } else {
                             setNotificationState({
-                                message: "Rewards couldn't be claimed!", open: true,
+                                message: t("rewards.toastify.error"), open: true,
                                 severity: "error"
                             })
                             setLoading(false)
@@ -343,13 +345,13 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your rewards should arrive shortly",
+                                message: t("rewards.toastify.info"),
                                 open: true,
                                 severity: "info"
                             })
                         } else if(data.status == "error") {
                             setNotificationState({
-                                message: "Transaction relayer error. Please try again",
+                                message: t("rewards.toastify.transaction_error"),
                                 open: true,
                                 severity: "error"
                             })
@@ -366,7 +368,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: "You succesfully claimed your rewards.", open: true,
+                            message: t("rewards.toastify.success"), open: true,
                             severity: "success"
                         })
                         //setLoading(false)
@@ -374,14 +376,14 @@ export function Stake(props: any): any {
                     })
                     .catch((error: any) => {
                         setNotificationState({
-                            message: "Rewards couldn't be claimed!", open: true,
+                            message: t("rewards.toastify.error"), open: true,
                             severity: "error"
                         })
                         setLoading(false)
                     })
             } catch (error: any) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your rewards haven't been claimed.",
+                    message: t("rewards.toastify.rejected"),
                     open: true,
                     severity: "info"
                 })
@@ -413,7 +415,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. Rewards were not claimed.",
+                        message: t("rewards.toastify.rejected"),
                         open: true,
                         severity: "info"
                     })
@@ -431,10 +433,10 @@ export function Stake(props: any): any {
                 <CardContent className="row">
                     <div className="col-12 col-md-10 mb-2">
                         <Typography variant="h4" component="div" className="rewards mb-3">
-                            Your rewards
+                            {t("rewards.title")}
                         </Typography>
                         <Typography >
-                            Your unclaimed DXN rewards:&nbsp;
+                            {t("rewards.unclaimed_rewards")}:&nbsp;
                                 <strong>
                                     {Number(rewardsUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,
@@ -443,7 +445,7 @@ export function Stake(props: any): any {
                                 </strong>
                         </Typography>
                         <p className='my-2 counter'>
-                            Get next rewards in <Countdown date={Date.now() + endDate} renderer={renderer} />
+                            {t("rewards.counter")} <Countdown date={Date.now() + endDate} renderer={renderer} />
                         </p>
                     </div>
                     <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
@@ -451,8 +453,10 @@ export function Stake(props: any): any {
                     </div>
                 </CardContent>
                 <CardActions className='button-container px-3'>
-                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>Claim</LoadingButton>
-                    <span className="text">Unclaimed DXN is considered automatically staked. Only claim when you want to trade.</span>
+                    <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>
+                        {t("rewards.claim")}
+                    </LoadingButton>
+                    <span className="text">{t("rewards.claim_description")}</span>
                 </CardActions>
             </Card>
             </>
@@ -565,7 +569,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: "Your succesfully approved contract for staking.", open: true,
+                            message: t("rewards.toastify.success"), open: true,
                             severity: "success"
                         })
                         setLoading(false)
@@ -575,7 +579,7 @@ export function Stake(props: any): any {
                     })
                     .catch((error: any) => {
                         setNotificationState({
-                            message: "Contract couldn't be approved for staking!", open: true,
+                            message: t("stake.toastify.error"), open: true,
                             severity: "error"
                         })
                         setLoading(false)
@@ -583,7 +587,7 @@ export function Stake(props: any): any {
                     })
             } catch (error) {
                 setNotificationState({
-                    message: "You rejected the transaction. Contract hasn't been approved for staking.", open: true,
+                    message: t("stake.toastify.info"), open: true,
                     severity: "info"
                 })
                 setLoading(false)
@@ -603,13 +607,13 @@ export function Stake(props: any): any {
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
                             setNotificationState({
-                                message: "Your tokens were succesfully unstaked.", open: true,
+                                message: t("unstake.toastify.success"), open: true,
                                 severity: "success"
                             })
                             setLoading(false)
                         } else {
                             setNotificationState({
-                                message: "Your tokens couldn't be unstaked!", open: true,
+                                message: t("unstake.toastify.error"), open: true,
                                 severity: "error"
                             })
                             setLoading(false)
@@ -617,13 +621,13 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your DXN should be unstaked shortly",
+                                message: t("unstake.toastify.info"),
                                 open: true,
                                 severity: "info"
                             })
                         } else if(data.status == "error") {
                             setNotificationState({
-                                message: "Transaction relayer error. Please try again",
+                                message: t("unstake.toastify.transaction_error"),
                                 open: true,
                                 severity: "error"
                             })
@@ -641,7 +645,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: "Your tokens were succesfully unstaked.", open: true,
+                            message: t("unstake.toastify.success"), open: true,
                             severity: "success"
                         })
                         setLoading(false)
@@ -650,14 +654,14 @@ export function Stake(props: any): any {
                     .catch((error: any) => {
                         setLoading(false)
                         setNotificationState({
-                            message: "Your tokens couldn't be unstaked!", open: true,
+                            message: t("unstake.toastify.error"), open: true,
                             severity: "error"
                         })
 
                     })
             } catch(error) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your tokens haven't been unstaked.",
+                    message: t("unstake.toastify.rejected"),
                     open: true,
                     severity: "info"
                 })
@@ -688,7 +692,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. DXN were not unstaked.",
+                        message: t("unstake.toastify.rejected"),
                         open: true,
                         severity: "info"
                     })
@@ -713,12 +717,12 @@ export function Stake(props: any): any {
                         const {tx: txReceipt} = JSON.parse(data.result)
                         if(txReceipt.status == 1){
                             setNotificationState({
-                                message: "You succesfully staked your DXN.", open: true,
+                                message: t("stake.toastify.staked"), open: true,
                                 severity: "success"
                             })
                         } else {
                             setNotificationState({
-                                message: "DXN couldn't be claimed!", open: true,
+                                message: t("stake.toastify.claim_error"), open: true,
                                 severity: "error"
                             })
                             setLoading(false)
@@ -726,13 +730,13 @@ export function Stake(props: any): any {
                     } catch(error) {
                         if(data.status == "pending") {
                             setNotificationState({
-                                message: "Your transaction is pending. Your DXN should be staked shortly",
+                                message: t("stake.toastify.stake_info"),
                                 open: true,
                                 severity: "info"
                             })
                         } else if(data.status == "error") {
                             setNotificationState({
-                                message: "Transaction relayer error. Please try again",
+                                message: t("stake.toastify.stake_transaction_error"),
                                 open: true,
                                 severity: "error"
                             })
@@ -750,7 +754,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: "Your tokens were succesfully staked.", open: true,
+                            message: t("stake.toastify.staked"), open: true,
                             severity: "success"
                         })
                         //setLoading(false)
@@ -758,14 +762,14 @@ export function Stake(props: any): any {
                     })
                     .catch((error: any) => {
                         setNotificationState({
-                            message: "Your tokens couldn't be staked!", open: true,
+                            message: t("stake.toastify.stake_error"), open: true,
                             severity: "error"
                         })
                         setLoading(false)
                     })
             } catch(error) {
                 setNotificationState({
-                    message: "You rejected the transaction. Your tokens haven't been staked.",
+                    message: t("stake.toastify.rejected"),
                     open: true,
                     severity: "info"
                 })
@@ -797,7 +801,7 @@ export function Stake(props: any): any {
         
                 } catch (error: any) {
                     setNotificationState({
-                        message: "You rejected the transaction. DXN were not staked.",
+                        message: t("stake.toastify.rejected"),
                         open: true,
                         severity: "info"
                     })
@@ -818,8 +822,8 @@ export function Stake(props: any): any {
                     onChange={handleChange}
                     className="tab-container"
                 >
-                    <ToggleButton className="tab-btn" value="stake">Stake</ToggleButton>
-                    <ToggleButton className="tab-btn" value="unstake" >Unstake</ToggleButton>
+                    <ToggleButton className="tab-btn" value="stake">{t("stake.stake")}</ToggleButton>
+                    <ToggleButton className="tab-btn" value="unstake" >{t("unstake.unstake")}</ToggleButton>
 
                 </ToggleButtonGroup>
               
@@ -831,7 +835,7 @@ export function Stake(props: any): any {
                     <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                         <Typography className="p-0">
-                            Your staked amount:
+                            {t("stake.staked_amount")}:
                         </Typography>
                         <Typography variant="h6" className="p-0 data-height">
                             <strong>
@@ -844,7 +848,7 @@ export function Stake(props: any): any {
                     <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                         <Typography className="p-0">
-                            Available DXN in your wallet:
+                            {t("stake.wallet")}:
                         </Typography>
                         <Typography variant="h6" className="p-0" data-height>
                             <strong>
@@ -857,7 +861,7 @@ export function Stake(props: any): any {
                     {approved && <Grid className="amount-row px-3" container>
                         <Grid item>
                             <OutlinedInput id="outlined-basic"
-                                placeholder="Amount to stake"
+                                placeholder={t("stake.amount_to_stake")}
                                 type="number"
                                 value={amountToStake}
                                 inputProps={{ min: 0 }}
@@ -866,14 +870,17 @@ export function Stake(props: any): any {
                         <Grid className="max-btn-container" item>
                             <Button className="max-btn" 
                                 size="small" variant="contained" color="error" 
-                               onClick = {()=>setAmountToStake(userUnstakedAmount)  }>
-                                max
+                                onClick = {()=>setAmountToStake(userUnstakedAmount)  }>
+                                    {t("stake.max")}
                             </Button>
                         </Grid>
                     </Grid>}
                 </CardContent>
                 <CardActions className='button-container px-3'>
-                    {approved && <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>Stake</LoadingButton>}
+                    {approved && 
+                        <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>
+                            {t("stake.stake")}
+                        </LoadingButton>}
                     {!approved &&
                         <>
                             <LoadingButton 
@@ -882,10 +889,10 @@ export function Stake(props: any): any {
                                 variant="contained"
                                 disabled={ userUnstakedAmount === '0.00' ||  userUnstakedAmount === '0'}
                                 onClick={approveStaking}>
-                                    Initialize Staking
+                                    {t("stake.init_button")}
                             </LoadingButton>
                             <span className="text">
-                                Make sure you have DXN tokens in your wallet before you can stake them.
+                                {t("stake.init_text")}
                             </span>
                         </> 
                     }
@@ -898,7 +905,7 @@ export function Stake(props: any): any {
                     <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
                         <Typography className="p-0">
-                            Available to unstake:
+                            {t("unstake.available")}:
                         </Typography>
                         <Typography variant="h6" className="p-0">
                             <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
@@ -923,7 +930,7 @@ export function Stake(props: any): any {
                             <OutlinedInput value={amountToUnstake}
                                 id="outlined-basic"
                                 className="max-field"
-                                placeholder="Amount to unstake"
+                                placeholder={t("unstake.amount_to_unstake")}
                                 onChange={e => setAmountToUnstake(e.target.value)}
                                 inputProps={{ min: 0 }}
                                 type="number" />
@@ -932,13 +939,15 @@ export function Stake(props: any): any {
                             <Button className="max-btn"
                                 size="small" variant="contained" color="error" 
                                 onClick = {()=>setAmountToUnstake(tokensForUnstake)  }>
-                                max
+                                {t("unstake.max")}
                             </Button>
                         </Grid>
                     </Grid>
                 </CardContent>
                 <CardActions className='button-container px-3'>
-                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>Unstake</LoadingButton>
+                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>
+                        {t("unstake.unstake")}
+                    </LoadingButton>
                 </CardActions>
                 </>
             }

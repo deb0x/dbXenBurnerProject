@@ -21,6 +21,8 @@ import { AppBarComponent } from './components/App/AppBar';
 import { Burn } from './components/App/Burn';
 import ScreenSize from './components/Common/ScreenSize';
 import Countdown, { zeroPad } from "react-countdown";
+import { useTranslation } from 'react-i18next';
+import DropdownLanguage from './components/DropdownLanguage';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -104,6 +106,7 @@ function App() {
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
     const dimensions = ScreenSize();
+    const { t } = useTranslation();
     
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -208,23 +211,24 @@ function App() {
                 <div className="navigation-mobile">
                     <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
                         onClick={() => setSelectedIndex(0)}>
-                            Mint
+                            {t("mobile.mint")}
                     </div>
                     <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
                         onClick={() => setSelectedIndex(1)}>
-                            Fees
+                            {t("mobile.fees")}
                     </div>
                 </div>
             </div> :
             <div className="app-container p-0 ">
                 <div className="initial-page">
+                    <DropdownLanguage />
                     <div className="row">
                         <div className="col-lg-7 img-container mr-4">
                             <img className="image--left" src={elephant} alt="elephant" />
                             <div className="img-content">
-                                <p>Connect your wallet</p>
-                                <p>Burn $XEN</p>
-                                <p>Earn crypto</p>
+                                <p>{t("home.connect_text")}</p>
+                                <p>{t("home.burn_text")}</p>
+                                <p>{t("home.earn_text")}</p>
                                   
                                 <div>
                                     { (() =>  {
@@ -247,11 +251,11 @@ function App() {
                                                 { activating ? 
                                                     <Spinner color={'black'} /> :
                                                     !connected ? 
-                                                        "Connect" :
+                                                        t("home.connect") :
                                                         <span>
                                                             {typeof window.ethereum === 'undefined' ? 
-                                                                `Check your prerequisites` : 
-                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                                t("home.prerequisites") : 
+                                                                account === undefined ? t("home.unsupported_network") + ` ${networkName}` : ''}
                                                         </span>
                                                 }
                                             </Button>
@@ -264,7 +268,7 @@ function App() {
                             <div className="text-container">
                                 <img className="dark-logo" src={deb0xen} alt="logo" />
                                 <p>
-                                    Community built crypto protocol <br/> contributing to XEN deflation
+                                    {t("home.community_text")} <br/>    {t("home.contributing_text")}
                                 </p>
                                 <div className="connect-mobile">
                                     { (() =>  {
@@ -287,11 +291,11 @@ function App() {
                                                 { activating ? 
                                                     <Spinner color={'black'} /> :
                                                     !connected ? 
-                                                        "Connect" :
+                                                        t("home.connect") :
                                                         <span>
                                                             {typeof window.ethereum === 'undefined' ? 
-                                                                `Check your prerequisites` : 
-                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                                t("home.prerequisites") : 
+                                                                account === undefined ? t("home.unsupported_network") + ` ${networkName}` : ''}
                                                         </span>
                                                 }
                                             </Button>
