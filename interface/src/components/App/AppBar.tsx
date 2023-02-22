@@ -59,8 +59,9 @@ export function AppBarComponent(props: any): any {
     const context = useWeb3React();
     const { connector, library, chainId, account, activate, deactivate } = context
     const [deb0xViewsAddress, setDeb0xViewsAddress] = useState("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+    const [deb0xAddress, setDeb0xAddress] = useState("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
     const [deb0xERC20Address, setDeb0xERC20Address] = useState("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+    const [xenAddress, setXENAddress] = useState("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
     const [activatingConnector, setActivatingConnector] = useState<any>();
     const [networkName, setNetworkName] = useState<any>();
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
@@ -93,16 +94,33 @@ export function AppBarComponent(props: any): any {
     async function getChainId() {
         const currentChainId = await window.ethereum.request({
             method: 'eth_chainId',
-        });
-        if(currentChainId === 137) {
-            setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-            setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-            setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-        } else {
-            setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-            setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-            setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-        }
+        }).then((result:any) =>{
+            console.log("Resul" +result)
+            console.log("Asdasdsa ");
+            console.log(result === 0x89)
+            if(parseInt(result, 16) === 137) {
+                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+                setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
+            } else {
+                console.log("app bar INTU AICI ?");
+                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+                setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
+            }
+        })
+        // console.log(currentChainId)
+        // if(currentChainId === 137) {
+        //     setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+        //     setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+        //     setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+        // } else {
+        //     setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+        //     setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+        //     setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+        // }
     }
 
     useEffect(() => {

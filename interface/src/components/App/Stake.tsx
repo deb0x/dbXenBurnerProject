@@ -42,8 +42,9 @@ export function Stake(props: any): any {
     const now: any = Date.now()
     let endDate = date.getTime() - now;
     const [deb0xViewsAddress, setDeb0xViewsAddress] = useState("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+    const [deb0xAddress, setDeb0xAddress] = useState("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
     const [deb0xERC20Address, setDeb0xERC20Address] = useState("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+    const [xenAddress, setXENAddress] = useState("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
     
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
@@ -68,16 +69,21 @@ export function Stake(props: any): any {
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            });
-            if(currentChainId === 137) {
-                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-            } else {
-                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-            }
+            }).then((result:any) =>{
+                console.log("Resul" +result)
+                if(parseInt(result, 16) === 137) {
+                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
+                } else {
+                    console.log("INTU AICI ?");
+                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
+                }
+            })
         }
 
         useEffect(() => {
@@ -118,7 +124,6 @@ export function Stake(props: any): any {
 
         async function feesAccrued() {
             const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress);
-
             await deb0xViewsContract.getUnclaimedFees(account).then((result: any) => {
                 setFeesUnclaimed(ethers.utils.formatEther(result))
             });
@@ -276,16 +281,21 @@ export function Stake(props: any): any {
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            });
-            if(currentChainId === 137) {
-                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-            } else {
-                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-            }
+            }).then((result:any) =>{
+                if(parseInt(result, 16) === 137) {
+                    console.log("Resul" +result)
+                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
+                } else {
+                    console.log("INTU AICI ?");
+                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
+                }
+            })
         }
 
         useEffect(() => {
@@ -339,16 +349,21 @@ export function Stake(props: any): any {
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            });
-            if(currentChainId === 137) {
-                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-            } else {
-                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-            }
+            }).then((result:any) =>{
+                console.log(result === 0x89)
+                if(parseInt(result, 16) === 137) {
+                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
+                } else {
+                    console.log("INTU AICI ?");
+                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
+                }
+            })
         }
 
         useEffect(() => {
@@ -382,7 +397,9 @@ export function Stake(props: any): any {
 
             let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
 
+            console.log("bbbbbbbbbbbbbb  "+deb0xContract)
             const currentCycle = await deb0xContract.currentStartedCycle();
+            console.log("cccccccccccccccccccccccc   "+currentCycle)
 
             const totalSupply = await deb0xContract.summedCycleStakes(currentCycle);
 
@@ -552,16 +569,21 @@ export function Stake(props: any): any {
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            });
-            if(currentChainId === 137) {
-                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-            } else {
-                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-            }
+            }).then((result:any) =>{
+                console.log("Resul" +result)
+                if(parseInt(result, 16) === 137) {
+                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
+                } else {
+                    console.log("INTU AICI ?");
+                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
+                }
+            })
         }
 
         useEffect(() => {
@@ -642,7 +664,9 @@ export function Stake(props: any): any {
 
             const deb0xContract = DBXen(library, deb0xAddress)
 
+            console.log("ssssssssssssssssss "+deb0xContract.address)
            await deb0xContract.currentStartedCycle().then(async (currentCycle:any) =>{
+            console.log("hhhhhhh "+currentCycle)
                 await deb0xContract.summedCycleStakes(currentCycle).then((totalSupply:any) => {
                     setTotalStaked(ethers.utils.formatEther(totalSupply))
                 })

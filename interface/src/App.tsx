@@ -135,7 +135,7 @@ function App() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0xA86A"}],
+            params: [{ chainId: "0x89"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -145,7 +145,7 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0xA86A', 
+                        chainId: '0x89', 
                         chainName:'Polygon Network',
                         rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
                         blockExplorerUrls:['https://polygonscan.com/'],  
