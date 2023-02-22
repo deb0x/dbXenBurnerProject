@@ -691,6 +691,7 @@ export function Stake(props: any): any {
                             message: "Your tokens were succesfully unstaked.", open: true,
                             severity: "success"
                         })
+                        setTokensForUntakedAmount();
                         setLoading(false)
 
                     })
