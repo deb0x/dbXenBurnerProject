@@ -13,7 +13,6 @@ const ChainProvider = ( { children }: Props ) => {
             window.ethereum.request({
                 method: 'eth_chainId',
             }).then((result: any) => {
-                console.log("APP", result)
                 if(parseInt(result, 16) === 137) {
                     setChain({
                         deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",

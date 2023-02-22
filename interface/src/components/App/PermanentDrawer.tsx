@@ -76,8 +76,8 @@ export function PermanentDrawer(props: any): any {
                                 <div className="row">
                                     <span className="col-6">DBXen: </span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A">
-                                        {formatAccountName("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")}
+                                        href="https://polygonscan.com/address/0x4F3ce26D9749C0f36012C9AbB41BF9938476c462">
+                                        {formatAccountName("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")}
                                     </a>
                                 </div>
                                 <div className="row">

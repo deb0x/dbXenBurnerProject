@@ -33,8 +33,6 @@ export default function ChainSetter(props: any) {
     useEffect(() => {
         window.ethereum.on("chainChanged", networkChanged);
 
-        console.log("CHAIN", chain)
-
         return () => {
             window.ethereum.removeListener("chainChanged", networkChanged);
             };

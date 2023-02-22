@@ -34,7 +34,6 @@ export function Burn(): any {
     }, [account]);
 
     useEffect(() => {
-        console.log(chain.deb0xAddress)
     }, [chain.deb0xAddress]);
 
     useEffect(() => {
@@ -73,11 +72,15 @@ export function Burn(): any {
     }
 
     async function estimationValues() {
+        let priceURL = "";
+        (Number(chain.chainId)) === 137 ?
+            priceURL = "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3" :
+            priceURL = "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
 
         let method: Method = 'POST';
         const options = {
             method: method,
-            url: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3 ',
+            url: priceURL,
             port: 443,
             headers: {
                 'Content-Type': 'application/json'

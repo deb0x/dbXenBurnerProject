@@ -305,7 +305,6 @@ export function Stake(props: any): any {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
             }).then((result:any) =>{
-                console.log(result === 0x89)
                 
             })
         }
@@ -341,9 +340,7 @@ export function Stake(props: any): any {
 
             let balance = parseFloat((ethers.utils.formatEther(unclaimedRewards.add(accWithdrawableStake))))
 
-            console.log("bbbbbbbbbbbbbb  "+deb0xContract)
             const currentCycle = await deb0xContract.currentStartedCycle();
-            console.log("cccccccccccccccccccccccc   "+currentCycle)
 
             const totalSupply = await deb0xContract.summedCycleStakes(currentCycle);
 
@@ -514,7 +511,6 @@ export function Stake(props: any): any {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
             }).then((result:any) =>{
-                console.log("Resul" +result)
                 
             })
         }
@@ -597,9 +593,7 @@ export function Stake(props: any): any {
 
             const deb0xContract = DBXen(library, chain.deb0xAddress)
 
-            console.log("ssssssssssssssssss "+deb0xContract.address)
            await deb0xContract.currentStartedCycle().then(async (currentCycle:any) =>{
-            console.log("hhhhhhh "+currentCycle)
                 await deb0xContract.summedCycleStakes(currentCycle).then((totalSupply:any) => {
                     setTotalStaked(ethers.utils.formatEther(totalSupply))
                 })
