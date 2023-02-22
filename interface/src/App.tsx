@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -21,6 +21,8 @@ import { AppBarComponent } from './components/App/AppBar';
 import { Burn } from './components/App/Burn';
 import ScreenSize from './components/Common/ScreenSize';
 import Countdown, { zeroPad } from "react-countdown";
+import ChainContext from './components/Contexts/ChainContext';
+import ChainProvider from './components/Contexts/ChainProvider';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -104,6 +106,7 @@ function App() {
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
     const dimensions = ScreenSize();
+    const { chain, setChain }  = useContext(ChainContext)
     
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -128,7 +131,7 @@ function App() {
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
                 // switchNetwork();               
             }).catch((err: any) => displayErrorMsg(err))
-            : displayErrorMsg("Please install MetaMask")
+            : displayErrorMsg("Please install MetaMask");
     }, [])
 
     async function switchNetwork() {
@@ -169,144 +172,144 @@ function App() {
     
     return (
 
-    <>
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {!!errorMsg &&
-            <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
-                {displayErrorMsg(errorMsg)}
-            </p>
-        }
-    </div>
-        <ThemeProvider>
-        { account ? 
-            <div className="app-container container-fluid">
-                { maintenance === "true" ?
-                    <div className="row main-row maintenance-mode">
-                        <img className="maintenance-img" src={maintenanceImg} alt="maintenance" />
-                        <h1>Maintenance Mode</h1>
-                        <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
-                    </div> :
-                    <div className="row main-row">
-                        <div className="col col-lg-3 col-12 p-0 side-menu-container">
-                            <PermanentDrawer />
+    <ChainProvider>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {!!errorMsg &&
+                <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                    {displayErrorMsg(errorMsg)}
+                </p>
+            }
+        </div>
+            <ThemeProvider>
+            { account ? 
+                <div className="app-container container-fluid">
+                    { maintenance === "true" ?
+                        <div className="row main-row maintenance-mode">
+                            <img className="maintenance-img" src={maintenanceImg} alt="maintenance" />
+                            <h1>Maintenance Mode</h1>
+                            <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
+                        </div> :
+                        <div className="row main-row">
+                            <div className="col col-lg-3 col-12 p-0 side-menu-container">
+                                <PermanentDrawer />
+                            </div>
+                            <div className="col col-lg-9 col-12">
+                                <AppBarComponent />
+                                
+                                <Box className="main-container" sx={{marginTop: 12}}>
+                                {dimensions.width > 768 ? 
+                                    <Stake />
+                                    :
+                                    <>
+                                        {selectedIndex === 0 && <Burn /> }
+                                        {selectedIndex === 1 && <Stake /> }
+                                    </>
+                                }
+                                </Box>
+                            </div>
                         </div>
-                        <div className="col col-lg-9 col-12">
-                            <AppBarComponent />
-                            
-                            <Box className="main-container" sx={{marginTop: 12}}>
-                            {dimensions.width > 768 ? 
-                                <Stake />
-                                 :
-                                <>
-                                    {selectedIndex === 0 && <Burn /> }
-                                    {selectedIndex === 1 && <Stake /> }
-                                </>
-                            }
-                            </Box>
+                    }
+                    <div className="navigation-mobile">
+                        <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
+                            onClick={() => setSelectedIndex(0)}>
+                                Mint
+                        </div>
+                        <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
+                            onClick={() => setSelectedIndex(1)}>
+                                Fees
                         </div>
                     </div>
-                }
-                <div className="navigation-mobile">
-                    <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
-                        onClick={() => setSelectedIndex(0)}>
-                            Mint
-                    </div>
-                    <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
-                        onClick={() => setSelectedIndex(1)}>
-                            Fees
-                    </div>
-                </div>
-            </div> :
-            <div className="app-container p-0 ">
-                <div className="initial-page">
-                    <div className="row">
-                        <div className="col-lg-7 img-container mr-4">
-                            <img className="image--left" src={elephant} alt="elephant" />
-                            <div className="img-content">
-                                <p>Connect your wallet</p>
-                                <p>Burn $XEN</p>
-                                <p>Earn crypto</p>
-                                  
-                                <div>
-                                    { (() =>  {
-                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                        const activating = currentConnector === activatingConnector
-                                        const connected = currentConnector === connector
+                </div> :
+                <div className="app-container p-0 ">
+                    <div className="initial-page">
+                        <div className="row">
+                            <div className="col-lg-7 img-container mr-4">
+                                <img className="image--left" src={elephant} alt="elephant" />
+                                <div className="img-content">
+                                    <p>Connect your wallet</p>
+                                    <p>Burn $XEN</p>
+                                    <p>Earn crypto</p>
+                                    
+                                    <div>
+                                        { (() =>  {
+                                            const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                            const activating = currentConnector === activatingConnector
+                                            const connected = currentConnector === connector
 
-                                        return (
-                                            <Button variant="contained"
-                                                key={ConnectorNames.Injected}
-                                                // aria-describedby={id}
-                                                onClick={!connected ? 
-                                                    () => {
-                                                        setActivatingConnector(currentConnector)
-                                                        activate(currentConnector)
-                                                    } : 
-                                                    handleClick}
-                                                    className="connect-button">
-                                                
-                                                { activating ? 
-                                                    <Spinner color={'black'} /> :
-                                                    !connected ? 
-                                                        "Connect" :
-                                                        <span>
-                                                            {typeof window.ethereum === 'undefined' ? 
-                                                                `Check your prerequisites` : 
-                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
-                                                        </span>
-                                                }
-                                            </Button>
-                                        )
-                                    }) ()}
+                                            return (
+                                                <Button variant="contained"
+                                                    key={ConnectorNames.Injected}
+                                                    // aria-describedby={id}
+                                                    onClick={!connected ? 
+                                                        () => {
+                                                            setActivatingConnector(currentConnector)
+                                                            activate(currentConnector)
+                                                        } : 
+                                                        handleClick}
+                                                        className="connect-button">
+                                                    
+                                                    { activating ? 
+                                                        <Spinner color={'black'} /> :
+                                                        !connected ? 
+                                                            "Connect" :
+                                                            <span>
+                                                                {typeof window.ethereum === 'undefined' ? 
+                                                                    `Check your prerequisites` : 
+                                                                    account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                            </span>
+                                                    }
+                                                </Button>
+                                            )
+                                        }) ()}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-12 col-lg-5 text-center">
+                                <div className="text-container">
+                                    <img className="dark-logo" src={deb0xen} alt="logo" />
+                                    <p>
+                                        Community built crypto protocol <br/> contributing to XEN deflation
+                                    </p>
+                                    <div className="connect-mobile">
+                                        { (() =>  {
+                                            const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                            const activating = currentConnector === activatingConnector
+                                            const connected = currentConnector === connector
+
+                                            return (
+                                                <Button variant="contained"
+                                                    key={ConnectorNames.Injected}
+                                                    // aria-describedby={id}
+                                                    onClick={!connected ? 
+                                                        () => {
+                                                            setActivatingConnector(currentConnector)
+                                                            activate(currentConnector)
+                                                        } : 
+                                                        handleClick}
+                                                        className="connect-button">
+                                                    
+                                                    { activating ? 
+                                                        <Spinner color={'black'} /> :
+                                                        !connected ? 
+                                                            "Connect" :
+                                                            <span>
+                                                                {typeof window.ethereum === 'undefined' ? 
+                                                                    `Check your prerequisites` : 
+                                                                    account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                            </span>
+                                                    }
+                                                </Button>
+                                            )
+                                        }) ()}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="col-12 col-lg-5 text-center">
-                            <div className="text-container">
-                                <img className="dark-logo" src={deb0xen} alt="logo" />
-                                <p>
-                                    Community built crypto protocol <br/> contributing to XEN deflation
-                                </p>
-                                <div className="connect-mobile">
-                                    { (() =>  {
-                                        const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                        const activating = currentConnector === activatingConnector
-                                        const connected = currentConnector === connector
-
-                                        return (
-                                            <Button variant="contained"
-                                                key={ConnectorNames.Injected}
-                                                // aria-describedby={id}
-                                                onClick={!connected ? 
-                                                    () => {
-                                                        setActivatingConnector(currentConnector)
-                                                        activate(currentConnector)
-                                                    } : 
-                                                    handleClick}
-                                                    className="connect-button">
-                                                
-                                                { activating ? 
-                                                    <Spinner color={'black'} /> :
-                                                    !connected ? 
-                                                        "Connect" :
-                                                        <span>
-                                                            {typeof window.ethereum === 'undefined' ? 
-                                                                `Check your prerequisites` : 
-                                                                account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
-                                                        </span>
-                                                }
-                                            </Button>
-                                        )
-                                    }) ()}
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-            </div>
-        }
-        </ThemeProvider>
-    </>
+            }
+            </ThemeProvider>
+    </ChainProvider>
   )
 }
 

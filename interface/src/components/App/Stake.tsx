@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import {
     Card, CardActions, CardContent, Button, Grid,
@@ -26,25 +26,20 @@ import { createInstance } from '../../ethereum/forwarder'
 import dataFromWhitelist from '../../constants.json';
 import useAnalyticsEventTracker from '../Common/GaEventTracker';
 import Countdown, { zeroPad } from "react-countdown";
+import ChainContext from '../Contexts/ChainContext';
 
 const { whitelist } = dataFromWhitelist;
-const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
-const deb0xViewsAddress = "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E";
-const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729";
 
 export function Stake(props: any): any {
 
     const { account, library, activate } = useWeb3React()
+    const { chain }  = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
     const date: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
     const now: any = Date.now()
     let endDate = date.getTime() - now;
-    const [deb0xViewsAddress, setDeb0xViewsAddress] = useState("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-    const [deb0xAddress, setDeb0xAddress] = useState("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-    const [deb0xERC20Address, setDeb0xERC20Address] = useState("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-    const [xenAddress, setXENAddress] = useState("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
     
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
@@ -64,32 +59,6 @@ export function Stake(props: any): any {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
         const [loading, setLoading] = useState(false)
 
-
-    
-        async function getChainId() {
-            const currentChainId = await window.ethereum.request({
-                method: 'eth_chainId',
-            }).then((result:any) =>{
-                console.log("Resul" +result)
-                if(parseInt(result, 16) === 137) {
-                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
-                } else {
-                    console.log("INTU AICI ?");
-                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
-                }
-            })
-        }
-
-        useEffect(() => {
-            getChainId();
-        }, [])
-
         useEffect(() => {
             feesAccrued()
         }, [feesUnclaimed]);
@@ -107,9 +76,7 @@ export function Stake(props: any): any {
 
         async function getTotalXenBurnedInPreviusCycle() {
             const signer = await library.getSigner(0)
-            const deb0xContract = DBXen(signer, deb0xAddress)
-
-            console.log("XXXX", deb0xAddress)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
 
             await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
                 if (currentCycle != 0) {
@@ -123,7 +90,7 @@ export function Stake(props: any): any {
         }
 
         async function feesAccrued() {
-            const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = DBXenViews(library, chain.deb0xViewsAddress);
             await deb0xViewsContract.getUnclaimedFees(account).then((result: any) => {
                 setFeesUnclaimed(ethers.utils.formatEther(result))
             });
@@ -204,7 +171,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = DBXen(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
 
             const from = signer.getAddress();
             if (whitelist.includes(from)) {
@@ -282,19 +249,7 @@ export function Stake(props: any): any {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
             }).then((result:any) =>{
-                if(parseInt(result, 16) === 137) {
-                    console.log("Resul" +result)
-                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
-                } else {
-                    console.log("INTU AICI ?");
-                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
-                }
+                
             })
         }
 
@@ -307,7 +262,7 @@ export function Stake(props: any): any {
         }, [currentReward]);
 
         async function cycleReward() {
-            const deb0xContract = DBXen(library, deb0xAddress);
+            const deb0xContract = DBXen(library, chain.deb0xAddress);
             await deb0xContract.currentCycleReward().then((result: any) => {
                 setCurrentReward(ethers.utils.formatEther(result))
             })
@@ -351,18 +306,7 @@ export function Stake(props: any): any {
                 method: 'eth_chainId',
             }).then((result:any) =>{
                 console.log(result === 0x89)
-                if(parseInt(result, 16) === 137) {
-                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
-                } else {
-                    console.log("INTU AICI ?");
-                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
-                }
+                
             })
         }
 
@@ -379,7 +323,7 @@ export function Stake(props: any): any {
         }, [feeSharePercentage]);
 
         async function rewardsAccrued() {
-            const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = DBXenViews(library, chain.deb0xViewsAddress);
 
             await deb0xViewsContract.getUnclaimedRewards(account).then((result: any) => {
                 setRewardsUnclaimed(ethers.utils.formatEther(result))
@@ -387,9 +331,9 @@ export function Stake(props: any): any {
         }
 
         async function feeShare() {
-            const deb0xViewsContract = DBXenViews(library, deb0xViewsAddress);
+            const deb0xViewsContract = DBXenViews(library, chain.deb0xViewsAddress);
 
-            const deb0xContract = DBXen(library, deb0xAddress);
+            const deb0xContract = DBXen(library, chain.deb0xAddress);
 
             const unclaimedRewards = await deb0xViewsContract.getUnclaimedRewards(account);
 
@@ -483,7 +427,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = DBXen(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
 
 
             const from = await signer.getAddress();
@@ -571,18 +515,7 @@ export function Stake(props: any): any {
                 method: 'eth_chainId',
             }).then((result:any) =>{
                 console.log("Resul" +result)
-                if(parseInt(result, 16) === 137) {
-                    setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
-                    setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
-                    setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
-                    setXENAddress("0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e")
-                } else {
-                    console.log("INTU AICI ?");
-                    setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-                    setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
-                    setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
-                    setXENAddress("0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389")
-                }
+                
             })
         }
 
@@ -625,8 +558,8 @@ export function Stake(props: any): any {
         }, [approved]);
 
         async function setStakedAmount() {
-            const deb0xContract = await DBXen(library, deb0xAddress)
-            const deb0xViewsContract = await DBXenViews(library, deb0xViewsAddress)
+            const deb0xContract = await DBXen(library, chain.deb0xAddress)
+            const deb0xViewsContract = await DBXenViews(library, chain.deb0xViewsAddress)
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account)
             let firstStakeCycle = await deb0xContract.accFirstStake(account)
             let secondStakeCycle = await deb0xContract.accSecondStake(account)
@@ -638,14 +571,14 @@ export function Stake(props: any): any {
         }
 
         async function setTokensForUntakedAmount() {
-            const deb0xViewsContract =  DBXenViews(library, deb0xViewsAddress)
+            const deb0xViewsContract =  DBXenViews(library, chain.deb0xViewsAddress)
             const balance = await deb0xViewsContract.getAccWithdrawableStake(account).then((balance:any) =>{
                 setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
             })
         }
 
         async function setUnstakedAmount() {
-            const deb0xERC20Contract = await DBXenERC20(library, deb0xERC20Address)
+            const deb0xERC20Contract = await DBXenERC20(library, chain.deb0xERC20Address)
             const balance = await deb0xERC20Contract.balanceOf(account).then((balance:any) =>{
                 let number = ethers.utils.formatEther(balance);
                 setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
@@ -653,16 +586,16 @@ export function Stake(props: any): any {
         }
 
         async function setApproval() {
-            const deb0xERC20Contract = DBXenERC20(library, deb0xERC20Address)
+            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
 
-            await deb0xERC20Contract.allowance(account, deb0xAddress).then((allowance:any) =>
+            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>
                  allowance > 0 ? setApproved(true) : setApproved(false)
             )
         }
 
         async function totalAmountStaked() {
 
-            const deb0xContract = DBXen(library, deb0xAddress)
+            const deb0xContract = DBXen(library, chain.deb0xAddress)
 
             console.log("ssssssssssssssssss "+deb0xContract.address)
            await deb0xContract.currentStartedCycle().then(async (currentCycle:any) =>{
@@ -678,10 +611,10 @@ export function Stake(props: any): any {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-            const deb0xERC20Contract = DBXenERC20(signer, deb0xERC20Address)
+            const deb0xERC20Contract = DBXenERC20(signer, chain.deb0xERC20Address)
 
             try {
-                const tx = await deb0xERC20Contract.approve(deb0xAddress, ethers.utils.parseEther("5010000"))
+                const tx = await deb0xERC20Contract.approve(chain.deb0xAddress, ethers.utils.parseEther("5010000"))
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
@@ -790,7 +723,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = DBXen(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
 
             const from = await signer.getAddress();
             if (whitelist.includes(from)) {
@@ -901,7 +834,7 @@ export function Stake(props: any): any {
 
             const signer = await library.getSigner(0)
 
-            const deb0xContract = DBXen(signer, deb0xAddress)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
 
             const from = await signer.getAddress();
             if (whitelist.includes(from)) {
@@ -1079,7 +1012,7 @@ export function Stake(props: any): any {
 
         async function totalAmountStaked() {
 
-            const deb0xContract = DBXen(library, deb0xAddress)
+            const deb0xContract = DBXen(library, chain.deb0xAddress)
 
             const currentCycle = await deb0xContract.currentStartedCycle()
 

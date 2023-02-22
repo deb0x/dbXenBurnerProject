@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import XENCrypto from '../../ethereum/XENCrypto';
 import DBXen from "../../ethereum/dbxen"
@@ -9,10 +9,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import axios, { Method } from 'axios';
 import web3 from 'web3';
+import ChainContext from '../Contexts/ChainContext';
 const { BigNumber } = require("ethers");
-
-const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
-const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 export function Burn(): any {
     const context = useWeb3React()
@@ -28,12 +26,16 @@ export function Burn(): any {
     const [gasLimit, setCurrentGasLimit] = useState<number>();
     const [valueAndFee, setValueAndFee] = useState<any>();
     const [totalBatchApproved, setBatchApproved] = useState<number>();
-    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
-    
+    const { chain }  = useContext(ChainContext)
+
     useEffect(() => {
         getAllowanceForAccount();
         estimationValues();
     }, [account]);
+
+    useEffect(() => {
+        console.log(chain.deb0xAddress)
+    }, [chain.deb0xAddress]);
 
     useEffect(() => {
         getAllowanceForAccount();
@@ -45,23 +47,10 @@ export function Burn(): any {
         setBalance()
     }, [account, balanceGratherThanZero]);
 
-    async function getChainId() {
-        const currentChainId = await window.ethereum.request({
-            method: 'eth_chainId',
-        });
-        currentChainId === 137 ?
-            setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462") :
-            setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A") 
-    }
-
-    useEffect(() => {
-        getChainId();
-    }, [])
-
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress);
-        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>{
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
+        await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) =>{
             let batchApproved = Number(ethers.utils.formatEther(amount)) / 2500000;
             setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
@@ -73,7 +62,7 @@ export function Burn(): any {
     async function setBalance() {
         setLoading(true);
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress);
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         let number;
 
         await xenContract.balanceOf(account).then((balance: any) => {
@@ -99,7 +88,7 @@ export function Burn(): any {
         };
 
         const signer = library.getSigner(0)
-        const deb0xContract = DBXen(signer, deb0xAddress)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
@@ -128,7 +117,7 @@ export function Burn(): any {
     async function setApproval() {
         setLoading(true);
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress)
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress)
         let amountToApprove = 0;
             if(totalBatchApproved != undefined){
                 if(value > totalBatchApproved){
@@ -136,7 +125,7 @@ export function Burn(): any {
                 }
             }
         try {
-            const tx = await xenContract.increaseAllowance(deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
+            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
             tx.wait()
                 .then((result: any) => {
                     getAllowanceForAccount();
@@ -165,7 +154,7 @@ export function Burn(): any {
     async function burnXEN() {
         setLoading(true)
         const signer = await library.getSigner(0)
-        const deb0xContract = DBXen(signer, deb0xAddress)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
         let gasLimitIntervalValue = gasLimit
         let currentValue = valueAndFee.fee;
 
