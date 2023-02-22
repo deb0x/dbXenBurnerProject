@@ -22,6 +22,7 @@ const deb0xViewsAddress = "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E";
 const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729"
 const tokenSymbol = 'DBXen';
 
+
 const tokenDecimals = 18;
 enum ConnectorNames { Injected = 'Injected' };
 
@@ -29,9 +30,37 @@ const connectorsByName: { [connectorName in ConnectorNames]: any } = {
     [ConnectorNames.Injected]: injected
 }
 
+const networks: any = {
+    polygon: {
+      chainId: `0x${Number(137).toString(16)}`,
+      chainName: "Polygon Mainnet",
+      nativeCurrency: {
+        name: "MATIC",
+        symbol: "MATIC",
+        decimals: 18
+      },
+      rpcUrls: ["https://polygon-rpc.com/"],
+      blockExplorerUrls: ["https://polygonscan.com/"]
+    },
+    avalanche: {
+        chainId: `0x${Number(43114).toString(16)}`,
+        chainName: "Avalanche Mainnet C-Chain",
+        nativeCurrency: {
+          name: "Avalanche",
+          symbol: "AVAX",
+          decimals: 18,
+        },
+        rpcUrls: ["https://api.avax.network/ext/bc/C/rpc"],
+        blockExplorerUrls: ["https://snowtrace.io/"],
+    }
+};
+
 export function AppBarComponent(props: any): any {
     const context = useWeb3React();
     const { connector, library, chainId, account, activate, deactivate } = context
+    const [deb0xViewsAddress, setDeb0xViewsAddress] = useState("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+    const [deb0xERC20Address, setDeb0xERC20Address] = useState("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
     const [activatingConnector, setActivatingConnector] = useState<any>();
     const [networkName, setNetworkName] = useState<any>();
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
@@ -49,7 +78,7 @@ export function AppBarComponent(props: any): any {
     const id = open ? 'simple-popper' : undefined;
 
     if(library){
-        checkENS();
+        // checkENS();
         setUnstakedAmount();
     }
 
@@ -60,6 +89,30 @@ export function AppBarComponent(props: any): any {
     useEffect(() => {
         setTheme(localStorage.getItem('globalTheme'));
     }, []);
+
+    async function getChainId() {
+        const currentChainId = await window.ethereum.request({
+            method: 'eth_chainId',
+        });
+        if(currentChainId === 137) {
+            setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+            setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+            setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+        } else {
+            setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+            setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+            setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+        }
+    }
+
+    useEffect(() => {
+        getChainId();
+        window.ethereum.on("chainChanged", networkChanged);
+
+        return () => {
+            window.ethereum.removeListener("chainChanged", networkChanged);
+            };
+    }, [])
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -112,16 +165,16 @@ export function AppBarComponent(props: any): any {
         }
     },[])
 
-    async function checkENS(){
-        if(chainId !== 137){
-            var name = await library.lookupAddress(account);
-            if(name !== null)
-            {   
-                setEnsName(name);
-            }
-        }
+    // async function checkENS(){
+    //     if(chainId !== 137){
+    //         var name = await library.lookupAddress(account);
+    //         if(name !== null)
+    //         {   
+    //             setEnsName(name);
+    //         }
+    //     }
        
-    }
+    // }
 
     function floorPrecised(number:any) {
         var power = Math.pow(10, 2);
@@ -205,7 +258,36 @@ export function AppBarComponent(props: any): any {
     const handleClickAway = () => {
         setOpen(false)
     };
+
+    const changeNetwork = async ({ networkName, setError }: any) => {
+        try {
+            if (!window.ethereum) throw new Error("No crypto wallet found");
+            await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [
+                    {
+                        ...networks[networkName]
+                    }
+                ]
+            });
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
     
+    const [error, setError] = useState<any>();
+
+    const handleNetworkSwitch = async (networkName: any) => {
+        setError("");
+        await changeNetwork({ networkName, setError }).then(() => {
+            getChainId();
+            window.location.reload();
+        });
+    };
+
+    const networkChanged = (chainId: any) => {
+        console.log({ chainId });
+    };
     return (
         <ClickAwayListener onClickAway={handleClickAway}>
             <div>
@@ -259,6 +341,20 @@ export function AppBarComponent(props: any): any {
                         )
                     }) ()}
                     </Box>
+                    <div className="row">
+                        <button
+                            onClick={() => handleNetworkSwitch("polygon")}
+                            className="mt-2 mb-2 btn btn-primary"
+                        >
+                            Switch to Polygon
+                        </button>
+                        <button
+                            onClick={() => handleNetworkSwitch("avalanche")}
+                            className="mt-2 mb-2 btn bg-warning"
+                        >
+                            Switch to Avalanche
+                        </button>
+                    </div>
                 </div>
                 <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
                     <ul>

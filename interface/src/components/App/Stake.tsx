@@ -34,14 +34,17 @@ const deb0xERC20Address = "0x47DD60FA40A050c0677dE19921Eb4cc512947729";
 
 export function Stake(props: any): any {
 
-    const { account, library } = useWeb3React()
+    const { account, library, activate } = useWeb3React()
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
     const date: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
     const now: any = Date.now()
     let endDate = date.getTime() - now;
-
+    const [deb0xViewsAddress, setDeb0xViewsAddress] = useState("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+    const [deb0xERC20Address, setDeb0xERC20Address] = useState("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+    
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
             // Render a complete state
@@ -59,6 +62,27 @@ export function Stake(props: any): any {
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
         const [loading, setLoading] = useState(false)
+
+
+    
+        async function getChainId() {
+            const currentChainId = await window.ethereum.request({
+                method: 'eth_chainId',
+            });
+            if(currentChainId === 137) {
+                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+            } else {
+                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+            }
+        }
+
+        useEffect(() => {
+            getChainId();
+        }, [])
 
         useEffect(() => {
             feesAccrued()
@@ -78,6 +102,8 @@ export function Stake(props: any): any {
         async function getTotalXenBurnedInPreviusCycle() {
             const signer = await library.getSigner(0)
             const deb0xContract = DBXen(signer, deb0xAddress)
+
+            console.log("XXXX", deb0xAddress)
 
             await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
                 if (currentCycle != 0) {
@@ -245,6 +271,27 @@ export function Stake(props: any): any {
 
     function CyclePanel() {
         const [currentReward, setCurrentReward] = useState("")
+
+    
+        async function getChainId() {
+            const currentChainId = await window.ethereum.request({
+                method: 'eth_chainId',
+            });
+            if(currentChainId === 137) {
+                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+            } else {
+                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+            }
+        }
+
+        useEffect(() => {
+            getChainId();
+        }, [])
+
         useEffect(() => {
             cycleReward()
         }, [currentReward]);
@@ -287,6 +334,26 @@ export function Stake(props: any): any {
         const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
         const [loading, setLoading] = useState(false)
+
+    
+        async function getChainId() {
+            const currentChainId = await window.ethereum.request({
+                method: 'eth_chainId',
+            });
+            if(currentChainId === 137) {
+                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+            } else {
+                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+            }
+        }
+
+        useEffect(() => {
+            getChainId();
+        }, [])
 
         useEffect(() => {
             rewardsAccrued()
@@ -480,6 +547,26 @@ export function Stake(props: any): any {
         const [amountToStake, setAmountToStake] = useState("")
         const [loading, setLoading] = useState(false)
         const [approved, setApproved] = useState<Boolean | null>(false)
+
+    
+        async function getChainId() {
+            const currentChainId = await window.ethereum.request({
+                method: 'eth_chainId',
+            });
+            if(currentChainId === 137) {
+                setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")
+                setDeb0xViewsAddress("0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E")
+                setDeb0xERC20Address("0x47DD60FA40A050c0677dE19921Eb4cc512947729")
+            } else {
+                setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+                setDeb0xViewsAddress("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")
+                setDeb0xERC20Address("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")
+            }
+        }
+
+        useEffect(() => {
+            getChainId();
+        }, [])
 
         const handleChange = (
             event: React.MouseEvent<HTMLElement>,

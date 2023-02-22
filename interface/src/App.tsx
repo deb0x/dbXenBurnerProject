@@ -126,16 +126,16 @@ function App() {
     useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
-                switchNetwork();               
+                // switchNetwork();               
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask")
-        }, [])
+    }, [])
 
     async function switchNetwork() {
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: "0x89"}],
+            params: [{ chainId: "0xA86A"}],
             }).then(
                 displayErrorMsg("You have switched to the right network")
             );            
@@ -145,7 +145,7 @@ function App() {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                        chainId: '0x89', 
+                        chainId: '0xA86A', 
                         chainName:'Polygon Network',
                         rpcUrls:['https://rpc-mainnet.maticvigil.com'],                   
                         blockExplorerUrls:['https://polygonscan.com/'],  
@@ -195,7 +195,8 @@ function App() {
                             
                             <Box className="main-container" sx={{marginTop: 12}}>
                             {dimensions.width > 768 ? 
-                                <Stake /> :
+                                <Stake />
+                                 :
                                 <>
                                     {selectedIndex === 0 && <Burn /> }
                                     {selectedIndex === 1 && <Stake /> }

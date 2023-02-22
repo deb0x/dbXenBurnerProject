@@ -28,7 +28,8 @@ export function Burn(): any {
     const [gasLimit, setCurrentGasLimit] = useState<number>();
     const [valueAndFee, setValueAndFee] = useState<any>();
     const [totalBatchApproved, setBatchApproved] = useState<number>();
-
+    const [deb0xAddress, setDeb0xAddress] = useState("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")
+    
     useEffect(() => {
         getAllowanceForAccount();
         estimationValues();
@@ -43,6 +44,19 @@ export function Burn(): any {
     useEffect(() => {
         setBalance()
     }, [account, balanceGratherThanZero]);
+
+    async function getChainId() {
+        const currentChainId = await window.ethereum.request({
+            method: 'eth_chainId',
+        });
+        currentChainId === 137 ?
+            setDeb0xAddress("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462") :
+            setDeb0xAddress("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A") 
+    }
+
+    useEffect(() => {
+        getChainId();
+    }, [])
 
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)

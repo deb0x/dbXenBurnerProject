@@ -76,22 +76,22 @@ export function PermanentDrawer(props: any): any {
                                 <div className="row">
                                     <span className="col-6">DBXen: </span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0x4F3ce26D9749C0f36012C9AbB41BF9938476c462">
-                                        {formatAccountName("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")}
+                                        href="https://polygonscan.com/address/0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A">
+                                        {formatAccountName("0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A")}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenERC20: </span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0x47DD60FA40A050c0677dE19921Eb4cc512947729">
-                                        {formatAccountName("0x47DD60FA40A050c0677dE19921Eb4cc512947729")}
+                                        href="https://polygonscan.com/address/0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b">
+                                        {formatAccountName("0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b")}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenViews:</span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0xcf7582e5fac8a6674ccd96ce71d807808ca8ba6e">
-                                        {formatAccountName("0xcf7582e5fac8a6674ccd96ce71d807808ca8ba6e")}
+                                        href="https://polygonscan.com/address/0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997">
+                                        {formatAccountName("0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997")}
                                     </a>
                                 </div>
                             </div>
