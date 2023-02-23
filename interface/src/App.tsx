@@ -132,7 +132,7 @@ function App() {
                  window.ethereum.request({
                     method: 'eth_chainId',
                   }).then((chainId:any) => {
-                    switchNetwork(chainId); 
+                 //   switchNetwork(chainId); 
                   })
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask");
