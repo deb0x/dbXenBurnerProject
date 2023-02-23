@@ -38,8 +38,6 @@ const ChainProvider = ( { children }: Props ) => {
         },
         []
     );
-
-    useEffect(() => { console.log(chain); }, [chain]);
     
     return (
       <ChainContext.Provider value={{chain, setChain}}>

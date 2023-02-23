@@ -1,5 +1,9 @@
+import Popper from '@mui/material/Popper';
 import { useContext, useEffect, useState } from "react";
 import ChainContext from "./ChainContext";
+import polygon from "../../photos/icons/polygon.svg";
+import avalanche from "../../photos/icons/avalanche.svg";
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
     polygon: {
@@ -28,7 +32,9 @@ const networks: any = {
 
 export default function ChainSetter(props: any) {
     const { chain, setChain } = useContext(ChainContext);
-
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [open, setOpen] = useState<any>(false);
+    const id = open ? 'simple-popper' : "";
 
     useEffect(() => {
         window.ethereum.on("chainChanged", networkChanged);
@@ -78,9 +84,8 @@ export default function ChainSetter(props: any) {
     
     const [error, setError] = useState<any>();
 
-    const handleNetworkSwitch = async (event: any) => {
+    const handleNetworkSwitch = async (networkName: any) => {
         setError("");
-        const networkName = event.target.value
         await changeNetwork({ networkName, setError }).then(() => {
             window.location.reload();
         });
@@ -90,10 +95,40 @@ export default function ChainSetter(props: any) {
        window.location.reload()
     };
 
+    const handleClick = (event: any) => {
+        const { currentTarget } = event;
+        setAnchorEl(currentTarget)
+        setOpen(!open)
+    };
+
+    const handleClickAway = () => {
+        setOpen(false)
+    };
+
+
     return (
-        <select onChange={handleNetworkSwitch} value={chain.chainName} className="chain-switcher">
-            <option className="polygon" value="polygon">Polygon</option>
-            <option className="avalanche" value="avalanche">Avalanche</option>
-        </select>
+        <ClickAwayListener onClickAway={handleClickAway}>
+            <div>
+                <button onClick={handleClick} className="chain-switcher">
+                    {chain.chainName.charAt(0).toUpperCase() + chain.chainName.slice(1)}
+                </button>
+                <Popper id={id} open={open} anchorEl={anchorEl} className="chain-popper">
+                    <button
+                        onClick={() => handleNetworkSwitch("polygon")}
+                        className="btn"
+                    >
+                        <img alt="polygon" src={polygon} className="polygon"/>
+                        Switch to Polygon
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("avalanche")}
+                        className="btn"
+                    >
+                        <img alt="avalanche" src={avalanche} className="avalanche"/>
+                        Switch to Avalanche
+                    </button>       
+                </Popper>
+            </div>
+        </ClickAwayListener>
     )
 }
