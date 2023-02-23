@@ -36,7 +36,7 @@ const ChainProvider = ( { children }: Props ) => {
                 }
             });
         },
-        []
+        [chain]
     );
     
     return (

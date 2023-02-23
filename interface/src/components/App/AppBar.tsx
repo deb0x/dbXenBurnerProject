@@ -204,7 +204,6 @@ export function AppBarComponent(props: any): any {
     };
 
     const handleClickAway = () => {
-        console.log("XXX")
         setOpen(false)
     };
 

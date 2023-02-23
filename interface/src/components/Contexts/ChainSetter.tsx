@@ -14,7 +14,7 @@ const networks: any = {
         symbol: "MATIC",
         decimals: 18
       },
-      rpcUrls: ["https://polygon-rpc.com/"],
+      rpcUrls: ["https://polygon.llamarpc.com"],
       blockExplorerUrls: ["https://polygonscan.com/"]
     },
     avalanche: {
