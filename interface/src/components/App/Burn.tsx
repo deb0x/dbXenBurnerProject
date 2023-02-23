@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import XENCrypto from '../../ethereum/XENCrypto';
 import DBXen from "../../ethereum/dbxen"
@@ -9,10 +9,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import axios, { Method } from 'axios';
 import web3 from 'web3';
+import ChainContext from '../Contexts/ChainContext';
 const { BigNumber } = require("ethers");
-
-const deb0xAddress = "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462";
-const xenCryptoAddress = "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e";
 
 export function Burn(): any {
     const context = useWeb3React()
@@ -28,11 +26,15 @@ export function Burn(): any {
     const [gasLimit, setCurrentGasLimit] = useState<number>();
     const [valueAndFee, setValueAndFee] = useState<any>();
     const [totalBatchApproved, setBatchApproved] = useState<number>();
+    const { chain }  = useContext(ChainContext)
 
     useEffect(() => {
         getAllowanceForAccount();
         estimationValues();
     }, [account]);
+
+    useEffect(() => {
+    }, [chain.deb0xAddress]);
 
     useEffect(() => {
         getAllowanceForAccount();
@@ -46,8 +48,8 @@ export function Burn(): any {
 
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress);
-        await xenContract.allowance(account, deb0xAddress).then((amount: any) =>{
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
+        await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) =>{
             let batchApproved = Number(ethers.utils.formatEther(amount)) / 2500000;
             setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
@@ -59,7 +61,7 @@ export function Burn(): any {
     async function setBalance() {
         setLoading(true);
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress);
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         let number;
 
         await xenContract.balanceOf(account).then((balance: any) => {
@@ -70,11 +72,15 @@ export function Burn(): any {
     }
 
     async function estimationValues() {
+        let priceURL = "";
+        (Number(chain.chainId)) === 137 ?
+            priceURL = "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3" :
+            priceURL = "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
 
         let method: Method = 'POST';
         const options = {
             method: method,
-            url: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3 ',
+            url: priceURL,
             port: 443,
             headers: {
                 'Content-Type': 'application/json'
@@ -85,7 +91,7 @@ export function Burn(): any {
         };
 
         const signer = library.getSigner(0)
-        const deb0xContract = DBXen(signer, deb0xAddress)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
@@ -93,11 +99,14 @@ export function Burn(): any {
                         let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                         let protocol_fee = value * (1 - 0.00005 * value);
                         let gasLimitVal = 0;
-
+                        (Number(chain.chainId)) === 137 ?
                         numberBatchesBurnedInCurrentCycle != 0 ?
                             gasLimitVal = (BigNumber.from("250000")) :
                             gasLimitVal = (BigNumber.from("400000"))
-
+                        :
+                        numberBatchesBurnedInCurrentCycle != 0 ?
+                        gasLimitVal = (BigNumber.from("400000")) :
+                        gasLimitVal = (BigNumber.from("600000"))
                         setCurrentGasLimit(gasLimitVal);
                         let fee = gasLimitVal * price * protocol_fee / 1000000000;
                         let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
@@ -114,7 +123,7 @@ export function Burn(): any {
     async function setApproval() {
         setLoading(true);
         const signer = library.getSigner(0)
-        const xenContract = XENCrypto(signer, xenCryptoAddress)
+        const xenContract = XENCrypto(signer, chain.xenCryptoAddress)
         let amountToApprove = 0;
             if(totalBatchApproved != undefined){
                 if(value > totalBatchApproved){
@@ -122,7 +131,7 @@ export function Burn(): any {
                 }
             }
         try {
-            const tx = await xenContract.increaseAllowance(deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
+            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
             tx.wait()
                 .then((result: any) => {
                     getAllowanceForAccount();
@@ -151,7 +160,7 @@ export function Burn(): any {
     async function burnXEN() {
         setLoading(true)
         const signer = await library.getSigner(0)
-        const deb0xContract = DBXen(signer, deb0xAddress)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
         let gasLimitIntervalValue = gasLimit
         let currentValue = valueAndFee.fee;
 
@@ -230,7 +239,7 @@ export function Burn(): any {
             <div className="side-menu--bottom burn-container">
                 <div className="row">
                     <p className="text-center mb-0">Choose the number of XEN batches you want to burn</p>
-                    <p className="text-center">(1 batch = 2 500 000 XEN)</p>
+                    <p className="text-center">(1 batch = 2,500,000 XEN)</p>
                 </div>
                 <div className="row">
                     <div className="col input-col">
@@ -248,11 +257,11 @@ export function Burn(): any {
                 <div className="values-container">
                     <div className="value-content">
                         <p>Protocol Fee:</p>
-                        <p> ~{maticValue} MATIC</p>
+                        <p> ~{maticValue} {chain.currency}</p>
                     </div>
                     <div className="value-content">
                         <p>Total transaction cost:</p>
-                        <p> ~{totalCost} MATIC</p>
+                        <p> ~{totalCost} {chain.currency}</p>
                     </div>
                     <div className="value-content">
                         <p>Total XEN burned:</p>

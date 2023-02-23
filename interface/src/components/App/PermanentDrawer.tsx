@@ -18,6 +18,8 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 import { Burn } from './Burn';
 import formatAccountName from '../Common/AccountName';
+import ChainContext from '../Contexts/ChainContext';
+import ChainSetter from '../Contexts/ChainSetter';
 
 declare global {
     interface Window {
@@ -32,6 +34,8 @@ export function PermanentDrawer(props: any): any {
     const dimensions = ScreenSize();
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
+    const { chain } = useContext(ChainContext);
+    const [baseUrl, setBaseUrl] = useState("");
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId =>
@@ -40,6 +44,12 @@ export function PermanentDrawer(props: any): any {
             setActivatingConnector(undefined)
         }
     }, [activatingConnector, connector])
+
+    useEffect(() => {
+        Number(chain.chainId) === 137 ?
+            setBaseUrl("https://polygonscan.com/address/") :
+            setBaseUrl("https://snowtrace.io/address/")
+    }, [])
 
     useEffect(() => {
         setTimeout(() => { setNotificationState({}) }, 2000)
@@ -76,22 +86,22 @@ export function PermanentDrawer(props: any): any {
                                 <div className="row">
                                     <span className="col-6">DBXen: </span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0x4F3ce26D9749C0f36012C9AbB41BF9938476c462">
-                                        {formatAccountName("0x4F3ce26D9749C0f36012C9AbB41BF9938476c462")}
+                                        href={baseUrl+chain.deb0xAddress}>
+                                        {formatAccountName(chain.deb0xAddress)}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenERC20: </span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0x47DD60FA40A050c0677dE19921Eb4cc512947729">
-                                        {formatAccountName("0x47DD60FA40A050c0677dE19921Eb4cc512947729")}
+                                        href={baseUrl+chain.deb0xERC20Address}>
+                                        {formatAccountName(chain.deb0xERC20Address)}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenViews:</span>
                                     <a className="col-6" target="_blank"
-                                        href="https://polygonscan.com/address/0xcf7582e5fac8a6674ccd96ce71d807808ca8ba6e">
-                                        {formatAccountName("0xcf7582e5fac8a6674ccd96ce71d807808ca8ba6e")}
+                                        href={baseUrl+chain.deb0xViewsAddress}>
+                                        {formatAccountName(chain.deb0xViewsAddress)}
                                     </a>
                                 </div>
                             </div>
