@@ -25,9 +25,9 @@ const ChainProvider = ( { children }: Props ) => {
                     })
                 } else {
                     setChain({
-                        deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
-                        deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
-                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                        deb0xAddress: "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD",
+                        deb0xViewsAddress: "0xf032f7FB8258728A1938473B2115BB163d5Da593",
+                        deb0xERC20Address: "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F",
                         xenCryptoAddress: "0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
                         chainId: parseInt(result, 16),
                         chainName: "avalanche",
