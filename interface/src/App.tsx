@@ -129,12 +129,17 @@ function App() {
     useEffect(() => {   
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
-                // switchNetwork();               
+                 window.ethereum.request({
+                    method: 'eth_chainId',
+                  }).then((chainId:any) => {
+                    switchNetwork(chainId); 
+                  })
             }).catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask");
     }, [])
 
-    async function switchNetwork() {
+    async function switchNetwork(chainId:any) {
+        if((parseInt(chainId.toString(), 16) !== 137) && (parseInt(chainId.toString(), 16) !== 43114)){
         try {
             await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
@@ -162,7 +167,7 @@ function App() {
                 displayErrorMsg("Cannot switch to the network");
             }
         }
-        
+    }
     }
 
     function displayErrorMsg(error: string) {
