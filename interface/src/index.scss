@@ -486,7 +486,8 @@ $randomNumber: random(4);
                 .main-container {
                     height: 75vh;
                     margin-top: 0;
-                    overflow-y: inherit;
+                    padding: 85px 0;
+                    margin: 10px 0;
                     .content-box {
                         height: auto;
                         border-radius: 25px;
