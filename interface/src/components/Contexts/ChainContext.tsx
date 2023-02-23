@@ -6,7 +6,9 @@ export const initialChain = {
         deb0xViewsAddress: "",
         deb0xERC20Address: "",
         xenCryptoAddress: "",
-        chainId: ""
+        chainId: "",
+        chainName: "",
+        currency: ""
     },
     setChain: (_value: any) => {}
 }

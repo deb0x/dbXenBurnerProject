@@ -254,11 +254,11 @@ export function Burn(): any {
                 <div className="values-container">
                     <div className="value-content">
                         <p>Protocol Fee:</p>
-                        <p> ~{maticValue} MATIC</p>
+                        <p> ~{maticValue} {chain.currency}</p>
                     </div>
                     <div className="value-content">
                         <p>Total transaction cost:</p>
-                        <p> ~{totalCost} MATIC</p>
+                        <p> ~{totalCost} {chain.currency}</p>
                     </div>
                     <div className="value-content">
                         <p>Total XEN burned:</p>

@@ -210,7 +210,7 @@ export function Stake(props: any): any {
                                 Your protocol fee share
                             </Typography>
                             <Typography >
-                                Your unclaimed MATIC fees:&nbsp;
+                                Your unclaimed {chain.currency} fees:&nbsp;
                                 <strong>
                                     {Number(feesUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,

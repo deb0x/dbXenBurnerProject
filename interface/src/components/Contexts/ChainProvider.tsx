@@ -19,7 +19,9 @@ const ChainProvider = ( { children }: Props ) => {
                         deb0xViewsAddress: "0xCF7582E5FaC8a6674CcD96ce71D807808Ca8ba6E",
                         deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                         xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                        chainId: parseInt(result, 16)
+                        chainId: parseInt(result, 16),
+                        chainName: "polygon",
+                        currency: "MATIC"
                     })
                 } else {
                     setChain({
@@ -27,7 +29,9 @@ const ChainProvider = ( { children }: Props ) => {
                         deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
                         deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
                         xenCryptoAddress: "0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
-                        chainId: parseInt(result, 16)
+                        chainId: parseInt(result, 16),
+                        chainName: "avalanche",
+                        currency: "AVAX"
                     })
                 }
             });

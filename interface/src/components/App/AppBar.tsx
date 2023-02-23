@@ -226,6 +226,7 @@ export function AppBarComponent(props: any): any {
                     </Box>
                     <Box className="main-menu--right">
                     
+                    <ChainSetter />
                     { (() =>  {
                         const currentConnector = connectorsByName[ConnectorNames.Injected]
                         const activating = currentConnector === activatingConnector
@@ -262,7 +263,6 @@ export function AppBarComponent(props: any): any {
                         )
                     }) ()}
                     </Box>
-                    <ChainSetter />
                 </div>
                 <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
                     <ul>
