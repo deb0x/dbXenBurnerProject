@@ -1,7 +1,5 @@
 @import './componentsStyling/theme.scss';
-
 $randomNumber: random(4);
-
 @font-face {
     font-family: 'Karla';
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
@@ -26,6 +24,7 @@ $randomNumber: random(4);
         background-image: url('./photos/backgrounds/Fundal 4 – 1.png');
     }
 }
+
 .app-container {
     height: 100%;
     border-radius: 100px;
@@ -108,23 +107,19 @@ $randomNumber: random(4);
         .d-none {
             display: none;
         }
-
         .maintenance-mode {
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
             align-content: center;
-
             .maintenance-img {
                 max-height: 250px;
                 width: auto;
             }
-
             h1 {
                 color: t('text');
             }
-
             h4 {
                 font-weight: normal;
                 margin-top: 30px;
@@ -135,7 +130,6 @@ $randomNumber: random(4);
         .editor span {
             color: t('text') !important;
         }
-
         .navigation-mobile,
         .connect-mobile {
             display: none;
@@ -186,6 +180,9 @@ $randomNumber: random(4);
                         width: 235px;
                         height: 50px;
                         font-weight: 800;
+                        .unsupported {
+                            font-size: 12px;
+                        }
                     }
                 }
             }
@@ -210,7 +207,6 @@ $randomNumber: random(4);
                 }
             }
         }
-
         .show-popup {
             font-size: 27px;
             margin-top: -5px;
@@ -221,7 +217,6 @@ $randomNumber: random(4);
             text-decoration: underline;
             background: transparent;
         }
-
         @media (max-width: 768px) {
             // .main-container {
             //     overflow-y: inherit;
@@ -246,7 +241,6 @@ $randomNumber: random(4);
     }
 }
 
-
 .chain-popper {
     z-index: 1203;
     width: 250px;
@@ -265,7 +259,7 @@ $randomNumber: random(4);
         &:hover {
             color: #fff;
         }
-        img{
+        img {
             max-width: 25px;
             margin-right: 10px;
         }
@@ -286,7 +280,6 @@ $randomNumber: random(4);
         border-radius: 100px;
         box-shadow: 0px 3px 25px #0F0B1380;
         border: 1px solid #2B2235;
-
         .close-popup {
             background: #2B2235;
             color: #fff;
@@ -310,18 +303,19 @@ $randomNumber: random(4);
             }
         }
         .for-label {
-            color:#F2E9DC
+            color: #F2E9DC
         }
         .inputs {
             color: #F2E9DC;
-            background:#1F1826 0% 0% no-repeat padding-box;
+            background: #1F1826 0% 0% no-repeat padding-box;
             border: #1F1826;
             &:focus {
                 background: #1F1826 0% 0% no-repeat padding-box;
                 border: #1F1826;
             }
         }
-        h3, h4 {
+        h3,
+        h4 {
             color: #fff;
         }
     }
@@ -331,7 +325,6 @@ $randomNumber: random(4);
         background-color: #FFEEE8;
         box-shadow: 0px 3px 25px #0F0B1380;
         position: relative;
-
         .add-contact-text {
             color: #2B2235;
         }
@@ -378,7 +371,7 @@ $randomNumber: random(4);
         }
         .add-button {
             width: 150px;
-            background-color:#F5B700;
+            background-color: #F5B700;
             border-radius: 33px;
             padding: 10px auto;
             transition: 0.5s;
@@ -407,7 +400,6 @@ $randomNumber: random(4);
     align-items: flex-start;
     flex-direction: column;
     position: relative;
-
     .close-popup {
         position: absolute;
         top: -20px;
@@ -420,49 +412,40 @@ $randomNumber: random(4);
         color: #333;
         text-align: center;
     }
-
     ul {
         list-style-type: none;
         padding: 0;
         flex-direction: row;
         display: flex;
-
         li {
             display: flex;
             flex-direction: column;
             width: 33%;
             padding: 0 1%;
-
             p {
                 color: #280E44;
                 font-size: 24px;
                 font-weight: bold;
             }
-
             span {
                 color: #CE4760;
             }
-
             img {
                 max-width: 45px;
                 margin-bottom: 15px;
             }
         }
-
         a {
-            text-decoration : none;
+            text-decoration: none;
         }
     }
-
     h3 img {
         max-height: 30px;
         vertical-align: baseline;
     }
-
     h4 {
         font-size: 20px;
     }
-
     h4 img {
         max-height: 30px;
         vertical-align: baseline;
@@ -472,11 +455,9 @@ $randomNumber: random(4);
 .initial-page-popup {
     .modal-box {
         width: 90%;
-
         .how-to-use-list {
             align-items: center;
             justify-content: center;
-
             ul {
                 margin: 50px 0;
                 a {
@@ -514,7 +495,6 @@ $randomNumber: random(4);
                         border-radius: 25px;
                         margin: 0;
                         border-radius: 25px;
-
                     }
                     ul.MuiList-root {
                         height: 63vh;
@@ -550,7 +530,7 @@ $randomNumber: random(4);
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        &.active{
+                        &.active {
                             color: #19D2D2;
                         }
                     }
@@ -586,6 +566,11 @@ $randomNumber: random(4);
                             height: 50px;
                             font-weight: 400;
                             font-size: 2.5vh;
+                            .unsupported {
+                                font-size: 12px;
+                                color: #2B2235;
+                                line-height: 1;
+                            }
                         }
                     }
                 }
@@ -621,10 +606,8 @@ $randomNumber: random(4);
                 align-items: flex-start !important;
                 justify-content: flex-start !important;
             }
-
             ul {
                 flex-direction: column;
-
                 li {
                     width: 100%;
                     margin-bottom: 30px;
@@ -641,14 +624,14 @@ $randomNumber: random(4);
     width: 5px;
     height: 5px;
 }
-  
+
 ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px rgb(204, 204, 204); 
+    box-shadow: inset 0 0 5px rgb(204, 204, 204);
     border-radius: 10px;
 }
-   
+
 ::-webkit-scrollbar-thumb {
-    background: rgb(204, 204, 204); 
+    background: rgb(204, 204, 204);
     border-radius: 10px;
 }
 
@@ -660,7 +643,7 @@ $randomNumber: random(4);
 
 @media only screen and (min-width: 1050px) {
     .theme {
-        zoom: .9;        
+        zoom: .9;
     }
 }
 

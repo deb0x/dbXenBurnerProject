@@ -257,10 +257,10 @@ function App() {
                                                         <Spinner color={'black'} /> :
                                                         !connected ? 
                                                             "Connect" :
-                                                            <span>
+                                                            <span className="unsupported">
                                                                 {typeof window.ethereum === 'undefined' ? 
                                                                     `Check your prerequisites` : 
-                                                                    account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                                    account === undefined ? `Switch to POLYGON/AVALANCHE` : ''}
                                                             </span>
                                                     }
                                                 </Button>
@@ -297,10 +297,10 @@ function App() {
                                                         <Spinner color={'black'} /> :
                                                         !connected ? 
                                                             "Connect" :
-                                                            <span>
+                                                            <span className='unsupported'>
                                                                 {typeof window.ethereum === 'undefined' ? 
                                                                     `Check your prerequisites` : 
-                                                                    account === undefined ? `Unsupported Network. Switch to ${networkName}` : ''}
+                                                                    account === undefined ? `Switch to POLYGON/AVALANCHE` : ''}
                                                             </span>
                                                     }
                                                 </Button>
