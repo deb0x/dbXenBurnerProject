@@ -30,6 +30,14 @@ $randomNumber: random(4);
     height: 100%;
     border-radius: 100px;
     box-shadow: 0px 3px 25px #0f0b1382;
+    .chain-switcher {
+        font-family: "Karla";
+        padding: 5px 25px;
+        border-radius: 25px;
+        background-color: #030328;
+        color: #F2E9DC;
+        border: 1px solid #19D2D2;
+    }
     .main-row,
     .side-menu-container {
         height: 100%;
@@ -238,6 +246,31 @@ $randomNumber: random(4);
     }
 }
 
+
+.chain-popper {
+    z-index: 1203;
+    width: 250px;
+    padding: 15px;
+    margin-top: 15px !important;
+    border-radius: 25px;
+    background-color: #051645;
+    box-shadow: 0px 3px 15px #0f0b1373;
+    button {
+        color: #fff;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        font-family: 'Karla';
+        &:hover {
+            color: #fff;
+        }
+        img{
+            max-width: 25px;
+            margin-right: 10px;
+        }
+    }
+}
 
 .modal-box {
     height: 470px;
@@ -509,6 +542,7 @@ $randomNumber: random(4);
                     height: 10vh;
                     font-size: 3vh;
                     background-color: #051645;
+                    z-index: 999;
                     .navigation-item {
                         width: 100%;
                         text-align: center;
