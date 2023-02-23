@@ -1,20 +1,21 @@
 {
   "files": {
-    "main.css": "/static/css/main.3ef27922.chunk.css",
-    "main.js": "/static/js/main.f3f9adfd.chunk.js",
-    "main.js.map": "/static/js/main.f3f9adfd.chunk.js.map",
+    "main.css": "/static/css/main.6a9325c3.chunk.css",
+    "main.js": "/static/js/main.88e22115.chunk.js",
+    "main.js.map": "/static/js/main.88e22115.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.29f1d258.js",
     "runtime-main.js.map": "/static/js/runtime-main.29f1d258.js.map",
     "static/css/2.b8e408b6.chunk.css": "/static/css/2.b8e408b6.chunk.css",
-    "static/js/2.24be0dcf.chunk.js": "/static/js/2.24be0dcf.chunk.js",
-    "static/js/2.24be0dcf.chunk.js.map": "/static/js/2.24be0dcf.chunk.js.map",
+    "static/js/2.94993695.chunk.js": "/static/js/2.94993695.chunk.js",
+    "static/js/2.94993695.chunk.js.map": "/static/js/2.94993695.chunk.js.map",
     "static/js/3.b0f08aa9.chunk.js": "/static/js/3.b0f08aa9.chunk.js",
     "static/js/3.b0f08aa9.chunk.js.map": "/static/js/3.b0f08aa9.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.b8e408b6.chunk.css.map": "/static/css/2.b8e408b6.chunk.css.map",
-    "static/css/main.3ef27922.chunk.css.map": "/static/css/main.3ef27922.chunk.css.map",
-    "static/js/2.24be0dcf.chunk.js.LICENSE.txt": "/static/js/2.24be0dcf.chunk.js.LICENSE.txt",
+    "static/css/main.6a9325c3.chunk.css.map": "/static/css/main.6a9325c3.chunk.css.map",
+    "static/js/2.94993695.chunk.js.LICENSE.txt": "/static/js/2.94993695.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/Karla-Regular.6d937d4f.ttf",
+    "static/media/avalanche.234db155.svg": "/static/media/avalanche.234db155.svg",
     "static/media/coin-bag-solid--dark.b9b74873.svg": "/static/media/coin-bag-solid--dark.b9b74873.svg",
     "static/media/coin-bag-solid--light.d9344235.svg": "/static/media/coin-bag-solid--light.d9344235.svg",
     "static/media/copy-1.6be37e8f.svg": "/static/media/copy-1.6be37e8f.svg",
@@ -25,6 +26,7 @@
     "static/media/fees.50cb4df6.svg": "/static/media/fees.50cb4df6.svg",
     "static/media/file-icon.92106822.svg": "/static/media/file-icon.92106822.svg",
     "static/media/finance.d8ebf4c0.svg": "/static/media/finance.d8ebf4c0.svg",
+    "static/media/polygon.c13e4066.svg": "/static/media/polygon.c13e4066.svg",
     "static/media/token.0bd78e9a.svg": "/static/media/token.0bd78e9a.svg",
     "static/media/wallet--dark.307c5384.svg": "/static/media/wallet--dark.307c5384.svg",
     "static/media/wallet--light.60fbc32b.svg": "/static/media/wallet--light.60fbc32b.svg",
@@ -34,8 +36,8 @@
   "entrypoints": [
     "static/js/runtime-main.29f1d258.js",
     "static/css/2.b8e408b6.chunk.css",
-    "static/js/2.24be0dcf.chunk.js",
-    "static/css/main.3ef27922.chunk.css",
-    "static/js/main.f3f9adfd.chunk.js"
+    "static/js/2.94993695.chunk.js",
+    "static/css/main.6a9325c3.chunk.css",
+    "static/js/main.88e22115.chunk.js"
   ]
 }
