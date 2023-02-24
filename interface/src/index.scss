@@ -473,7 +473,7 @@ $randomNumber: random(4);
             min-height: 100vh;
             padding: 25px 10px;
             .app-container {
-                height: 94vh;
+                height: 85vh;
                 border-radius: 25px;
                 header {
                     background-color: transparent;
@@ -484,10 +484,8 @@ $randomNumber: random(4);
                     height: auto;
                 }
                 .main-container {
-                    height: 75vh;
                     margin-top: 0;
-                    padding: 85px 0;
-                    margin: 10px 0;
+                    overflow-y: inherit;
                     .content-box {
                         height: auto;
                         border-radius: 25px;
