@@ -101,12 +101,12 @@ export function Burn(): any {
                         let gasLimitVal = 0;
                         (Number(chain.chainId)) === 137 ?
                         numberBatchesBurnedInCurrentCycle != 0 ?
-                            gasLimitVal = (BigNumber.from("250000")) :
-                            gasLimitVal = (BigNumber.from("400000"))
+                            gasLimitVal = (BigNumber.from("350000")) :
+                            gasLimitVal = (BigNumber.from("500000"))
                         :
                         numberBatchesBurnedInCurrentCycle != 0 ?
-                        gasLimitVal = (BigNumber.from("400000")) :
-                        gasLimitVal = (BigNumber.from("600000"))
+                        gasLimitVal = (BigNumber.from("500000")) :
+                        gasLimitVal = (BigNumber.from("700000"))
                         setCurrentGasLimit(gasLimitVal);
                         let fee = gasLimitVal * price * protocol_fee / 1000000000;
                         let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
