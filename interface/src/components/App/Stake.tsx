@@ -37,10 +37,12 @@ export function Stake(props: any): any {
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
-    const date: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
+    const datePolygon: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
+    const dateAvalance: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
     const now: any = Date.now()
-    let endDate = date.getTime() - now;
-    
+    let endDatePolygon = datePolygon.getTime() - now;
+    let endDateAvalance = dateAvalance.getTime() - now;
+
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
             // Render a complete state
@@ -219,7 +221,11 @@ export function Stake(props: any): any {
                                 </strong>
                             </Typography>
                             <p className='my-2 counter'>
-                                Get next fees in <Countdown date={Date.now() + endDate} renderer={renderer} />
+                                Get next fees in 
+                                {chain.chainName === "polygon" ?
+                                    <Countdown date={Date.now() + endDatePolygon} renderer={renderer} /> :
+                                    <Countdown date={Date.now() + endDateAvalance} renderer={renderer} />
+                                }
                             </p>
                         </div>
                         <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
@@ -473,7 +479,11 @@ export function Stake(props: any): any {
                                 </strong>
                             </Typography>
                             <p className='my-2 counter'>
-                                Get next rewards in <Countdown date={Date.now() + endDate} renderer={renderer} />
+                                Get next rewards in 
+                                {chain.chainName === "polygon" ?
+                                    <Countdown date={Date.now() + endDatePolygon} renderer={renderer} /> :
+                                    <Countdown date={Date.now() + endDateAvalance} renderer={renderer} />
+                                }
                             </p>
                         </div>
                         <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
