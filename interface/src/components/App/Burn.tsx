@@ -17,7 +17,7 @@ export function Burn(): any {
     const { library, account } = context
     const [notificationState, setNotificationState] = useState({});
     const [value, setValue] = useState(1);
-    const [approveBrun, setApproveBurn] = useState<boolean>(false);
+    const [approveBurn, setApproveBurn] = useState<boolean>(false);
     const [balanceGratherThanZero, checkBalance] = useState("");
     const [maticValue, setMaticValue] = useState<any>();
     const [totalCost, setTotalCost] = useState<any>();
@@ -26,6 +26,7 @@ export function Burn(): any {
     const [gasLimit, setCurrentGasLimit] = useState<number>();
     const [valueAndFee, setValueAndFee] = useState<any>();
     const [totalBatchApproved, setBatchApproved] = useState<number>();
+    const [maxAvailableBatch, setMaxBatch] = useState<number>(0);
     const { chain }  = useContext(ChainContext)
 
     useEffect(() => {
@@ -40,6 +41,7 @@ export function Burn(): any {
         getAllowanceForAccount();
         setXENAmount(value * 2500000);
         estimationValues();
+        setBalance();
     }, [value]);
 
     useEffect(() => {
@@ -55,7 +57,9 @@ export function Burn(): any {
             Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
                 setApproveBurn(false) :
                 setApproveBurn(true)
+                setBalance();
             })
+   
     }
 
     async function setBalance() {
@@ -66,6 +70,7 @@ export function Burn(): any {
 
         await xenContract.balanceOf(account).then((balance: any) => {
             number = ethers.utils.formatEther(balance);
+            setMaxBatch(Math.trunc(Number(number)/2500000))
             checkBalance(number.toString())
             setLoading(false);
         })
@@ -163,7 +168,7 @@ export function Burn(): any {
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
         let gasLimitIntervalValue = gasLimit
         let currentValue = valueAndFee.fee;
-
+  
         try {
             const overrides =
             {
@@ -272,7 +277,13 @@ export function Burn(): any {
                             })} XEN</p>
                     </div>
                 </div>
-                {approveBrun ?
+                {approveBurn ?
+                maxAvailableBatch < value ?
+                    <LoadingButton className="burn-btn"
+                    loadingPosition="end"
+                    disabled={true}>
+                    {loading ? <Spinner color={'black'} /> : "Insufficient XEN balance"}
+                </LoadingButton> :
                     <LoadingButton className="burn-btn"
                         loadingPosition="end"
                         onClick={() => burnXEN()} >
