@@ -21,9 +21,11 @@ const ChainProvider = ( { children }: Props ) => {
                         xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
                         chainId: parseInt(result, 16),
                         chainName: "polygon",
-                        currency: "MATIC"
+                        currency: "MATIC",
+                        priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
                     })
                 } else {
+                    if(parseInt(result, 16) === 43114){
                     setChain({
                         deb0xAddress: "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD",
                         deb0xViewsAddress: "0x67873aDDc934C6A1C4b2Bd6d2e08D4431d1181fD",
@@ -31,8 +33,21 @@ const ChainProvider = ( { children }: Props ) => {
                         xenCryptoAddress: "0xC0C5AA69Dbe4d6DDdfBc89c0957686ec60F24389",
                         chainId: parseInt(result, 16),
                         chainName: "avalanche",
-                        currency: "AVAX"
+                        currency: "AVAX",
+                        priceURL: "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
                     })
+                } else{
+                    setChain({
+                        deb0xAddress: "0x4F70AFdbB1Fe1372D06E68cF08C5770175956446",
+                        deb0xViewsAddress: "0x659Af0089d91beB78483a3A4732c32FCEb434E01",
+                        deb0xERC20Address: "0xE774b90b744Dd7F407cefb0e5525EeE48Fb21b24",
+                        xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                        chainId: parseInt(result, 16),
+                        chainName: "binance",
+                        currency: "BNB",
+                        priceURL: "https://bsc-mainnet.blastapi.io/a8f2c3c6-f724-466f-9c19-3e3a69536a5e"
+                    })
+                }
                 }
             });
         },

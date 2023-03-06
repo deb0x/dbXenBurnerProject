@@ -65,6 +65,7 @@ export function Burn(): any {
     async function setBalance() {
         setLoading(true);
         const signer = library.getSigner(0)
+        console.log(chain.xenCryptoAddress)
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         let number;
 
@@ -77,11 +78,8 @@ export function Burn(): any {
     }
 
     async function estimationValues() {
-        let priceURL = "";
-        (Number(chain.chainId)) === 137 ?
-            priceURL = "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3" :
-            priceURL = "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
-
+        let priceURL = chain.priceURL;
+   
         let method: Method = 'POST';
         const options = {
             method: method,
