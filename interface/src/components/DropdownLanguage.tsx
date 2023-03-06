@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const DropdownLanguage = () => {
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation();
     const [language, setLanguage] = useState(JSON.parse(localStorage.getItem('language') || "null" ));
 
     useEffect(() => {
@@ -17,8 +17,8 @@ const DropdownLanguage = () => {
 
     return (
         <select onChange={handleLangChange} value={language} className="language-switcher">
-            <option value="en">English</option>
-            <option value="zh">Chinese</option>
+            <option value="en">{t("app_bar.language.english")}</option>
+            <option value="zh">{t("app_bar.language.chinese")}</option>
         </select>
     );
 };
