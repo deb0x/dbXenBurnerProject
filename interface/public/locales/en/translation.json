@@ -26,7 +26,16 @@
         "wallet": "In wallet",
         "wallet_id": "Copy wallet ID",
         "add_token": "Add token to wallet",
-        "disconnect": "Disconnect wallet"
+        "disconnect": "Disconnect wallet",
+        "toastify": {
+            "token_added": "The token was added in your wallet",
+            "error": "There was an error. Try again later",
+            "address_copied": "The address ID was copied successfully"
+        },
+        "language": {
+            "english": "English",
+            "chinese": "Chinese"
+        }
     },
     "fees": {
         "title": "Your protocol fee share",
