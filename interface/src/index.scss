@@ -258,7 +258,8 @@ $randomNumber: random(4);
     }
 }
 
-.chain-popper {
+.chain-popper,
+.language-popper {
     z-index: 1203;
     width: 250px;
     padding: 15px;
@@ -279,6 +280,18 @@ $randomNumber: random(4);
         img {
             max-width: 25px;
             margin-right: 10px;
+        }
+    }
+}
+
+.language-popper {
+    width: 150px;
+    button {
+        justify-content: center;
+        border-bottom: 1px solid #19D2D2;
+        border-radius: 0%;
+        &:last-child {
+            border-bottom: 0;
         }
     }
 }

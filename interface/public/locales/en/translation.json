@@ -43,8 +43,8 @@
             "address_copied": "The address ID was copied successfully"
         },
         "language": {
-            "english": "EN",
-            "chinese": "CN"
+            "en": "EN",
+            "zh": "CN"
         }
     },
     "fees": {

@@ -43,8 +43,8 @@
             "address_copied": "已成功复制钱包ID"
         },
         "language": {
-            "english": "英语",
-            "chinese": "中文"
+            "en": "英语",
+            "zh": "中文"
         }
     },
     "fees": {
