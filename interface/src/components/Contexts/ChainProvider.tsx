@@ -45,7 +45,7 @@ const ChainProvider = ( { children }: Props ) => {
                         chainId: parseInt(result, 16),
                         chainName: "binance",
                         currency: "BNB",
-                        priceURL: "https://bsc-mainnet.blastapi.io/a8f2c3c6-f724-466f-9c19-3e3a69536a5e"
+                        priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/6aa7b16846912259970ec647"
                     })
                 }
                 }

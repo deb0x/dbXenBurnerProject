@@ -65,7 +65,6 @@ export function Burn(): any {
     async function setBalance() {
         setLoading(true);
         const signer = library.getSigner(0)
-        console.log(chain.xenCryptoAddress)
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         let number;
 
@@ -79,7 +78,6 @@ export function Burn(): any {
 
     async function estimationValues() {
         let priceURL = chain.priceURL;
-   
         let method: Method = 'POST';
         const options = {
             method: method,
