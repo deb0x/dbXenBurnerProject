@@ -111,7 +111,7 @@ contract DBXenViews {
             );
         }
 
-        uint256 currentRewards = getUnclaimedRewards(account);
+        uint256 currentRewards = getUnclaimedRewards(account) + dbxen.accWithdrawableStake(account);
 
         if (
             calculatedCycle > lastStartedCycleTemp &&

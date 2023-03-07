@@ -21,6 +21,8 @@ import { AppBarComponent } from './components/App/AppBar';
 import { Burn } from './components/App/Burn';
 import ScreenSize from './components/Common/ScreenSize';
 import Countdown, { zeroPad } from "react-countdown";
+import { useTranslation } from 'react-i18next';
+import DropdownLanguage from './components/DropdownLanguage';
 import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
 
@@ -106,6 +108,7 @@ function App() {
     const [networkName, setNetworkName] = useState<any>();
     let errorMsg;
     const dimensions = ScreenSize();
+    const { t } = useTranslation();
     const { chain, setChain }  = useContext(ChainContext)
     
     useEffect(() => {
@@ -217,23 +220,24 @@ function App() {
                     <div className="navigation-mobile">
                         <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(0)}>
-                                Mint
+                                {t("mobile.mint")}
                         </div>
                         <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(1)}>
-                                Fees
+                                {t("mobile.fees")}
                         </div>
                     </div>
                 </div> :
                 <div className="app-container p-0 ">
                     <div className="initial-page">
+                    <DropdownLanguage />
                         <div className="row">
                             <div className="col-lg-7 img-container mr-4">
                                 <img className="image--left" src={elephant} alt="elephant" />
                                 <div className="img-content">
-                                    <p>Connect your wallet</p>
-                                    <p>Burn $XEN</p>
-                                    <p>Earn crypto</p>
+                                    <p>{t("home.connect_text")}</p>
+                                    <p>{t("home.burn_text")}</p>
+                                    <p>{t("home.earn_text")}</p>
                                     
                                     <div>
                                         { (() =>  {
@@ -281,39 +285,39 @@ function App() {
                                             const activating = currentConnector === activatingConnector
                                             const connected = currentConnector === connector
 
-                                            return (
-                                                <Button variant="contained"
-                                                    key={ConnectorNames.Injected}
-                                                    // aria-describedby={id}
-                                                    onClick={!connected ? 
-                                                        () => {
-                                                            setActivatingConnector(currentConnector)
-                                                            activate(currentConnector)
-                                                        } : 
-                                                        handleClick}
-                                                        className="connect-button">
-                                                    
-                                                    { activating ? 
-                                                        <Spinner color={'black'} /> :
-                                                        !connected ? 
-                                                            "Connect" :
-                                                            <span className='unsupported'>
-                                                                {typeof window.ethereum === 'undefined' ? 
-                                                                    `Check your prerequisites` : 
-                                                                    account === undefined ? `Switch to POLYGON/AVALANCHE` : ''}
-                                                            </span>
-                                                    }
-                                                </Button>
-                                            )
-                                        }) ()}
-                                    </div>
+                                        return (
+                                            <Button variant="contained"
+                                                key={ConnectorNames.Injected}
+                                                // aria-describedby={id}
+                                                onClick={!connected ? 
+                                                    () => {
+                                                        setActivatingConnector(currentConnector)
+                                                        activate(currentConnector)
+                                                    } : 
+                                                    handleClick}
+                                                    className="connect-button">
+                                                
+                                                { activating ? 
+                                                    <Spinner color={'black'} /> :
+                                                    !connected ? 
+                                                        t("home.connect") :
+                                                        <span>
+                                                            {typeof window.ethereum === 'undefined' ? 
+                                                                t("home.prerequisites") : 
+                                                                account === undefined ? t("home.unsupported_network") + ` ${networkName}` : ''}
+                                                        </span>
+                                                }
+                                            </Button>
+                                        )
+                                    }) ()}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            }
-            </ThemeProvider>
+            </div>
+        }
+        </ThemeProvider>
     </ChainProvider>
   )
 }
