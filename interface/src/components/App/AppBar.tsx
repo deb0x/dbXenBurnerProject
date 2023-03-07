@@ -16,8 +16,9 @@ import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
-import DropdownLanguage from '../DropdownLanguage';
 import "i18next";
+import { useTranslation } from 'react-i18next';
+import DropdownLanguage from '../DropdownLanguage';
 import ChainProvider from '../Contexts/ChainProvider';
 import ChainSetter from '../Contexts/ChainSetter';
 import ChainContext from '../Contexts/ChainContext';
@@ -48,6 +49,7 @@ export function AppBarComponent(props: any): any {
     const deb0xViewsContract = DBXenViews(library, chain.deb0xViewsAddress)
     const [totalStaked, setTotalStaked] = useState("")
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
+    const { t } = useTranslation();
 
     const id = open ? 'simple-popper' : "";
 
@@ -156,7 +158,7 @@ export function AppBarComponent(props: any): any {
 
             if (wasAdded) {
                 setNotificationState({
-                    message: "The token was added in your wallet",
+                    message: t("app_bar.toastify.token_added"),
                     open: true,
                     severity: "success"
                 })      
@@ -164,7 +166,7 @@ export function AppBarComponent(props: any): any {
             }
             } catch (error: any) {
                 setNotificationState({
-                    message: "There was an error. Try again later",
+                    message: t("app_bar.toastify.error"),
                     open: true,
                     severity: "info"
                 })
@@ -175,7 +177,7 @@ export function AppBarComponent(props: any): any {
         if(account) {
             navigator.clipboard.writeText(account)
             setNotificationState({
-                message: "The address ID was copied successfully",
+                message: t("app_bar.toastify.address_copied"),
                 open: true,
                 severity: "success"
             })
@@ -215,19 +217,20 @@ export function AppBarComponent(props: any): any {
                 <div className="app-bar--top">
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
-                        <p className="mb-0">Total tokens staked:&nbsp; 
+                        <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
                             {Number(totalStaked).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             })} DXN</p>
                         <p className="mb-0">
-                            Total XEN burned: {totalXENBurned}
+                            {t("app_bar.xen_burned")}: {totalXENBurned}
                         </p>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        <ChainSetter />
+                    <DropdownLanguage />
+                    <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
-                            <div><DropdownLanguage />
+                            <div>
                                 { (() =>  {
                                     const currentConnector = connectorsByName[ConnectorNames.Injected]
                                     const activating = currentConnector === activatingConnector
@@ -248,10 +251,10 @@ export function AppBarComponent(props: any): any {
                                             { activating ? 
                                                 <Spinner color={'black'} /> :
                                                 !connected ? 
-                                                    "Connect Wallet" :
+                                                    t("home.connect_text") :
                                                     <span>
                                                         {account === undefined ? 
-                                                            `Unsupported Network. Switch to ${networkName}` : 
+                                                            t("home.unsupported_network") + ` ${networkName}` : 
                                                             account ? 
                                                                 ensName === "" ? 
                                                                     `${formatAccountName(account)}` :
@@ -266,7 +269,7 @@ export function AppBarComponent(props: any): any {
                                 <Popper className={`popper ${theme === "classic" ? "classic" : "dark"}` } id={id} open={open} anchorEl={anchorEl}>
                                     <ul>
                                         <li>
-                                            Unclaimed rewards: <br/> 
+                                            {t("app_bar.rewards")}: <br/> 
                                             {Number(rewardsUnclaimed).toLocaleString('en-US', {
                                                 minimumFractionDigits: 2,
                                                 maximumFractionDigits: 2
@@ -274,7 +277,7 @@ export function AppBarComponent(props: any): any {
                                             <span>DXN</span>
                                         </li>
                                         <li>
-                                            Active stake: <br/>
+                                            {t("app_bar.stake")}: <br/>
                                             {Number(userStakedAmount).toLocaleString('en-US', {
                                                 minimumFractionDigits: 2,
                                                 maximumFractionDigits: 2
@@ -282,7 +285,7 @@ export function AppBarComponent(props: any): any {
                                             <span>DXN</span>
                                         </li>
                                         <li>
-                                            In wallet: <br/> 
+                                            {t("app_bar.wallet")}: <br/> 
                                             {Number(userUnstakedAmount).toLocaleString('en-US', {
                                                 minimumFractionDigits: 2,
                                                 maximumFractionDigits: 2
@@ -295,14 +298,14 @@ export function AppBarComponent(props: any): any {
                                             copyWalletID()
                                         }}
                                         className="copy-wallet-btn">
-                                        <span><img src={copyIcon} alt="copy" /></span>Copy wallet ID
+                                        <span><img src={copyIcon} alt="copy" /></span>{t("app_bar.wallet_id")}
                                     </Button>
                                     <Button
                                         onClick={(event: any) => {
                                             addToken()
                                         }}
                                         className="add-token-btn">
-                                        <span><img src={walletIcon} alt="wallet"/></span>Add token to wallet
+                                        <span><img src={walletIcon} alt="wallet"/></span>{t("app_bar.add_token")}
                                     </Button>
                                     <Button 
                                         onClick={(event: any) => {
@@ -310,7 +313,7 @@ export function AppBarComponent(props: any): any {
                                             deactivate()
                                         }}
                                             className="logout-btn">
-                                            <span><img src={disconnectIcon} alt="disconnect"/></span>Disconnect wallet
+                                            <span><img src={disconnectIcon} alt="disconnect"/></span>{t("app_bar.disconnect")}
                                     </Button>  
                                 </Popper>
                             </div>
