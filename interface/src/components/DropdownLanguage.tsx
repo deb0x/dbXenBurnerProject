@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 const DropdownLanguage = () => {
     const { i18n, t } = useTranslation();
-    const [language, setLanguage] = useState(JSON.parse(localStorage.getItem('language') || "en" ));
+    const [language, setLanguage] = useState(JSON.parse(localStorage.getItem('language') || "null" ));
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState<any>(false);
     const id = open ? 'simple-popper' : "";
