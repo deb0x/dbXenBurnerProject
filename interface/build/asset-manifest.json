@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.5831f81e.chunk.css",
-    "main.js": "/static/js/main.9964a5ae.chunk.js",
-    "main.js.map": "/static/js/main.9964a5ae.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.6d920ce5.js",
-    "runtime-main.js.map": "/static/js/runtime-main.6d920ce5.js.map",
+    "main.css": "/static/css/main.4dd81b70.chunk.css",
+    "main.js": "/static/js/main.2a3f3a54.chunk.js",
+    "main.js.map": "/static/js/main.2a3f3a54.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.d0524481.js",
+    "runtime-main.js.map": "/static/js/runtime-main.d0524481.js.map",
     "static/css/2.b8e408b6.chunk.css": "/static/css/2.b8e408b6.chunk.css",
-    "static/js/2.787f9ae2.chunk.js": "/static/js/2.787f9ae2.chunk.js",
-    "static/js/2.787f9ae2.chunk.js.map": "/static/js/2.787f9ae2.chunk.js.map",
-    "static/js/3.0f1aa2a4.chunk.js": "/static/js/3.0f1aa2a4.chunk.js",
-    "static/js/3.0f1aa2a4.chunk.js.map": "/static/js/3.0f1aa2a4.chunk.js.map",
+    "static/js/2.b4052540.chunk.js": "/static/js/2.b4052540.chunk.js",
+    "static/js/2.b4052540.chunk.js.map": "/static/js/2.b4052540.chunk.js.map",
+    "static/js/3.43fc959b.chunk.js": "/static/js/3.43fc959b.chunk.js",
+    "static/js/3.43fc959b.chunk.js.map": "/static/js/3.43fc959b.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.b8e408b6.chunk.css.map": "/static/css/2.b8e408b6.chunk.css.map",
-    "static/css/main.5831f81e.chunk.css.map": "/static/css/main.5831f81e.chunk.css.map",
-    "static/js/2.787f9ae2.chunk.js.LICENSE.txt": "/static/js/2.787f9ae2.chunk.js.LICENSE.txt",
+    "static/css/main.4dd81b70.chunk.css.map": "/static/css/main.4dd81b70.chunk.css.map",
+    "static/js/2.b4052540.chunk.js.LICENSE.txt": "/static/js/2.b4052540.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/Karla-Regular.6d937d4f.ttf",
     "static/media/avalanche.234db155.svg": "/static/media/avalanche.234db155.svg",
     "static/media/coin-bag-solid--dark.b9b74873.svg": "/static/media/coin-bag-solid--dark.b9b74873.svg",
@@ -26,6 +26,7 @@
     "static/media/fees.50cb4df6.svg": "/static/media/fees.50cb4df6.svg",
     "static/media/file-icon.92106822.svg": "/static/media/file-icon.92106822.svg",
     "static/media/finance.d8ebf4c0.svg": "/static/media/finance.d8ebf4c0.svg",
+    "static/media/getFetch.cjs": "/static/media/getFetch.5fde86e3.cjs",
     "static/media/polygon.c13e4066.svg": "/static/media/polygon.c13e4066.svg",
     "static/media/token.0bd78e9a.svg": "/static/media/token.0bd78e9a.svg",
     "static/media/wallet--dark.307c5384.svg": "/static/media/wallet--dark.307c5384.svg",
@@ -34,10 +35,10 @@
     "static/media/permanentDrawer.scss": "/static/media/white_dbxen.8b09777a.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.6d920ce5.js",
+    "static/js/runtime-main.d0524481.js",
     "static/css/2.b8e408b6.chunk.css",
-    "static/js/2.787f9ae2.chunk.js",
-    "static/css/main.5831f81e.chunk.css",
-    "static/js/main.9964a5ae.chunk.js"
+    "static/js/2.b4052540.chunk.js",
+    "static/css/main.4dd81b70.chunk.css",
+    "static/js/main.2a3f3a54.chunk.js"
   ]
 }
