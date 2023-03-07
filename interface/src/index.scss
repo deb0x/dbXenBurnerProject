@@ -48,6 +48,8 @@ $randomNumber: random(4);
         background-color: #030328;
         color: #F2E9DC;
         border: 1px solid #19D2D2;
+        margin: 0 5px;
+        text-align: center;
         option {
             font-size: 12px;
         }
@@ -235,6 +237,7 @@ $randomNumber: random(4);
             // .main-container {
             //     overflow-y: inherit;
             // }
+            
         }
     }
     .initial-page.contracts {
@@ -585,6 +588,14 @@ $randomNumber: random(4);
                                 line-height: 1;
                             }
                         }
+                    }
+                    .language-switcher {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        font-size: 2vh;
+                        width: 25%;
+                        padding: 5px;
                     }
                 }
                 .initial-page.contracts {

@@ -227,8 +227,8 @@ export function AppBarComponent(props: any): any {
                         </p>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                    <DropdownLanguage />
-                    <ChainSetter />
+                        <DropdownLanguage />
+                        <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
                             <div>
                                 { (() =>  {
