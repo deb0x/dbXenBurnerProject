@@ -214,7 +214,7 @@ export function Stake(props: any): any {
                             {t("fees.title")}
                         </Typography>
                         <Typography >
-                            {t("fees.unclaimed_fees")}:&nbsp;
+                            {t("fees.unclaimed_fees")} {chain.currency} {t("fees.unclaimed_fees_2")}:&nbsp;
                                 <strong>
                                     {Number(feesUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 2,

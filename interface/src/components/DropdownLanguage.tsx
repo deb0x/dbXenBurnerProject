@@ -5,10 +5,15 @@ import { useTranslation } from "react-i18next";
 
 const DropdownLanguage = () => {
     const { i18n, t } = useTranslation();
-    const [language, setLanguage] = useState(JSON.parse(localStorage.getItem('language') || "null" ));
+    const [language, setLanguage] = useState("en");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState<any>(false);
     const id = open ? 'simple-popper' : "";
+
+    useEffect(() => {
+        if(JSON.parse(localStorage.getItem('language') || "null") !== null)
+            setLanguage(JSON.parse(localStorage.getItem('language') || "null"));
+    }, [])
 
     useEffect(() => {
         localStorage.setItem('language', JSON.stringify(language));
