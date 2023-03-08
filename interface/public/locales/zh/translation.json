@@ -1,0 +1,120 @@
+{
+    "home": {
+        "connect_text": "连接你的钱包",
+        "burn_text": "燃烧 $XEN",
+        "earn_text": "赚取更多加密货币",
+        "connect_button": "连接",
+        "community_text": "由社区驱动的去中心化协议，",
+        "contributing_text": "助力于XEN代币的通缩。",
+        "maintenance_title": "维护模式",
+        "maintenance_description": "我们正在进行紧急修复和调整，很快将会恢复正常运行。",
+        "connect": "连接",
+        "prerequisites": "检查您的使用环境",
+        "unsupported_network": "不支持该网络，请切换至",
+        "toastify": {
+            "install_metamask": "请安装MetaMask",
+            "switched": "已切换至正确网络",
+            "switch_error": "无法切换网络"
+        }
+    },
+    "burn": {
+        "label": "请选择销毁XEN的批次数量",
+        "batch": "1 批次 = 2 500 000 XEN",
+        "max": "最大",
+        "protocol_fee": "协议费",
+        "transaction_cost": "总交易费",
+        "xen_burned": "XEN销毁量",
+        "approve_button": "授权XEN代币",
+        "burn_button": "销毁XEN",
+        "balance": "账户余额为0!"
+    },
+    "app_bar": {
+        "tokens_staked": "当前总质押",
+        "xen_burned": "XEN销毁总量",
+        "rewards": "未领取奖励",
+        "stake": "当前质押",
+        "wallet": "钱包余额",
+        "wallet_id": "复制钱包ID",
+        "add_token": "一键添加DXN",
+        "disconnect": "断开连接",
+        "toastify": {
+            "token_added": "代币已添加至钱包",
+            "error": "出现错误，请稍后尝试。",
+            "address_copied": "已成功复制钱包ID"
+        },
+        "language": {
+            "en": "英语",
+            "zh": "中文"
+        }
+    },
+    "fees": {
+        "title": "协议费用奖励",
+        "unclaimed_fees": "未领取",
+        "unclaimed_fees_2": "",
+        "counter": "下次奖励",
+        "collect": "领取",
+        "toastify": {
+            "success": "已成功领取协议收入！",
+            "error": "无法领取!",
+            "info": "交易处理中，很快将会到账。",
+            "transaction_error": "交易中继错误，请重试。",
+            "rejected": "你拒绝了交易，收入未被领取。"
+        }
+    },
+    "daily_stats": {
+        "title": "每日数据",
+        "this_cycle": "本轮铸造"
+    },
+    "rewards": {
+        "title": "代币奖励",
+        "unclaimed_rewards": "未领取DXN",
+        "counter": "下次奖励",
+        "claim": "领取",
+        "claim_description": "未领取的DXN将被自动质押并持续捕获收入,您可以随时领取。",
+        "toastify": {
+            "success": "已成功领取代币奖励。",
+            "error": "代币无法领取！",
+            "info": "交易处理中，很快将会到账。",
+            "transaction_error": "交易中继错误，请重试。",
+            "rejected": "你拒绝了交易，收入未被领取。"
+        }
+    },
+    "stake": {
+        "stake": "质押",
+        "staked_amount": "已质押金额",
+        "wallet": "钱包余额",
+        "init_text": "质押前请确保您钱包中有足够的DXN余额。",
+        "init_button": "授权质押",
+        "amount_to_stake": "输入质押数量",
+        "max": "最大",
+        "toastify": {
+            "success": "你已成功批准该合约！",
+            "error": "该合约未被批准！",
+            "info": "你已拒绝交易，该合约未被批准。",
+            "transaction_error": "你已拒绝交易，代币未被质押。",
+            "rejected": "你已拒绝交易，DXN未被质押。",
+            "staked": "代币质押成功。",
+            "stake_error": "你的代币无法被质押!",
+            "claim_error": "无法领取DXN!",
+            "stake_info": "交易处理中，DXN很快将会到账。",
+            "stake_transaction_error": "交易中继错误，请重试。"
+        }
+    },
+    "unstake": {
+        "unstake": "取出",
+        "available": "可取出",
+        "amount_to_unstake": "输入取出数量",
+        "max": "最大",
+        "toastify": {
+            "success": "已成功取出代币",
+            "error": "你的代币无法被取出!",
+            "info": "交易处理中，DXN很快将会到账。",
+            "transaction_error": "交易中继错误，请重试。",
+            "rejected": "你拒绝了交易，代币未被取出。"
+        }
+    },
+    "mobile": {
+        "mint": "铸造",
+        "fees": "收入"
+    }
+}

@@ -1,0 +1,120 @@
+{
+    "home": {
+        "connect_text": "Connect your wallet",
+        "burn_text": "Burn $XEN",
+        "earn_text": "Earn crypto",
+        "connect_button": "Connect",
+        "community_text": "Community built crypto protocol",
+        "contributing_text": "contributing to XEN deflation",
+        "maintenance_title": "Maintenance Mode",
+        "maintenance_description": "We're tightening some nuts and bolts round the back. We'll be back up and running soon.",
+        "connect": "Connect",
+        "prerequisites": "Check your prerequisites",
+        "unsupported_network": "Unsupported Network. Switch to",
+        "toastify": {
+            "install_metamask": "Please install MetaMask",
+            "switched": "You have switched to the right network",
+            "switch_error": "Cannot switch to the network"
+        }
+    },
+    "burn": {
+        "label": "Choose the number of XEN batches you want to burn",
+        "batch": "1 batch = 2 500 000 XEN",
+        "max": "MAX",
+        "protocol_fee": "Protocol Fee",
+        "transaction_cost": "Total transaction cost",
+        "xen_burned": "Total XEN burned",
+        "approve_button": "Approve Burn XEN",
+        "burn_button": "Burn XEN",
+        "balance": "Your balance is 0!"
+    },
+    "app_bar": {
+        "tokens_staked": "Total tokens staked",
+        "xen_burned": "Total XEN burned",
+        "rewards": "Unclaimed rewards",
+        "stake": "Active stake",
+        "wallet": "In wallet",
+        "wallet_id": "Copy wallet ID",
+        "add_token": "Add token to wallet",
+        "disconnect": "Disconnect wallet",
+        "toastify": {
+            "token_added": "The token was added in your wallet",
+            "error": "There was an error. Try again later",
+            "address_copied": "The address ID was copied successfully"
+        },
+        "language": {
+            "en": "EN",
+            "zh": "CN"
+        }
+    },
+    "fees": {
+        "title": "Your protocol fee share",
+        "unclaimed_fees": "Your unclaimed",
+        "unclaimed_fees_2": "fees",
+        "counter": "Get next fees in",
+        "collect": "Collect",
+        "toastify": {
+            "success": "You succesfully claimed your fees.",
+            "error": "Fees couldn't be claimed!",
+            "info": "Your transaction is pending. Your fees should arrive shortly",
+            "transaction_error": "Transaction relayer error. Please try again",
+            "rejected": "You rejected the transaction. Fees were not claimed."
+        }
+    },
+    "daily_stats": {
+        "title": "Daily stats",
+        "this_cycle": "This cycle mints"
+    },
+    "rewards": {
+        "title": "Your rewards",
+        "unclaimed_rewards": "Your unclaimed DXN rewards",
+        "counter": "Get next rewards in",
+        "claim": "Claim",
+        "claim_description": "Unclaimed DXN is considered automatically staked. Only claim when you want to trade.",
+        "toastify": {
+            "success": "You succesfully claimed your rewards.",
+            "error": "Rewards couldn't be claimed!",
+            "info": "Your transaction is pending. Your rewards should arrive shortly",
+            "transaction_error": "Transaction relayer error. Please try again",
+            "rejected": "You rejected the transaction. Rewards were not claimed."
+        }
+    },
+    "stake": {
+        "stake": "Stake",
+        "staked_amount": "Your staked amount",
+        "wallet": "Available DXN in your wallet",
+        "init_text": "Make sure you have DXN tokens in your wallet before you can stake them.",
+        "init_button": "Initialize staking",
+        "amount_to_stake": "Amount to stake",
+        "max": "MAX",
+        "toastify": {
+            "success": "Your succesfully approved contract for staking.",
+            "error": "Contract couldn't be approved for staking!",
+            "info": "You rejected the transaction. Contract hasn't been approved for staking.",
+            "transaction_error": "You rejected the transaction. Your tokens haven't been staked.",
+            "rejected": "You rejected the transaction. DXN were not staked.",
+            "staked": "Your tokens were succesfully staked.",
+            "stake_error": "Your tokens couldn't be staked!",
+            "claim_error": "DXN couldn't be claimed!",
+            "stake_info": "Your transaction is pending. Your DXN should be staked shortly",
+            "stake_transaction_error": "Transaction relayer error. Please try again"
+        }
+    },
+    "unstake": {
+        "unstake": "Unstake",
+        "available": "Available to unstake",
+        "amount_to_unstake": "Amount to unstake",
+        "max": "MAX",
+        "toastify": {
+            "success": "Your tokens were succesfully unstaked.",
+            "error": "Your tokens couldn't be unstaked!",
+            "info": "Your transaction is pending. Your DXN should be unstaked shortly",
+            "transaction_error": "Transaction relayer error. Please try again",
+            "rejected": "You rejected the transaction. Your tokens haven't been unstaked."
+        }
+    },
+    "mobile": {
+        "mint": "Mint",
+        "fees": "Fees"
+    }
+}
