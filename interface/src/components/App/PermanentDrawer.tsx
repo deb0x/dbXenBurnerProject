@@ -3,23 +3,16 @@ import { useWeb3React } from '@web3-react/core';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { injected } from '../../connectors';
-import XENCrypto from '../../ethereum/XENCrypto';
-import DBXen from "../../ethereum/dbxen"
 import { ethers } from "ethers";
 import "../../componentsStyling/permanentDrawer.scss";
 import ScreenSize from '../Common/ScreenSize';
 import SnackbarNotification from './Snackbar';
-import LoadingButton from '@mui/lab/LoadingButton';
-import { Spinner } from './Spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTwitter, faGithub, faTelegram } from "@fortawesome/free-brands-svg-icons";
 import document from "../../photos/icons/file-icon.svg";
-import axios, { Method } from 'axios';
-import web3 from 'web3';
 import { Burn } from './Burn';
 import formatAccountName from '../Common/AccountName';
 import ChainContext from '../Contexts/ChainContext';
-import ChainSetter from '../Contexts/ChainSetter';
 
 declare global {
     interface Window {
@@ -46,9 +39,17 @@ export function PermanentDrawer(props: any): any {
     }, [activatingConnector, connector])
 
     useEffect(() => {
-        Number(chain.chainId) === 137 ?
-            setBaseUrl("https://polygonscan.com/address/") :
-            setBaseUrl("https://snowtrace.io/address/")
+        switch(Number(chain.chainId)) {
+            case 137:
+                setBaseUrl("https://polygonscan.com/address/")
+                break;
+            case 43114:
+                setBaseUrl("https://snowtrace.io/address/")
+                break;
+            case 56:
+                setBaseUrl("https://bscscan.com/address/")
+                break;
+        }
     }, [])
 
     useEffect(() => {
