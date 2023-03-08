@@ -49,7 +49,8 @@
     },
     "fees": {
         "title": "协议费用奖励",
-        "unclaimed_fees": "未领取Matic",
+        "unclaimed_fees": "未领取",
+        "unclaimed_fees_2": "",
         "counter": "下次奖励",
         "collect": "领取",
         "toastify": {
