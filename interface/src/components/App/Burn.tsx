@@ -79,11 +79,7 @@ export function Burn(): any {
     }
 
     async function estimationValues() {
-        let priceURL = "";
-        (Number(chain.chainId)) === 137 ?
-            priceURL = "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3" :
-            priceURL = "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
-
+        let priceURL = chain.priceURL;
         let method: Method = 'POST';
         const options = {
             method: method,
@@ -102,6 +98,7 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
+                    if(Number(chain.chainId) !=56){
                     await axios.request(options).then((result) => {
                         let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                         let protocol_fee = value * (1 - 0.00005 * value);
@@ -122,6 +119,22 @@ export function Burn(): any {
                         setMaticValue(fee.toFixed(4));
                         setTotalCost(totalValue.toFixed(4));
                     })
+                }
+                     else {
+                        let price = 5;
+                        let protocol_fee = value * (1 - 0.00005 * value);
+                        let gasLimitVal = 0;
+                        numberBatchesBurnedInCurrentCycle != 0 ?
+                            gasLimitVal = (BigNumber.from("350000")) :
+                            gasLimitVal = (BigNumber.from("500000"))
+                   
+                        setCurrentGasLimit(gasLimitVal);
+                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                        setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                        setMaticValue(fee.toFixed(4));
+                        setTotalCost(totalValue.toFixed(4));
+                    }
                 }
             )
         })

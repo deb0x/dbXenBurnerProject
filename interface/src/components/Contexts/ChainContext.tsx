@@ -8,7 +8,8 @@ export const initialChain = {
         xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
         chainId: "137",
         chainName: "polygon",
-        currency: "MATIC"
+        currency: "MATIC",
+        priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
     },
     setChain: (_value: any) => {}
 }
