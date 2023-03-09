@@ -340,6 +340,30 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         emit RewardsClaimed(currentCycle, _msgSender(), reward);
     }
 
+    function claimRewards(uint256 amount)
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+        uint256 reward = accRewards[_msgSender()] - accWithdrawableStake[_msgSender()];
+        
+        require(reward > 0, "DBXen: account has no rewards");
+
+        require(amount <= reward, "DBXen: amount to claim is bigger than user rewards");
+
+        accRewards[_msgSender()] -= amount;
+        if (lastStartedCycle == currentStartedCycle) {
+            pendingStakeWithdrawal += amount;
+        } else {
+            summedCycleStakes[currentCycle] = summedCycleStakes[currentCycle] - amount;
+        }
+
+        dxn.mintReward(_msgSender(), amount);
+        emit RewardsClaimed(currentCycle, _msgSender(), amount);
+    }
+
     /**
      * @dev Transfers newly accrued fees to sender's address.
      */
@@ -356,6 +380,22 @@ contract DBXen is ERC2771Context, ReentrancyGuard, IBurnRedeemable {
         accAccruedFees[_msgSender()] = 0;
         sendViaCall(payable(_msgSender()), fees);
         emit FeesClaimed(getCurrentCycle(), _msgSender(), fees);
+    }
+
+    function claimFees(uint256 amount)
+        external
+        nonReentrant()
+    {
+        calculateCycle();
+        updateCycleFeesPerStakeSummed();
+        updateStats(_msgSender());
+
+        uint256 fees = accAccruedFees[_msgSender()];
+        require(fees > 0, "DBXen: amount is zero");
+        require(amount <= fees, "DBXen: amount to claim is bigger than user fees");
+        accAccruedFees[_msgSender()] -= amount;
+        sendViaCall(payable(_msgSender()), amount);
+        emit FeesClaimed(getCurrentCycle(), _msgSender(), amount);
     }
 
     /**
