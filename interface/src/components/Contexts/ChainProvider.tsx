@@ -40,9 +40,9 @@ const ChainProvider = ( { children }: Props ) => {
                         break;
                     case 56:
                         setChain({
-                            deb0xAddress: "0x4F70AFdbB1Fe1372D06E68cF08C5770175956446",
-                            deb0xViewsAddress: "0x659Af0089d91beB78483a3A4732c32FCEb434E01",
-                            deb0xERC20Address: "0xE774b90b744Dd7F407cefb0e5525EeE48Fb21b24",
+                            deb0xAddress: "0x0274E01fB60c69D125A8074E5971a213fc14eA3d",
+                            deb0xViewsAddress: "0xED471d2af94B03030DE0B7B9C9afe15b75CAcf79",
+                            deb0xERC20Address: "0x5c12A73F8ae7D666A95c653b805D7b2d548E6464",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
                             chainId: parseInt(result, 16),
                             chainName: "binance",
