@@ -95,7 +95,7 @@ export default function ChainSetter(props: any) {
                     case 56:
                         setChain({
                             deb0xAddress: "0x9caf6C4e5B9E3A6f83182Befd782304c7A8EE6De",
-                            deb0xViewsAddress: "0x36076Ff3095e67C4A581B27f59881454241EFDAB",
+                            deb0xViewsAddress: "0xA0C192aE0C75FDE64A42D9f0430e7163Fd6701e5",
                             deb0xERC20Address: "0xCcd09b80453335aa914f5d9174984b6586c315EC",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
                             chainId: parseInt(result, 16),
