@@ -135,7 +135,7 @@ describe("Test burn functionality", async function() {
 
     });
 
-    it.only("Claim rewards functionatility: several people get their reward in different cycles", async() => {
+    it("Claim rewards functionatility: several people get their reward in different cycles", async() => {
 
         const xenContractLocal = await ethers.getContractFactory("XENCryptoMock", alice);
 

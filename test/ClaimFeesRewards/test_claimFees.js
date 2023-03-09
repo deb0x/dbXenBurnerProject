@@ -87,8 +87,7 @@ describe("Test claim fee functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let unclaimedFeesAlice = await DBXENViewContractLocal.getUnclaimedFees(alice.address);
-
-        await DBXenContractLocal.connect(alice).claimFees();
+        await DBXenContractLocal.connect(alice).claimFees(unclaimedFeesAlice);
         const feesClaimed = await DBXenContractLocal.queryFilter("FeesClaimed")
         let totalFeesClaimed = BigNumber.from("0")
         for (let entry of feesClaimed) {
@@ -103,7 +102,7 @@ describe("Test claim fee functionality", async function() {
         await hre.ethers.provider.send("evm_mine")
 
         let unclaimedFeesBob = await DBXENViewContractLocal.getUnclaimedFees(bob.address);
-        await DBXenContractLocal.connect(bob).claimFees();
+        await DBXenContractLocal.connect(bob).claimFees(unclaimedFeesBob);
         const feesClaimedForBob = await DBXenContractLocal.queryFilter("FeesClaimed")
         let totalFeesClaimedForBob = BigNumber.from("0")
         for (let entry of feesClaimedForBob) {
@@ -136,10 +135,10 @@ describe("Test claim fee functionality", async function() {
         let unclaimedFeesDeanCurrent = await DBXENViewContractLocal.getUnclaimedFees(dean.address);
         let unclaimedFeesCarolCurrent = await DBXENViewContractLocal.getUnclaimedFees(carol.address);
 
-        await DBXenContractLocal.connect(alice).claimFees();
-        await DBXenContractLocal.connect(bob).claimFees();
-        await DBXenContractLocal.connect(dean).claimFees();
-        await DBXenContractLocal.connect(carol).claimFees();
+        await DBXenContractLocal.connect(alice).claimFees(unclaimedFeesAliceCurrent);
+        await DBXenContractLocal.connect(bob).claimFees(unclaimedFeesBobCurrent);
+        await DBXenContractLocal.connect(dean).claimFees(unclaimedFeesDeanCurrent);
+        await DBXenContractLocal.connect(carol).claimFees(unclaimedFeesCarolCurrent);
 
         let feeForActualCycle = BigNumber.from(unclaimedFeesBobCurrent).add(BigNumber.from(unclaimedFeesAliceCurrent)).add(BigNumber.from(unclaimedFeesDeanCurrent)).add(BigNumber.from(unclaimedFeesCarolCurrent))
 
@@ -161,10 +160,10 @@ describe("Test claim fee functionality", async function() {
         const libraryLocal = await lib.deploy();
 
         const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
-                     libraries: {
-                         MathX: libraryLocal.address
-                     }
-                 });
+            libraries: {
+                MathX: libraryLocal.address
+            }
+        });
 
         XENContractLocal = await xenContractLocal.deploy();
         await XENContractLocal.deployed();
@@ -185,13 +184,12 @@ describe("Test claim fee functionality", async function() {
 
 
         const DBXenLocal = await ethers.getContractFactory("DBXen");
-        DBXenContractLocal = await 
+        DBXenContractLocal = await
         DBXenLocal.deploy(ethers.constants.AddressZero, XENContractLocal.address);
         await DBXenContractLocal.deployed();
-        console.log("00000: ", await 
-        ethers.provider.getBalance(DBXenContractLocal.address));
+        console.log("00000: ", await ethers.provider.getBalance(DBXenContractLocal.address));
         const Deb0xViewsLocal = await ethers.getContractFactory("DBXenViews");
-        DBXENViewContractLocal = await 
+        DBXENViewContractLocal = await
         Deb0xViewsLocal.deploy(DBXenContractLocal.address);
         await DBXENViewContractLocal.deployed();
 
@@ -203,63 +201,65 @@ describe("Test claim fee functionality", async function() {
         await XENContractLocal.connect(carol).approve(DBXenContractLocal.address, approveMax)
 
         // let Bob and Carol to stake
-        await DBXenContractLocal.connect(alice).burnBatch(1, { value: 
-        ethers.utils.parseEther("1") })
-        console.log("1111:", await 
-        ethers.provider.getBalance(DBXenContractLocal.address));
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
-        //@note increase one day
+        await DBXenContractLocal.connect(alice).burnBatch(1, {
+            value: ethers.utils.parseEther("1")
+        })
+        console.log("1111:", await ethers.provider.getBalance(DBXenContractLocal.address));
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            //@note increase one day
         await hre.ethers.provider.send("evm_mine")
+        let rewardForAlice = await DBXENViewContractLocal.getUnclaimedRewards(alice.address);
+        let feeAlice = await DBXENViewContractLocal.getUnclaimedFees(alice.address);
 
-        await DBXenContractLocal.connect(alice).claimRewards();
-        await DBXenContractLocal.connect(alice).claimFees()
-        
-        
+        await DBXenContractLocal.connect(alice).claimRewards(rewardForAlice);
+        await DBXenContractLocal.connect(alice).claimFees(feeAlice)
+
         const aliceBalance = await DBXenERC20.balanceOf(alice.address)
-        await DBXenERC20.connect(alice).transfer(bob.address, 
-        aliceBalance.div(BigNumber.from("2")))
-        await DBXenERC20.connect(alice).transfer(carol.address, await 
-        DBXenERC20.balanceOf(alice.address))
-        await DBXenERC20.connect(alice).approve(DBXenContractLocal.address, 
-        approveMax)
-        await DBXenERC20.connect(bob).approve(DBXenContractLocal.address, 
-        approveMax)
-        await DBXenERC20.connect(carol).approve(DBXenContractLocal.address, 
-        approveMax)
+        await DBXenERC20.connect(alice).transfer(bob.address,
+            aliceBalance.div(BigNumber.from("2")))
+        await DBXenERC20.connect(alice).transfer(carol.address, await DBXenERC20.balanceOf(alice.address))
+        await DBXenERC20.connect(alice).approve(DBXenContractLocal.address,
+            approveMax)
+        await DBXenERC20.connect(bob).approve(DBXenContractLocal.address,
+            approveMax)
+        await DBXenERC20.connect(carol).approve(DBXenContractLocal.address,
+            approveMax)
 
         console.log("Bob Stake at Cycle 1:");
-        await DBXenContractLocal.connect(bob).stake(await 
-        DBXenERC20.balanceOf(bob.address));
+        await DBXenContractLocal.connect(bob).stake(await DBXenERC20.balanceOf(bob.address));
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
-        //@note increase one day
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            //@note increase one day
         await hre.ethers.provider.send("evm_mine")
         console.log("Carol Stake at Cycle 2:");
-        await DBXenContractLocal.connect(carol).stake(await 
-        DBXenERC20.balanceOf(carol.address))
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
-        //@note increase one day to cycle 2
+        await DBXenContractLocal.connect(carol).stake(await DBXenERC20.balanceOf(carol.address))
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            //@note increase one day to cycle 2
         await hre.ethers.provider.send("evm_mine")
 
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
-        //@note increase one day to cycle 2
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            //@note increase one day to cycle 2
         await hre.ethers.provider.send("evm_mine")
-        await DBXenContractLocal.connect(alice).burnBatch(1, { value: 
-        ethers.utils.parseEther("1") })
+        await DBXenContractLocal.connect(alice).burnBatch(1, {
+            value: ethers.utils.parseEther("1")
+        })
 
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24]) 
-        //@note increase one day to cycle 2
+        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
+            //@note increase one day to cycle 2
         await hre.ethers.provider.send("evm_mine")
         console.log("5th cycle accrued fees:", await DBXenContractLocal.cycleAccruedFees(4))
         console.log("Bob fee claim:");
-        DBXenContractLocal.connect(bob).claimFees();
+        let feeAlice2 = await DBXENViewContractLocal.getUnclaimedFees(alice.address);
+        let feeCarol = await DBXENViewContractLocal.getUnclaimedFees(bob.address);
+        let feeBob = await DBXENViewContractLocal.getUnclaimedFees(carol.address);
+
+        DBXenContractLocal.connect(bob).claimFees(feeBob);
 
         console.log("Carol fee claim:");
-        await DBXenContractLocal.connect(carol).claimFees();
-        
+        await DBXenContractLocal.connect(carol).claimFees(feeCarol);
+
         console.log("Alice fee claim:");
-        await DBXenContractLocal.connect(alice).claimFees(); // alice cannot claim
+        await DBXenContractLocal.connect(alice).claimFees(feeAlice2); // alice cannot claim
     });
 
 
