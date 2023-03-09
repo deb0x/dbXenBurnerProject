@@ -264,7 +264,7 @@ function App() {
                                                             <span  className="unsupported">
                                                                 {typeof window.ethereum === 'undefined' ? 
                                                                     `Check your prerequisites` : 
-                                                                    account === undefined ? `Switch to POLYGON/AVALANCHE` : ''}
+                                                                    account === undefined ? "Unsupported network" : ''}
                                                             </span>
                                                     }
                                                 </Button>
