@@ -39,11 +39,11 @@ export function Stake(props: any): any {
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
     const datePolygon: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
-    const dateAvalance: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
-    const now: any = Date.now()
-    let endDatePolygon = datePolygon.getTime() - now;
-    let endDateAvalance = dateAvalance.getTime() - now;
+    const dateAvalanche: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
+    const dateBinance: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
+    const now: any = Date.now();
     const { t } = useTranslation();
+    const [endDate, setEndDate] = useState<any>();
 
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
@@ -59,6 +59,20 @@ export function Stake(props: any): any {
         }
     };
 
+    useEffect(() => {
+        switch(Number(chain.chainId)) {
+            case 137: 
+                setEndDate(datePolygon.getTime() - now);
+                break;
+            case 43114: 
+                setEndDate(dateAvalanche.getTime() - now);
+                break;
+            case 56:
+                setEndDate(dateBinance.getTime() - now);
+                break;
+        }
+    }, [])
+
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
         const [loading, setLoading] = useState(false)
@@ -70,6 +84,7 @@ export function Stake(props: any): any {
 
         useEffect(() => {
             totalXenBurnedPreviousCycle();
+            console.log(endDate)
         }, []);
 
         async function totalXenBurnedPreviousCycle() {
@@ -224,10 +239,7 @@ export function Stake(props: any): any {
                             </Typography>
                             <p className='my-2 counter'>
                                 {t("fees.counter")} 
-                                {chain.chainName === "polygon" ?
-                                    <Countdown date={Date.now() + endDatePolygon} renderer={renderer} /> :
-                                    <Countdown date={Date.now() + endDateAvalance} renderer={renderer} />
-                                }
+                                <Countdown date={Date.now() + endDate} renderer={renderer} />
                             </p>
                         </div>
                         <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
@@ -482,10 +494,7 @@ export function Stake(props: any): any {
                             </Typography>
                             <p className='my-2 counter'>
                                 {t("rewards.counter")} 
-                                {chain.chainName === "polygon" ?
-                                    <Countdown date={Date.now() + endDatePolygon} renderer={renderer} /> :
-                                    <Countdown date={Date.now() + endDateAvalance} renderer={renderer} />
-                                }
+                                <Countdown date={Date.now() + endDate} renderer={renderer} /> 
                             </p>
                         </div>
                         <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
