@@ -4,6 +4,7 @@ import ChainContext from "./ChainContext";
 import polygon from "../../photos/icons/polygon.svg";
 import avalanche from "../../photos/icons/avalanche.svg";
 import bnb from "../../photos/icons/bnb.svg";
+import fantom from "../../photos/icons/fantom.svg";
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -39,6 +40,17 @@ const networks: any = {
         },
         rpcUrls: ['https://bsc.rpc.blxrbdn.com'],
         blockExplorerUrls: ['https://bscscan.com'] 
+    },
+    fantom:{
+        chainId: `0x${Number(250).toString(16)}`,
+        chainName: 'Fantom Opera',
+        nativeCurrency: {
+            name: 'Fantom Token',
+            symbol: 'FTM',
+            decimals: 18
+        },
+        rpcUrls: ['https://endpoints.omniatech.io/v1/fantom/mainnet/public'],
+        blockExplorerUrls: ['https://ftmscan.com'] 
     }
 };
 
@@ -104,6 +116,18 @@ export default function ChainSetter(props: any) {
                             priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/6aa7b16846912259970ec647"
                         })
                         break;
+                        case 250:
+                            setChain({
+                                deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
+                                deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                xenCryptoAddress: "0xeF4B763385838FfFc708000f884026B8c0434275",
+                                chainId: parseInt(result, 16),
+                                chainName: "fantom",
+                                currency: "FTM",
+                                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/2635b5831c0386d8a21cff97"
+                            })
+                            break;
                 }
             });
         } catch (err: any) {
@@ -162,6 +186,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="bnb" src={bnb} className="bnb"/>
                         Switch to Binance
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("fantom")}
+                        className="btn"
+                    >
+                        <img alt="fantom" src={fantom} className="fantom"/>
+                        Switch to Fantom
                     </button>
                 </Popper>
             </div>

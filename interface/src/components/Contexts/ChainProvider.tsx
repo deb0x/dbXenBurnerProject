@@ -47,9 +47,21 @@ const ChainProvider = ( { children }: Props ) => {
                             chainId: parseInt(result, 16),
                             chainName: "binance",
                             currency: "BNB",
-                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/6aa7b16846912259970ec647"
+                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                         })
                         break;
+                        case 250:
+                            setChain({
+                                deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
+                                deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                xenCryptoAddress: "0xeF4B763385838FfFc708000f884026B8c0434275",
+                                chainId: parseInt(result, 16),
+                                chainName: "fantom",
+                                currency: "FTM",
+                                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            })
+                            break;
                 }
             });
         },
