@@ -84,7 +84,6 @@ export function Stake(props: any): any {
 
         useEffect(() => {
             totalXenBurnedPreviousCycle();
-            console.log(endDate)
         }, []);
 
         async function totalXenBurnedPreviousCycle() {
