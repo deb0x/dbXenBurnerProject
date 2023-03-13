@@ -62,6 +62,18 @@ const ChainProvider = ( { children }: Props ) => {
                                 priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                             })
                             break;
+                            case 1284:
+                                setChain({
+                                    deb0xAddress: "0xaec85ff2a37ac2e0f277667bfc1ce1fffa6d782a",
+                                    deb0xViewsAddress: "0xdea7280c879bd503bf7e1a8e5a4b99dfd7577c00",
+                                    deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                    xenCryptoAddress: "0xb564A5767A00Ee9075cAC561c427643286F8F4E1",
+                                    chainId: parseInt(result, 16),
+                                    chainName: "moonbeam",
+                                    currency: "GLMR",
+                                    priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                })
+                                break;
                 }
             });
         },

@@ -49,6 +49,12 @@ export function PermanentDrawer(props: any): any {
             case 56:
                 setBaseUrl("https://bscscan.com/address/")
                 break;
+            case 250:
+                setBaseUrl("https://ftmscan.com/address/")
+                break;
+            case 1284:
+                setBaseUrl("https://moonbeam.moonscan.io/address/")
+                break;
         }
     }, [])
 

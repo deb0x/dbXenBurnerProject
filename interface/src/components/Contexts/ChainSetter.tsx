@@ -5,6 +5,7 @@ import polygon from "../../photos/icons/polygon.svg";
 import avalanche from "../../photos/icons/avalanche.svg";
 import bnb from "../../photos/icons/bnb.svg";
 import fantom from "../../photos/icons/fantom.svg";
+import moonbeam from "../../photos/icons/moonbeam.svg"
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -51,6 +52,17 @@ const networks: any = {
         },
         rpcUrls: ['https://endpoints.omniatech.io/v1/fantom/mainnet/public'],
         blockExplorerUrls: ['https://ftmscan.com'] 
+    },
+    moonbeam:{
+        chainId: `0x${Number(1284).toString(16)}`,
+        chainName: 'Moonbeam',
+        nativeCurrency: {
+            name: 'Moonbeam',
+            symbol: 'GLMR',
+            decimals: 18
+        },
+        rpcUrls: ['https://moonbeam.api.onfinality.io/public'],
+        blockExplorerUrls: ['https://moonscan.io'] 
     }
 };
 
@@ -113,7 +125,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "binance",
                             currency: "BNB",
-                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/6aa7b16846912259970ec647"
+                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                         })
                         break;
                         case 250:
@@ -125,9 +137,21 @@ export default function ChainSetter(props: any) {
                                 chainId: parseInt(result, 16),
                                 chainName: "fantom",
                                 currency: "FTM",
-                                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/2635b5831c0386d8a21cff97"
+                                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                             })
                             break;
+                            case 1284:
+                                setChain({
+                                    deb0xAddress: "0xaec85ff2a37ac2e0f277667bfc1ce1fffa6d782a",
+                                    deb0xViewsAddress: "0xdea7280c879bd503bf7e1a8e5a4b99dfd7577c00",
+                                    deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                    xenCryptoAddress: "0xb564A5767A00Ee9075cAC561c427643286F8F4E1",
+                                    chainId: parseInt(result, 16),
+                                    chainName: "moonbeam",
+                                    currency: "GLMR",
+                                    priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                })
+                                break;
                 }
             });
         } catch (err: any) {
@@ -193,6 +217,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="fantom" src={fantom} className="fantom"/>
                         Switch to Fantom
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("moonbeam")}
+                        className="btn"
+                    >
+                        <img alt="moonbeam" src={moonbeam} className="moonbeam"/>
+                        Switch to Moonbeam
                     </button>
                 </Popper>
             </div>
