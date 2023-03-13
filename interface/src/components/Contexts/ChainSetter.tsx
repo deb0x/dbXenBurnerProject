@@ -5,7 +5,9 @@ import polygon from "../../photos/icons/polygon.svg";
 import avalanche from "../../photos/icons/avalanche.svg";
 import bnb from "../../photos/icons/bnb.svg";
 import fantom from "../../photos/icons/fantom.svg";
-import moonbeam from "../../photos/icons/moonbeam.svg"
+import moonbeam from "../../photos/icons/moonbeam.svg";
+import okx from "../../photos/icons/okx.svg";
+import evmos from "../../photos/icons/evmos.svg";
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -63,6 +65,28 @@ const networks: any = {
         },
         rpcUrls: ['https://moonbeam.api.onfinality.io/public'],
         blockExplorerUrls: ['https://moonscan.io'] 
+    },
+    okx:{
+        chainId: `0x${Number(66).toString(16)}`,
+        chainName: 'OKXChain Mainnet',
+        nativeCurrency: {
+            name: 'OKXChain Token',
+            symbol: 'OKT',
+            decimals: 18
+        },
+        rpcUrls: ['https://exchainrpc.okex.org'],
+        blockExplorerUrls: ['https://www.oklink.com/en/okc'] 
+    },
+    evmos: {
+            chainId: `0x${Number(9001).toString(16)}`,
+            chainName: 'Evmos',
+            nativeCurrency: {
+                name: 'Evmos',
+                symbol: 'EVMOS',
+                decimals: 18
+            },
+            rpcUrls: ['https://eth.bd.evmos.org:8545'],
+            blockExplorerUrls: ['https://escan.live'] 
     }
 };
 
@@ -152,6 +176,30 @@ export default function ChainSetter(props: any) {
                                     priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                                 })
                                 break;
+                            case 66:
+                                    setChain({
+                                        deb0xAddress: "0xaec85ff2a37ac2e0f277667bfc1ce1fffa6d782a",
+                                        deb0xViewsAddress: "0x5f8cabea25ada7db13e590c34ae4a1b1191ab997",
+                                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                        xenCryptoAddress: "0x1cC4D981e897A3D2E7785093A648c0a75fAd0453",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "okx",
+                                        currency: "OKT",
+                                        priceURL: "https://oKc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                    })
+                                    break;
+                            case 9001:
+                                    setChain({
+                                        deb0xAddress: "0xdeA7280c879BD503bF7E1A8e5A4B99dfD7577C00",
+                                        deb0xViewsAddress: "0x624A755fcd3F68351565d264A5Bf2Ed71EF4B0d2",
+                                        deb0xERC20Address: "0xA26a487E485470a51377080762c1196fC47fE9Ad",
+                                        xenCryptoAddress: "0x2ab0e9e4ee70fff1fb9d67031e44f6410170d00e",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "Evmos",
+                                        currency: "EVMOS",
+                                        priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                    })
+                                    break;
                 }
             });
         } catch (err: any) {
@@ -224,6 +272,20 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="moonbeam" src={moonbeam} className="moonbeam"/>
                         Switch to Moonbeam
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("okx")}
+                        className="btn"
+                    >
+                        <img alt="okx" src={okx} className="okx"/>
+                        Switch to OKXChain
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("evmos")}
+                        className="btn"
+                    >
+                        <img alt="evmos" src={evmos} className="evmos"/>
+                        Switch to Evmos
                     </button>
                 </Popper>
             </div>

@@ -98,9 +98,10 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if(Number(chain.chainId) !=56){
+                    if(Number(chain.chainId) !=56 && Number(chain.chainId) != 66){
                     await axios.request(options).then((result) => {
-                        let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
+                        if(result.data.result != undefined){
+                            let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                         let protocol_fee = value * (1 - 0.00005 * value);
                         let gasLimitVal = 0;
                         (Number(chain.chainId)) === 137 ?
@@ -118,9 +119,11 @@ export function Burn(): any {
                         setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
                         setMaticValue(fee.toFixed(4));
                         setTotalCost(totalValue.toFixed(4));
+                        }
                     })
                 }
-                     else {
+                 else {
+                        if(Number(chain.chainId) === 56){
                         let price = 5;
                         let protocol_fee = value * (1 - 0.00005 * value);
                         let gasLimitVal = 0;
@@ -135,6 +138,22 @@ export function Burn(): any {
                         setMaticValue(fee.toFixed(4));
                         setTotalCost(totalValue.toFixed(4));
                     }
+                 else {
+                    let price = 0.1;
+                    let protocol_fee = value * (1 - 0.00005 * value);
+                    let gasLimitVal = 0;
+                    numberBatchesBurnedInCurrentCycle != 0 ?
+                        gasLimitVal = (BigNumber.from("350000")) :
+                        gasLimitVal = (BigNumber.from("500000"))
+               
+                    setCurrentGasLimit(gasLimitVal);
+                    let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                    let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                    setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
+                    setMaticValue(fee.toFixed(5));
+                    setTotalCost(totalValue.toFixed(5));
+                }
+            }
                 }
             )
         })
