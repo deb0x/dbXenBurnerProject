@@ -61,6 +61,12 @@ export function PermanentDrawer(props: any): any {
             case 9001:
                 setBaseUrl("https://escan.live/address/")
                 break;
+            case 2000:
+                    setBaseUrl("https://explorer.dogechain.dog/address/")
+                    break;
+            case 10001:
+                    setBaseUrl("https://www.oklink.com/eth/address/")
+                    break;
         }
     }, [])
 

@@ -8,6 +8,8 @@ import fantom from "../../photos/icons/fantom.svg";
 import moonbeam from "../../photos/icons/moonbeam.svg";
 import okx from "../../photos/icons/okx.svg";
 import evmos from "../../photos/icons/evmos.svg";
+import dc from "../../photos/icons/dc.svg";
+import ethpow from "../../photos/icons/ethpow.svg";
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -87,7 +89,29 @@ const networks: any = {
             },
             rpcUrls: ['https://eth.bd.evmos.org:8545'],
             blockExplorerUrls: ['https://escan.live'] 
-    }
+    },
+    doge: {
+        chainId: `0x${Number(2000).toString(16)}`,
+        chainName: 'Dogechain Mainnet',
+        nativeCurrency: {
+            name: 'Dogechain Token',
+            symbol: 'DC',
+            decimals: 18
+        },
+        rpcUrls: ['https://rpc.dogechain.dog'],
+        blockExplorerUrls: ['https://explorer.dogechain.dog'] 
+},
+ethpow: {
+    chainId: `0x${Number(10001).toString(16)}`,
+    chainName: 'Ethereum PoW',
+    nativeCurrency: {
+        name: 'EthereumPoW',
+        symbol: 'ETHW',
+        decimals: 18
+    },
+    rpcUrls: ['https://mainnet.ethereumpow.org'],
+    blockExplorerUrls: ['https://www.oklink.com/en/ethw/'] 
+}
 };
 
 export default function ChainSetter(props: any) {
@@ -200,6 +224,30 @@ export default function ChainSetter(props: any) {
                                         priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                                     })
                                     break;
+                            case 2000:
+                                    setChain({
+                                        deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                        deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
+                                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                        xenCryptoAddress: "0x948eed4490833D526688fD1E5Ba0b9B35CD2c32e",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "Dogechain",
+                                        currency: "DOGE",
+                                        priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                        })
+                                        break;
+                            case 10001:
+                                    setChain({
+                                        deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                        deb0xViewsAddress: "0x5f8cabea25ada7db13e590c34ae4a1b1191ab997",
+                                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                        xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "EthereumPoW",
+                                        currency: "ETHW",
+                                        priceURL: "https://mainnet.ethereumpow.org"
+                                        })
+                                        break;
                 }
             });
         } catch (err: any) {
@@ -286,6 +334,20 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="evmos" src={evmos} className="evmos"/>
                         Switch to Evmos
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("doge")}
+                        className="btn"
+                    >
+                        <img alt="dc" src={dc} className="dc"/>
+                        Switch to Dogechain
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("ethpow")}
+                        className="btn"
+                    >
+                        <img alt="ethpow" src={ethpow} className="ethpow"/>
+                        Switch to EthereumPoW
                     </button>
                 </Popper>
             </div>

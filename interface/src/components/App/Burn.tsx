@@ -92,13 +92,12 @@ export function Burn(): any {
                 "jsonrpc": "2.0", "method": "eth_gasPrice", "params": [], "id": 1
             })
         };
-
         const signer = library.getSigner(0)
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if(Number(chain.chainId) !=56 && Number(chain.chainId) != 66){
+                    if(Number(chain.chainId) !=56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000){
                     await axios.request(options).then((result) => {
                         if(result.data.result != undefined){
                             let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
@@ -137,6 +136,21 @@ export function Burn(): any {
                         setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
                         setMaticValue(fee.toFixed(4));
                         setTotalCost(totalValue.toFixed(4));
+                    }
+                    if(Number(chain.chainId) === 2000){
+                        let price = 250;
+                        let protocol_fee = value * (1 - 0.00005 * value);
+                        let gasLimitVal = 0;
+                        numberBatchesBurnedInCurrentCycle != 0 ?
+                            gasLimitVal = (BigNumber.from("350000")) :
+                            gasLimitVal = (BigNumber.from("500000"))
+                   
+                        setCurrentGasLimit(gasLimitVal);
+                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                        setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
+                        setMaticValue(fee.toFixed(5));
+                        setTotalCost(totalValue.toFixed(5));
                     }
                  else {
                     let price = 0.1;

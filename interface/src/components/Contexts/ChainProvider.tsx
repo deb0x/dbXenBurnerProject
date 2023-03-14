@@ -98,6 +98,30 @@ const ChainProvider = ( { children }: Props ) => {
                                         priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
                                     })
                                     break;
+                            case 2000:
+                                    setChain({
+                                        deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                        deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
+                                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                        xenCryptoAddress: "0x948eed4490833D526688fD1E5Ba0b9B35CD2c32e",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "Dogechain",
+                                        currency: "DOGE",
+                                        priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                                        })
+                                        break;
+                            case 10001:
+                                    setChain({
+                                        deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                                        deb0xViewsAddress: "0x5f8cabea25ada7db13e590c34ae4a1b1191ab997",
+                                        deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                                        xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                                        chainId: parseInt(result, 16),
+                                        chainName: "EthereumPoW",
+                                        currency: "ETHW",
+                                        priceURL: "https://mainnet.ethereumpow.org"
+                                        })
+                                        break;
                 }
             });
         },
