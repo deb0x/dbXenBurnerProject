@@ -41,6 +41,12 @@ export function Stake(props: any): any {
     const datePolygon: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
     const dateAvalanche: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
     const dateBinance: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
+    const dateFantom: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
+    const dateMoonbeam: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
+    const dateOKXChain: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
+    const dateEvmos: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
+    const dateDogechain: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
+    const dateEthereumPow: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
     const now: any = Date.now();
     const { t } = useTranslation();
     const [endDate, setEndDate] = useState<any>();
@@ -69,6 +75,24 @@ export function Stake(props: any): any {
                 break;
             case 56:
                 setEndDate(dateBinance.getTime() - now);
+                break;
+            case 250:
+                setEndDate(dateFantom.getTime() - now);
+                break;
+            case 1284:
+                setEndDate(dateMoonbeam.getTime() - now);
+                break;
+            case 66:
+                setEndDate(dateOKXChain.getTime() - now);
+                break;
+            case 9001:
+                setEndDate(dateEvmos.getTime() - now);
+                break;
+            case 2000:
+                setEndDate(dateDogechain.getTime() - now);
+                    break;
+            case 10001:
+                setEndDate(dateEthereumPow.getTime() - now);
                 break;
         }
     }, [])
