@@ -43,6 +43,15 @@ module.exports = {
             timeout: 1800000,
             accounts: { mnemonic: mnemonic },
         },
+        bsc: {
+            url: "https://bsc.rpc.blxrbdn.com",
+            chainId: 56,
+            gasPrice: "auto",
+            allowUnlimitedContractSize: true,
+            timeout: 1800000,
+            accounts: { mnemonic: mnemonic },
+        },
+
     },
     goerli: {
         apiKey: ""
