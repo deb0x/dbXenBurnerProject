@@ -142,7 +142,7 @@ describe("Test burn functionality", async function() {
         await DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("10") })
     });
 
-    it.only("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
+    it("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
 
         const xenContractLocal = await ethers.getContractFactory("XENCryptoMock");
 
