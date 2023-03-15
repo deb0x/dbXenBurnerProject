@@ -271,24 +271,24 @@ export function AppBarComponent(props: any): any {
                                         <li>
                                             {t("app_bar.rewards")}: <br/> 
                                             {Number(rewardsUnclaimed).toLocaleString('en-US', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
+                                                minimumFractionDigits: 10,
+                                                maximumFractionDigits: 10
                                             })} 
                                             <span>DXN</span>
                                         </li>
                                         <li>
                                             {t("app_bar.stake")}: <br/>
                                             {Number(userStakedAmount).toLocaleString('en-US', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
+                                                minimumFractionDigits: 10,
+                                                maximumFractionDigits: 10
                                             })} 
                                             <span>DXN</span>
                                         </li>
                                         <li>
                                             {t("app_bar.wallet")}: <br/> 
                                             {Number(userUnstakedAmount).toLocaleString('en-US', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
+                                                minimumFractionDigits: 10,
+                                                maximumFractionDigits: 10
                                             })} 
                                             <span>DXN</span>
                                         </li>

@@ -251,12 +251,12 @@ export function Stake(props: any): any {
                         <Typography variant="h4" component="div" className="rewards mb-3">
                             {t("fees.title")}
                         </Typography>
-                        <Typography >
+                        <Typography className="data-height">
                             {t("fees.unclaimed_fees")} {chain.currency} {t("fees.unclaimed_fees_2")}:&nbsp;
                                 <strong>
                                     {Number(feesUnclaimed).toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
+                                        minimumFractionDigits: 10,
+                                        maximumFractionDigits: 10
                                     })}
                                 </strong>
                             </Typography>
@@ -322,8 +322,8 @@ export function Stake(props: any): any {
                             {t("daily_stats.this_cycle")}:&nbsp; 
                             <strong>
                                 {Number(currentReward).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
+                                    minimumFractionDigits: 10,
+                                    maximumFractionDigits: 10
                                 })}
                             </strong> DXN
                         </Typography>
@@ -506,12 +506,12 @@ export function Stake(props: any): any {
                         <Typography variant="h4" component="div" className="rewards mb-3">
                             {t("rewards.title")}
                         </Typography>
-                        <Typography >
+                        <Typography className="data-height">
                             {t("rewards.unclaimed_rewards")}:&nbsp;
                                 <strong>
                                     {Number(rewardsUnclaimed).toLocaleString('en-US', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
+                                        minimumFractionDigits: 10,
+                                        maximumFractionDigits: 10
                                     })}
                                 </strong>
                             </Typography>
@@ -933,8 +933,8 @@ export function Stake(props: any): any {
                         <Typography variant="h6" className="p-0 data-height">
                             <strong>
                                 {Number(userStakedAmount).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
+                                    minimumFractionDigits: 10,
+                                    maximumFractionDigits: 10
                                 })} DXN</strong>
                         </Typography>
                     </div>
@@ -943,11 +943,11 @@ export function Stake(props: any): any {
                         <Typography className="p-0">
                             {t("stake.wallet")}:
                         </Typography>
-                        <Typography variant="h6" className="p-0" data-height>
+                        <Typography variant="h6" className="p-0 data-height" data-height>
                             <strong>
                                 {Number(userUnstakedAmount).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
+                                    minimumFractionDigits: 10,
+                                    maximumFractionDigits: 10
                                 })} DXN</strong>
                         </Typography>
                     </div>
@@ -1002,8 +1002,8 @@ export function Stake(props: any): any {
                         </Typography>
                         <Typography variant="h6" className="p-0">
                             <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
+                                    minimumFractionDigits: 10,
+                                    maximumFractionDigits: 10
                                 })} DXN</strong>
                         </Typography>
                     </div>
