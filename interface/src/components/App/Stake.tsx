@@ -41,12 +41,12 @@ export function Stake(props: any): any {
     const datePolygon: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
     const dateAvalanche: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
     const dateBinance: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
-    const dateFantom: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
-    const dateMoonbeam: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
-    const dateOKXChain: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
-    const dateEvmos: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
-    const dateDogechain: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
-    const dateEthereumPow: any = new Date(Date.UTC(2023, 2, 17, 13, 57, 40, 0));
+    const dateOKXChain: any = new Date(Date.UTC(2023, 2, 17, 11, 24, 7, 0));
+    const dateFantom: any = new Date(Date.UTC(2023, 2, 17, 11, 44, 7, 0));
+    const dateDogechain: any = new Date(Date.UTC(2023, 2, 17, 11, 55, 14, 0));
+    const dateMoonbeam: any = new Date(Date.UTC(2023, 2, 17, 12, 3, 30, 0));
+    const dateEvmos: any = new Date(Date.UTC(2023, 2, 17, 12, 16, 48, 0));
+    const dateEthereumPow: any = new Date(Date.UTC(2023, 2, 17, 12, 24, 59, 0));
     const now: any = Date.now();
     const { t } = useTranslation();
     const [endDate, setEndDate] = useState<any>();
@@ -90,7 +90,7 @@ export function Stake(props: any): any {
                 break;
             case 2000:
                 setEndDate(dateDogechain.getTime() - now);
-                    break;
+                break;
             case 10001:
                 setEndDate(dateEthereumPow.getTime() - now);
                 break;
