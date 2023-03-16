@@ -107,7 +107,7 @@ contract DBXenViews {
                 feePerStake;
         } else {
             currentCycleFeesPerStakeSummed = dbxen.cycleFeesPerStakeSummed(
-                dbxen.previousStartedCycle()
+                lastStartedCycleTemp + 1
             );
         }
 
