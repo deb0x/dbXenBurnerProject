@@ -92,12 +92,8 @@ export function Burn(): any {
                 "jsonrpc": "2.0", "method": "eth_gasPrice", "params": [], "id": 1
             })
         };
-<<<<<<< HEAD
 
         const signer = library.getSigner(0);
-=======
-        const signer = library.getSigner(0)
->>>>>>> origin/main
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
