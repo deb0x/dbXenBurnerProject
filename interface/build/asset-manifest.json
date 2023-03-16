@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/static/css/main.ff3b18e0.chunk.css",
-    "main.js": "/static/js/main.2c4f8f1e.chunk.js",
-    "main.js.map": "/static/js/main.2c4f8f1e.chunk.js.map",
+    "main.css": "/static/css/main.ec7a79c7.chunk.css",
+    "main.js": "/static/js/main.1994a9d0.chunk.js",
+    "main.js.map": "/static/js/main.1994a9d0.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.d0524481.js",
     "runtime-main.js.map": "/static/js/runtime-main.d0524481.js.map",
     "static/css/2.b8e408b6.chunk.css": "/static/css/2.b8e408b6.chunk.css",
@@ -12,7 +12,7 @@
     "static/js/3.43fc959b.chunk.js.map": "/static/js/3.43fc959b.chunk.js.map",
     "index.html": "/index.html",
     "static/css/2.b8e408b6.chunk.css.map": "/static/css/2.b8e408b6.chunk.css.map",
-    "static/css/main.ff3b18e0.chunk.css.map": "/static/css/main.ff3b18e0.chunk.css.map",
+    "static/css/main.ec7a79c7.chunk.css.map": "/static/css/main.ec7a79c7.chunk.css.map",
     "static/js/2.af5b19c0.chunk.js.LICENSE.txt": "/static/js/2.af5b19c0.chunk.js.LICENSE.txt",
     "static/media/index.scss": "/static/media/Karla-Regular.6d937d4f.ttf",
     "static/media/avalanche.234db155.svg": "/static/media/avalanche.234db155.svg",
@@ -20,14 +20,20 @@
     "static/media/coin-bag-solid--dark.b9b74873.svg": "/static/media/coin-bag-solid--dark.b9b74873.svg",
     "static/media/coin-bag-solid--light.d9344235.svg": "/static/media/coin-bag-solid--light.d9344235.svg",
     "static/media/copy-1.6be37e8f.svg": "/static/media/copy-1.6be37e8f.svg",
+    "static/media/dc.27c8576a.svg": "/static/media/dc.27c8576a.svg",
     "static/media/diconnect.a287fc1c.svg": "/static/media/diconnect.a287fc1c.svg",
     "static/media/elephant.605d60c2.svg": "/static/media/elephant.605d60c2.svg",
     "static/media/elephant.b785cc48.png": "/static/media/elephant.b785cc48.png",
     "static/media/empty.efc45323.png": "/static/media/empty.efc45323.png",
+    "static/media/ethpow.bcd11d82.svg": "/static/media/ethpow.bcd11d82.svg",
+    "static/media/evmos.59e38ec2.svg": "/static/media/evmos.59e38ec2.svg",
+    "static/media/fantom.3f8c71bb.svg": "/static/media/fantom.3f8c71bb.svg",
     "static/media/fees.50cb4df6.svg": "/static/media/fees.50cb4df6.svg",
     "static/media/file-icon.92106822.svg": "/static/media/file-icon.92106822.svg",
     "static/media/finance.d8ebf4c0.svg": "/static/media/finance.d8ebf4c0.svg",
     "static/media/getFetch.cjs": "/static/media/getFetch.5fde86e3.cjs",
+    "static/media/moonbeam.c0522d32.svg": "/static/media/moonbeam.c0522d32.svg",
+    "static/media/okx.6ecc0351.svg": "/static/media/okx.6ecc0351.svg",
     "static/media/polygon.c13e4066.svg": "/static/media/polygon.c13e4066.svg",
     "static/media/token.0bd78e9a.svg": "/static/media/token.0bd78e9a.svg",
     "static/media/wallet--dark.307c5384.svg": "/static/media/wallet--dark.307c5384.svg",
@@ -39,7 +45,7 @@
     "static/js/runtime-main.d0524481.js",
     "static/css/2.b8e408b6.chunk.css",
     "static/js/2.af5b19c0.chunk.js",
-    "static/css/main.ff3b18e0.chunk.css",
-    "static/js/main.2c4f8f1e.chunk.js"
+    "static/css/main.ec7a79c7.chunk.css",
+    "static/js/main.1994a9d0.chunk.js"
   ]
 }
