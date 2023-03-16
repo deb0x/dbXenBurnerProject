@@ -153,7 +153,7 @@ export function Burn(): any {
                         setMaticValue(fee.toFixed(5));
                         setTotalCost(totalValue.toFixed(5));
                     }
-                 else {
+                 else if(Number(chain.chainId) === 66){
                     let price = 0.1;
                     let protocol_fee = value * (1 - 0.00005 * value);
                     let gasLimitVal = 0;
