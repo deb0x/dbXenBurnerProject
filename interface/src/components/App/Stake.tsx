@@ -54,7 +54,11 @@ export function Stake(props: any): any {
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
             // Render a complete state
-            return;
+            return (
+                <span>
+                    ~ {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                </span>
+            );
         } else {
             // Render a countdown
             return (
@@ -66,6 +70,14 @@ export function Stake(props: any): any {
     };
 
     useEffect(() => {
+        timer();
+    }, [])
+
+    useEffect(() => {
+        timer();
+    }, [chain.chainId])
+
+    function timer() {
         switch(Number(chain.chainId)) {
             case 137: 
                 setEndDate(datePolygon.getTime() - now);
@@ -95,7 +107,7 @@ export function Stake(props: any): any {
                 setEndDate(dateEthereumPow.getTime() - now);
                 break;
         }
-    }, [])
+    }
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
