@@ -149,7 +149,7 @@ export function AppBarComponent(props: any): any {
                 type: 'ERC20',
                 options: {
                   address: chain.deb0xERC20Address,
-                  symbol: tokenSymbol,
+                  symbol: chain.dxnTokenName,
                   decimals: tokenDecimals,
                 //   image: tokenImage,
                 },

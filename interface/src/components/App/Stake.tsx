@@ -39,10 +39,9 @@ export function Stake(props: any): any {
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
     const dateEthereum: any = new Date(Date.UTC(2023, 3, 17, 14, 3, 19, 0));
-    const datePolygon: any = new Date(Date.UTC(2023, 2, 17, 14, 3, 19, 0));
-    const dateAvalanche: any = new Date(Date.UTC(2023, 2, 17, 14, 7, 20, 0));
+    const datePolygon: any = new Date(Date.UTC(2023, 3, 17, 14, 3, 19, 0));
+    const dateAvalanche: any = new Date(Date.UTC(2023, 3, 17, 14, 7, 20, 0));
     const dateBinance: any = new Date(Date.UTC(2023, 3, 17, 13, 57, 40, 0));
-    
     const dateOKXChain: any = new Date(Date.UTC(2023, 3, 17, 11, 24, 7, 0));
     const dateFantom: any = new Date(Date.UTC(2023, 3, 17, 11, 44, 7, 0));
     const dateDogechain: any = new Date(Date.UTC(2023, 3, 17, 11, 55, 14, 0));
@@ -56,7 +55,11 @@ export function Stake(props: any): any {
     const renderer = ({ hours, minutes, seconds, completed }: any) => {
         if (completed) {
             // Render a complete state
-            return;
+            return (
+                <span>
+                    ~ {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                </span>
+            );
         } else {
             // Render a countdown
             return (
@@ -68,9 +71,17 @@ export function Stake(props: any): any {
     };
 
     useEffect(() => {
+        timer();
+    }, [])
+
+    useEffect(() => {
+        timer();
+    }, [chain.chainId])
+
+    function timer() {
         switch(Number(chain.chainId)) {
             case 1: 
-                setEndDate(dateEthereum.getTime() - now);
+                setEndDate(dateEthereumPow.getTime() - now);
                 break;
             case 137: 
                 setEndDate(datePolygon.getTime() - now);
@@ -100,7 +111,7 @@ export function Stake(props: any): any {
                 setEndDate(dateEthereumPow.getTime() - now);
                 break;
         }
-    }, [])
+    }
 
     function FeesPanel() {
         const [feesUnclaimed, setFeesUnclaimed] = useState("")
