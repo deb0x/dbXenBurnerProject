@@ -121,11 +121,12 @@ const networks: any = {
             symbol: 'ETH',
             decimals: 18
         },
-        rpcUrls: ['https://mainnet.infura.io/v3/'],
+        rpcUrls: ['https://eth.llamarpc.com'],
         blockExplorerUrls: ['https://etherscan.io'] 
     }
 };
 
+let API_KEY = process.env.REACT_APP_API_KEY_INFURA;
 export default function ChainSetter(props: any) {
     const { chain, setChain } = useContext(ChainContext);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -173,7 +174,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "polygon",
                             currency: "MATIC",
-                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            priceURL: `https://polygon-mainnet.infura.io/v3/${API_KEY}`,
                             dxnTokenName: "mDXN"
                         })
                         break;
@@ -320,8 +321,8 @@ export default function ChainSetter(props: any) {
                 </button>
                 <Popper id={id} open={open} anchorEl={anchorEl} className="chain-popper">
                 <button
-                        onClick={() => handleNetworkSwitch("polygon")}
-                        className="eth"
+                        onClick={() => handleNetworkSwitch("eth")}
+                        className="btn"
                     >
                         <img alt="eth" src={eth} className="eth"/>
                         Switch to Ethereum
