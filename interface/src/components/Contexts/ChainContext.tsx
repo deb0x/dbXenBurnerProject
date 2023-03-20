@@ -1,5 +1,6 @@
 import { createContext } from "react";
 
+let infuraKey = process.env.REACT_APP_API_KEY_INFURA;
 export const initialChain = {
     chain: {
         deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
@@ -9,7 +10,7 @@ export const initialChain = {
         chainId: "137",
         chainName: "polygon",
         currency: "MATIC",
-        priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
+        priceURL: `https://polygon-mainnet.infura.io/v3/${infuraKey}`
     },
     setChain: (_value: any) => {}
 }
