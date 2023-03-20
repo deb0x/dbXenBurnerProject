@@ -4,7 +4,7 @@ import { NetworkConnector } from '@web3-react/network-connector'
 
 // const POLLING_INTERVAL = 12000
 const RPC_URLS: { [chainId: number]: string } = {
-    1: 'https://mainnet.infura.io/v3//6010818c577b4531b1886965421a91d3',
+    1: 'https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     137: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     43114: 'https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     56: 'https://bsc.rpc.blxrbdn.com',

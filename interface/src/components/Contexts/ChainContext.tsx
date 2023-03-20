@@ -10,7 +10,8 @@ export const initialChain = {
         chainId: "137",
         chainName: "polygon",
         currency: "MATIC",
-        priceURL: `https://polygon-mainnet.infura.io/v3/${infuraKey}`
+        priceURL: `https://polygon-mainnet.infura.io/v3/${infuraKey}`,
+        dxnTokenName: "mDXN"
     },
     setChain: (_value: any) => {}
 }

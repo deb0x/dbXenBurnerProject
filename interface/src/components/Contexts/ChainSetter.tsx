@@ -173,7 +173,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "polygon",
                             currency: "MATIC",
-                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
+                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            dxnTokenName: "mDXN"
                         })
                         break;
                     case 43114: 
@@ -185,7 +186,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "avalanche",
                             currency: "AVAX",
-                            priceURL: "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
+                            priceURL: "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            dxnTokenName: "aDXN"
                         })
                         break;
                     case 56:
@@ -197,7 +199,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "binance",
                             currency: "BNB",
-                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "bDXN"
                         })
                         break;
                     case 250:
@@ -209,7 +212,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "fantom",
                             currency: "FTM",
-                            priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "fmDXN"
                         })
                         break;
                     case 1284:
@@ -221,7 +225,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "moonbeam",
                             currency: "GLMR",
-                            priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "mbDXN"
                         })
                         break;
                     case 66:
@@ -233,7 +238,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "okx",
                             currency: "OKT",
-                            priceURL: "https://oKc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://oKc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "okDXN"
                         })
                         break;
                     case 9001:
@@ -245,7 +251,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Evmos",
                             currency: "EVMOS",
-                            priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "coDXN"
                         })
                         break;
                     case 2000:
@@ -257,7 +264,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Dogechain",
                             currency: "DOGE",
-                            priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d"
+                            priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "dcDXN"
                         })
                         break;
                     case 10001:
@@ -269,7 +277,8 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "EthereumPoW",
                             currency: "ETHW",
-                            priceURL: "https://mainnet.ethereumpow.org"
+                            priceURL: "https://mainnet.ethereumpow.org",
+                            dxnTokenName: "vvDXN"
                         })
                         break;
                 }
