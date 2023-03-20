@@ -161,7 +161,7 @@ export default function ChainSetter(props: any) {
                         chainId: parseInt(result, 16),
                         chainName: "Ethereum",
                         currency: "ETH",
-                        priceURL: "https://mainnet.infura.io/v3//6010818c577b4531b1886965421a91d3"
+                        priceURL: "https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3"
                     })
                     break;
                     case 137: 
