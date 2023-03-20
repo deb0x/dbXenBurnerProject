@@ -121,7 +121,7 @@ const networks: any = {
             symbol: 'ETH',
             decimals: 18
         },
-        rpcUrls: ['https://mainnet.infura.io/v3/'],
+        rpcUrls: ['https://eth.llamarpc.com'],
         blockExplorerUrls: ['https://etherscan.io'] 
     }
 };
@@ -320,8 +320,8 @@ export default function ChainSetter(props: any) {
                 </button>
                 <Popper id={id} open={open} anchorEl={anchorEl} className="chain-popper">
                 <button
-                        onClick={() => handleNetworkSwitch("polygon")}
-                        className="eth"
+                        onClick={() => handleNetworkSwitch("eth")}
+                        className="btn"
                     >
                         <img alt="eth" src={eth} className="eth"/>
                         Switch to Ethereum
