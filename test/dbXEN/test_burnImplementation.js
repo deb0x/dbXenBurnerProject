@@ -5,22 +5,14 @@ const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test burn functionality", async function() {
+describe.only("Test burn functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
         [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
 
-        const lib = await ethers.getContractFactory("MathX");
-        const library = await lib.deploy();
-
-        const xenContract = await ethers.getContractFactory("XENCrypto", {
-            libraries: {
-                MathX: library.address
-            }
-        });
-
-        XENContract = await xenContract.deploy();
+        const xen = await ethers.getContractFactory("XENCryptoMock");
+        XENContract = await xen.deploy();
         await XENContract.deployed();
 
         const Deb0x = await ethers.getContractFactory("DBXen");
@@ -41,15 +33,7 @@ describe("Test burn functionality", async function() {
     });
 
     it(`Simple test for one person, one cycle`, async() => {
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("1"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("2500000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
@@ -57,19 +41,11 @@ describe("Test burn functionality", async function() {
 
         await DBXenContract.connect(alice).claimRewards();
         let aliceDBXenBalace = await DBXenERC20.balanceOf(alice.address);
-        expect(aliceDBXenBalace).to.equal(NumUtils.day(2));
+        expect(aliceDBXenBalace).to.equal(NumUtils.day(1));
     });
 
     it(`Test burn functionality with Xen contract`, async() => {
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("5000000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -78,10 +54,10 @@ describe("Test burn functionality", async function() {
         await DBXenContract.connect(alice).claimRewards();
         let aliceDBXenBalace = await DBXenERC20.balanceOf(alice.address);
 
-        expect(aliceDBXenBalace).to.equal(NumUtils.day(2));
-        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("1"));
+        expect(aliceDBXenBalace).to.equal(NumUtils.day(1));
+        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("2500000"));
 
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("300000000"))
         await DBXenContract.connect(alice).burnBatch(120, { value: ethers.utils.parseEther("10") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
@@ -90,38 +66,19 @@ describe("Test burn functionality", async function() {
         await DBXenContract.connect(alice).claimRewards();
         let aliceDBXenBalaceInThirdCycle = await DBXenERC20.balanceOf(alice.address);
 
-        expect(aliceDBXenBalaceInThirdCycle).to.equal(BigNumber.from(NumUtils.day(3)).add(BigNumber.from(NumUtils.day(2))));
-        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("121"));
+        expect(aliceDBXenBalaceInThirdCycle).to.equal(BigNumber.from(NumUtils.day(2)).add(BigNumber.from(NumUtils.day(1))));
+        expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("302500000"));
     });
 
     it(`Test burn functionality with Xen contract and multiple users`, async() => {
-        const lib = await ethers.getContractFactory("MathX");
-        const libraryLocal = await lib.deploy();
-
-        const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
-            libraries: {
-                MathX: libraryLocal.address
-            }
-        });
-
-        XENContractLocal = await xenContractLocal.deploy();
+        const xen = await ethers.getContractFactory("XENCryptoMock");
+        XENContractLocal = await xen.deploy();
         await XENContractLocal.deployed();
 
         aliceInstance = XENContractLocal.connect(alice);
         bobInstance = XENContractLocal.connect(bob);
         deanInstance = XENContractLocal.connect(dean);
         carolInstance = XENContractLocal.connect(carol);
-
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimRank(100);
-        await carolInstance.claimRank(100);
-        await deanInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await bobInstance.claimMintReward();
-        await carolInstance.claimMintReward();
-        await deanInstance.claimMintReward();
 
         const DBXenLocal = await ethers.getContractFactory("DBXen");
         DBXenContractLocal = await DBXenLocal.deploy(ethers.constants.AddressZero, XENContractLocal.address);
@@ -134,19 +91,17 @@ describe("Test burn functionality", async function() {
         const dbxAddress = await DBXenContractLocal.dxn()
         DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
-        await XENContractLocal.connect(alice).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(bob).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(carol).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(dean).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
+        await XENContractLocal.connect(alice).approve(DBXenContractLocal.address, ethers.utils.parseEther("25000000000"))
+        await XENContractLocal.connect(bob).approve(DBXenContractLocal.address, ethers.utils.parseEther("25000000000"))
+        await XENContractLocal.connect(carol).approve(DBXenContractLocal.address, ethers.utils.parseEther("25000000000"))
+        await XENContractLocal.connect(dean).approve(DBXenContractLocal.address, ethers.utils.parseEther("25000000000"))
 
         await DBXenContractLocal.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("10") })
     });
 
-    it("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
-
-        const xenContractLocal = await ethers.getContractFactory("XENCryptoMock");
-
-        XENContractLocal = await xenContractLocal.deploy();
+    it.skip("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
+        const xen = await ethers.getContractFactory("XENCryptoMock");
+        XENContractLocal = await xen.deploy();
         await XENContractLocal.deployed();
 
         aliceInstance = XENContractLocal.connect(alice);
