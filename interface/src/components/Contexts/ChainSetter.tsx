@@ -154,9 +154,9 @@ export default function ChainSetter(props: any) {
                 switch(parseInt(result, 16)) {
                     case 1: 
                         setChain({
-                            deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
-                            deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                            deb0xAddress: "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD",
+                            deb0xViewsAddress: "0xf032f7FB8258728A1938473B2115BB163d5Da593",
+                            deb0xERC20Address: "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F",
                             xenCryptoAddress: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
                             chainId: parseInt(result, 16),
                             chainName: "Ethereum",
