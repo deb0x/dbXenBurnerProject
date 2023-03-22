@@ -104,14 +104,20 @@ export function Burn(): any {
                             let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                         let protocol_fee = value * (1 - 0.00005 * value);
                         let gasLimitVal = 0;
-                        (Number(chain.chainId)) === 137 ?
-                        numberBatchesBurnedInCurrentCycle != 0 ?
-                            gasLimitVal = (BigNumber.from("350000")) :
-                            gasLimitVal = (BigNumber.from("500000"))
-                        :
-                        numberBatchesBurnedInCurrentCycle != 0 ?
-                        gasLimitVal = (BigNumber.from("500000")) :
-                        gasLimitVal = (BigNumber.from("700000"))
+                        if((Number(chain.chainId)) === 1){
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                            gasLimitVal = (BigNumber.from("150000")) :
+                            gasLimitVal = (BigNumber.from("200000"))
+                        }else{
+                            (Number(chain.chainId)) === 137 ?
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("350000")) :
+                                gasLimitVal = (BigNumber.from("500000"))
+                                :
+                                numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("500000")) :
+                                gasLimitVal = (BigNumber.from("700000"))
+                        }
                         setCurrentGasLimit(gasLimitVal);
                         let fee = gasLimitVal * price * protocol_fee / 1000000000;
                         let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
@@ -153,7 +159,7 @@ export function Burn(): any {
                         setMaticValue(fee.toFixed(5));
                         setTotalCost(totalValue.toFixed(5));
                     }
-                 else if(Number(chain.chainId) === 66){
+                  if(Number(chain.chainId) === 66){
                     let price = 0.1;
                     let protocol_fee = value * (1 - 0.00005 * value);
                     let gasLimitVal = 0;
