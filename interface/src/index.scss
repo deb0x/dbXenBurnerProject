@@ -283,8 +283,17 @@ $randomNumber: random(4);
         }
     }
     .ethpow,
-    .okx {
+    .okx,
+    .dc {
         border-radius: 50%;
+    }
+    .img-container.eth {
+        width: 25px;
+        margin-right: 10px;
+        .eth {
+            max-height: 25px;
+            margin-right: 0;
+        }
     }
 }
 

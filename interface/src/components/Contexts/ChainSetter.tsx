@@ -10,6 +10,7 @@ import okx from "../../photos/icons/okx.svg";
 import evmos from "../../photos/icons/evmos.svg";
 import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
+import eth from "../../photos/icons/eth.svg";
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -111,6 +112,17 @@ const networks: any = {
         },
         rpcUrls: ['https://mainnet.ethereumpow.org'],
         blockExplorerUrls: ['https://www.oklink.com/en/ethw/'] 
+    },
+    eth: {
+        chainId: `0x${Number(1).toString(16)}`,
+        chainName: 'Ethereum Mainnet',
+        nativeCurrency: {
+            name: 'Ethereum',
+            symbol: 'ETH',
+            decimals: 18
+        },
+        rpcUrls: ['https://eth.llamarpc.com'],
+        blockExplorerUrls: ['https://etherscan.io'] 
     }
 };
 
@@ -140,6 +152,19 @@ export default function ChainSetter(props: any) {
                 ]
             }).then((result: any) => {
                 switch(parseInt(result, 16)) {
+                    case 1: 
+                        setChain({
+                            deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                            deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                            xenCryptoAddress: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+                            chainId: parseInt(result, 16),
+                            chainName: "Ethereum",
+                            currency: "ETH",
+                            priceURL: "https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            dxnTokenName: "DXN"
+                        })
+                        break;
                     case 137: 
                         setChain({
                             deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
@@ -295,6 +320,15 @@ export default function ChainSetter(props: any) {
                     {chain.chainName.charAt(0).toUpperCase() + chain.chainName.slice(1)}
                 </button>
                 <Popper id={id} open={open} anchorEl={anchorEl} className="chain-popper">
+                <button
+                        onClick={() => handleNetworkSwitch("eth")}
+                        className="btn"
+                    >
+                        <div className="img-container eth">
+                            <img alt="eth" src={eth} className="eth"/>
+                        </div>
+                        Switch to Ethereum
+                    </button>
                     <button
                         onClick={() => handleNetworkSwitch("polygon")}
                         className="btn"
