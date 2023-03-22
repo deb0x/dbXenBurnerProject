@@ -121,7 +121,7 @@ const networks: any = {
             symbol: 'ETH',
             decimals: 18
         },
-        rpcUrls: ['https://mainnet.infura.io/v3/'],
+        rpcUrls: ['https://eth-rpc.gateway.pokt.network'],
         blockExplorerUrls: ['https://etherscan.io'] 
     }
 };
