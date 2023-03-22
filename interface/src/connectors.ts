@@ -4,6 +4,7 @@ import { NetworkConnector } from '@web3-react/network-connector'
 
 // const POLLING_INTERVAL = 12000
 const RPC_URLS: { [chainId: number]: string } = {
+    1: 'https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     137: 'https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     43114: 'https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3',
     56: 'https://bsc.rpc.blxrbdn.com',
@@ -15,10 +16,10 @@ const RPC_URLS: { [chainId: number]: string } = {
     10001:'https://mainnet.ethereumpow.org'
 }
 
-export const injected = new InjectedConnector({ supportedChainIds: [137, 43114, 56, 250, 1284, 66, 9001, 2000,10001 ] })
+export const injected = new InjectedConnector({ supportedChainIds: [1, 137, 43114, 56, 250, 1284, 66, 9001, 2000,10001 ] })
 
 export const network = new NetworkConnector({
-    urls: { 137: RPC_URLS[137], 43114: RPC_URLS[43114], 56: RPC_URLS[56],  250: RPC_URLS[250], 1284: RPC_URLS[1284],
+    urls: {1: RPC_URLS[1], 137: RPC_URLS[137], 43114: RPC_URLS[43114], 56: RPC_URLS[56],  250: RPC_URLS[250], 1284: RPC_URLS[1284],
         66: RPC_URLS[66],  9001: RPC_URLS[9001],  2000: RPC_URLS[2000], 10001: RPC_URLS[10001]},
     defaultChainId: 137
 })

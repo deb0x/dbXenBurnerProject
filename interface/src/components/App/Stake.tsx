@@ -38,6 +38,7 @@ export function Stake(props: any): any {
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
+    const dateEthereum: any = new Date(Date.UTC(2023, 3, 22, 14, 0, 11, 0));
     const datePolygon: any = new Date(Date.UTC(2023, 3, 17, 14, 3, 19, 0));
     const dateAvalanche: any = new Date(Date.UTC(2023, 3, 17, 14, 7, 20, 0));
     const dateBinance: any = new Date(Date.UTC(2023, 3, 17, 13, 57, 40, 0));
@@ -79,6 +80,9 @@ export function Stake(props: any): any {
 
     function timer() {
         switch(Number(chain.chainId)) {
+            case 1: 
+                setEndDate(dateEthereum.getTime() - now);
+                break;
             case 137: 
                 setEndDate(datePolygon.getTime() - now);
                 break;
