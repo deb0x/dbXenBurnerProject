@@ -5,7 +5,7 @@ const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe.only("Test burn functionality", async function() {
+describe("Test burn functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
@@ -49,7 +49,7 @@ describe.only("Test burn functionality", async function() {
         await XENContract.transferFrom(deployer.address, carol.address, ethers.utils.parseEther("30000000000"))
     });
 
-    it.only(`Simple test for one person, one cycle`, async() => {
+    it(`Simple test for one person, one cycle`, async() => {
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("25000000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
@@ -61,7 +61,7 @@ describe.only("Test burn functionality", async function() {
         expect(aliceDBXenBalace).to.equal(NumUtils.day(1));
     });
 
-    it.only(`Test burn functionality with Xen contract`, async() => {
+    it(`Test burn functionality with Xen contract`, async() => {
         await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("5000000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
@@ -87,7 +87,7 @@ describe.only("Test burn functionality", async function() {
         expect(await aliceInstance.userBurns(alice.address)).to.equal(ethers.utils.parseEther("302500000"));
     });
 
-    it.only("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
+    it("Should revert the burn transaction if value sent is less than the required protocol fee", async function() {
 
         await XENContract.connect(alice).approve(DBXenContract.address, BigNumber.from("0xffffffffffffffffffffffffffffffffffffffff"))
 
@@ -102,13 +102,6 @@ describe.only("Test burn functionality", async function() {
         } catch (error) {
             console.log(error.message);
         }
-        try {
-            await expect(DBXenContract.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("0.5") }))
-                .to.include("DBXen: value less than protocol fee")
-        } catch (error) {
-            console.log(error.message);
-        }
-        // await DBXenContract.connect(alice).burnBatch(10000, { value: ethers.utils.parseEther("0.6") })
     })
 
 });
