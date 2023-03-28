@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="20"
+   height="22.5"
+   viewBox="0 0 20 22.5"
+   version="1.1"
+   id="svg199"
+   sodipodi:docname="copy-1.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs203" />
+  <sodipodi:namedview
+     id="namedview201"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="35.644444"
+     inkscape:cx="10.001559"
+     inkscape:cy="11.25"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg199" />
+  <path
+     id="Icon_awesome-copy"
+     data-name="Icon awesome-copy"
+     d="M14.286,19.688v1.758A1.063,1.063,0,0,1,13.214,22.5H1.071A1.063,1.063,0,0,1,0,21.445V5.273A1.063,1.063,0,0,1,1.071,4.219H4.286V17.227a2.483,2.483,0,0,0,2.5,2.461Zm0-15.117V0h-7.5A1.063,1.063,0,0,0,5.714,1.055V17.227a1.063,1.063,0,0,0,1.071,1.055H18.929A1.063,1.063,0,0,0,20,17.227V5.625H15.357A1.066,1.066,0,0,1,14.286,4.57Zm5.4-1.364L16.742.309A1.08,1.08,0,0,0,15.985,0h-.27V4.219H20V3.952a1.046,1.046,0,0,0-.314-.746Z"
+     fill="#285943"
+     style="fill:#91c499;fill-opacity:1" />
+</svg>
