@@ -40,6 +40,9 @@ export function PermanentDrawer(props: any): any {
 
     useEffect(() => {
         switch(Number(chain.chainId)) {
+            case 1:
+                setBaseUrl("https://etherscan.io/address/")
+                break;
             case 137:
                 setBaseUrl("https://polygonscan.com/address/")
                 break;
