@@ -9,12 +9,12 @@ describe("Test burn functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [deployer, alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const lib = await ethers.getContractFactory("MathX");
         const library = await lib.deploy();
 
-        const xenContract = await ethers.getContractFactory("XENCrypto", {
+        const xenContract = await ethers.getContractFactory("XENCryptoMockMint", {
             libraries: {
                 MathX: library.address
             }
@@ -38,131 +38,78 @@ describe("Test burn functionality", async function() {
         bobInstance = XENContract.connect(bob);
         deanInstance = XENContract.connect(dean);
         carolInstance = XENContract.connect(carol);
+
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, alice.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, bob.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, dean.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, carol.address, ethers.utils.parseEther("30000000000"))
     });
 
     it("Simple burn check", async() => {
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 100 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-
         let balanceBeforeBurn = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") });
 
         let balanceAfterBurn = await XENContract.balanceOf(alice.address);
-        let tokensForOneBatch = ethers.utils.parseEther("1");
+        let tokensForOneBatch = ethers.utils.parseEther("2500000");
         let expectedBalanceAfterBurn = BigNumber.from(balanceBeforeBurn.toString()).sub(BigNumber.from(tokensForOneBatch));
         expect(expectedBalanceAfterBurn).to.equal(balanceAfterBurn);
     });
 
     it("Multiple batches burn", async() => {
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-
         let actualBalance = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("500000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(2, { value: ethers.utils.parseEther("1") });
 
         let balanceAfterBurn = await XENContract.balanceOf(alice.address);
-        let tokensForTwoBatches = ethers.utils.parseEther("2");
+        let tokensForTwoBatches = ethers.utils.parseEther("5000000");
         let expectedBalanceAfterBurn = BigNumber.from(actualBalance.toString()).sub(BigNumber.from(tokensForTwoBatches));
         expect(expectedBalanceAfterBurn).to.equal(balanceAfterBurn);
 
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 101 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-
         let actualBalanceAfterFirstBurn = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("1250000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(5, { value: ethers.utils.parseEther("1") });
 
         let balanceAfterFirstBurn = await XENContract.balanceOf(alice.address);
-        let tokensForFiveBatch = ethers.utils.parseEther("5");
+        let tokensForFiveBatch = ethers.utils.parseEther("12500000");
         let expectedBalanceAfterFirstBurn = BigNumber.from(actualBalanceAfterFirstBurn.toString()).sub(BigNumber.from(tokensForFiveBatch));
         expect(expectedBalanceAfterFirstBurn).to.equal(balanceAfterFirstBurn);
     });
 
     it("Multiple batches, multiple users", async() => {
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimRank(100);
-        await deanInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
-        await hre.ethers.provider.send("evm_mine")
-
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimMintReward();
-        await bobInstance.claimRank(100);
-        await deanInstance.claimMintReward();
-        await deanInstance.claimRank(100);
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await bobInstance.claimMintReward();
-        await deanInstance.claimMintReward();
-
         let actualBalanceAlice = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(3, { value: ethers.utils.parseEther("1") });
 
         let balanceAfterBurnAlice = await XENContract.balanceOf(alice.address);
-        let tokensForThreeBatches = ethers.utils.parseEther("3");
+        let tokensForThreeBatches = ethers.utils.parseEther("7500000");
         let expectedBalanceAfterBurnAlice = BigNumber.from(actualBalanceAlice.toString()).sub(BigNumber.from(tokensForThreeBatches));
         expect(expectedBalanceAfterBurnAlice).to.equal(balanceAfterBurnAlice);
         expect(await XENContract.userBurns(alice.address)).to.equal(BigNumber.from(tokensForThreeBatches))
 
         let actualBalanceBob = await XENContract.balanceOf(bob.address);
-        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(bob).burnBatch(3, { value: ethers.utils.parseEther("1") });
         let balanceAfterBurnBob = await XENContract.balanceOf(bob.address);
         let expectedBalanceAfterBurnBob = BigNumber.from(actualBalanceBob.toString()).sub(BigNumber.from(tokensForThreeBatches));
         expect(expectedBalanceAfterBurnBob).to.equal(balanceAfterBurnBob);
         expect(await XENContract.userBurns(bob.address)).to.equal(BigNumber.from(tokensForThreeBatches))
 
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimRank(100);
-        await deanInstance.claimRank(100);
-        await carolInstance.claimRank(100);
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await bobInstance.claimMintReward();
-        await deanInstance.claimMintReward();
-        await carolInstance.claimMintReward();
-
         let actualBalanceCarol = await XENContract.balanceOf(carol.address);
-        await XENContract.connect(carol).approve(DBXenContract.address, ethers.utils.parseEther("250000"))
+        await XENContract.connect(carol).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(carol).burnBatch(1, { value: ethers.utils.parseEther("1") });
         let balanceAfterBurnCarol = await XENContract.balanceOf(carol.address);
-        let tokensForOneBatches = ethers.utils.parseEther("1");
+        let tokensForOneBatches = ethers.utils.parseEther("2500000");
         let expectedBalanceCarol = BigNumber.from(actualBalanceCarol.toString()).sub(BigNumber.from(tokensForOneBatches));
         expect(expectedBalanceCarol).to.equal(balanceAfterBurnCarol);
         expect(await XENContract.userBurns(carol.address)).to.equal(BigNumber.from(tokensForOneBatches))
 
         let actualBalanceAfterFirstBurnAlice = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(3, { value: ethers.utils.parseEther("1") });
         let balanceAfterSecondBurnAlice = await XENContract.balanceOf(alice.address);
         let expectedBalanceAfterFirstBurnAlice = BigNumber.from(actualBalanceAfterFirstBurnAlice.toString()).sub(BigNumber.from(tokensForThreeBatches));
@@ -175,31 +122,18 @@ describe("Test burn functionality", async function() {
     });
 
     it("Claim fees after burn action", async() => {
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 100 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimMintReward();
-        await bobInstance.claimRank(100);
-
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 122 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await bobInstance.claimMintReward();
         let actualBalanceAlice = await XENContract.balanceOf(alice.address);
-        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(alice).burnBatch(3, { value: ethers.utils.parseEther("1") });
         let balanceAfterBurnAlice = await XENContract.balanceOf(alice.address);
-        let tokensForThreeBatches = ethers.utils.parseEther("3");
+        let tokensForThreeBatches = ethers.utils.parseEther("7500000");
         let expectedBalanceAfterBurnAlice = BigNumber.from(actualBalanceAlice.toString()).sub(BigNumber.from(tokensForThreeBatches));
 
         expect(expectedBalanceAfterBurnAlice).to.equal(balanceAfterBurnAlice);
         expect(await XENContract.userBurns(alice.address)).to.equal(BigNumber.from(tokensForThreeBatches))
 
         let actualBalanceBob = await XENContract.balanceOf(bob.address);
-        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("750000"))
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
         await DBXenContract.connect(bob).burnBatch(3, { value: ethers.utils.parseEther("1") });
 
         let balanceAfterBurnBob = await XENContract.balanceOf(bob.address);
