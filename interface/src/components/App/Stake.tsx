@@ -613,7 +613,23 @@ export function Stake(props: any): any {
 
         useEffect(() => {
             setApproval()
-        }, [approved]);
+        }, []);
+
+        useEffect(() => {
+            setStakeAmount()
+        }, [amountToStake]);
+
+        async function setStakeAmount() {
+            if(Number(amountToStake) != 0){
+            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+
+            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>{
+                    let allowanceValue = ethers.utils.formatEther(allowance.toString());
+                    allowanceValue > amountToStake ? 
+                    setApproved(true) : setApproved(false)
+        })
+    }
+        }
 
         async function setStakedAmount() {
             const deb0xContract = await DBXen(library, chain.deb0xAddress)
@@ -649,6 +665,7 @@ export function Stake(props: any): any {
             await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>
                  allowance > 0 ? setApproved(true) : setApproved(false)
             )
+            console.log(approved)
         }
 
         async function totalAmountStaked() {
@@ -661,6 +678,10 @@ export function Stake(props: any): any {
                 })
             })
 
+        }
+
+        async function backToApprove(){
+            setApproved(false)
         }
 
         async function approveStaking() {
@@ -1003,7 +1024,16 @@ export function Stake(props: any): any {
                             <span className="text">
                                 {t("stake.init_text")}
                             </span>
-                        </> 
+                            <LoadingButton 
+                                className="collect-btn" 
+                                loading={loading}
+                                variant="contained"
+                                onClick={backToApprove}>
+                            </LoadingButton>
+                            <span className="text">
+                                Back
+                            </span>
+                        </>  
                     }
                 </CardActions>
                 </>
@@ -1128,4 +1158,8 @@ export function Stake(props: any): any {
             </Box>
         </>
     )
+}
+
+function typeOf(amountToStake: string): any {
+    throw new Error('Function not implemented.');
 }
