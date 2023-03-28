@@ -674,7 +674,7 @@ export function Stake(props: any): any {
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
-                            message: t("rewards.toastify.success"), open: true,
+                            message: t("stake.toastify.success"), open: true,
                             severity: "success"
                         })
                         setLoading(false)
