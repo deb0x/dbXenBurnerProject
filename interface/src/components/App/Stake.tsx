@@ -1029,23 +1029,23 @@ export function Stake(props: any): any {
                             <span className="text">
                                 {t("stake.init_text")}
                             </span>
-                            </>  
+                        </>  
                     }
                     { backButton &&
                       <>
-                      <LoadingButton 
+                        <LoadingButton 
                            className="collect-btn" 
                            loading={false}
                            variant="contained"
                            onClick={backToApprove}>
                                Back 
-                       </LoadingButton>
-                          <span className="text">
-                         Your input value is grather than your current approved value!
-                         Back to input or approve!
-                      </span>
-                         </>  
-                   }
+                        </LoadingButton>
+                        <span className="text">
+                            Your input value is grather than your current approved value!
+                            Back to input or approve!
+                        </span>
+                      </>  
+                    }
                 </CardActions>
                 </>
                 : 
