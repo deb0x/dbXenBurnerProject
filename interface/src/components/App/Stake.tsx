@@ -616,23 +616,23 @@ export function Stake(props: any): any {
         }, []);
 
         useEffect(() => {
-            setStakeAmount()
+            setStakeAmount();
         }, [amountToStake]);
 
         async function setStakeAmount() {
-            if(Number(amountToStake) != 0){
-                const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
-                await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>{
-                    let allowanceValue = ethers.utils.formatEther(allowance.toString());
-                    if(allowanceValue < amountToStake){
-                    setApproved(false)
-                    setBack(true);
-                } else {
-                    setBack(false);
-                    setApproved(true)
+            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) => {
+                let allowanceValue = ethers.utils.formatEther(allowance.toString());
+                if (Number(amountToStake) > 0.0) {
+                    if (Number(allowanceValue) < Number(amountToStake)) {
+                        setApproved(false)
+                        setBack(true);
+                    } else {
+                        setBack(false);
+                        setApproved(true)
                     }
-                })
-            }
+                }
+            })
         }
 
         async function backToApprove(){
@@ -1011,13 +1011,13 @@ export function Stake(props: any): any {
                         </Grid>
                     </Grid>}
                 </CardContent>
-                <CardActions className='button-container px-3'>
+                <CardActions className='button-container multi-actions px-3'>
                     {approved && 
                         <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>
                             {t("stake.stake")}
                         </LoadingButton>}
                     {!approved &&
-                        <>
+                        <div className="collect">
                             <LoadingButton 
                                 className="collect-btn" 
                                 loading={loading}
@@ -1029,22 +1029,22 @@ export function Stake(props: any): any {
                             <span className="text">
                                 {t("stake.init_text")}
                             </span>
-                        </>  
+                        </div>  
                     }
                     { backButton &&
-                      <>
-                        <LoadingButton 
-                           className="collect-btn" 
-                           loading={false}
-                           variant="contained"
-                           onClick={backToApprove}>
-                               Back 
-                        </LoadingButton>
-                        <span className="text">
-                            Your input value is grather than your current approved value!
-                            Back to input or approve!
-                        </span>
-                      </>  
+                        <div className="back-to-approve">
+                            <LoadingButton 
+                                className="collect-btn" 
+                                loading={false}
+                                variant="contained"
+                                onClick={backToApprove}>
+                                Back 
+                            </LoadingButton>
+                            <span className="text">
+                                Your input value is grather than your current approved value!
+                                Back to input or approve!
+                            </span>
+                        </div>  
                     }
                 </CardActions>
                 </>
