@@ -5,8 +5,8 @@ const { abi } = require("../../artifacts/contracts/DBXenERC20.sol/DBXenERC20.jso
 const { abiLib } = require("../../artifacts/contracts/MathX.sol/MathX.json")
 const { NumUtils } = require("../utils/NumUtils.ts");
 
-describe("Test stake functionality", async function() {
-    let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
+describe("Test reentrancy Attack", async function() {
+    let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance, attackContract;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
         [deployer, alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
@@ -34,6 +34,10 @@ describe("Test stake functionality", async function() {
         const dbxAddress = await DBXenContract.dxn()
         DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
 
+        const Attack = await ethers.getContractFactory("Attack");
+        attackContract = await Attack.deploy(DBXenContract.address,XENContract.address);
+        await attackContract.deployed();
+
         aliceInstance = XENContract.connect(alice);
         bobInstance = XENContract.connect(bob);
         deanInstance = XENContract.connect(dean);
@@ -48,4 +52,22 @@ describe("Test stake functionality", async function() {
         await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
         await XENContract.transferFrom(deployer.address, carol.address, ethers.utils.parseEther("30000000000"))
     });
+
+
+    it(`Test Reentrancy attack on the contract`, async() => {
+
+        // await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
+        await  XENContract.connect(alice).transfer(attackContract.address,ethers.utils.parseEther("10000000000"));
+
+        await attackContract.connect(alice).attack({value: ethers.utils.parseEther("1")}).then(res=>{
+            assert.fail("must throw err")
+        }).catch(err=>{
+            expect(err.message).to.contain("DBXen: failed to send amount");
+
+        })
+    });
+
+   
+
+
 });

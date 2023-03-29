@@ -10,12 +10,12 @@ describe("Test claim fee without staking functionality", async function() {
     let DBXenContract, DBXENViewContract, DBXenERC20, XENContract, aliceInstance, bobInstance, deanInstance;
     let alice, bob, carol, dean;
     beforeEach("Set enviroment", async() => {
-        [alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
+        [deployer, alice, bob, carol, dean, messageReceiver, feeReceiver] = await ethers.getSigners();
 
         const lib = await ethers.getContractFactory("MathX");
         const library = await lib.deploy();
 
-        const xenContract = await ethers.getContractFactory("XENCrypto", {
+        const xenContract = await ethers.getContractFactory("XENCryptoMockMint", {
             libraries: {
                 MathX: library.address
             }
@@ -39,76 +39,46 @@ describe("Test claim fee without staking functionality", async function() {
         bobInstance = XENContract.connect(bob);
         deanInstance = XENContract.connect(dean);
         carolInstance = XENContract.connect(carol);
+
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, alice.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, bob.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, dean.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.approve(deployer.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.transferFrom(deployer.address, carol.address, ethers.utils.parseEther("30000000000"))
     });
 
     it("Multiple accounts claim rewards and fees", async() => {
-        const lib = await ethers.getContractFactory("MathX");
-        const libraryLocal = await lib.deploy();
+        await XENContract.connect(alice).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.connect(bob).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.connect(dean).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
+        await XENContract.connect(carol).approve(DBXenContract.address, ethers.utils.parseEther("30000000000"))
 
-        const xenContractLocal = await ethers.getContractFactory("XENCrypto", {
-            libraries: {
-                MathX: libraryLocal.address
-            }
-        });
-
-        XENContractLocal = await xenContractLocal.deploy();
-        await XENContractLocal.deployed();
-
-        aliceInstance = XENContractLocal.connect(alice);
-        bobInstance = XENContractLocal.connect(bob);
-        deanInstance = XENContractLocal.connect(dean);
-        carolInstance = XENContractLocal.connect(carol);
-
-        await aliceInstance.claimRank(100);
-        await bobInstance.claimRank(100);
-        await carolInstance.claimRank(100);
-        await deanInstance.claimRank(100);
-        await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 102 * 24])
-        await hre.ethers.provider.send("evm_mine")
-        await aliceInstance.claimMintReward();
-        await bobInstance.claimMintReward();
-        await carolInstance.claimMintReward();
-        await deanInstance.claimMintReward();
-
-        const DBXenLocal = await ethers.getContractFactory("DBXen");
-        DBXenContractLocal = await DBXenLocal.deploy(ethers.constants.AddressZero, XENContractLocal.address);
-        await DBXenContractLocal.deployed();
-
-        const Deb0xViewsLocal = await ethers.getContractFactory("DBXenViews");
-        DBXENViewContractLocal = await Deb0xViewsLocal.deploy(DBXenContractLocal.address);
-        await DBXENViewContractLocal.deployed();
-
-        const dbxAddress = await DBXenContractLocal.dxn()
-        DBXenERC20 = new ethers.Contract(dbxAddress, abi, hre.ethers.provider)
-
-        await XENContractLocal.connect(alice).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(bob).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(dean).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-        await XENContractLocal.connect(carol).approve(DBXenContractLocal.address, ethers.utils.parseEther("500000"))
-
-        await DBXenContractLocal.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
+        await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
-        await DBXenContractLocal.connect(alice).claimRewards();
+        await DBXenContract.connect(alice).claimRewards();
         let AliceRewarClaimed = BigNumber.from("0")
-        const rewardClaimed = await DBXenContractLocal.queryFilter("RewardsClaimed")
+        const rewardClaimed = await DBXenContract.queryFilter("RewardsClaimed")
         for (let entry of rewardClaimed) {
             AliceRewarClaimed = AliceRewarClaimed.add(entry.args.reward)
         }
         expect(NumUtils.day(1)).to.equal(AliceRewarClaimed);
 
-        await DBXenContractLocal.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(bob).burnBatch(10, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(dean).burnBatch(167, { value: ethers.utils.parseEther("1") })
-        await DBXenContractLocal.connect(carol).burnBatch(120, { value: ethers.utils.parseEther("1") })
+        await DBXenContract.connect(alice).burnBatch(1, { value: ethers.utils.parseEther("1") })
+        await DBXenContract.connect(bob).burnBatch(10, { value: ethers.utils.parseEther("1") })
+        await DBXenContract.connect(dean).burnBatch(167, { value: ethers.utils.parseEther("1") })
+        await DBXenContract.connect(carol).burnBatch(120, { value: ethers.utils.parseEther("1") })
 
         await hre.ethers.provider.send("evm_increaseTime", [60 * 60 * 24])
         await hre.ethers.provider.send("evm_mine")
 
         let aliceBalanceInCycleOne = await DBXenERC20.balanceOf(alice.address);
-        await DBXenContractLocal.connect(alice).claimRewards();
+        await DBXenContract.connect(alice).claimRewards();
 
         //Alice distribution 
         //298 total batches burned => 1 batch = 0.3356....% from reward pool
@@ -119,7 +89,7 @@ describe("Test claim fee without staking functionality", async function() {
         //expect(aliceBalanceInCycleTwo).to.equal(aliceRewardsCycleTwo)
 
         //298 total batches burned => 10 batch = 3.36%...% from reward pool
-        await DBXenContractLocal.connect(bob).claimRewards();
+        await DBXenContract.connect(bob).claimRewards();
         let bobPercentage = BigNumber.from("3355704697986577223").mul(BigNumber.from(NumUtils.day(2))).div(BigNumber.from("100"));
         //div 10.000 because we use 3356 above not 0.3356
         let bobRewardsCycleTwo = bobPercentage.div(BigNumber.from("1000000000000000000"));
@@ -128,7 +98,7 @@ describe("Test claim fee without staking functionality", async function() {
         //expect(bobRewardsCycleTwo).to.equal(bobBalanceInCycleTwo)
 
         //298 total batches burned => 167 batch = 56.050...% from reward pool
-        await DBXenContractLocal.connect(dean).claimRewards();
+        await DBXenContract.connect(dean).claimRewards();
         let deanPercentage = BigNumber.from("56040268456375841311").mul(BigNumber.from(NumUtils.day(2))).div(BigNumber.from("100"));
         let deanRewardsCycleTwo = deanPercentage.div(BigNumber.from("1000000000000000000"));
         let deanBalanceInCycleTwo = await DBXenERC20.balanceOf(dean.address);
@@ -136,7 +106,7 @@ describe("Test claim fee without staking functionality", async function() {
         //expect(deanRewardsCycleTwo).to.equal(deanBalanceInCycleTwo)
 
         //298 total batches burned => 120 batch = 40.268...% from reward pool
-        await DBXenContractLocal.connect(carol).claimRewards();
+        await DBXenContract.connect(carol).claimRewards();
         let carolPercentage = BigNumber.from("40268456375838923123").mul(BigNumber.from(NumUtils.day(2))).div(BigNumber.from("100"));
         let carolRewardsCycleTwo = carolPercentage.div(BigNumber.from("1000000000000000000"));
         let carolBalanceInCycleTwo = await DBXenERC20.balanceOf(carol.address);
@@ -145,9 +115,9 @@ describe("Test claim fee without staking functionality", async function() {
 
         //Claim Fees
         //Alice
-        let claimableFee = await DBXENViewContractLocal.getUnclaimedFees(alice.address);
+        let claimableFee = await DBXENViewContract.getUnclaimedFees(alice.address);
         let balanceAliceBeforeClaimFees = await hre.ethers.provider.getBalance(alice.address);
-        let gas = await DBXenContractLocal.connect(alice).claimFees();
+        let gas = await DBXenContract.connect(alice).claimFees();
         const transactionReceipt = await ethers.provider.getTransactionReceipt(gas.hash);
         const gasUsed = transactionReceipt.gasUsed;
         const gasPricePaid = transactionReceipt.effectiveGasPrice;
@@ -157,9 +127,9 @@ describe("Test claim fee without staking functionality", async function() {
         expect(balanceAliceAfterClaimFees).to.equal(expectedValue)
 
         //Bob
-        let claimableFeeBob = await DBXENViewContractLocal.getUnclaimedFees(bob.address);
+        let claimableFeeBob = await DBXENViewContract.getUnclaimedFees(bob.address);
         let balanceBobBeforeClaimFees = await hre.ethers.provider.getBalance(bob.address);
-        let gasBob = await DBXenContractLocal.connect(bob).claimFees();
+        let gasBob = await DBXenContract.connect(bob).claimFees();
         const transactionReceiptBob = await ethers.provider.getTransactionReceipt(gasBob.hash);
         const gasUsedBob = transactionReceiptBob.gasUsed;
         const gasPricePaidBob = transactionReceiptBob.effectiveGasPrice;
@@ -169,9 +139,9 @@ describe("Test claim fee without staking functionality", async function() {
         expect(balanceBobAfterClaimFees).to.equal(expectedValueBob);
 
         //Dean
-        let claimableFeeDean = await DBXENViewContractLocal.getUnclaimedFees(dean.address);
+        let claimableFeeDean = await DBXENViewContract.getUnclaimedFees(dean.address);
         let balanceDeanBeforeClaimFees = await hre.ethers.provider.getBalance(dean.address);
-        let gasDean = await DBXenContractLocal.connect(dean).claimFees();
+        let gasDean = await DBXenContract.connect(dean).claimFees();
         const transactionReceiptDean = await ethers.provider.getTransactionReceipt(gasDean.hash);
         const gasUsedDean = transactionReceiptDean.gasUsed;
         const gasPricePaidDean = transactionReceiptDean.effectiveGasPrice;
@@ -181,9 +151,9 @@ describe("Test claim fee without staking functionality", async function() {
         expect(balanceDeanAfterClaimFees).to.equal(expectedValueDean);
 
         //Carol
-        let claimableFeeCarol = await DBXENViewContractLocal.getUnclaimedFees(carol.address);
+        let claimableFeeCarol = await DBXENViewContract.getUnclaimedFees(carol.address);
         let balanceCarolBeforeClaimFees = await hre.ethers.provider.getBalance(carol.address);
-        let gasCarol = await DBXenContractLocal.connect(carol).claimFees();
+        let gasCarol = await DBXenContract.connect(carol).claimFees();
         const transactionReceiptCarol = await ethers.provider.getTransactionReceipt(gasCarol.hash);
         const gasUsedCarol = transactionReceiptCarol.gasUsed;
         const gasPricePaidCarol = transactionReceiptCarol.effectiveGasPrice;
@@ -193,5 +163,4 @@ describe("Test claim fee without staking functionality", async function() {
         expect(balanceCarolAfterClaimFees).to.equal(expectedValueCarol)
 
     });
-
 });
