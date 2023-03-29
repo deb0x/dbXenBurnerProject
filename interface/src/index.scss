@@ -76,7 +76,6 @@ $randomNumber: random(4);
         .main-container {
             margin-top: 0;
             display: flex;
-            // height: 80vh;
             overflow-y: auto;
             .floating-btn {
                 position: fixed;
@@ -688,6 +687,9 @@ $randomNumber: random(4);
 @media only screen and (min-width: 900px) {
     .theme {
         zoom: .8;
+    }
+    .cards-grid {
+        height: 75vh;
     }
 }
 

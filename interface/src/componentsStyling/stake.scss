@@ -62,8 +62,18 @@
                     }
                     .button-container {
                         margin-bottom: 2vh;
+                        &.multi-actions {
+                            flex-direction: column;
+                            align-items: flex-start;
+                        }
                         span.text {
                             padding-left: 1vh;
+                        }
+                        .collect,
+                        .back-to-approve {
+                            display: flex;
+                            align-items: center;
+                            margin: 5px 0;
                         }
                     }
 
@@ -137,6 +147,7 @@
                     align-items: center;
                     margin: 5px 0 15px 0;
                     padding: 0;
+                    flex-flow: nowrap;
                     fieldset {
                         border-color: t('text');
                         border-radius: 50px;
@@ -195,5 +206,8 @@
         strong {
             font-size: 3.2vw;
         }
+    }
+    .button-container.multi-actions {
+        flex-direction: column;
     }
 }
