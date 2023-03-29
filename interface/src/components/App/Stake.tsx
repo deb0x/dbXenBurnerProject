@@ -567,7 +567,7 @@ export function Stake(props: any): any {
         const [amountToStake, setAmountToStake] = useState("")
         const [loading, setLoading] = useState(false)
         const [approved, setApproved] = useState<Boolean | null>(false)
-
+        const [backButton, setBack] = useState<Boolean | null>(false)
     
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
@@ -621,14 +621,24 @@ export function Stake(props: any): any {
 
         async function setStakeAmount() {
             if(Number(amountToStake) != 0){
-            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
-
-            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>{
+                const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+                await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>{
                     let allowanceValue = ethers.utils.formatEther(allowance.toString());
-                    allowanceValue > amountToStake ? 
-                    setApproved(true) : setApproved(false)
-        })
-    }
+                    if(allowanceValue < amountToStake){
+                    setApproved(false)
+                    setBack(true);
+                } else {
+                    setBack(false);
+                    setApproved(true)
+                    }
+                })
+            }
+        }
+
+        async function backToApprove(){
+            setBack(false);
+            setApproved(true);
+            setAmountToStake("");
         }
 
         async function setStakedAmount() {
@@ -665,7 +675,6 @@ export function Stake(props: any): any {
             await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>
                  allowance > 0 ? setApproved(true) : setApproved(false)
             )
-            console.log(approved)
         }
 
         async function totalAmountStaked() {
@@ -678,10 +687,6 @@ export function Stake(props: any): any {
                 })
             })
 
-        }
-
-        async function backToApprove(){
-            setApproved(false)
         }
 
         async function approveStaking() {
@@ -1024,17 +1029,23 @@ export function Stake(props: any): any {
                             <span className="text">
                                 {t("stake.init_text")}
                             </span>
-                            <LoadingButton 
-                                className="collect-btn" 
-                                loading={loading}
-                                variant="contained"
-                                onClick={backToApprove}>
-                            </LoadingButton>
-                            <span className="text">
-                                Back
-                            </span>
-                        </>  
+                            </>  
                     }
+                    { backButton &&
+                      <>
+                      <LoadingButton 
+                           className="collect-btn" 
+                           loading={false}
+                           variant="contained"
+                           onClick={backToApprove}>
+                               Back 
+                       </LoadingButton>
+                          <span className="text">
+                         Your input value is grather than your current approved value!
+                         Back to input or approve!
+                      </span>
+                         </>  
+                   }
                 </CardActions>
                 </>
                 : 
