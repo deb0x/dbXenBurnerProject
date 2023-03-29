@@ -1170,7 +1170,3 @@ export function Stake(props: any): any {
         </>
     )
 }
-
-function typeOf(amountToStake: string): any {
-    throw new Error('Function not implemented.');
-}
