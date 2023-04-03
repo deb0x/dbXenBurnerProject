@@ -11,6 +11,7 @@ import evmos from "../../photos/icons/evmos.svg";
 import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
+import xn from "../../photos/icons/xn.svg";
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 const networks: any = {
@@ -123,6 +124,17 @@ const networks: any = {
         },
         rpcUrls: ['https://eth-rpc.gateway.pokt.network'],
         blockExplorerUrls: ['https://etherscan.io'] 
+    },
+    xn: {
+        chainId: `0x${Number(202212).toString(16)}`,
+        chainName: 'X1 Devnet',
+        nativeCurrency: {
+            name: 'X1 Devnet',
+            symbol: 'XN',
+            decimals: 18
+        },
+        rpcUrls: ['https://x1-devnet.xen.network'],
+        blockExplorerUrls: ['https://explorer.x1-devnet.xen.network/'] 
     }
 };
 
@@ -163,6 +175,19 @@ export default function ChainSetter(props: any) {
                             currency: "ETH",
                             priceURL: "https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
                             dxnTokenName: "DXN"
+                        })
+                        break;
+                    case 202212: 
+                        setChain({
+                            deb0xAddress: "0xAEC85ff2A37Ac2E0F277667bFc1Ce1ffFa6d782A",
+                            deb0xViewsAddress: "0x5f8cABEa25AdA7DB13e590c34Ae4A1B1191ab997",
+                            deb0xERC20Address: "0x24b8cd32f93aC877D4Cc6da2369d73a6aC47Cb7b",
+                            xenCryptoAddress: "0xD342D63466B520d8D331CaFF863900d402Aa5b00",
+                            chainId: parseInt(result, 16),
+                            chainName: "X1 Devnet",
+                            currency: "XN",
+                            priceURL: "https://explorer.x1-devnet.xen.network/",
+                            dxnTokenName: "xnDXN"
                         })
                         break;
                     case 137: 
@@ -328,6 +353,15 @@ export default function ChainSetter(props: any) {
                             <img alt="eth" src={eth} className="eth"/>
                         </div>
                         Switch to Ethereum
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("xn")}
+                        className="btn"
+                    >
+                        <div className="img-container xn">
+                            <img alt="xn" src={xn} className="xn"/>
+                        </div>
+                        Switch to XN
                     </button>
                     <button
                         onClick={() => handleNetworkSwitch("polygon")}

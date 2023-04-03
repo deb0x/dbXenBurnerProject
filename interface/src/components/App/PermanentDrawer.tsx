@@ -43,6 +43,9 @@ export function PermanentDrawer(props: any): any {
             case 1:
                 setBaseUrl("https://etherscan.io/address/")
                 break;
+            case 202212:
+                setBaseUrl("https://explorer.x1-devnet.xen.network/address/")
+                break;
             case 137:
                 setBaseUrl("https://polygonscan.com/address/")
                 break;
