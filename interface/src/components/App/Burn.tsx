@@ -218,46 +218,51 @@ export function Burn(): any {
     }
 
     async function burnXEN() {
-        setLoading(true)
-        const signer = await library.getSigner(0)
-        const deb0xContract = DBXen(signer, chain.deb0xAddress)
-        let gasLimitIntervalValue = gasLimit
-        let currentValue = valueAndFee.fee;
+        if(valueAndFee === undefined){
+            estimationValues();
+        }
+        else {
+            setLoading(true)
+            const signer = await library.getSigner(0)
+            const deb0xContract = DBXen(signer, chain.deb0xAddress)
+            let gasLimitIntervalValue = gasLimit
+            let currentValue = valueAndFee.fee;
   
-        try {
-            const overrides =
-            {
-                value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
-                gasLimit: gasLimitIntervalValue
-            }
-            const tx = await deb0xContract["burnBatch(uint256)"](value, overrides)
+            try {
+                const overrides =
+                {
+                    value: ethers.utils.parseUnits(currentValue.toString(), "ether"),
+                    gasLimit: gasLimitIntervalValue
+                }
+                const tx = await deb0xContract["burnBatch(uint256)"](value, overrides)
 
-            await tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "Burn completed",
-                        open: true,
-                        severity: "success"
+                await tx.wait()
+                    .then((result: any) => {
+                        setNotificationState({
+                            message: "Burn completed",
+                            open: true,
+                            severity: "success"
+                        })
+                        getAllowanceForAccount();
+                        setLoading(false)
                     })
-                    getAllowanceForAccount();
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Something went wrong!",
-                        open: true,
-                        severity: "error"
+                    .catch((error: any) => {
+                        setNotificationState({
+                            message: "Something went wrong!",
+                            open: true,
+                            severity: "error"
+                        })
+                        setLoading(false)
                     })
-                    setLoading(false)
+            } catch (error: any) {
+                console.log(error.message)
+                setNotificationState({
+                    message: "You rejected the transaction.",
+                    open: true,
+                    severity: "info"
                 })
-        } catch (error: any) {
-            console.log(error.message)
-            setNotificationState({
-                message: "You rejected the transaction.",
-                open: true,
-                severity: "info"
-            })
-            setLoading(false)
+                setLoading(false)
+            }
         }
     }
 
