@@ -261,6 +261,7 @@ function App() {
                                                         <Spinner color={'black'} /> :
                                                         !connected ? 
                                                             "Connect" :
+
                                                             <span  className="unsupported">
                                                                 {typeof window.ethereum === 'undefined' ? 
                                                                     `Check your prerequisites` : 
