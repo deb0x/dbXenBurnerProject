@@ -141,6 +141,8 @@ export function AppBarComponent(props: any): any {
         setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
     }
 
+    const tokenImage = "https://raw.githubusercontent.com/deb0x/dbXenBurnerProject/main/interface/src/photos/token_icon.png";
+
     async function addToken() {
         try {
             const wasAdded = await window.ethereum.request({
@@ -151,7 +153,7 @@ export function AppBarComponent(props: any): any {
                   address: chain.deb0xERC20Address,
                   symbol: chain.dxnTokenName,
                   decimals: tokenDecimals,
-                //   image: tokenImage,
+                  image: tokenImage,
                 },
               },
             });
