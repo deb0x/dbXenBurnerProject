@@ -2,15 +2,15 @@ import { createContext } from "react";
 
 export const initialChain = {
     chain: {
-        deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
-        deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-        deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
-        xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-        chainId: "137",
-        chainName: "polygon",
-        currency: "MATIC",
-        priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-        dxnTokenName: "mDXN"
+        deb0xAddress: "0xF5c80c305803280B587F8cabBcCdC4d9BF522AbD",
+        deb0xViewsAddress: "0xf032f7FB8258728A1938473B2115BB163d5Da593",
+        deb0xERC20Address: "0x80f0C1c49891dcFDD40b6e0F960F84E6042bcB6F",
+        xenCryptoAddress: "0x06450dEe7FD2Fb8E39061434BAbCFC05599a6Fb8",
+        chainId: "1",
+        chainName: "Ethereum",
+        currency: "ETH",
+        priceURL: "https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+        dxnTokenName: "DXN"
     },
     setChain: (_value: any) => {}
 }
