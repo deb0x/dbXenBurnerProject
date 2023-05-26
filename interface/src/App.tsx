@@ -134,13 +134,18 @@ function App() {
 
     useEffect(() => {   
         window.ethereum ?
-            window.ethereum.request({method: "eth_requestAccounts"}).then(() => {
+            window.ethereum.request({method: "eth_requestAccounts"})
+            .then(() => {
                  window.ethereum.request({
                     method: 'eth_chainId',
                   }).then((chainId:any) => {
                  //   switchNetwork(chainId); 
                   })
-            }).catch((err: any) => displayErrorMsg(err))
+            })
+            .then(() => getTotalXenBurned().then((result: any) => {
+                setTotalXENBurned(result.toLocaleString('en-US'));
+            }))
+            .catch((err: any) => displayErrorMsg(err))
             : displayErrorMsg("Please install MetaMask");
     }, [])
 
@@ -189,12 +194,6 @@ function App() {
     }
 
     const showDashboard = () => setSelectedIndex(3);
-
-    const xenBurned = async () => {
-        await getTotalXenBurned().then((result: any) => {
-            setTotalXENBurned(result.toLocaleString('en-US'));
-        })
-    }
 
     async function getTotalXenBurned(){
         const signer = await library?.getSigner(0)

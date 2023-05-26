@@ -263,13 +263,18 @@ export function AppBarComponent(props: any): any {
                         </p>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        <button onClick={ props.handleSwitchComponent } className="component-switcher">
-                            <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
-                            <img src={arrow} alt="arrow" />
-                        </button>
-                        <button onClick={ props.showDashboard } className="dashboard-btn">
-                            Dashboard
-                        </button>
+                        {Number(chain.chainId) === 1 ?
+                            <>
+                                <button onClick={ props.handleSwitchComponent } className="component-switcher">
+                                    <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
+                                    <img src={arrow} alt="arrow" />
+                                </button>
+                                <button onClick={ props.showDashboard } className="dashboard-btn">
+                                    Dashboard
+                                </button>
+                            </> : <></>
+                        }
+                        
                         <DropdownLanguage />
                         <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
