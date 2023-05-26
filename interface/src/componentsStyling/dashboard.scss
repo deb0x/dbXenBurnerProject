@@ -1,0 +1,29 @@
+#dbxen-iframe {
+    position: relative;
+    width: 100%;
+    font-family: "Karla";
+    height: 75vh;
+}
+@media (max-width: 1024px) {
+    #dbxen-iframe {
+        padding-bottom: 100vh;
+    }
+}
+iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border: none;
+    bottom: 0;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    #dbxen-iframe {
+        height: 63vh!important;
+        padding-bottom: 80px;
+    }
+
+}

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { injected } from '../../connectors';
@@ -16,12 +16,22 @@ import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
+import dbxen from '../../photos/icons/dbxen.svg';
+import arrow from '../../photos/icons/arrow-right.svg';
+import heart from '../../photos/icons/heart.svg';
+import pizza from '../../photos/icons/pizza.png';
+import qrcode from '../../photos/icons/qrcode.png';
+import arrowDown from '../../photos/icons/arrow-down-long-solid.svg';
+import clipboard from '../../photos/icons/clipboard.svg';
 import "i18next";
 import { useTranslation } from 'react-i18next';
 import DropdownLanguage from '../DropdownLanguage';
 import ChainProvider from '../Contexts/ChainProvider';
 import ChainSetter from '../Contexts/ChainSetter';
 import ChainContext from '../Contexts/ChainContext';
+import { Modal } from '@mui/material';
+import SnackbarNotification from './Snackbar';
+import ScreenSize from '../Common/ScreenSize';
 const tokenSymbol = 'DBXen';
 
 
@@ -41,7 +51,7 @@ export function AppBarComponent(props: any): any {
     const [userUnstakedAmount,setUserUnstakedAmount] = useState<any>(0);
     const [ensName, setEnsName] = useState<any>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [, setNotificationState] = useState({})
+    const [notificationState, setNotificationState] = useState({})
     const [theme, setTheme] = useState(localStorage.getItem('globalTheme'));
     const [userStakedAmount, setUserStakedAmount] = useState("")
     const [rewardsUnclaimed, setRewardsUnclaimed] = useState("")
@@ -50,6 +60,10 @@ export function AppBarComponent(props: any): any {
     const [totalStaked, setTotalStaked] = useState("")
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
     const { t } = useTranslation();
+    const [show, setShow] = useState(false);
+    const ref = useRef<any>(null);
+    const dimensions = ScreenSize();
+
 
     const id = open ? 'simple-popper' : "";
 
@@ -213,12 +227,32 @@ export function AppBarComponent(props: any): any {
         setOpen(false)
     };
 
+    const copyAddress = () =>
+    {
+        setNotificationState({
+            message: "Address copied to clipboard!",
+            open: true,
+            severity: "success"
+        });
+        navigator.clipboard.writeText("0x23e487A4503D133a84bE04229D053Ba67e2Bd14B")
+        .then(() => {
+            setTimeout(() => {setNotificationState({})}, 3000)
+        });
+    }
+
     return (
         <ChainProvider>
+            <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             <div>
                 <div className="app-bar--top">
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
+                        <button type="button" onClick={() => setShow(!show)} className="donate-btn">
+                            <span>Donate</span>
+                            <img src={heart} alt="heart" />
+                        </button>
+
+                        
                         <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
                             {Number(totalStaked).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
@@ -229,6 +263,18 @@ export function AppBarComponent(props: any): any {
                         </p>
                     </Box>
                     <Box className="main-menu--right d-flex">
+                        {Number(chain.chainId) === 1 ?
+                            <>
+                                <button onClick={ props.handleSwitchComponent } className="component-switcher">
+                                    <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
+                                    <img src={arrow} alt="arrow" />
+                                </button>
+                                <button onClick={ props.showDashboard } className="dashboard-btn">
+                                    Dashboard
+                                </button>
+                            </> : <></>
+                        }
+                        
                         <DropdownLanguage />
                         <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
@@ -323,6 +369,35 @@ export function AppBarComponent(props: any): any {
                     </Box>
                 </div>
             </div>
+            <Modal open={show} onClose={() => setShow(false)}>
+                <Box ref={ref} className="modal-box--donate">
+                    <div className="modal-body">
+                        <div className="content-top">
+                            <p className="message">
+                                Send a 
+                                <img src={pizza} alt="pizza" className="pizza"/>
+                                to the team!
+                            </p>
+                        </div>
+                        <img src={arrowDown} alt="arrow" className="arrow"/>
+                        <div className="content-bottom">
+                            <div className="address">
+                            { dimensions.width > 768 ?
+                                <p>0x23e487A4503D133a84bE04229D053Ba67e2Bd14B</p> :
+                                formatAccountName("0x23e487A4503D133a84bE04229D053Ba67e2Bd14B")
+                            }
+                                <Button
+                                    size="small"
+                                    onClick={copyAddress}
+                                    className="copy-wallet-btn">
+                                    <img src={clipboard} alt="copy" className="copy"/>
+                                </Button>
+                            </div>
+                            <img src={qrcode} alt="qrcode" className="qrcode" />
+                        </div>
+                    </div>
+                </Box>
+            </Modal>
         </ChainProvider>
     );
 }
