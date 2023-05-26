@@ -252,15 +252,16 @@ export function AppBarComponent(props: any): any {
                             <img src={heart} alt="heart" />
                         </button>
 
-                        
-                        <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
-                            {Number(totalStaked).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })} DXN</p>
-                        <p className="mb-0">
-                            {t("app_bar.xen_burned")}: {totalXENBurned}
-                        </p>
+                        <div className='mb-2'>
+                            <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
+                                {Number(totalStaked).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</p>
+                            <p className="mb-0">
+                                {t("app_bar.xen_burned")}: {totalXENBurned}
+                            </p>
+                        </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
                         {Number(chain.chainId) === 1 ?
