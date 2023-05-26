@@ -13,6 +13,9 @@ import document from "../../photos/icons/file-icon.svg";
 import { Burn } from './Burn';
 import formatAccountName from '../Common/AccountName';
 import ChainContext from '../Contexts/ChainContext';
+import "i18next";
+import { useTranslation } from 'react-i18next';
+import DBXen from "../../ethereum/dbxen"
 
 declare global {
     interface Window {
@@ -22,13 +25,16 @@ declare global {
 
 export function PermanentDrawer(props: any): any {
     const context = useWeb3React()
-    const { connector } = context
+    const { connector, library } = context
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const dimensions = ScreenSize();
     const [notificationState, setNotificationState] = useState({});
     const [networkName, setNetworkName] = useState<any>();
     const { chain } = useContext(ChainContext);
     const [baseUrl, setBaseUrl] = useState("");
+    const { t } = useTranslation();
+    const [totalStaked, setTotalStaked] = useState("")
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId =>
@@ -74,6 +80,41 @@ export function PermanentDrawer(props: any): any {
     }, [])
 
     useEffect(() => {
+        totalAmountStaked()
+    }, [totalAmountStaked]);
+
+    useEffect(() => {
+        xenBurned();
+    },[]);
+
+    const xenBurned = async () => {
+        await getTotalXenBurned().then((result: any) => {
+            setTotalXENBurned(result.toLocaleString('en-US'));
+        })
+    }
+
+    async function getTotalXenBurned(){
+        const signer = await library.getSigner(0)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
+        let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        return batchBurned * 2500000;
+    }
+
+    function floorPrecised(number:any) {
+        var power = Math.pow(10, 2);
+        return (Math.floor(parseFloat(number) * power) / power).toString();
+    }
+
+    async function totalAmountStaked() {
+        const deb0xContract = DBXen(library, chain.deb0xAddress)
+        const currentCycle= await deb0xContract.currentStartedCycle()
+        const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
+        const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
+        setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
+    }
+
+    useEffect(() => {
         setTimeout(() => { setNotificationState({}) }, 2000)
     }, [notificationState])
     return (
@@ -88,6 +129,16 @@ export function PermanentDrawer(props: any): any {
                         <div className="image-container">
                             <div className="img"></div>
                         </div>
+                        <Box className="main-menu--left">
+                            <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
+                                {Number(totalStaked).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</p>
+                            <p className="mb-0">
+                                {t("app_bar.xen_burned")}: {totalXENBurned}
+                            </p>
+                        </Box>
                         <Burn />
                         <div className="content">
                             <div className="social-media">

@@ -23,13 +23,26 @@ $randomNumber: random(4);
     & .theme--classic {
         background-image: url('./photos/backgrounds/Fundal 4 – 1.png');
     }
+    .built-in {
+        color: #fff;
+        float: right;
+        padding-right: 45px;
+        padding-top: 15px;
+        a {
+            color: #fff;
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
 }
 
 .app-container {
     height: 100%;
     border-radius: 100px;
     box-shadow: 0px 3px 25px #0f0b1382;
-    .chain-switcher {
+    .chain-switcher,
+    .dashboard-btn {
         font-family: "Karla";
         padding: 5px 25px;
         border-radius: 25px;
@@ -513,6 +526,14 @@ $randomNumber: random(4);
 @media (max-width: 768px) {
     #root {
         height: 100vh;
+        .built-in {
+            padding-right: 0;
+            &.connected {
+                position: absolute;
+                top: 0;
+                padding-top: 0;
+            }
+        }
         .theme {
             height: auto;
             min-height: 100vh;
@@ -527,6 +548,7 @@ $randomNumber: random(4);
                 .side-menu-container {
                     flex: auto;
                     height: auto;
+                    display: none;
                 }
                 .main-container {
                     margin-top: 0;

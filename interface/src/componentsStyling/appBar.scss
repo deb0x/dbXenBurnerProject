@@ -27,6 +27,50 @@
                 button {
                     margin: 0 5px;
                 }
+                .component-switcher {
+                    font-family: "Karla";
+                    padding: 5px 15px;
+                    border-radius: 25px;
+                    background-color: #030328;
+                    color: #F2E9DC;
+                    border: 1px solid #19D2D2;
+                    width: 150px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    img {
+                        max-height: 15px;
+                        width: auto;
+                    }
+                }
+            }
+            .main-menu--left {
+                align-items: center;
+                p {
+                    display: none;
+                }
+                .donate-btn {
+                    font-family: "Karla";
+                    padding: 5px 15px;
+                    border-radius: 25px;
+                    background-color: #19D2D2;
+                    color: #030328;
+                    border: 1px solid #19D2D2;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 16px;
+                    font-weight: 800;
+                    z-index: 1  ;
+                    img {
+                        max-height: 15px;
+                        width: auto;
+                        margin-left: 10px;
+                    }
+                    .donate-input {
+                        z-index: 9999;
+                    }
+                }
             }
         }
         @media (max-width: 768px) {
@@ -41,6 +85,7 @@
                 .main-menu--right {
                     width: 100%;
                     justify-content: space-between;
+                    flex-wrap: wrap;
                     .MuiButton-contained {
                         width: 100%;
                     }
@@ -52,10 +97,15 @@
                         width: 15%;
                         padding: 5px;
                     }
+                    & button {
+                        margin: 6px 0;
+                    }
+                    
                 }
                 .main-menu--left {
-                    font-size: 2vh;
-                    padding: 10px 0;
+                    display: block;
+                    font-size: 3.5vw;
+                    padding: 15px 0;
                 }
             }
         }
@@ -133,5 +183,103 @@
     }
     .copy-wallet-btn {
         color: #91c499;
+    }
+}
+
+.modal-box--donate {
+    background-color: #030328;
+    height: 470px;
+    width: 100%;
+    max-width: 750px;
+    margin-left: 50%;
+    transform: translate(-50%, 40%);
+    border-radius: 60px;
+    box-shadow: 0 0 15px #19D2D2;
+    color: #fff;
+    font-family: "Karla";
+    display: flex;
+    justify-content: center;
+    .modal-body {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        .content-top {
+            padding-top: 50px;
+            text-align: center;
+            p {
+                color: #F5B700;
+                font-weight: 700;
+                margin: 0;
+                font-size: 24px;
+            }
+            .pizza {
+                max-width: 70px;
+                margin: 0 10px;
+            }
+        }
+        .content-bottom {
+            text-align: center;
+            padding-bottom: 50px;
+            .qrcode {
+                max-width: 150px;
+            }
+            .address {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                p {
+                    margin-bottom: 0;
+                }
+                .copy-wallet-btn {
+                    justify-content: left;
+                    min-width: auto;
+                    .copy {
+                        width: 16px;
+                    }
+                }
+            }
+        }
+        .arrow {
+            width: 50px;
+            display: inline-block;
+            position: relative;
+            -moz-animation: bounce 0.5s infinite linear;
+            -o-animation: bounce 0.5s infinite linear;
+            -webkit-animation: bounce 0.5s infinite linear;
+            animation: bounce 0.5s infinite linear;
+            text-align: center;
+        }
+        @-webkit-keyframes bounce {
+            0% { top: 0; }
+            50% { top: -0.2em; }
+            70% { top: -0.3em; }
+            100% { top: 0; }
+        }
+        @-moz-keyframes bounce {
+            0% { top: 0; }
+            50% { top: -0.2em; }
+            70% { top: -0.3em; }
+            100% { top: 0; }
+        }
+        @-o-keyframes bounce {
+            0% { top: 0; }
+            50% { top: -0.2em; }
+            70% { top: -0.3em; }
+            100% { top: 0; }
+        }
+        @-ms-keyframes bounce {
+            0% { top: 0; }
+            50% { top: -0.2em; }
+            70% { top: -0.3em; }
+            100% { top: 0; }
+        }
+        @keyframes bounce {
+            0% { top: 0; }
+            50% { top: -0.2em; }
+            70% { top: -0.3em; }
+            100% { top: 0; }
+        }
     }
 }
