@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import DropdownLanguage from './components/DropdownLanguage';
 import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
+import { Dashboard } from './components/App/Dashboard';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -101,7 +102,7 @@ function ContractsDeployed() {
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
     const { connector, account, activate } = context
-    const [selectedIndex, setSelectedIndex] = useState<any>(0);
+    const [selectedIndex, setSelectedIndex] = useState<any>(1);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -177,6 +178,15 @@ function App() {
         errorMsg = error;
         return errorMsg;
     }
+
+    const handleSwitchComponent = () =>
+    {
+        selectedIndex === 2 ? 
+            setSelectedIndex(1):
+            setSelectedIndex(2)
+    }
+
+    const showDashboard = () => setSelectedIndex(3);
     
     return (
 
@@ -202,15 +212,22 @@ function App() {
                                 <PermanentDrawer />
                             </div>
                             <div className="col col-lg-9 col-12">
-                                <AppBarComponent />
+                                <AppBarComponent
+                                    handleSwitchComponent={ handleSwitchComponent }
+                                    showDashboard = { showDashboard }
+                                    selectedIndex = { selectedIndex } />
                                 
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                 {dimensions.width > 768 ? 
-                                    <Stake />
+                                    <>
+                                        {selectedIndex === 3 && <Dashboard /> }
+                                        {selectedIndex === 1 && <Stake /> }
+                                    </>
                                     :
                                     <>
                                         {selectedIndex === 0 && <Burn /> }
                                         {selectedIndex === 1 && <Stake /> }
+                                        {selectedIndex === 3 && <Dashboard /> }
                                     </>
                                 }
                                 </Box>
@@ -317,6 +334,11 @@ function App() {
                 </div>
             </div>
         }
+        <span className={`built-in ${account ? "connected" : ""}`}>
+            built in the
+            &nbsp;
+            <a href="https://homeoftheprodigies.com/" target="_blank">Home of the Prodigies</a>
+        </span>
         </ThemeProvider>
     </ChainProvider>
   )
