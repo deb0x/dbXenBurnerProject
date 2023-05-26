@@ -16,6 +16,7 @@ import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
+import dbxen from '../../photos/icons/dbxen.svg';
 import arrow from '../../photos/icons/arrow-right.svg';
 import heart from '../../photos/icons/heart.svg';
 import pizza from '../../photos/icons/pizza.png';
@@ -228,12 +229,15 @@ export function AppBarComponent(props: any): any {
 
     const copyAddress = () =>
     {
-        navigator.clipboard.writeText("0x23e487A4503D133a84bE04229D053Ba67e2Bd14B");
         setNotificationState({
             message: "Address copied to clipboard!",
             open: true,
             severity: "success"
-        }) ;
+        });
+        navigator.clipboard.writeText("0x23e487A4503D133a84bE04229D053Ba67e2Bd14B")
+        .then(() => {
+            setTimeout(() => {setNotificationState({})}, 3000)
+        });
     }
 
     return (
@@ -259,6 +263,10 @@ export function AppBarComponent(props: any): any {
                         </p>
                     </Box>
                     <Box className="main-menu--right d-flex">
+                        <button onClick={ props.handleSwitchComponent } className="component-switcher">
+                            <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
+                            <img src={arrow} alt="arrow" />
+                        </button>
                         <button onClick={ props.showDashboard } className="dashboard-btn">
                             Dashboard
                         </button>

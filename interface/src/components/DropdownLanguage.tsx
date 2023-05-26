@@ -53,7 +53,7 @@ const DropdownLanguage = () => {
                         className="btn"
                     >
                         {t("app_bar.language.zh")}
-                    </button>       
+                    </button>
                 </Popper>
             </div>
         </ClickAwayListener>

@@ -26,6 +26,7 @@ import DropdownLanguage from './components/DropdownLanguage';
 import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
 import { Dashboard } from './components/App/Dashboard';
+import DBXen from './ethereum/dbxen';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -101,7 +102,7 @@ function ContractsDeployed() {
 
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
-    const { connector, account, activate } = context
+    const { connector, account, activate, library } = context
     const [selectedIndex, setSelectedIndex] = useState<any>(1);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
@@ -111,6 +112,7 @@ function App() {
     const dimensions = ScreenSize();
     const { t } = useTranslation();
     const { chain, setChain }  = useContext(ChainContext)
+    const [totalXENBurned, setTotalXENBurned] = useState<any>();
     
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -181,12 +183,26 @@ function App() {
 
     const handleSwitchComponent = () =>
     {
-        selectedIndex === 2 ? 
-            setSelectedIndex(1):
-            setSelectedIndex(2)
+        // selectedIndex === 2 ? 
+        //     setSelectedIndex(1):
+            setSelectedIndex(1)
     }
 
     const showDashboard = () => setSelectedIndex(3);
+
+    const xenBurned = async () => {
+        await getTotalXenBurned().then((result: any) => {
+            setTotalXENBurned(result.toLocaleString('en-US'));
+        })
+    }
+
+    async function getTotalXenBurned(){
+        const signer = await library?.getSigner(0)
+        const deb0xContract = DBXen(signer, chain.deb0xAddress)
+        let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
+        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        return batchBurned * 2500000;
+    }
     
     return (
 
@@ -220,14 +236,16 @@ function App() {
                                 <Box className="main-container" sx={{marginTop: 12}}>
                                 {dimensions.width > 768 ? 
                                     <>
-                                        {selectedIndex === 3 && <Dashboard /> }
+                                        {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
+                                        {/* {selectedIndex === 2 && <DbXeNFT /> } */}
                                         {selectedIndex === 1 && <Stake /> }
                                     </>
                                     :
                                     <>
                                         {selectedIndex === 0 && <Burn /> }
                                         {selectedIndex === 1 && <Stake /> }
-                                        {selectedIndex === 3 && <Dashboard /> }
+                                        {/* {selectedIndex === 2 && <DbXeNFT /> } */}
+                                        {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
                                     </>
                                 }
                                 </Box>
