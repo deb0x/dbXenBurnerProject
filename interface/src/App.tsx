@@ -114,7 +114,7 @@ function App() {
     let errorMsg;
     const dimensions = ScreenSize();
     const { t } = useTranslation();
-    const { chain, setChain }  = useContext(ChainContext)
+    const { chain }  = useContext(ChainContext)
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
     
     useEffect(() => {
@@ -135,7 +135,7 @@ function App() {
         setAnchorEl(anchorEl ? null : event.currentTarget);
     };
 
-    useEffect(() => {   
+    useEffect(() => {  
         window.ethereum ?
             window.ethereum.request({method: "eth_requestAccounts"})
             .then(() => {
@@ -259,10 +259,13 @@ function App() {
                             onClick={() => setSelectedIndex(0)}>
                                 {t("mobile.mint")}
                         </div>
-                        <div className={`navigation-item dashboard ${selectedIndex === 3 ? "active" : ""}`}
-                            onClick={() => setSelectedIndex(3)}>
-                            <FontAwesomeIcon icon={faChartLine as IconProp} />
-                        </div>
+                        { Number(window.ethereum.networkVersion) === 1 ?
+                            <div className={`navigation-item dashboard ${selectedIndex === 3 ? "active" : ""}`}
+                                onClick={() => setSelectedIndex(3)}>
+                                <FontAwesomeIcon icon={faChartLine as IconProp} />
+                            </div> :
+                            <></>
+                        }
                         <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(1)}>
                                 {t("mobile.fees")}
