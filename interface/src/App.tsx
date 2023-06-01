@@ -27,6 +27,9 @@ import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
 import { Dashboard } from './components/App/Dashboard';
 import DBXen from './ethereum/dbxen';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -255,6 +258,10 @@ function App() {
                         <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(0)}>
                                 {t("mobile.mint")}
+                        </div>
+                        <div className={`navigation-item dashboard ${selectedIndex === 3 ? "active" : ""}`}
+                            onClick={() => setSelectedIndex(3)}>
+                            <FontAwesomeIcon icon={faChartLine as IconProp} />
                         </div>
                         <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(1)}>

@@ -553,11 +553,12 @@ $randomNumber: random(4);
                 .main-container {
                     margin-top: 0;
                     overflow-y: inherit;
+                    height: 55vh;
                     .content-box {
                         height: auto;
                         border-radius: 25px;
                         margin: 0;
-                        border-radius: 25px;
+                        padding-bottom: 35px;
                     }
                     ul.MuiList-root {
                         height: 63vh;
@@ -593,12 +594,19 @@ $randomNumber: random(4);
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        border-right: 2px solid #030328;
                         &.active {
                             color: #19D2D2;
                         }
+                        &.dashboard {
+                            fill: #fff;
+                        }
+                        &.dashboard {
+                            fill: #19D2D2;
+                        }
                     }
-                    div:first-child {
-                        border-right: 2px solid #030328;
+                    div:last-child {
+                        border-right: none;
                     }
                 }
                 .initial-page {

@@ -45,6 +45,7 @@
                 }
             }
             .main-menu--left {
+                display: flex;
                 align-items: center;
                 p {
                     display: none;
@@ -85,7 +86,6 @@
                 .main-menu--right {
                     width: 100%;
                     justify-content: space-between;
-                    flex-wrap: wrap;
                     .MuiButton-contained {
                         width: 100%;
                     }
@@ -106,6 +106,18 @@
                     display: block;
                     font-size: 3.5vw;
                     padding: 15px 0;
+                    display: flex;
+                    flex-direction: column-reverse;
+                    p {
+                        display: block;
+                    }
+                    .donate-btn {
+                        position: absolute;
+                        top: 25px;
+                        left: 10px;
+                        font-size: 2vh;
+                        margin: 6px 0;
+                    }
                 }
             }
         }
