@@ -114,7 +114,7 @@ function App() {
     let errorMsg;
     const dimensions = ScreenSize();
     const { t } = useTranslation();
-    const { chain }  = useContext(ChainContext)
+    const { chain, setChain }  = useContext(ChainContext)
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
     
     useEffect(() => {

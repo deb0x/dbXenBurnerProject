@@ -251,7 +251,6 @@ export function AppBarComponent(props: any): any {
                             <span>Donate</span>
                             <img src={heart} alt="heart" />
                         </button>
-
                         <div className='mb-2'>
                             <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
                                 {Number(totalStaked).toLocaleString('en-US', {
