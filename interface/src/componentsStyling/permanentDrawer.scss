@@ -191,10 +191,10 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             .burn-container {
                 width: 100%;
                 max-width: 100%;
-                height: 56vh;
-                overflow-y: scroll;
+                overflow-y: auto;
                 overflow-x: hidden;
                 margin: 2vh;
+                align-self: unset;
                 .row {
                     margin: 0 auto;
                 }
