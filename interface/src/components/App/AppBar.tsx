@@ -243,7 +243,7 @@ export function AppBarComponent(props: any): any {
     return (
         <ChainProvider>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
-            <div>
+            <>
                 <div className="app-bar--top">
                     <img className="logo" src={logo} alt="logo" />
                     <Box className="main-menu--left">
@@ -251,19 +251,19 @@ export function AppBarComponent(props: any): any {
                             <span>Donate</span>
                             <img src={heart} alt="heart" />
                         </button>
-
-                        
-                        <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
-                            {Number(totalStaked).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })} DXN</p>
-                        <p className="mb-0">
-                            {t("app_bar.xen_burned")}: {totalXENBurned}
-                        </p>
+                        <div className='mb-2'>
+                            <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
+                                {Number(totalStaked).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })} DXN</p>
+                            <p className="mb-0">
+                                {t("app_bar.xen_burned")}: {totalXENBurned}
+                            </p>
+                        </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        {Number(chain.chainId) === 1 ?
+                        {Number(chain.chainId) === 1 && dimensions.width > 768 ?
                             <>
                                 <button onClick={ props.handleSwitchComponent } className="component-switcher">
                                     <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
@@ -368,7 +368,7 @@ export function AppBarComponent(props: any): any {
                         </ClickAwayListener>
                     </Box>
                 </div>
-            </div>
+            </>
             <Modal open={show} onClose={() => setShow(false)}>
                 <Box ref={ref} className="modal-box--donate">
                     <div className="modal-body">

@@ -45,6 +45,7 @@
                 }
             }
             .main-menu--left {
+                display: flex;
                 align-items: center;
                 p {
                     display: none;
@@ -106,6 +107,18 @@
                     display: block;
                     font-size: 3.5vw;
                     padding: 15px 0;
+                    display: flex;
+                    flex-direction: column-reverse;
+                    p {
+                        display: block;
+                    }
+                    .donate-btn {
+                        position: absolute;
+                        top: 25px;
+                        left: 10px;
+                        font-size: 2vh;
+                        margin: 6px 0;
+                    }
                 }
             }
         }
