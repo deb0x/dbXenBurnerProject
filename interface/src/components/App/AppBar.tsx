@@ -264,16 +264,18 @@ export function AppBarComponent(props: any): any {
                         </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
+                        {dimensions.width > 768 ?
+                            <button onClick={ props.handleSwitchComponent } className="component-switcher">
+                                <img src={props.selectedIndex === 2 ? dbxen : dbxenft} alt="logo" />
+                                <img src={arrow} alt="arrow" />
+                            </button>
+                            : <></>
+                        }
                         {Number(chain.chainId) === 1 && dimensions.width > 768 ?
-                            <>
-                                <button onClick={ props.handleSwitchComponent } className="component-switcher">
-                                    <img src={props.selectedIndex === 2 ? dbxen : dbxenft} alt="logo" />
-                                    <img src={arrow} alt="arrow" />
-                                </button>
-                                <button onClick={ props.showDashboard } className="dashboard-btn">
-                                    Dashboard
-                                </button>
-                            </> : <></>
+                            <button onClick={ props.showDashboard } className="dashboard-btn">
+                                Dashboard
+                            </button>
+                            : <></>
                         }
                         
                         <DropdownLanguage />
