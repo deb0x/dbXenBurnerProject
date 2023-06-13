@@ -17,6 +17,7 @@ import walletIcon from '../../photos/icons/wallet.svg';
 import disconnectIcon from '../../photos/icons/diconnect.svg';
 import logo from "../../photos/white_dbxen.svg";
 import dbxen from '../../photos/icons/dbxen.svg';
+import dbxenft from '../../photos/icons/dbxenft.svg';
 import arrow from '../../photos/icons/arrow-right.svg';
 import heart from '../../photos/icons/heart.svg';
 import pizza from '../../photos/icons/pizza.png';
@@ -266,7 +267,7 @@ export function AppBarComponent(props: any): any {
                         {Number(chain.chainId) === 1 && dimensions.width > 768 ?
                             <>
                                 <button onClick={ props.handleSwitchComponent } className="component-switcher">
-                                    <img src={props.selectedIndex === 2 ? dbxen : dbxen} alt="logo" />
+                                    <img src={props.selectedIndex === 2 ? dbxen : dbxenft} alt="logo" />
                                     <img src={arrow} alt="arrow" />
                                 </button>
                                 <button onClick={ props.showDashboard } className="dashboard-btn">
