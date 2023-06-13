@@ -1,0 +1,57 @@
+.table-view {
+    width: 100%;
+    display: none;
+    table {
+        thead {
+            color: #62CFD0;
+            tr {
+                th {
+                    border-bottom: 0;
+                    text-align: center;
+                    padding-bottom: 25px;
+                    white-space: nowrap;
+                    font-weight: 400;
+                }
+            }
+        }
+        tbody {
+            color: #fff;
+            tr {
+                border-bottom: 1px solid #3F10CD;
+                &:last-child {
+                    border-bottom: 0;
+                }
+                td {
+                    border: 0;
+                    vertical-align: middle;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                button {
+                    padding: 5px 15px;
+                    border-radius: 25px;
+                    background-color: #19D2D2;
+                    color: #030328;
+                    text-transform: uppercase;
+                    border: 0;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}
+
+.text-container {
+    height: 75vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .text-container {
+        height: unset;
+    }
+}

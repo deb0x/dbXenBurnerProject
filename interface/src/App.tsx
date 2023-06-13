@@ -30,6 +30,7 @@ import DBXen from './ethereum/dbxen';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { DbXeNFT } from './components/App/DbXeNFT';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -106,7 +107,7 @@ function ContractsDeployed() {
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
     const { connector, account, activate, library } = context
-    const [selectedIndex, setSelectedIndex] = useState<any>(1);
+    const [selectedIndex, setSelectedIndex] = useState<any>(2);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -191,9 +192,9 @@ function App() {
 
     const handleSwitchComponent = () =>
     {
-        // selectedIndex === 2 ? 
-        //     setSelectedIndex(1):
-            setSelectedIndex(1)
+        selectedIndex === 2 ? 
+            setSelectedIndex(1):
+            setSelectedIndex(2)
     }
 
     const showDashboard = () => setSelectedIndex(3);
@@ -239,14 +240,14 @@ function App() {
                                 {dimensions.width > 768 ? 
                                     <>
                                         {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
-                                        {/* {selectedIndex === 2 && <DbXeNFT /> } */}
+                                        {selectedIndex === 2 && <DbXeNFT /> }
                                         {selectedIndex === 1 && <Stake /> }
                                     </>
                                     :
                                     <>
                                         {selectedIndex === 0 && <Burn /> }
                                         {selectedIndex === 1 && <Stake /> }
-                                        {/* {selectedIndex === 2 && <DbXeNFT /> } */}
+                                        {selectedIndex === 2 && <DbXeNFT /> }
                                         {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
                                     </>
                                 }
@@ -269,6 +270,10 @@ function App() {
                         <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
                             onClick={() => setSelectedIndex(1)}>
                                 {t("mobile.fees")}
+                        </div>
+                        <div className={`navigation-item ${selectedIndex === 2 ? "active" : ""}`}
+                            onClick={() => setSelectedIndex(2)}>
+                                DBXeNFT
                         </div>
                     </div>
                 </div> :

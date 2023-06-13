@@ -89,17 +89,28 @@
                     flex-wrap: wrap;
                     .MuiButton-contained {
                         width: 100%;
+                        font-size: 4vw;
+                        padding: 5px 10px;
                     }
-                    .language-switcher {
+                    .language-switcher-container {
                         position: absolute;
                         top: 25px;
                         right: 10px;
-                        font-size: 2vh;
                         width: 15%;
-                        padding: 5px;
+                        .language-switcher {
+                            font-size: 2vh;
+                            padding: 5px;
+                            width: 100%;
+                        }
+                        
                     }
                     & button {
                         margin: 6px 0;
+                    }
+
+                    & button.chain-switcher {
+                        font-size: 4vw;
+                        padding: 5px 10px;
                     }
                     
                 }
