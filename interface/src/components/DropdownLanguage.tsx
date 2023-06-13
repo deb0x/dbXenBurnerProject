@@ -37,7 +37,7 @@ const DropdownLanguage = () => {
 
     return (
         <ClickAwayListener onClickAway={handleClickAway}>
-            <div>
+            <div className="language-switcher-container">
                 <button onClick={handleClick} className="language-switcher">
                     {t("app_bar.language."+language)}
                 </button>
