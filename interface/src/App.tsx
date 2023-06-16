@@ -107,7 +107,7 @@ function ContractsDeployed() {
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
     const { connector, account, activate, library } = context
-    const [selectedIndex, setSelectedIndex] = useState<any>(1);
+    const [selectedIndex, setSelectedIndex] = useState<any>(2);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
