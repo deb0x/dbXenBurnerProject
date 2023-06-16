@@ -1,4 +1,5 @@
 import "../../componentsStyling/dbxenft.scss";
+import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
 
 export function DbXeNFT(): any {
     return (
@@ -46,10 +47,22 @@ export function DbXeNFT(): any {
                     </tbody>
                 </table>
             </div>
-            <div className="text-container">
-                <div className="text-content">
-                    <p>Fair crypto matters. We have taken a pause to think.</p> 
-                    <p>We encourage you to do the same!</p>
+            <div className="text-container-nft">
+                <div className="upper-container">
+                    <div className="card">
+                        <img className="card-img-top" src={nftPlaceholder} alt="Card image cap" />
+                        <div className="card-body">
+                            <h5 className="card-title"> DBXeNFT document v1.1 </h5>
+                            <p className="card-text">
+                                This is v1.1 version of the DBXeNFT document that is released <strong>ONLY</strong> for public review. <br/>
+                                Speculation based on information in this document is at <strong>own risk</strong>.
+                            </p>
+                            <a href="https://dbxenft-litepaper.gitbook.io/dbxenft-v1.1.-for-community-review/" target="_blank" className="btn">Read the document</a>
+                        </div>
+                    </div>
+                </div>
+                <div className="text-down">
+                    <p>Fair crypto matters.</p>
                 </div>
             </div>
         </>
