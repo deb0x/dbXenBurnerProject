@@ -52,12 +52,12 @@ export function DbXeNFT(): any {
                     <div className="card">
                         <img className="card-img-top" src={nftPlaceholder} alt="Card image cap" />
                         <div className="card-body">
-                            <h5 className="card-title"> DBXeNFT document v1.1 </h5>
+                            <h5 className="card-title"> DBXeNFT litepaper </h5>
                             <p className="card-text">
-                                This is v1.1 version of the DBXeNFT document that is released <strong>ONLY</strong> for public review. <br/>
-                                Speculation based on information in this document is at <strong>own risk</strong>.
+                                Thank you for all the feedback. <br/> 
+                                We now have the final version of the lite paper available here.
                             </p>
-                            <a href="https://dbxenft-litepaper.gitbook.io/dbxenft-v1.1.-for-community-review/" target="_blank" className="btn">Read the document</a>
+                            <a href="https://dbxenft-litepaper.gitbook.io/dbxenft/" target="_blank" className="btn">Read the document</a>
                         </div>
                     </div>
                 </div>
