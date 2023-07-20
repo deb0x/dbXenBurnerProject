@@ -144,6 +144,22 @@ const ChainProvider = ( { children }: Props ) => {
                             dxnTokenName: "vvDXN"
                         })
                         break;
+                    case 80001:
+                        setChain({
+                            deb0xAddress: "0x0E792967c96e14247ca787D31705537a62D5f95b",
+                            deb0xViewsAddress: "0x82D197ED51f4290F8F152D297e1ae13947FeBA61",
+                            deb0xERC20Address: "0xeCfBEa573c667c58A2b35e9DA7c5de4EE81d2abc",
+                            xenCryptoAddress: "0xF230D614e75aE05dF44075CaB230Fa67F10D8dCD",
+                            dbxenftFactoryAddress: "0x5FA482dd7A8eE5ff4d44c72113626A721b4F4316",
+                            dbxenftAddress: "0x1B51D7f974e98800afF491c3347E8C248dD4573c",
+                            xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
+                            chainId: parseInt(result, 16),
+                            chainName: "Mumbai",
+                            currency: "MATIC",
+                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            dxnTokenName: "mumDXN"
+                        })
+                        break;
                 }
             });
         },
