@@ -302,6 +302,7 @@ export default function ChainSetter(props: any) {
                             dbxenftFactory: "0x5FA482dd7A8eE5ff4d44c72113626A721b4F4316",
                             dbxenft: "0x1B51D7f974e98800afF491c3347E8C248dD4573c",
                             xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
+                            mintInfoAddress: "0xd47faeb4ec3432568fa93df528b237d103a78e88",
                             chainId: parseInt(result, 16),
                             chainName: "Mumbai",
                             currency: "MATIC",
