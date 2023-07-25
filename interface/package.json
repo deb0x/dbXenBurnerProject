@@ -39,6 +39,7 @@
     "ipfs-http-client": "^55.0.0",
     "ipfs-unixfs-exporter": "^7.0.6",
     "js-ipfs-fetch": "^3.3.0",
+    "moralis": "^2.22.4",
     "node-sass": "^7.0.3",
     "react": "^17.0.2",
     "react-countdown": "^2.3.5",

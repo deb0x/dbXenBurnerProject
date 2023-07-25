@@ -1,5 +1,6 @@
 import "../../componentsStyling/dbxenft.scss";
 import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
+import nftImage from "../../photos/xenft.svg";
 import { useState, useEffect, useContext } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import ChainContext from '../Contexts/ChainContext';
@@ -15,16 +16,154 @@ import {
     Multicall,
     ContractCallResults,
     ContractCallContext,
-  } from 'ethereum-multicall';
+} from 'ethereum-multicall';
+import Moralis from "moralis";
+
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 const { BigNumber } = require("ethers");
+
+const dummyData = [
+    {
+        id: 11,
+        status: "status",
+        VMUs: "VMUs",
+        term: "term",
+        maturity: "maturity",
+        EAA: "EAA",
+        cRank: "cRank",
+        AMP: "AMP",
+        xenBurned: "xenBurned",
+        category: "category"
+    },
+    {
+        id: 2,
+        status: "status",
+        VMUs: "VMUs",
+        term: "term",
+        maturity: "maturity",
+        EAA: "EAA",
+        cRank: "cRank",
+        AMP: "AMP",
+        xenBurned: "xenBurned",
+        category: "category"
+    }
+]
+
+interface XENFTEntry {
+    id: number;
+    claimStatus: string;
+    class: string;
+    VMUs: number;
+    cRank: string;
+    AMP: number;
+    EAA: string;
+    maturityYear: number;
+    maturityMonth: string;
+    maturityDateTime: Date;
+    term: number;
+    xenBurned: string;
+    category: string;
+}
 
 export function DbXeNFT(): any {
     const context = useWeb3React()
     const { library, account } = context
     const { chain }  = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({});
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+
+    const XENFTContract: any = {
+        // address: contractData.XENFTAdd,
+        // abi: abiXENFT,
+        // signerOrProvider: provider,
+    };
+
+    const MintInfoContract: any = {
+        // address: contractData.MintInfoAdd,
+        // abi: abiMintInfo,
+        // signerOrProvider: provider,
+    };
+
+    const XENContract: any = {
+        // address: contractData.XENCryptoAdd,
+        // abi: abiXenCrypto,
+        // signerOrProvider: provider,
+    };
+
+    useEffect(() => {
+        startMoralis();
+        getXENFTs();
+    }, [chain])
+
+    const startMoralis = () => {
+        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY })
+            .catch((e) => console.log("moralis error"))
+    }
+
+    const getXENFTs = () => {
+        Moralis.EvmApi.nft.getWalletNFTs({
+            chain: chain.chainId,
+            format: "decimal",
+            normalizeMetadata: true,
+            tokenAddresses: [chain.xenftAddress],
+            address: account ? account : ""
+        }).then((result) => {
+            const response = result.raw;
+
+            if (response) {
+                const resultArray: any = response.result;
+
+                let xenftEntries: XENFTEntry[] = [];
+                const thisDate = new Date();
+
+                console.log(resultArray)
+
+                for (let i = 0; i < resultArray?.length; i++) {
+                    let result = resultArray[i];
+                    const resultAttributes: any[] = result.normalized_metadata.attributes;
+
+                    if (chain.chainId == "80001") {
+
+                        xenftEntries.push({
+                            id: result.token_id,
+                            claimStatus:
+                                resultAttributes[7].value == "no"
+                                    ? new Date(resultAttributes[6].value * 1000) < new Date()
+                                        ? "Claimable"
+                                        : ` ${daysLeft(
+                                            new Date(resultAttributes[6].value * 1000),
+                                            new Date()
+                                        )} day(s) left`
+                                    : "Redeemed",
+                            class: "-",
+                            VMUs: parseInt(resultAttributes[1].value),
+                            cRank: resultAttributes[2].value,
+                            AMP: parseInt(resultAttributes[4].value),
+                            EAA: resultAttributes[5].value,
+                            maturityYear: 0,
+                            maturityMonth: "-",
+                            maturityDateTime: new Date(resultAttributes[6].value * 1000),
+                            term: 0,
+                            xenBurned: "0",
+                            category: "-",
+                        });
+                    } else {
+                        const maturityDateObject = resultAttributes.find(
+                            (item) => item.trait_type == "Maturity DateTime"
+                        );
+        
+                        // MintIn
+                    }
+                }
+            }
+        })
+    }
+
+    const daysLeft = (date_1: Date, date_2: Date) => {
+        let difference = date_1.getTime() - date_2.getTime();
+        let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
+        return TotalDays;
+    };
 
     async function isXENFTApproved(tokenId: any) {
         const xenftContract = XENFT(library, chain.xenftAddress);
@@ -554,8 +693,25 @@ export function DbXeNFT(): any {
         return Math.floor(Date.now() / 1000)
     }
 
+    const [displayXenftDetails, setDisplayXenftDetails] = useState(false);
+    const [displayDbxenftDetails, setDisplayDbxenftDetails] = useState(false);
+    const [xenftId, setXenftId] = useState();
+
+    const handleExpandRow = (id: any) => {
+        dummyData.map((data: any) => {
+            if (id == data.id) {
+                setXenftId(data.id);
+                setDisplayXenftDetails(!displayXenftDetails);
+            }
+        })
+    }
+
+    const handleBurnXenft = (id: any) => {
+        setDisplayDbxenftDetails(true);
+    }
+
     return (
-        <>
+        <div className="content-box">
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
             <div className="table-view table-responsive-xl">
@@ -577,30 +733,251 @@ export function DbXeNFT(): any {
                         </tr>
                     </thead>
                     <tbody>
-                    <tr key="key">
-                        <td>id</td>
-                        <td>status</td>
-                        <td>VMUs</td>
-                        <td>term</td>
-                        <td>maturity</td>
-                        <td>EAA</td>
-                        <td>cRank</td>
-                        <td>AMP</td>
-                        <td>xenBurned</td>
-                        <td>category</td>
-                        <td>class</td>
-                        <td>
-                            <button
-                                className="detail-btn"
-                                type="button"
-                            >
-                                Details
-                            </button>
-                        </td>
-                    </tr>
+                        {dummyData.map((data: any, i: any) =>
+                            <>
+                                <tr key={i}>
+                                    <td>{data.id}</td>
+                                    <td>{data.status}</td>
+                                    <td>{data.VMUs}</td>
+                                    <td>{data.term}</td>
+                                    <td>{data.maturity}</td>
+                                    <td>{data.EAA}</td>
+                                    <td>{data.cRank}</td>
+                                    <td>{data.AMP}</td>
+                                    <td>{data.xenBurned}</td>
+                                    <td>{data.category}</td>
+                                    <td>{data.class}</td>
+                                    <td>
+                                        <button
+                                            className="detail-btn"
+                                            type="button"
+                                            onClick={() => handleExpandRow(data.id)}
+                                        >
+                                            Details
+                                        </button>
+                                    </td>
+                                </tr>
+                                {displayXenftDetails && xenftId === data.id ?
+                                    <tr>
+                                        <td colSpan={displayDbxenftDetails ? 6 : 12}>
+                                            <div className="detailed-view row">
+                                                <div className="col xenft-container">
+                                                    <div className="xenft-details">
+                                                        <div className="image-container">
+                                                            <img src={nftImage} alt="nft-image" />
+                                                        </div>
+                                                        <div className="details-container">
+                                                            <div className="row">
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        Matures on
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.maturity}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        cRank
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.cRank}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        AMP
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.AMP}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row">
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        Category
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.category}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        Class
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.class}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        VMUs
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.VMUs}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="row">
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        Contract
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        0x0a25…fa59
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        EAA
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.EAA}
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-4">
+                                                                    <p className="label">
+                                                                        Chain
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        Ethereum
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="power">
+                                                        <p className="label">DBXen power</p>
+                                                        <p className="value">
+                                                            299994830.049458 $DXN
+                                                        </p>
+                                                    </div>
+                                                    <div className="burn-button-container">
+                                                        <button className="btn burn-button"
+                                                            onClick={handleBurnXenft}>
+                                                            BURN XEN
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        {displayDbxenftDetails ? 
+                                            <td colSpan={displayDbxenftDetails ? 6 : 12}>
+                                                <div className="detailed-view row">
+                                                    <div className="col xenft-container">
+                                                        <div className="xenft-details">
+                                                            <div className="image-container">
+                                                                <img src={nftImage} alt="nft-image" />
+                                                            </div>
+                                                            <div className="details-container">
+                                                                <div className="row">
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            Matures on
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.maturity}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            cRank
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.cRank}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            AMP
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.AMP}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row">
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            Category
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.category}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            Class
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.class}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            VMUs
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.VMUs}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="row">
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            Contract
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            0x0a25…fa59
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            EAA
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            {data.EAA}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-4">
+                                                                        <p className="label">
+                                                                            Chain
+                                                                        </p>
+                                                                        <p className="value">
+                                                                            Ethereum
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="power">
+                                                            <p className="label">DBXen power</p>
+                                                            <p className="value">
+                                                                299994830.049458 $DXN
+                                                            </p>
+                                                        </div>
+                                                        <div className="burn-button-container">
+                                                            <button className="btn burn-button"
+                                                                onClick={handleBurnXenft}>
+                                                                BURN XEN
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td> :
+                                            <></>
+                                        }
+                                    </tr> :
+                                    <></>
+                                }
+                            </>
+                        )
+                        }
                     </tbody>
                 </table>
             </div>
+
             <div className="text-container-nft">
                 <div className="upper-container">
                     <div className="card">
@@ -608,7 +985,7 @@ export function DbXeNFT(): any {
                         <div className="card-body">
                             <h5 className="card-title"> DBXeNFT litepaper </h5>
                             <p className="card-text">
-                                Thank you for all the feedback. <br/> 
+                                Thank you for all the feedback. <br />
                                 We now have the final version of the lite paper available here.
                             </p>
                             <a href="https://dbxenft-litepaper.gitbook.io/dbxenft/" target="_blank" className="btn">Read the document</a>
@@ -624,6 +1001,6 @@ export function DbXeNFT(): any {
                     <p>Fair crypto matters.</p>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

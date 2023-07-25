@@ -1,7 +1,11 @@
 .table-view {
     width: 100%;
-    display: none;
+    p {
+        margin-bottom: 0;
+    }
+    // display: none;
     table {
+        font-family: "Karla";
         thead {
             color: #62CFD0;
             tr {
@@ -39,12 +43,63 @@
             }
         }
     }
+    .detailed-view {
+        height: 100%;
+        width: 100%;
+        font-family: "Manrope";
+        .nft-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .nft-id {
+                font-size: 30px;
+            }
+            .nft-details {
+                font-size: 14px;
+            }
+        }
+        .xenft-container {
+            .xenft-details {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .image-container {
+                    img {
+                        width: 35%;
+                    }
+                }
+                .details-container {
+                    font-size: 14px;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-around;
+                    .label {
+                        opacity: 0.4;
+                    }
+                }
+            }
+            .power {
+                color: #62CFD0;
+                .label {
+                    opacity: 0.4;
+                    font-size: 14px;
+                }
+                .value {
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+            }
+        }
+    }
 }
+
+
 
 .text-container-nft {
     height: 75vh;
     width: 100%;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     text-align: center;
