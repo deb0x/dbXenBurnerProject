@@ -7,10 +7,13 @@ import ChainContext from '../Contexts/ChainContext';
 import DBXENFTFactory from "../../ethereum/dbxenftFactory";
 import XENFT from "../../ethereum/xenTorrent";
 import XENCrypto from "../../ethereum/XENCrypto";
+import mintInfo from "../../ethereum/mintInfo";
 import DXN from "../../ethereum/dbxenerc20"
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import SnackbarNotification from './Snackbar';
+import axios, { Method } from 'axios';
+import web3 from 'web3';
 import { ethers } from "ethers";
 import {
     Multicall,
@@ -18,6 +21,7 @@ import {
     ContractCallContext,
 } from 'ethereum-multicall';
 import Moralis from "moralis";
+import { StringMap } from "i18next";
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 const { BigNumber } = require("ethers");
@@ -57,38 +61,25 @@ interface XENFTEntry {
     cRank: string;
     AMP: number;
     EAA: string;
-    maturityYear: number;
-    maturityMonth: string;
     maturityDateTime: Date;
     term: number;
     xenBurned: string;
     category: string;
+    image: string;
+}
+interface DBXENFT {
+    protoclFee: string;
+    transactionFee: string
 }
 
 export function DbXeNFT(): any {
     const context = useWeb3React()
     const { library, account } = context
-    const { chain }  = useContext(ChainContext)
+    const { chain } = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({});
     const [loading, setLoading] = useState(false);
-
-    const XENFTContract: any = {
-        // address: contractData.XENFTAdd,
-        // abi: abiXENFT,
-        // signerOrProvider: provider,
-    };
-
-    const MintInfoContract: any = {
-        // address: contractData.MintInfoAdd,
-        // abi: abiMintInfo,
-        // signerOrProvider: provider,
-    };
-
-    const XENContract: any = {
-        // address: contractData.XENCryptoAdd,
-        // abi: abiXenCrypto,
-        // signerOrProvider: provider,
-    };
+    const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
+    const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
 
     useEffect(() => {
         startMoralis();
@@ -96,7 +87,7 @@ export function DbXeNFT(): any {
     }, [chain])
 
     const startMoralis = () => {
-        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY })
+        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch((e) => console.log("moralis error"))
     }
 
@@ -107,9 +98,8 @@ export function DbXeNFT(): any {
             normalizeMetadata: true,
             tokenAddresses: [chain.xenftAddress],
             address: account ? account : ""
-        }).then((result) => {
+        }).then(async (result) => {
             const response = result.raw;
-
             if (response) {
                 const resultArray: any = response.result;
 
@@ -123,7 +113,6 @@ export function DbXeNFT(): any {
                     const resultAttributes: any[] = result.normalized_metadata.attributes;
 
                     if (chain.chainId == "80001") {
-
                         xenftEntries.push({
                             id: result.token_id,
                             claimStatus:
@@ -135,26 +124,64 @@ export function DbXeNFT(): any {
                                             new Date()
                                         )} day(s) left`
                                     : "Redeemed",
-                            class: "-",
+                            class: resultAttributes[0].value,
                             VMUs: parseInt(resultAttributes[1].value),
                             cRank: resultAttributes[2].value,
-                            AMP: parseInt(resultAttributes[4].value),
+                            AMP: parseInt(resultAttributes[3].value),
                             EAA: resultAttributes[5].value,
-                            maturityYear: 0,
-                            maturityMonth: "-",
-                            maturityDateTime: new Date(resultAttributes[6].value * 1000),
-                            term: 0,
-                            xenBurned: "0",
-                            category: "-",
+                            maturityDateTime: resultAttributes[7].value,
+                            term: resultAttributes[8].value,
+                            xenBurned: resultAttributes[9].value,
+                            category: resultAttributes[10].value,
+                            image: result.normalized_metadata.image
                         });
                     } else {
                         const maturityDateObject = resultAttributes.find(
                             (item) => item.trait_type == "Maturity DateTime"
                         );
-        
-                        // MintIn
+                        const signer = library.getSigner(0)
+                        const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
+                        const XENFTContract = XENFT(signer, chain.xenftAddress);
+                        const isRedeemed = await MintInfoContract.getRedeemed(
+                            await XENFTContract.mintInfo(result.token_id)
+                        )
+
+                        try {
+                            const maturityDate = new Date(maturityDateObject.value);
+
+                            let claimStatus;
+                            if (thisDate < maturityDate) {
+                                const daysToGo = daysLeft(maturityDate, thisDate);
+                                claimStatus = `${daysToGo} days left`;
+                            } else if (isRedeemed) {
+                                claimStatus = "Redeemed";
+                            } else if ((thisDate.getTime() - maturityDate.getTime()) / (1000 * 3600 * 24) >= 6) {
+                                claimStatus = "Penalized"
+                            }
+                            else {
+                                claimStatus = "Claimable";
+                            }
+                            xenftEntries.push({
+                                id: result.token_id,
+                                claimStatus: claimStatus,
+                                class: resultAttributes[0].value,
+                                VMUs: parseInt(resultAttributes[1].value),
+                                cRank: resultAttributes[2].value,
+                                AMP: parseInt(resultAttributes[3].value),
+                                EAA: resultAttributes[5].value,
+                                maturityDateTime: resultAttributes[7].value,
+                                term: parseInt(resultAttributes[8].value),
+                                xenBurned: resultAttributes[9].value,
+                                category: resultAttributes[10].value,
+                                image: result.normalized_metadata.image
+                            });
+                        } catch (err) {
+                            console.log(err);
+                        }
                     }
                 }
+                setXENFTs(xenftEntries);
+                setLoading(false);
             }
         })
     }
@@ -185,7 +212,7 @@ export function DbXeNFT(): any {
         const signer = library.getSigner(0)
         const xenftContract = XENFT(signer, chain.xenftAddress);
 
-        try{
+        try {
             const tx = await xenftContract.setApprovalForAll(chain.dbxenftFactoryAddress, true)
             tx.wait()
                 .then((result: any) => {
@@ -208,53 +235,56 @@ export function DbXeNFT(): any {
                 severity: "info"
             })
             setLoading(false)
-        }      
+        }
     }
 
     async function mintDBXENFT(
-            tokenId: any,
-            maturityTs: number,
-            VMUs: number,
-            EAA: string,
-            term: number,
-            AMP: number,
-            cRank: string) 
-    {
+        tokenId: any,
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string,
+        claimStatus: string) {
         setLoading(true)
         const signer = await library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
+        let fee;
 
         try {
-            const fee = await calcMintFee(
-                maturityTs,
-                VMUs,
-                EAA,
-                term,
-                AMP,
-                cRank
-            )
-
+            if (claimStatus == "Redeemed") {
+                fee = ethers.utils.parseEther("0.001");
+            } else {
+                fee = await calcMintFee(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                )
+            }
             const overrides = {
                 value: fee
             }
-            console.log(ethers.utils.formatEther(fee))
 
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
-            .then((result: any) => {
-                setNotificationState({
-                    message: "Your succesfully minted a DBXENFT.", open: true,
-                    severity: "success"
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "Your succesfully minted a DBXENFT.", open: true,
+                        severity: "success"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
-            .catch((error: any) => {
-                setNotificationState({
-                    message: "Contract couldn't mint your DBXENFT!", open: true,
-                    severity: "error"
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Contract couldn't mint your DBXENFT!", open: true,
+                        severity: "error"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
         } catch (error) {
             console.log(error)
             setNotificationState({
@@ -262,7 +292,7 @@ export function DbXeNFT(): any {
                 severity: "info"
             })
             setLoading(false)
-        }   
+        }
     }
 
     async function approveDXN() {
@@ -270,7 +300,7 @@ export function DbXeNFT(): any {
         const signer = library.getSigner(0)
         const xenftContract = DXN(signer, chain.deb0xERC20Address);
 
-        try{
+        try {
             const tx = await xenftContract.approve(chain.dbxenftFactoryAddress, ethers.constants.MaxUint256)
             tx.wait()
                 .then((result: any) => {
@@ -293,7 +323,7 @@ export function DbXeNFT(): any {
                 severity: "info"
             })
             setLoading(false)
-        }      
+        }
     }
 
     async function stake(tokenId: any, amount: any) {
@@ -309,27 +339,27 @@ export function DbXeNFT(): any {
 
             const tx = await dbxenftFactory.stake(amount, tokenId, overrides)
             await tx.wait()
-            .then((result: any) => {
-                setNotificationState({
-                    message: "You succesfully staked on your DBXENFT.", open: true,
-                    severity: "success"
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "You succesfully staked on your DBXENFT.", open: true,
+                        severity: "success"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
-            .catch((error: any) => {
-                setNotificationState({
-                    message: "Staking for your DBXENFT was unsuccesful!", open: true,
-                    severity: "error"
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Staking for your DBXENFT was unsuccesful!", open: true,
+                        severity: "error"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
                 severity: "info"
             })
             setLoading(false)
-        } 
+        }
     }
 
     async function unstake(tokenId: any, amount: any) {
@@ -341,27 +371,27 @@ export function DbXeNFT(): any {
 
             const tx = await dbxenftFactory.unstake(tokenId, amount)
             await tx.wait()
-            .then((result: any) => {
-                setNotificationState({
-                    message: "You succesfully unstaked your DXN.", open: true,
-                    severity: "success"
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "You succesfully unstaked your DXN.", open: true,
+                        severity: "success"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
-            .catch((error: any) => {
-                setNotificationState({
-                    message: "Unstaking your DXN was unsuccesful!", open: true,
-                    severity: "error"
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Unstaking your DXN was unsuccesful!", open: true,
+                        severity: "error"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Your DXN haven't been unstaked.", open: true,
                 severity: "info"
             })
             setLoading(false)
-        } 
+        }
     }
 
     async function claimFees(tokenId: any) {
@@ -373,27 +403,27 @@ export function DbXeNFT(): any {
 
             const tx = await dbxenftFactory.claimFees(tokenId)
             await tx.wait()
-            .then((result: any) => {
-                setNotificationState({
-                    message: "You succesfully claimed your fees.", open: true,
-                    severity: "success"
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "You succesfully claimed your fees.", open: true,
+                        severity: "success"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
-            .catch((error: any) => {
-                setNotificationState({
-                    message: "Claiming your fees was unsuccesful!", open: true,
-                    severity: "error"
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Claiming your fees was unsuccesful!", open: true,
+                        severity: "error"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
                 severity: "info"
             })
             setLoading(false)
-        } 
+        }
     }
 
     async function claimXen(tokenId: any) {
@@ -405,27 +435,27 @@ export function DbXeNFT(): any {
 
             const tx = await dbxenftFactory.claimXen(tokenId)
             await tx.wait()
-            .then((result: any) => {
-                setNotificationState({
-                    message: "You succesfully claimed your Xen.", open: true,
-                    severity: "success"
+                .then((result: any) => {
+                    setNotificationState({
+                        message: "You succesfully claimed your Xen.", open: true,
+                        severity: "success"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
-            .catch((error: any) => {
-                setNotificationState({
-                    message: "Claiming your Xen was unsuccesful!", open: true,
-                    severity: "error"
+                .catch((error: any) => {
+                    setNotificationState({
+                        message: "Claiming your Xen was unsuccesful!", open: true,
+                        severity: "error"
+                    })
+                    setLoading(false)
                 })
-                setLoading(false)
-            })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Your Xen haven't been claimed.", open: true,
                 severity: "info"
             })
             setLoading(false)
-        } 
+        }
     }
 
     function calcMaturityDays(term: any, maturityTs: any) {
@@ -435,16 +465,16 @@ export function DbXeNFT(): any {
 
         const currentTimestamp = getTimestampInSeconds()
         const SECONDS_IN_DAYS = 3600 * 24
-        
-        if(currentTimestamp < maturityTs) {
-            daysTillClaim = (maturityTs - currentTimestamp) / SECONDS_IN_DAYS
+
+        if (currentTimestamp < maturityTs) {
+            daysTillClaim = Math.floor((maturityTs - currentTimestamp) / SECONDS_IN_DAYS);
             daysSinceMinted = term - daysTillClaim
         } else {
-            daysSinceMinted = (term * SECONDS_IN_DAYS + (currentTimestamp - maturityTs))
-                / SECONDS_IN_DAYS
+            daysSinceMinted = Math.floor((term * SECONDS_IN_DAYS + (currentTimestamp - maturityTs))
+                / SECONDS_IN_DAYS)
         }
 
-        if(daysSinceMinted > daysTillClaim) {
+        if (daysSinceMinted > daysTillClaim) {
             maturityDays = daysSinceMinted - daysTillClaim
         }
 
@@ -458,7 +488,7 @@ export function DbXeNFT(): any {
         term: number,
         AMP: number,
         cRank: string
-        ) {
+    ) {
         const estReward: any = await getNFTRewardInXen(
             maturityTs,
             VMUs,
@@ -477,7 +507,6 @@ export function DbXeNFT(): any {
         const minFee = BigNumber.from(1e15)
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(1_000_000_000))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-        console.log(fee)
 
         return fee
     }
@@ -502,7 +531,7 @@ export function DbXeNFT(): any {
         const currentCycle = response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0]
         const dbxenftFirstStake = response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0]
         const dbxenftSecondStake = response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0]
-    
+
         const contractCallContext2: ContractCallContext[] = [
             {
                 reference: 'DBXENFTFactory',
@@ -523,10 +552,10 @@ export function DbXeNFT(): any {
 
         let unlockedStake = 0
 
-        if(dbxenftFirstStake != 0 && currentCycle > dbxenftFirstStake) {
+        if (dbxenftFirstStake != 0 && currentCycle > dbxenftFirstStake) {
             unlockedStake += dbxenftFirstStakeCycle
 
-            if(dbxenftSecondStake != 0 && currentCycle > dbxenftSecondStake) {
+            if (dbxenftSecondStake != 0 && currentCycle > dbxenftSecondStake) {
                 unlockedStake += dbxenfSecondStakeCycle
             }
         }
@@ -579,7 +608,7 @@ export function DbXeNFT(): any {
         const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[11].returnValues[0])
         let stakeCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[12].returnValues[0])
 
-        if(!currentCycle.eq(currentStartedCycle)) {
+        if (!currentCycle.eq(currentStartedCycle)) {
             previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
             lastStartedCycle = currentStartedCycle
         }
@@ -611,42 +640,41 @@ export function DbXeNFT(): any {
         const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
         //const pendingDXN = BigNumber.from("100000000000000000000")
         const pendingDXN = response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0]
-    
-        
 
-        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) {
+
+
+        if (currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) {
             const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
-            .div(summedCyclePowers)
+                .div(summedCyclePowers)
 
             CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
         }
 
-        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+        if (baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
             baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
             dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
         }
 
-        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
+        if (currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
             dbxenftAccruedFees = dbxenftAccruedFees.add(
                 dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
-                .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                    .div(BigNumber.from("10000000000000000000000000000000000000000"))
             )
 
-            if(!pendingDXN.isZero()) {
+            if (!pendingDXN.isZero()) {
                 stakeCycle = stakeCycle.sub(BigNumber.from("1"))
                 const extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
 
-                if((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
+                if ((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
                     dbxenftAccruedFees = dbxenftAccruedFees.add(
                         extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle.add(BigNumber.from("1"))))
-                        .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                            .div(BigNumber.from("10000000000000000000000000000000000000000"))
                     )
                 }
             }
         }
-        console.log(dbxenftAccruedFees)
     }
- 
+
     async function getNFTRewardInXen(
         maturityTs: number,
         VMUs: number,
@@ -658,18 +686,18 @@ export function DbXeNFT(): any {
         const XENContract = XENCrypto(library, chain.xenCryptoAddress)
         const globalRank = await XENContract.globalRank();
         const cRankDelta = Math.max((globalRank.sub(BigNumber.from(cRank))).toNumber(), 2);
-        
+
         const factor = 10_000;
         const reward = Math.floor(
-          AMP
-          * (Math.floor(Math.max(Math.log2(cRankDelta), 1) * factor) / factor)
-          * (Number.isFinite(term) ? term : term)
-          * ((parseInt(EAA) + 1) / 1_000)
+            AMP
+            * (Math.floor(Math.max(Math.log2(cRankDelta), 1) * factor) / factor)
+            * (Number.isFinite(term) ? term : term)
+            * ((parseInt(EAA) + 1) / 1_000)
         )
-        
+
         let pen = 0
         const currentTimestamp = getTimestampInSeconds()
-        if(currentTimestamp > maturityTs) {
+        if (currentTimestamp > maturityTs) {
             pen = calcPenalty(getTimestampInSeconds() - maturityTs)
         }
         const rew = Math.floor((reward * (100 - pen)) / 100);
@@ -678,18 +706,17 @@ export function DbXeNFT(): any {
 
     function calcPenalty(secsLate: number) {
         const daysLate = Math.floor(secsLate / 86400)
-        if(daysLate > 6) {
+        if (daysLate > 6) {
             return 99
         }
-        console.log(daysLate + 3)
         const penalty = ((BigNumber.from(1).shl(daysLate + 3)).div(BigNumber.from(7)).sub(BigNumber.from(1))).toNumber()
-        if(penalty < 99) {
+        if (penalty < 99) {
             return penalty
         }
         return 99
     }
 
-    function getTimestampInSeconds () {
+    function getTimestampInSeconds() {
         return Math.floor(Date.now() / 1000)
     }
 
@@ -698,16 +725,78 @@ export function DbXeNFT(): any {
     const [xenftId, setXenftId] = useState();
 
     const handleExpandRow = (id: any) => {
-        dummyData.map((data: any) => {
+        XENFTs.map((data: any) => {
             if (id == data.id) {
                 setXenftId(data.id);
                 setDisplayXenftDetails(!displayXenftDetails);
+                setDisplayDbxenftDetails(false);
+                setDBXNFT({
+                    protoclFee: "0",
+                    transactionFee: "0"
+                })
             }
         })
     }
 
-    const handleBurnXenft = (id: any) => {
+    const handleBurnXenft = async (NFTData: any) => {
         setDisplayDbxenftDetails(true);
+        const signer = library.getSigner(0);
+        const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
+        const XENFTContract = XENFT(signer, chain.xenftAddress);
+        let mintInforesult = await XENFTContract.mintInfo(NFTData.id)
+        let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+        let term = mintInfoData[0];
+        let maturityTs = mintInfoData[1];
+        let amp = mintInfoData[2];
+        let eea = mintInfoData[3];
+
+        let priceURL = chain.priceURL;
+        let method: Method = 'POST';
+        const options = {
+            method: method,
+            url: priceURL,
+            port: 443,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                "jsonrpc": "2.0", "method": "eth_gasPrice", "params": [], "id": 1
+            })
+        };
+        let gasLimitVal;
+        let price;
+        let transactionFee;
+        await axios.request(options).then(async (result) => {
+            if (result.data.result != undefined) {
+                if (Number(chain.chainId) === 137) {
+                    gasLimitVal = (BigNumber.from("400000"));
+                    price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
+                    transactionFee = gasLimitVal * price / 1000000000;
+                    console.log("transactionFee " + transactionFee);
+                    if (NFTData.claimStatus == "Redeemed") {
+                        setDBXNFT({
+                            protoclFee: "0.001",
+                            transactionFee: transactionFee.toString()
+                        })
+                        if (!isApprovedForAll()) {
+                            await approveForAll();
+                        }
+                        await mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus);
+                    } else {
+                        let protocolFee = await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank);
+                        console.log(ethers.utils.formatEther(protocolFee.toString()));
+                        setDBXNFT({
+                            protoclFee: ethers.utils.formatEther(protocolFee.toString()).slice(0, 6),
+                            transactionFee: transactionFee.toString()
+                        })
+                        if (!isApprovedForAll()) {
+                            await approveForAll();
+                        }
+                        await mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus);
+                    }
+                }
+            }
+        })
     }
 
     return (
@@ -733,14 +822,14 @@ export function DbXeNFT(): any {
                         </tr>
                     </thead>
                     <tbody>
-                        {dummyData.map((data: any, i: any) =>
+                        {XENFTs.map((data: any, i: any) =>
                             <>
                                 <tr key={i}>
                                     <td>{data.id}</td>
-                                    <td>{data.status}</td>
+                                    <td>{data.claimStatus}</td>
                                     <td>{data.VMUs}</td>
                                     <td>{data.term}</td>
-                                    <td>{data.maturity}</td>
+                                    <td>{data.maturityDateTime}</td>
                                     <td>{data.EAA}</td>
                                     <td>{data.cRank}</td>
                                     <td>{data.AMP}</td>
@@ -764,7 +853,7 @@ export function DbXeNFT(): any {
                                                 <div className="col xenft-container">
                                                     <div className="xenft-details">
                                                         <div className="image-container">
-                                                            <img src={nftImage} alt="nft-image" />
+                                                            <img src={data.image} alt="nft-image" />
                                                         </div>
                                                         <div className="details-container">
                                                             <div className="row">
@@ -773,7 +862,7 @@ export function DbXeNFT(): any {
                                                                         Matures on
                                                                     </p>
                                                                     <p className="value">
-                                                                        {data.maturity}
+                                                                        {data.maturityDateTime}
                                                                     </p>
                                                                 </div>
                                                                 <div className="col-4">
@@ -825,7 +914,7 @@ export function DbXeNFT(): any {
                                                                         Contract
                                                                     </p>
                                                                     <p className="value">
-                                                                        0x0a25…fa59
+                                                                        {chain.xenftAddress}
                                                                     </p>
                                                                 </div>
                                                                 <div className="col-4">
@@ -841,7 +930,7 @@ export function DbXeNFT(): any {
                                                                         Chain
                                                                     </p>
                                                                     <p className="value">
-                                                                        Ethereum
+                                                                        {chain.chainName}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -855,116 +944,82 @@ export function DbXeNFT(): any {
                                                     </div>
                                                     <div className="burn-button-container">
                                                         <button className="btn burn-button"
-                                                            onClick={handleBurnXenft}>
-                                                            BURN XEN
+                                                            onClick={() => handleBurnXenft(data)}>
+                                                            PREVIEW DATA
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        {displayDbxenftDetails ? 
+                                        {displayDbxenftDetails ?
                                             <td colSpan={displayDbxenftDetails ? 6 : 12}>
-                                                <div className="detailed-view row">
-                                                    <div className="col xenft-container">
-                                                        <div className="xenft-details">
-                                                            <div className="image-container">
-                                                                <img src={nftImage} alt="nft-image" />
-                                                            </div>
-                                                            <div className="details-container">
-                                                                <div className="row">
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            Matures on
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.maturity}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            cRank
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.cRank}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            AMP
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.AMP}
-                                                                        </p>
-                                                                    </div>
+                                                {DBXENFT != null ?
+                                                    <div className="detailed-view row">
+                                                        <div className="col xenft-container">
+                                                            <div className="xenft-details">
+                                                                <div className="image-container">
+                                                                    <img src={nftImage} alt="nft-image" />
                                                                 </div>
-                                                                <div className="row">
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            Category
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.category}
-                                                                        </p>
+                                                                <div className="details-container">
+                                                                    <div className="row">
+                                                                        <div className="col-4">
+                                                                            <p className="label">
+                                                                                Protocol fee
+                                                                            </p>
+                                                                            <p className="value">
+                                                                                {DBXENFT?.protoclFee.toString()}
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="col-4">
+                                                                            <p className="label">
+                                                                                Transaction cost
+                                                                            </p>
+                                                                            <p className="value">
+                                                                                {DBXENFT?.transactionFee.toString()}
+                                                                            </p>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            Class
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.class}
-                                                                        </p>
+                                                                    <div className="row">
                                                                     </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            VMUs
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.VMUs}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="row">
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            Contract
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            0x0a25…fa59
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            EAA
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            {data.EAA}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="col-4">
-                                                                        <p className="label">
-                                                                            Chain
-                                                                        </p>
-                                                                        <p className="value">
-                                                                            Ethereum
-                                                                        </p>
+                                                                    <div className="row">
+                                                                        <div className="col-4">
+                                                                            <p className="label">
+                                                                                Contract
+                                                                            </p>
+                                                                            <p className="value">
+                                                                                0x0a25…fa59
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="col-4">
+                                                                        </div>
+                                                                        <div className="col-4">
+                                                                            <p className="label">
+                                                                                Chain
+                                                                            </p>
+                                                                            <p className="value">
+                                                                                {chain.chainName}
+                                                                            </p>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="power">
-                                                            <p className="label">DBXen power</p>
-                                                            <p className="value">
-                                                                299994830.049458 $DXN
-                                                            </p>
-                                                        </div>
-                                                        <div className="burn-button-container">
+                                                            <div className="power">
+                                                                <p className="label">DBXen power</p>
+                                                                <p className="value">
+                                                                    299994830.049458 $DXN
+                                                                </p>
+                                                            </div>
+                                                            {/* <div className="burn-button-container">
                                                             <button className="btn burn-button"
                                                                 onClick={handleBurnXenft}>
                                                                 BURN XEN
                                                             </button>
+                                                        </div> */}
                                                         </div>
-                                                    </div>
-                                                </div>
+                                                    </div> :
+                                                    <div>
+                                                        <p>Wait for date please</p>
+                                                    </div>}
                                             </td> :
                                             <></>
                                         }
@@ -993,10 +1048,10 @@ export function DbXeNFT(): any {
                     </div>
                 </div>
                 <LoadingButton className="burn-btn"
-                        loadingPosition="end"
-                        onClick={() => getUnclaimedFees(11)} >
-                        {loading ? <Spinner color={'black'} /> : "Do stuff"}
-                    </LoadingButton>
+                    loadingPosition="end"
+                    onClick={() => getUnclaimedFees(11)} >
+                    {loading ? <Spinner color={'black'} /> : "Do stuff"}
+                </LoadingButton>
                 <div className="text-down">
                     <p>Fair crypto matters.</p>
                 </div>
