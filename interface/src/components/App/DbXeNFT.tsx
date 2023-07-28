@@ -248,7 +248,7 @@ export function DbXeNFT(): any {
                 })
                 setLoading(false)
             })
-        } catch (error) {
+        } catch (error) { 
             setNotificationState({
                 message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
                 severity: "info"
@@ -298,11 +298,11 @@ export function DbXeNFT(): any {
         const SECONDS_IN_DAYS = 3600 * 24
         
         if(currentTimestamp < maturityTs) {
-            daysTillClaim = (maturityTs - currentTimestamp) / SECONDS_IN_DAYS
+            daysTillClaim = Math.floor((maturityTs - currentTimestamp) / SECONDS_IN_DAYS)
             daysSinceMinted = term - daysTillClaim
         } else {
-            daysSinceMinted = (term * SECONDS_IN_DAYS + (currentTimestamp - maturityTs))
-                / SECONDS_IN_DAYS
+            daysSinceMinted = Math.floor((term * SECONDS_IN_DAYS + (currentTimestamp - maturityTs))
+                / SECONDS_IN_DAYS)
         }
 
         if(daysSinceMinted > daysTillClaim) {
@@ -341,6 +341,59 @@ export function DbXeNFT(): any {
         console.log(fee)
 
         return fee
+    }
+
+    async function getDBXENFTPower(tokenId: any) {
+        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
+
+        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
+        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+
+
+        const contractCallContext: ContractCallContext[] = [
+            {
+                reference: 'DBXENFTFactory',
+                contractAddress: chain.dbxenftFactoryAddress,
+                abi,
+                calls: [
+                    { reference: 'getCurrentCycleCall', methodName: 'getCurrentCycle', methodParameters: [] },
+                    { reference: 'getLastStartedCycle', methodName: 'lastStartedCycle', methodParameters: [] },
+                    { reference: 'getDBXENFTEntryPower', methodName: 'dbxenftEntryPower', methodParameters: [tokenId] },
+                    { reference: 'getEntryCycleReward', methodName: 'rewardPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getTotalEntryCycleEntryPower', methodName: 'totalEntryPowerPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getBaseDBXENFTPower', methodName: 'baseDBXeNFTPower', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTPower', methodName: 'dbxenftPower', methodParameters: [tokenId] },
+                    { reference: 'getLastFeeUpdateCycle', methodName: 'lastFeeUpdateCycle', methodParameters: [tokenId] },
+                    { reference: 'getPendingDXN', methodName: 'pendingDXN', methodParameters: [tokenId] }
+                ]
+            }
+        ];
+
+        const response: ContractCallResults = await multicall.call(contractCallContext);
+        const currentCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        let lastStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        const dbxenftEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+        const entryCycleReward = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+        const totalEntryCycleEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        let baseDBXENFTPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
+        let dbxenftPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
+        const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
+        const pendingDXN = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
+
+        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
+            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
+        }
+
+        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))
+            && !pendingDXN.isZero()) {
+
+            const extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+
+            dbxenftPower = dbxenftPower.add(extraPower)
+        }
+
+        return dbxenftPower
     }
 
     async function getDBXENFTWithdrawableStake(tokenId: any) {
@@ -506,6 +559,144 @@ export function DbXeNFT(): any {
             }
         }
         console.log(dbxenftAccruedFees)
+    }
+
+    async function getUpdatedDBXENFTData(tokenId: any) {
+        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
+
+        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
+        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+
+
+        const contractCallContext: ContractCallContext[] = [
+            {
+                reference: 'DBXENFTFactory',
+                contractAddress: chain.dbxenftFactoryAddress,
+                abi,
+                calls: [
+                    { reference: 'getCurrentCycleCall', methodName: 'getCurrentCycle', methodParameters: [] },
+                    { reference: 'getDBXENFTAccruedFees', methodName: 'dbxenftAccruedFees', methodParameters: [tokenId] },
+                    { reference: 'getPreviousStartedCycle', methodName: 'previousStartedCycle', methodParameters: [] },
+                    { reference: 'getLastStartedCycle', methodName: 'lastStartedCycle', methodParameters: [] },
+                    { reference: 'getCurrentStartedCycle', methodName: 'currentStartedCycle', methodParameters: [] },
+                    { reference: 'getPendingFees', methodName: 'pendingFees', methodParameters: [] },
+                    { reference: 'getDBXENFTEntryPower', methodName: 'dbxenftEntryPower', methodParameters: [tokenId] },
+                    { reference: 'getEntryCycleReward', methodName: 'rewardPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getTotalEntryCycleEntryPower', methodName: 'totalEntryPowerPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getBaseDBXENFTPower', methodName: 'baseDBXeNFTPower', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTPower', methodName: 'dbxenftPower', methodParameters: [tokenId] },
+                    { reference: 'getLastFeeUpdateCycle', methodName: 'lastFeeUpdateCycle', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTFirstStake', methodName: 'dbxenftFirstStake', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTSecondStake', methodName: 'dbxenftSecondStake', methodParameters: [tokenId] }
+                ]
+            }
+        ];
+
+        const response: ContractCallResults = await multicall.call(contractCallContext);
+        const currentCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        let dbxenftAccruedFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        let previousStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+        let lastStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+        const currentStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        const pendingFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
+        const dbxenftEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
+        const entryCycleReward = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
+        const totalEntryCycleEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
+        let baseDBXENFTPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
+        let dbxenftPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
+        const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[11].returnValues[0])
+        const dbxenftFirstStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[12].returnValues[0])
+        const dbxenftSecondStake = response.results.DBXENFTFactory.callsReturnContext[13].returnValues[0]
+
+        if(!currentCycle.eq(currentStartedCycle)) {
+            previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
+            lastStartedCycle = currentStartedCycle
+        }
+
+        const contractCallContext2: ContractCallContext[] = [
+            {
+                reference: 'DBXENFTFactory',
+                contractAddress: chain.dbxenftFactoryAddress,
+                abi,
+                calls: [
+                    { reference: 'getSummedCyclePowers', methodName: 'summedCyclePowers', methodParameters: [lastStartedCycle] },
+                    { reference: 'getCFPPSLastStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastStartedCycle.add(BigNumber.from("1"))] },
+                    { reference: 'getCFPPSPreviousStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [previousStartedCycle] },
+                    { reference: 'getCFPPSLastFeeUpdateCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastFeeUpdateCycle] },
+                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftFirstStake.add(BigNumber.from("1"))] },
+                    { reference: 'getCycleAccruedFees', methodName: 'cycleAccruedFees', methodParameters: [lastStartedCycle] },
+                    { reference: 'getPendingDXN', methodName: 'pendingDXN', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTFirstStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftFirstStake] },
+                    { reference: 'getDBXENFTSecondStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftSecondStake] },
+                    { reference: 'getDBXENFTWithdrawableStake', methodName: 'dbxenftWithdrawableStake', methodParameters: [tokenId] }
+                ]
+            }
+        ];
+
+        const response2: ContractCallResults = await multicall.call(contractCallContext2);
+
+        const summedCyclePowers = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        let CFPPSLastStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        const CFPPSPreviousStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+        const CFPPSLastFeeUpdateCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+        const CFPPSStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
+        //const pendingDXN = BigNumber.from("100000000000000000000")
+        const pendingDXN = response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0]
+        const dbxenftFirstStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[7].returnValues[0]
+        const dbxenfSecondStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[8].returnValues[0]
+        let dbxenftWithdrawableStake = response2.results.DBXENFTFactory.callsReturnContext[9].returnValues[0]
+    
+        
+
+        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) {
+            const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
+            .div(summedCyclePowers)
+
+            CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
+        }
+
+        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
+            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
+        }
+
+        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
+            dbxenftAccruedFees = dbxenftAccruedFees.add(
+                dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
+                .div(BigNumber.from("10000000000000000000000000000000000000000"))
+            )
+
+            if(!pendingDXN.isZero()) {
+                let stakeCycle = dbxenftFirstStake.sub(BigNumber.from("1"))
+                const extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+
+                if((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
+                    dbxenftAccruedFees = dbxenftAccruedFees.add(
+                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle.add(BigNumber.from("1"))))
+                        .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                    )
+                }
+            }
+        }
+        let unlockedStake = BigNumber.from(0)
+
+        if(!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
+            unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
+
+            if(!dbxenftSecondStake.isZero() && currentCycle.gt(dbxenftSecondStake)) {
+                unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
+            }
+        }
+
+        dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
+
+        return {
+            dbxenftWithdrawableStake,
+            dbxenftAccruedFees,
+            baseDBXENFTPower,
+            dbxenftPower
+        }
     }
  
     async function getNFTRewardInXen(
