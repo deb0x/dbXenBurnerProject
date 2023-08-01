@@ -34,7 +34,7 @@ const { whitelist } = dataFromWhitelist;
 export function Stake(props: any): any {
 
     const { account, library, activate } = useWeb3React()
-    const { chain }  = useContext(ChainContext)
+    const { chain } = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({})
     const gaEventTracker = useAnalyticsEventTracker('Stake');
     const [previousCycleXENBurned, setPreviousCycleXENBurned] = useState<any>();
@@ -79,14 +79,14 @@ export function Stake(props: any): any {
     }, [chain.chainId])
 
     function timer() {
-        switch(Number(chain.chainId)) {
-            case 1: 
+        switch (Number(chain.chainId)) {
+            case 1:
                 setEndDate(dateEthereum.getTime() - now);
                 break;
-            case 137: 
+            case 137:
                 setEndDate(datePolygon.getTime() - now);
                 break;
-            case 43114: 
+            case 43114:
                 setEndDate(dateAvalanche.getTime() - now);
                 break;
             case 56:
@@ -261,14 +261,14 @@ export function Stake(props: any): any {
 
         return (
             <>
-            <Card variant="outlined" className="card-container">
-                <CardContent className="row">
-                    <div className="col-12 col-md-8 mb-2">
-                        <Typography variant="h4" component="div" className="rewards mb-3">
-                            {t("fees.title")}
-                        </Typography>
-                        <Typography className="data-height">
-                            {t("fees.unclaimed_fees")} {chain.currency} {t("fees.unclaimed_fees_2")}:&nbsp;
+                <Card variant="outlined" className="card-container">
+                    <CardContent className="row">
+                        <div className="col-12 col-md-8 mb-2">
+                            <Typography variant="h4" component="div" className="rewards mb-3">
+                                {t("fees.title")}
+                            </Typography>
+                            <Typography className="data-height">
+                                {t("fees.unclaimed_fees")} {chain.currency} {t("fees.unclaimed_fees_2")}:&nbsp;
                                 <strong>
                                     {Number(feesUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 10,
@@ -277,7 +277,7 @@ export function Stake(props: any): any {
                                 </strong>
                             </Typography>
                             <p className='my-2 counter'>
-                                {t("fees.counter")} 
+                                {t("fees.counter")}
                                 <Countdown date={Date.now() + endDate} renderer={renderer} />
                             </p>
                         </div>
@@ -303,12 +303,12 @@ export function Stake(props: any): any {
     function CyclePanel() {
         const [currentReward, setCurrentReward] = useState("")
 
-    
+
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            }).then((result:any) =>{
-                
+            }).then((result: any) => {
+
             })
         }
 
@@ -328,22 +328,22 @@ export function Stake(props: any): any {
         }
         return (
             <>
-            <Card variant="outlined" className="card-container">
-                <CardContent className="row">
-                    <div className="col-12 col-md-12 mb-2">
-                        <Typography variant="h4" component="div" className="rewards mb-3">
-                            {t("daily_stats.title")}
-                        </Typography>
-                        <Typography className="data-height">
-                            {t("daily_stats.this_cycle")}:&nbsp; 
-                            <strong>
-                                {Number(currentReward).toLocaleString('en-US', {
-                                    minimumFractionDigits: 10,
-                                    maximumFractionDigits: 10
-                                })}
-                            </strong> DXN
-                        </Typography>
-                        {/* <Typography className="data-height">
+                <Card variant="outlined" className="card-container">
+                    <CardContent className="row">
+                        <div className="col-12 col-md-12 mb-2">
+                            <Typography variant="h4" component="div" className="rewards mb-3">
+                                {t("daily_stats.title")}
+                            </Typography>
+                            <Typography className="data-height">
+                                {t("daily_stats.this_cycle")}:&nbsp;
+                                <strong>
+                                    {Number(currentReward).toLocaleString('en-US', {
+                                        minimumFractionDigits: 10,
+                                        maximumFractionDigits: 10
+                                    })}
+                                </strong> DXN
+                            </Typography>
+                            {/* <Typography className="data-height">
                             Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
                         </Typography> */}
                         </div>
@@ -359,12 +359,12 @@ export function Stake(props: any): any {
         const [feeSharePercentage, setFeeSharePercentage] = useState("")
         const [loading, setLoading] = useState(false)
 
-    
+
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            }).then((result:any) =>{
-                
+            }).then((result: any) => {
+
             })
         }
 
@@ -516,14 +516,14 @@ export function Stake(props: any): any {
 
         return (
             <>
-            <Card variant="outlined" className="card-container">
-                <CardContent className="row">
-                    <div className="col-12 col-md-10 mb-2">
-                        <Typography variant="h4" component="div" className="rewards mb-3">
-                            {t("rewards.title")}
-                        </Typography>
-                        <Typography className="data-height">
-                            {t("rewards.unclaimed_rewards")}:&nbsp;
+                <Card variant="outlined" className="card-container">
+                    <CardContent className="row">
+                        <div className="col-12 col-md-10 mb-2">
+                            <Typography variant="h4" component="div" className="rewards mb-3">
+                                {t("rewards.title")}
+                            </Typography>
+                            <Typography className="data-height">
+                                {t("rewards.unclaimed_rewards")}:&nbsp;
                                 <strong>
                                     {Number(rewardsUnclaimed).toLocaleString('en-US', {
                                         minimumFractionDigits: 10,
@@ -532,8 +532,8 @@ export function Stake(props: any): any {
                                 </strong>
                             </Typography>
                             <p className='my-2 counter'>
-                                {t("rewards.counter")} 
-                                <Countdown date={Date.now() + endDate} renderer={renderer} /> 
+                                {t("rewards.counter")}
+                                <Countdown date={Date.now() + endDate} renderer={renderer} />
                             </p>
                         </div>
                         <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
@@ -542,8 +542,8 @@ export function Stake(props: any): any {
                     </CardContent>
                     <CardActions className='button-container px-3'>
                         <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={claimRewards}>
-                        {t("rewards.claim")}
-                    </LoadingButton>
+                            {t("rewards.claim")}
+                        </LoadingButton>
                         <span className="text">{t("rewards.claim_description")}</span>
                     </CardActions>
                 </Card>
@@ -568,12 +568,12 @@ export function Stake(props: any): any {
         const [loading, setLoading] = useState(false)
         const [approved, setApproved] = useState<Boolean | null>(false)
         const [backButton, setBack] = useState<Boolean | null>(false)
-    
+
         async function getChainId() {
             const currentChainId = await window.ethereum.request({
                 method: 'eth_chainId',
-            }).then((result:any) =>{
-                
+            }).then((result: any) => {
+
             })
         }
 
@@ -585,6 +585,7 @@ export function Stake(props: any): any {
             event: React.MouseEvent<HTMLElement>,
             newAlignment: string,
         ) => {
+            console.log(newAlignment);
             setAlignment(newAlignment);
             gaEventTracker(newAlignment + " tab");
         };
@@ -621,7 +622,7 @@ export function Stake(props: any): any {
 
         async function setStakeAmount() {
             const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
-            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) => {
+            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance: any) => {
                 let allowanceValue = ethers.utils.formatEther(allowance.toString());
                 if (Number(amountToStake) > 0.0) {
                     if (Number(allowanceValue) < Number(amountToStake)) {
@@ -635,7 +636,7 @@ export function Stake(props: any): any {
             })
         }
 
-        async function backToApprove(){
+        async function backToApprove() {
             setBack(false);
             setApproved(true);
             setAmountToStake("");
@@ -655,15 +656,15 @@ export function Stake(props: any): any {
         }
 
         async function setTokensForUntakedAmount() {
-            const deb0xViewsContract =  DBXenViews(library, chain.deb0xViewsAddress)
-            const balance = await deb0xViewsContract.getAccWithdrawableStake(account).then((balance:any) =>{
+            const deb0xViewsContract = DBXenViews(library, chain.deb0xViewsAddress)
+            const balance = await deb0xViewsContract.getAccWithdrawableStake(account).then((balance: any) => {
                 setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
             })
         }
 
         async function setUnstakedAmount() {
             const deb0xERC20Contract = await DBXenERC20(library, chain.deb0xERC20Address)
-            const balance = await deb0xERC20Contract.balanceOf(account).then((balance:any) =>{
+            const balance = await deb0xERC20Contract.balanceOf(account).then((balance: any) => {
                 let number = ethers.utils.formatEther(balance);
                 setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
             })
@@ -672,8 +673,8 @@ export function Stake(props: any): any {
         async function setApproval() {
             const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
 
-            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance:any) =>
-                 allowance > 0 ? setApproved(true) : setApproved(false)
+            await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance: any) =>
+                allowance > 0 ? setApproved(true) : setApproved(false)
             )
         }
 
@@ -681,8 +682,8 @@ export function Stake(props: any): any {
 
             const deb0xContract = DBXen(library, chain.deb0xAddress)
 
-           await deb0xContract.currentStartedCycle().then(async (currentCycle:any) =>{
-                await deb0xContract.summedCycleStakes(currentCycle).then((totalSupply:any) => {
+            await deb0xContract.currentStartedCycle().then(async (currentCycle: any) => {
+                await deb0xContract.summedCycleStakes(currentCycle).then((totalSupply: any) => {
                     setTotalStaked(ethers.utils.formatEther(totalSupply))
                 })
             })
@@ -961,110 +962,110 @@ export function Stake(props: any): any {
                     <ToggleButton className="tab-btn" value="unstake" >{t("unstake.unstake")}</ToggleButton>
 
                 </ToggleButtonGroup>
-              
-            {
-                alignment === "stake" ?
-                
-                <>
-                <CardContent className="row">
-                    <div className="col-6 px-3">
-                        <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
-                        <Typography className="p-0">
-                            {t("stake.staked_amount")}:
-                        </Typography>
-                        <Typography variant="h6" className="p-0 data-height">
-                            <strong>
-                                {Number(userStakedAmount).toLocaleString('en-US', {
-                                    minimumFractionDigits: 10,
-                                    maximumFractionDigits: 10
-                                })} DXN</strong>
-                        </Typography>
-                    </div>
-                    <div className="col-6 px-3">
-                        <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
-                        <Typography className="p-0">
-                            {t("stake.wallet")}:
-                        </Typography>
-                        <Typography variant="h6" className="p-0 data-height" data-height>
-                            <strong>
-                                {Number(userUnstakedAmount).toLocaleString('en-US', {
-                                    minimumFractionDigits: 10,
-                                    maximumFractionDigits: 10
-                                })} DXN</strong>
-                        </Typography>
-                    </div>
-                    {approved && <Grid className="amount-row px-3" container>
-                        <Grid item>
-                            <OutlinedInput id="outlined-basic"
-                                placeholder={t("stake.amount_to_stake")}
-                                type="number"
-                                value={amountToStake}
-                                inputProps={{ min: 0 }}
-                                onChange={e => setAmountToStake(e.target.value)} />
-                        </Grid>
-                        <Grid className="max-btn-container" item>
-                            <Button className="max-btn" 
-                                size="small" variant="contained" color="error" 
-                                onClick = {()=>setAmountToStake(userUnstakedAmount)  }>
-                                    {t("stake.max")}
-                            </Button>
-                        </Grid>
-                    </Grid>}
-                </CardContent>
-                <CardActions className='button-container multi-actions px-3'>
-                    {approved && 
-                        <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>
-                            {t("stake.stake")}
-                        </LoadingButton>}
-                    {!approved &&
-                        <div className="collect">
-                            <LoadingButton 
-                                className="collect-btn" 
-                                loading={loading}
-                                variant="contained"
-                                disabled={ userUnstakedAmount === '0.00' ||  userUnstakedAmount === '0'}
-                                onClick={approveStaking}>
-                                    {t("stake.init_button")}
-                            </LoadingButton>
-                            <span className="text">
-                                {t("stake.init_text")}
-                            </span>
-                        </div>  
-                    }
-                    { backButton &&
-                        <div className="back-to-approve">
-                            <LoadingButton 
-                                className="collect-btn" 
-                                loading={false}
-                                variant="contained"
-                                onClick={backToApprove}>
-                                Back 
-                            </LoadingButton>
-                            <span className="text">
-                                Your input value is grather than your current approved value!
-                                Back to input or approve!
-                            </span>
-                        </div>  
-                    }
-                </CardActions>
-                </>
-                : 
 
-                <>
-                <CardContent className="row">
-                    <div className="col-6 px-3">
-                        <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
-                        <Typography className="p-0">
-                            {t("unstake.available")}:
-                        </Typography>
-                        <Typography variant="h6" className="p-0">
-                            <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
-                                    minimumFractionDigits: 10,
-                                    maximumFractionDigits: 10
-                                })} DXN</strong>
-                        </Typography>
-                    </div>
-                    {/* <div className="col-6 px-3">
+                {
+                    alignment === "stake" ?
+
+                        <>
+                            <CardContent className="row">
+                                <div className="col-6 px-3">
+                                    <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                                    <Typography className="p-0">
+                                        {t("stake.staked_amount")}:
+                                    </Typography>
+                                    <Typography variant="h6" className="p-0 data-height">
+                                        <strong>
+                                            {Number(userStakedAmount).toLocaleString('en-US', {
+                                                minimumFractionDigits: 10,
+                                                maximumFractionDigits: 10
+                                            })} DXN</strong>
+                                    </Typography>
+                                </div>
+                                <div className="col-6 px-3">
+                                    <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
+                                    <Typography className="p-0">
+                                        {t("stake.wallet")}:
+                                    </Typography>
+                                    <Typography variant="h6" className="p-0 data-height" data-height>
+                                        <strong>
+                                            {Number(userUnstakedAmount).toLocaleString('en-US', {
+                                                minimumFractionDigits: 10,
+                                                maximumFractionDigits: 10
+                                            })} DXN</strong>
+                                    </Typography>
+                                </div>
+                                {approved && <Grid className="amount-row px-3" container>
+                                    <Grid item>
+                                        <OutlinedInput id="outlined-basic"
+                                            placeholder={t("stake.amount_to_stake")}
+                                            type="number"
+                                            value={amountToStake}
+                                            inputProps={{ min: 0 }}
+                                            onChange={e => setAmountToStake(e.target.value)} />
+                                    </Grid>
+                                    <Grid className="max-btn-container" item>
+                                        <Button className="max-btn"
+                                            size="small" variant="contained" color="error"
+                                            onClick={() => setAmountToStake(userUnstakedAmount)}>
+                                            {t("stake.max")}
+                                        </Button>
+                                    </Grid>
+                                </Grid>}
+                            </CardContent>
+                            <CardActions className='button-container multi-actions px-3'>
+                                {approved &&
+                                    <LoadingButton disabled={!amountToStake} className="collect-btn" loading={loading} variant="contained" onClick={stake}>
+                                        {t("stake.stake")}
+                                    </LoadingButton>}
+                                {!approved &&
+                                    <div className="collect">
+                                        <LoadingButton
+                                            className="collect-btn"
+                                            loading={loading}
+                                            variant="contained"
+                                            disabled={userUnstakedAmount === '0.00' || userUnstakedAmount === '0'}
+                                            onClick={approveStaking}>
+                                            {t("stake.init_button")}
+                                        </LoadingButton>
+                                        <span className="text">
+                                            {t("stake.init_text")}
+                                        </span>
+                                    </div>
+                                }
+                                {backButton &&
+                                    <div className="back-to-approve">
+                                        <LoadingButton
+                                            className="collect-btn"
+                                            loading={false}
+                                            variant="contained"
+                                            onClick={backToApprove}>
+                                            Back
+                                        </LoadingButton>
+                                        <span className="text">
+                                            Your input value is grather than your current approved value!
+                                            Back to input or approve!
+                                        </span>
+                                    </div>
+                                }
+                            </CardActions>
+                        </>
+                        :
+
+                        <>
+                            <CardContent className="row">
+                                <div className="col-6 px-3">
+                                    <img className="display-element" src={theme === "classic" ? coinBagDark : coinBagLight} alt="coinbag" />
+                                    <Typography className="p-0">
+                                        {t("unstake.available")}:
+                                    </Typography>
+                                    <Typography variant="h6" className="p-0">
+                                        <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
+                                            minimumFractionDigits: 10,
+                                            maximumFractionDigits: 10
+                                        })} DXN</strong>
+                                    </Typography>
+                                </div>
+                                {/* <div className="col-6 px-3">
                         <img className="display-element" src={theme === "classic" ? walletDark : walletLight} alt="coinbag" />
                         <Typography className="p-0">
                             Your actual stake:
@@ -1075,32 +1076,32 @@ export function Stake(props: any): any {
                     </div> */}
 
 
-                    <Grid className="amount-row px-3" container>
-                        <Grid item>
-                            <OutlinedInput value={amountToUnstake}
-                                id="outlined-basic"
-                                className="max-field"
-                                placeholder={t("unstake.amount_to_unstake")}
-                                onChange={e => setAmountToUnstake(e.target.value)}
-                                inputProps={{ min: 0 }}
-                                type="number" />
-                        </Grid>
-                        <Grid className="max-btn-container" item>
-                            <Button className="max-btn"
-                                size="small" variant="contained" color="error" 
-                                onClick = {()=>setAmountToUnstake(tokensForUnstake)  }>
-                                {t("unstake.max")}
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-                <CardActions className='button-container px-3'>
-                    <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>
-                        {t("unstake.unstake")}
-                    </LoadingButton>
-                </CardActions>
-                </>
-            }
+                                <Grid className="amount-row px-3" container>
+                                    <Grid item>
+                                        <OutlinedInput value={amountToUnstake}
+                                            id="outlined-basic"
+                                            className="max-field"
+                                            placeholder={t("unstake.amount_to_unstake")}
+                                            onChange={e => setAmountToUnstake(e.target.value)}
+                                            inputProps={{ min: 0 }}
+                                            type="number" />
+                                    </Grid>
+                                    <Grid className="max-btn-container" item>
+                                        <Button className="max-btn"
+                                            size="small" variant="contained" color="error"
+                                            onClick={() => setAmountToUnstake(tokensForUnstake)}>
+                                            {t("unstake.max")}
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+                            </CardContent>
+                            <CardActions className='button-container px-3'>
+                                <LoadingButton className="collect-btn" disabled={!amountToUnstake} loading={loading} variant="contained" onClick={unstake}>
+                                    {t("unstake.unstake")}
+                                </LoadingButton>
+                            </CardActions>
+                        </>
+                }
 
             </Card>
 
@@ -1122,7 +1123,7 @@ export function Stake(props: any): any {
             const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
 
             const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
-            
+
             // setTotalStaked(ethers.utils.formatEther(currentStake))
 
             setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))

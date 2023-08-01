@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import {
     BURN_ROUTE,
     DASHBOARD_ROUTE,
-    DBXENFT_ROUTE,
+    MINTDBXENFT_ROUTE,
     FEES_ROUTE
 } from "../Common/routes";
 
@@ -35,8 +35,8 @@ export function AppBarMobile(): any {
                 onClick={() => navigate(FEES_ROUTE)}>
                     {t("mobile.fees")}
             </div>
-            <div className={`navigation-item ${location === DBXENFT_ROUTE ? "active" : ""}`}
-                onClick={() => navigate(DBXENFT_ROUTE)}>
+            <div className={`navigation-item ${location === MINTDBXENFT_ROUTE ? "active" : ""}`}
+                onClick={() => navigate(MINTDBXENFT_ROUTE)}>
                     DBXeNFT
             </div>
         </div>

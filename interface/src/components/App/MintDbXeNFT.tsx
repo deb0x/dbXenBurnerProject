@@ -22,36 +22,10 @@ import {
 } from 'ethereum-multicall';
 import Moralis from "moralis";
 import { StringMap } from "i18next";
+import formatAccountName from '../Common/AccountName';
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 const { BigNumber } = require("ethers");
-
-const dummyData = [
-    {
-        id: 11,
-        status: "status",
-        VMUs: "VMUs",
-        term: "term",
-        maturity: "maturity",
-        EAA: "EAA",
-        cRank: "cRank",
-        AMP: "AMP",
-        xenBurned: "xenBurned",
-        category: "category"
-    },
-    {
-        id: 2,
-        status: "status",
-        VMUs: "VMUs",
-        term: "term",
-        maturity: "maturity",
-        EAA: "EAA",
-        cRank: "cRank",
-        AMP: "AMP",
-        xenBurned: "xenBurned",
-        category: "category"
-    }
-]
 
 interface XENFTEntry {
     id: number;
@@ -72,7 +46,7 @@ interface DBXENFT {
     transactionFee: string
 }
 
-export function DbXeNFT(): any {
+export function MintDbXeNFT(): any {
     const context = useWeb3React()
     const { library, account } = context
     const { chain } = useContext(ChainContext)
@@ -106,12 +80,12 @@ export function DbXeNFT(): any {
                 let xenftEntries: XENFTEntry[] = [];
                 const thisDate = new Date();
 
-                console.log(resultArray)
-
                 for (let i = 0; i < resultArray?.length; i++) {
                     let result = resultArray[i];
                     const resultAttributes: any[] = result.normalized_metadata.attributes;
 
+
+                    console.log(result)
                     if (chain.chainId == "80001") {
                         xenftEntries.push({
                             id: result.token_id,
@@ -289,137 +263,6 @@ export function DbXeNFT(): any {
             console.log(error)
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
-                severity: "info"
-            })
-            setLoading(false)
-        }
-    }
-
-    async function approveDXN() {
-        setLoading(true);
-        const signer = library.getSigner(0)
-        const xenftContract = DXN(signer, chain.deb0xERC20Address);
-
-        try {
-            const tx = await xenftContract.approve(chain.dbxenftFactoryAddress, ethers.constants.MaxUint256)
-            tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "Your succesfully approved contract for accepting DXN.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Contract couldn't be approved for accepting your DXN!", open: true,
-                        severity: "error"
-                    })
-                    setLoading(false)
-                })
-        } catch (error) {
-            setNotificationState({
-                message: "You rejected the transaction. Contract hasn't been approved for accepting DXN.", open: true,
-                severity: "info"
-            })
-            setLoading(false)
-        }
-    }
-
-    async function stake(tokenId: any, amount: any) {
-        setLoading(true)
-        const signer = await library.getSigner(0)
-        const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
-
-        try {
-
-            const overrides = {
-                value: amount.div(1000)
-            }
-
-            const tx = await dbxenftFactory.stake(amount, tokenId, overrides)
-            await tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "You succesfully staked on your DBXENFT.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Staking for your DBXENFT was unsuccesful!", open: true,
-                        severity: "error"
-                    })
-                    setLoading(false)
-                })
-        } catch (error) {
-            setNotificationState({
-                message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
-                severity: "info"
-            })
-            setLoading(false)
-        }
-    }
-
-    async function unstake(tokenId: any, amount: any) {
-        setLoading(true)
-        const signer = await library.getSigner(0)
-        const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
-
-        try {
-
-            const tx = await dbxenftFactory.unstake(tokenId, amount)
-            await tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "You succesfully unstaked your DXN.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Unstaking your DXN was unsuccesful!", open: true,
-                        severity: "error"
-                    })
-                    setLoading(false)
-                })
-        } catch (error) {
-            setNotificationState({
-                message: "You rejected the transaction. Your DXN haven't been unstaked.", open: true,
-                severity: "info"
-            })
-            setLoading(false)
-        }
-    }
-
-    async function claimFees(tokenId: any) {
-        setLoading(true)
-        const signer = await library.getSigner(0)
-        const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
-
-        try {
-
-            const tx = await dbxenftFactory.claimFees(tokenId)
-            await tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "You succesfully claimed your fees.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Claiming your fees was unsuccesful!", open: true,
-                        severity: "error"
-                    })
-                    setLoading(false)
-                })
-        } catch (error) {
-            setNotificationState({
-                message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
                 severity: "info"
             })
             setLoading(false)
@@ -766,7 +609,7 @@ export function DbXeNFT(): any {
         let gasLimitVal;
         let price;
         let transactionFee;
-        await axios.request(options).then(async (result) => {
+        axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
                 if (Number(chain.chainId) === 137) {
                     gasLimitVal = (BigNumber.from("400000"));
@@ -847,12 +690,12 @@ export function DbXeNFT(): any {
                                     </td>
                                 </tr>
                                 {displayXenftDetails && xenftId === data.id ?
-                                    <tr>
+                                    <tr className="xenft-details-row">
                                         <td colSpan={displayDbxenftDetails ? 6 : 12}>
                                             <div className="detailed-view row">
                                                 <div className="col xenft-container">
                                                     <div className="xenft-details">
-                                                        <div className="image-container">
+                                                        <div className="img-container">
                                                             <img src={data.image} alt="nft-image" />
                                                         </div>
                                                         <div className="details-container">
@@ -914,7 +757,7 @@ export function DbXeNFT(): any {
                                                                         Contract
                                                                     </p>
                                                                     <p className="value">
-                                                                        {chain.xenftAddress}
+                                                                        {formatAccountName(chain.xenftAddress)}
                                                                     </p>
                                                                 </div>
                                                                 <div className="col-4">
@@ -957,7 +800,7 @@ export function DbXeNFT(): any {
                                                     <div className="detailed-view row">
                                                         <div className="col xenft-container">
                                                             <div className="xenft-details">
-                                                                <div className="image-container">
+                                                                <div className="img-container">
                                                                     <img src={nftImage} alt="nft-image" />
                                                                 </div>
                                                                 <div className="details-container">
@@ -1019,7 +862,8 @@ export function DbXeNFT(): any {
                                                     </div> :
                                                     <div>
                                                         <p>Wait for date please</p>
-                                                    </div>}
+                                                    </div>
+                                                }
                                             </td> :
                                             <></>
                                         }

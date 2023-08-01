@@ -29,15 +29,19 @@ import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
 import { Dashboard } from './components/App/Dashboard';
 import DBXen from './ethereum/dbxen';
-import { DbXeNFT } from './components/App/DbXeNFT';
+import { MintDbXeNFT } from './components/App/MintDbXeNFT';
+import { DbXeNFTList } from './components/App/DbXeNFTList';
 import {
     BURN_ROUTE,
     DASHBOARD_ROUTE,
-    DBXENFT_ROUTE,
+    MINTDBXENFT_ROUTE,
     FEES_ROUTE,
-    HOME_ROUTE
+    HOME_ROUTE,
+    DBXENFT_LIST_ROUTE,
+    DBXENFT_ROUTE
 } from './components/Common/routes';
 import { AppBarMobile } from './components/App/AppBarMobile';
+import { DbXeNFTPage } from './components/App/DbXeNFTPage';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -236,19 +240,19 @@ function App() {
                                         <Routes>
                                             {dimensions.width > 768 ? 
                                                 <>
-                                                    <Route path={ DASHBOARD_ROUTE } element={ <Dashboard totalXenBurned={ totalXENBurned } /> } />
-                                                    <Route path={ DBXENFT_ROUTE } element={ <DbXeNFT /> } />
                                                     <Route path={ HOME_ROUTE } element={ <Stake /> } />
                                                 </>
                                                 :
                                                 <>
-                                                    <Route path={ BURN_ROUTE } element={ <Burn /> } />
-                                                    <Route path={ DASHBOARD_ROUTE } element={ <Dashboard totalXenBurned={ totalXENBurned } /> } />
-                                                    <Route path={ DBXENFT_ROUTE } element={ <DbXeNFT /> } />
-                                                    <Route path={ FEES_ROUTE } element={ <Stake /> } />
                                                     <Route path={ HOME_ROUTE } element={ <Burn /> } />
                                                 </>
                                             }
+                                            <Route path={ BURN_ROUTE } element={ <Burn /> } />
+                                            <Route path={ DASHBOARD_ROUTE } element={ <Dashboard totalXenBurned={ totalXENBurned } /> } />
+                                            <Route path={ MINTDBXENFT_ROUTE } element={ <MintDbXeNFT /> } />
+                                            <Route path={ FEES_ROUTE } element={ <Stake /> } />
+                                            <Route path={ DBXENFT_LIST_ROUTE } element={ <DbXeNFTList /> } />
+                                            <Route path={ DBXENFT_ROUTE } element={ <DbXeNFTPage /> } />
                                         </Routes>
                                     </Box>
                                 </div>
