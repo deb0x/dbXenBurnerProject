@@ -118,6 +118,6 @@ idsPerCycle/
 metadata/
 metadata-unreveal/
 lastActiveCycle.json
-lastId.json/
+lastId.json
 meta-config-unreveal.json
 meta-config.json

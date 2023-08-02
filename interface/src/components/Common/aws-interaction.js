@@ -76,7 +76,6 @@ async function writeLastActiveCycle(cycle) {
     if (Number(data.lastCycle) != cycle) {
         let obj = {
             "lastCycle": cycle,
-            "value": false
         }
         console.log(obj)
         await fs.writeFile(`lastActiveCycle.json`, JSON.stringify(obj), "utf-8"),
@@ -133,29 +132,36 @@ async function generateAfterReveal(id, power, stakeAmount) {
 
 async function updateData(cycle) {
     let ids = [];
-    console.log("jere");
-    if (fs.existsSync(`./idsPerCycle/${cycle}.txt`)) {
-        console.log("jeressssssssss");
-        await fs.readFile(`./idsPerCycle/${cycle}.txt`, 'utf-8', async(err, data) => {
-            if (err) {
-                throw err;
-            } else {
-                console.log("AICI AGAIN?");
-                console.log(data)
-                ids = data.split(' ');
-                console.log(ids.length);
-                console.log(ids[3]);
-                for (let i = 0; i < ids.length; i++) {
-                    console.log("Sss");
-                    const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
-                    const response = await s3.getObject(params).promise() // await the promise
-                    const fileContent = response.Body.toString('utf-8');
-                    const jsonType = JSON.parse(fileContent);
-                    console.log("Actual content!");
-                    await generateAfterReveal(jsonType.id, 1, 1);
+    let lastActiveCycle = await readLastActiveCycle();
+    console.log("jere  eeee");
+    console.log(lastActiveCycle);
+    if (lastActiveCycle.lastCycle < cycle) {
+        console.log("E mai mic intradevar ");
+        if (fs.existsSync(`./idsPerCycle/${cycle}.txt`)) {
+            console.log("avem id uri");
+            await fs.readFile(`./idsPerCycle/${cycle}.txt`, 'utf-8', async(err, data) => {
+                if (err) {
+                    throw err;
+                } else {
+                    console.log("AICI AGAIN?");
+                    console.log(data)
+                    ids = data.split(' ');
+                    console.log(ids.length);
+                    console.log(ids[3]);
+                    for (let i = 0; i < ids.length; i++) {
+                        console.log("Ssssss")
+                        const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
+                        console.log(params);
+                        const response = await s3.getObject(params).promise() // await the promise
+                        const fileContent = response.Body.toString('utf-8');
+                        const jsonType = JSON.parse(fileContent);
+                        console.log("Actual content!");
+                        await generateAfterReveal(jsonType.id, 21, 13);
+                        await writeLastActiveCycle(cycle);
+                    }
                 }
-            }
-        })
+            })
+        }
     }
 }
 
@@ -171,31 +177,33 @@ async function writeNewId(cycle, id) {
     }
 }
 
-async function updateData(cycle) {
-    // console.log("Ssssssssss");
-    // await readLastId(cycle);
-    // let idsPerCycle = await readLastId(cycle);
-    // console.log("ggggggggggggggggggggggggggggg")
-    // console.log(idsPerCycle);
-    // console.log(idsPerCycle[0]);
-    // if (idsPerCycle.length != 0) {
-    //     for (let i = 0; i < idsPerCycle.length; i++) {
-    //         console.log("jersssssssssssssse");
-    //         const params = { Bucket: process.env.BUCKET, Key: idsPerCycle[i].toString() + '.json' }
-    //         const response = await s3.getObject(params).promise() // await the promise
-    //         const fileContent = response.Body.toString('utf-8');
-    //         const jsonType = JSON.parse(fileContent);
-    //         console.log("Actual content!");
-    //         await generateAfterReveal(jsonType.id, 3333, 111);
-    //     }
-    // }
-}
+// async function updateData(cycle) {
+//     // console.log("Ssssssssss");
+//     // await readLastId(cycle);
+//     // let idsPerCycle = await readLastId(cycle);
+//     // console.log("ggggggggggggggggggggggggggggg")
+//     // console.log(idsPerCycle);
+//     // console.log(idsPerCycle[0]);
+//     // if (idsPerCycle.length != 0) {
+//     //     for (let i = 0; i < idsPerCycle.length; i++) {
+//     //         console.log("jersssssssssssssse");
+//     //         const params = { Bucket: process.env.BUCKET, Key: idsPerCycle[i].toString() + '.json' }
+//     //         const response = await s3.getObject(params).promise() // await the promise
+//     //         const fileContent = response.Body.toString('utf-8');
+//     //         const jsonType = JSON.parse(fileContent);
+//     //         console.log("Actual content!");
+//     //         await generateAfterReveal(jsonType.id, 3333, 111);
+//     //     }
+//     // }
+// }
 
 cron.schedule('*/1 * * * *', async() => {
     // let currentId = 5;
     // let lastId = await readLastId();
     // console.log("last id ", lastId);
-    await updateData(1);
+    console.log("22222222222222222222");
+    await updateData(2);
+    console.log("111111111");
     // generateBeforeReveal(21);
     // generateBeforeReveal(22);
     // generateBeforeReveal(23);
