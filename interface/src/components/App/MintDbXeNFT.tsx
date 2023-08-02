@@ -42,7 +42,7 @@ interface XENFTEntry {
     image: string;
 }
 interface DBXENFT {
-    protoclFee: string;
+    protocolFee: string;
     transactionFee: string
 }
 
@@ -186,10 +186,13 @@ export function MintDbXeNFT(): any {
         const signer = library.getSigner(0)
         const xenftContract = XENFT(signer, chain.xenftAddress);
 
+        console.log("aaa")
+
         try {
             const tx = await xenftContract.setApprovalForAll(chain.dbxenftFactoryAddress, true)
             tx.wait()
                 .then((result: any) => {
+                    console.log(result)
                     setNotificationState({
                         message: "Your succesfully approved contract for handling your XENFTs.", open: true,
                         severity: "success"
@@ -227,9 +230,9 @@ export function MintDbXeNFT(): any {
         let fee;
 
         try {
-            if (claimStatus == "Redeemed") {
-                fee = ethers.utils.parseEther("0.001");
-            } else {
+            // if (claimStatus == "Redeemed") {
+            //     fee = ethers.utils.parseEther("0.01");
+            // } else {
                 fee = await calcMintFee(
                     maturityTs,
                     VMUs,
@@ -238,9 +241,10 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 )
-            }
+            // }
             const overrides = {
-                value: fee
+                value: fee,
+                gasLimit: (BigNumber.from("400000"))
             }
 
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
@@ -574,14 +578,14 @@ export function MintDbXeNFT(): any {
                 setDisplayXenftDetails(!displayXenftDetails);
                 setDisplayDbxenftDetails(false);
                 setDBXNFT({
-                    protoclFee: "0",
+                    protocolFee: "0",
                     transactionFee: "0"
                 })
             }
         })
     }
 
-    const handleBurnXenft = async (NFTData: any) => {
+    const previewData = async (NFTData: any) => {
         setDisplayDbxenftDetails(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
@@ -609,37 +613,47 @@ export function MintDbXeNFT(): any {
         let gasLimitVal;
         let price;
         let transactionFee;
+
         axios.request(options).then(async (result) => {
+            console.log(result)
             if (result.data.result != undefined) {
-                if (Number(chain.chainId) === 137) {
+                if (Number(chain.chainId) === 80001) {
                     gasLimitVal = (BigNumber.from("400000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
                     console.log("transactionFee " + transactionFee);
-                    if (NFTData.claimStatus == "Redeemed") {
-                        setDBXNFT({
-                            protoclFee: "0.001",
-                            transactionFee: transactionFee.toString()
-                        })
-                        if (!isApprovedForAll()) {
-                            await approveForAll();
-                        }
-                        await mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus);
-                    } else {
-                        let protocolFee = await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank);
-                        console.log(ethers.utils.formatEther(protocolFee.toString()));
-                        setDBXNFT({
-                            protoclFee: ethers.utils.formatEther(protocolFee.toString()).slice(0, 6),
-                            transactionFee: transactionFee.toString()
-                        })
-                        if (!isApprovedForAll()) {
-                            await approveForAll();
-                        }
-                        await mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus);
-                    }
+                    let protocolFee = 
+                        NFTData.claimStatus == "Redeemed" ? 
+                            "0.001" :
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank)
+                    setDBXNFT({
+                        protocolFee: protocolFee,
+                        transactionFee: transactionFee.toString()
+                    })
                 }
             }
         })
+    }
+
+    const handleBurnXenft = async (NFTData: any) => {
+        const signer = library.getSigner(0);
+        const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
+        const XENFTContract = XENFT(signer, chain.xenftAddress);
+        let mintInforesult = await XENFTContract.mintInfo(NFTData.id)
+        let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+        let term = mintInfoData[0];
+        let maturityTs = mintInfoData[1];
+        let amp = mintInfoData[2];
+        let eea = mintInfoData[3];
+
+        
+        isApprovedForAll()
+            .then((result) => {
+                console.log(NFTData.id)
+                result ?
+                    mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus) :
+                    approveForAll().then((result) => console.log("XXX", result))
+            })
     }
 
     return (
@@ -787,7 +801,7 @@ export function MintDbXeNFT(): any {
                                                     </div>
                                                     <div className="burn-button-container">
                                                         <button className="btn burn-button"
-                                                            onClick={() => handleBurnXenft(data)}>
+                                                            onClick={() => previewData(data)}>
                                                             PREVIEW DATA
                                                         </button>
                                                     </div>
@@ -810,7 +824,7 @@ export function MintDbXeNFT(): any {
                                                                                 Protocol fee
                                                                             </p>
                                                                             <p className="value">
-                                                                                {DBXENFT?.protoclFee.toString()}
+                                                                                {DBXENFT?.protocolFee.toString()}
                                                                             </p>
                                                                         </div>
                                                                         <div className="col-4">
@@ -852,12 +866,12 @@ export function MintDbXeNFT(): any {
                                                                     299994830.049458 $DXN
                                                                 </p>
                                                             </div>
-                                                            {/* <div className="burn-button-container">
+                                                            <div className="burn-button-container">
                                                             <button className="btn burn-button"
-                                                                onClick={handleBurnXenft}>
+                                                                onClick={() => handleBurnXenft(data)}>
                                                                 BURN XEN
                                                             </button>
-                                                        </div> */}
+                                                        </div>
                                                         </div>
                                                     </div> :
                                                     <div>

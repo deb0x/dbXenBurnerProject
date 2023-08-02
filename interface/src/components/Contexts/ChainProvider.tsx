@@ -161,7 +161,7 @@ const ChainProvider = ( { children }: Props ) => {
                             chainId: parseInt(result, 16),
                             chainName: "Mumbai",
                             currency: "MATIC",
-                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            priceURL: "https://polygon-mumbai.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "mumDXN"
                         })
                         break;
