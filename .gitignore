@@ -113,3 +113,11 @@ build/
 interface/build/
 
 .secrets.json
+
+idsPerCycle/
+metadata/
+metadata-unreveal/
+lastActiveCycle.json
+lastId.json
+meta-config-unreveal.json
+meta-config.json
