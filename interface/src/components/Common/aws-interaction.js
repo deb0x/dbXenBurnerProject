@@ -19,8 +19,6 @@ async function addToAWS(jsonFileName, revealOrUnreveal) {
         process.exit()
     } else {
         configs = JSON.parse(await fs.readFile(`./${revealOrUnreveal}/${jsonFileName}`, "utf-8"));
-        console.log("De aici am ");
-        console.log(configs)
     }
     console.log(process.env.BUCKET);
 
@@ -56,8 +54,11 @@ async function generateBeforeReveal(id) {
     let name = fillTemplate(config.name, templateVarsForName);
     let url = fillTemplate(config.external_url, templateVarsForName);
     let attributes = [{
-        dbxen_nft_power: 0,
-        dbxenstake: 0,
+        "trait_type": "DBXEN NFT POWER",
+        "value": "0"
+    }, {
+        "trait_type": "DBXEN STAKE",
+        "value": "0"
     }]
     let description = config.description;
     var obj = { id: id, name: name, description: description, image: config.image, external_url: url, attributes: attributes };
@@ -115,9 +116,13 @@ async function generateAfterReveal(id, power, stakeAmount) {
     let name = fillTemplate(config.name, templateVarsForName);
     let url = fillTemplate(config.external_url, templateVarsForName);
     let attributes = [{
-        dbxen_nft_power: power,
-        dbxenstake: stakeAmount,
+        "trait_type": "DBXEN NFT POWER",
+        "value": power.toString()
+    }, {
+        "trait_type": "DBXEN STAKE",
+        "value": stakeAmount.toString()
     }]
+
     let description = config.description;
     var obj = { id: id, name: name, description: description, image: config.image, external_url: url, attributes: attributes };
     console.log(obj);
@@ -137,17 +142,17 @@ async function updateData(cycle) {
     console.log(lastActiveCycle);
     if (lastActiveCycle.lastCycle < cycle) {
         console.log("E mai mic intradevar ");
-        if (fs.existsSync(`./idsPerCycle/${cycle}.txt`)) {
+        if (fs.existsSync(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`)) {
             console.log("avem id uri");
-            await fs.readFile(`./idsPerCycle/${cycle}.txt`, 'utf-8', async(err, data) => {
+            await fs.readFile(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`, 'utf-8', async(err, data) => {
                 if (err) {
                     throw err;
                 } else {
                     console.log("AICI AGAIN?");
                     console.log(data)
                     ids = data.split(' ');
-                    console.log(ids.length);
-                    console.log(ids[3]);
+                    console.log("am id ul ");
+                    console.log(ids);
                     for (let i = 0; i < ids.length; i++) {
                         console.log("Ssssss")
                         const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
@@ -156,7 +161,7 @@ async function updateData(cycle) {
                         const fileContent = response.Body.toString('utf-8');
                         const jsonType = JSON.parse(fileContent);
                         console.log("Actual content!");
-                        await generateAfterReveal(jsonType.id, 21, 13);
+                        await generateAfterReveal(jsonType.id, 11, 22);
                         await writeLastActiveCycle(cycle);
                     }
                 }
@@ -166,14 +171,26 @@ async function updateData(cycle) {
 }
 
 async function writeNewId(cycle, id) {
+    console.log(cycle);
+    console.log(id);
     if (!fs.existsSync(`./idsPerCycle/${cycle}.txt`)) {
         console.log("Se intra aici!");
         await fs.writeFile(`./idsPerCycle/${cycle}.txt`, id + " ");
         await generateBeforeReveal(id);
+        await writeLastActiveCycle(cycle);
     } else {
-        console.log("sau aici?");
-        await fs.appendFileSync(`./idsPerCycle/${cycle}.txt`, id + " ");
-        await generateBeforeReveal(id);
+        await fs.readFile(`./idsPerCycle/${cycle}.txt`, 'utf-8', async(err, data) => {
+            if (err) {
+                throw err;
+            } else {
+                let ids = data.split(' ');
+                if (!ids.includes(id.toString())) {
+                    await fs.appendFileSync(`./idsPerCycle/${cycle}.txt`, " " + id);
+                    await generateBeforeReveal(id);
+                    await writeLastActiveCycle(cycle);
+                }
+            }
+        })
     }
 }
 
@@ -201,9 +218,10 @@ cron.schedule('*/1 * * * *', async() => {
     // let currentId = 5;
     // let lastId = await readLastId();
     // console.log("last id ", lastId);
-    console.log("22222222222222222222");
     await updateData(2);
-    console.log("111111111");
+    // console.log("22222222222222222222");
+    // await updateData(2);
+    // console.log("111111111");
     // generateBeforeReveal(21);
     // generateBeforeReveal(22);
     // generateBeforeReveal(23);
