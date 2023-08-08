@@ -140,6 +140,31 @@ async function updateData(cycle) {
     let lastActiveCycle = await readLastActiveCycle();
     console.log("jere  eeee");
     console.log(lastActiveCycle);
+    if (lastActiveCycle.lastCycle == 1) {
+        if (fs.existsSync(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`)) {
+            console.log("avem id de pe 1");
+            await fs.readFile(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`, 'utf-8', async(err, data) => {
+                if (err) {
+                    throw err;
+                } else {
+                    ids = data.split(' ');
+                    console.log("am id ul ");
+                    console.log(ids);
+                    for (let i = 0; i < ids.length; i++) {
+                        console.log("Ssssss")
+                        const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
+                        console.log(params);
+                        const response = await s3.getObject(params).promise() // await the promise
+                        const fileContent = response.Body.toString('utf-8');
+                        const jsonType = JSON.parse(fileContent);
+                        console.log("Actual content!");
+                        await generateAfterReveal(jsonType.id, 11, 22);
+                        await writeLastActiveCycle(cycle);
+                    }
+                }
+            })
+        }
+    }
     if (lastActiveCycle.lastCycle < cycle) {
         console.log("E mai mic intradevar ");
         if (fs.existsSync(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`)) {
