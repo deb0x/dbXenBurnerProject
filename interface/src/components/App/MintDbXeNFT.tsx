@@ -23,6 +23,8 @@ import {
 import Moralis from "moralis";
 import { StringMap } from "i18next";
 import formatAccountName from '../Common/AccountName';
+import { writePerCycle, generateAfterReveal, getIdsMintedPerCycle } from "../Common/aws-interaction";
+import { arrToBufArr } from "ethereumjs-util";
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 const { BigNumber } = require("ethers");
@@ -66,6 +68,7 @@ export function MintDbXeNFT(): any {
     }
 
     const getXENFTs = () => {
+
         Moralis.EvmApi.nft.getWalletNFTs({
             chain: chain.chainId,
             format: "decimal",
@@ -161,6 +164,7 @@ export function MintDbXeNFT(): any {
     }
 
     const daysLeft = (date_1: Date, date_2: Date) => {
+
         let difference = date_1.getTime() - date_2.getTime();
         let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
         return TotalDays;
@@ -233,14 +237,14 @@ export function MintDbXeNFT(): any {
             // if (claimStatus == "Redeemed") {
             //     fee = ethers.utils.parseEther("0.01");
             // } else {
-                fee = await calcMintFee(
-                    maturityTs,
-                    VMUs,
-                    EAA,
-                    term,
-                    AMP,
-                    cRank
-                )
+            fee = await calcMintFee(
+                maturityTs,
+                VMUs,
+                EAA,
+                term,
+                AMP,
+                cRank
+            )
             // }
             const overrides = {
                 value: fee,
@@ -586,6 +590,12 @@ export function MintDbXeNFT(): any {
     }
 
     const previewData = async (NFTData: any) => {
+        let arr = await getIdsMintedPerCycle(1);
+        if (arr != undefined) {
+            for (let i = 0; i < arr.length; i++)
+                await generateAfterReveal(arr[i], 234);
+        }
+        console.log(arr[0]);
         setDisplayDbxenftDetails(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
@@ -622,8 +632,8 @@ export function MintDbXeNFT(): any {
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
                     console.log("transactionFee " + transactionFee);
-                    let protocolFee = 
-                        NFTData.claimStatus == "Redeemed" ? 
+                    let protocolFee =
+                        NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
                             await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
@@ -646,7 +656,7 @@ export function MintDbXeNFT(): any {
         let amp = mintInfoData[2];
         let eea = mintInfoData[3];
 
-        
+
         isApprovedForAll()
             .then((result) => {
                 console.log(NFTData.id)
@@ -867,11 +877,11 @@ export function MintDbXeNFT(): any {
                                                                 </p>
                                                             </div>
                                                             <div className="burn-button-container">
-                                                            <button className="btn burn-button"
-                                                                onClick={() => handleBurnXenft(data)}>
-                                                                BURN XEN
-                                                            </button>
-                                                        </div>
+                                                                <button className="btn burn-button"
+                                                                    onClick={() => handleBurnXenft(data)}>
+                                                                    BURN XEN
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div> :
                                                     <div>
