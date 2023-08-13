@@ -34,6 +34,7 @@
     "ethereum-multicall": "^2.19.0",
     "ethereumjs-util": "^5.1.1",
     "ethers": "^5.5.3",
+    "fs": "0.0.1-security",
     "i18next": "^22.4.9",
     "i18next-http-backend": "^2.1.1",
     "i18next-xhr-backend": "^3.2.2",

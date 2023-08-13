@@ -1,30 +1,24 @@
 import "../../componentsStyling/dbxenft.scss";
 import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
 import nftImage from "../../photos/xenft.svg";
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import ChainContext from '../Contexts/ChainContext';
 import DBXENFTFactory from "../../ethereum/dbxenftFactory";
+import DBXenft from "../../ethereum/DBXENFT";
 import XENFT from "../../ethereum/xenTorrent";
 import XENCrypto from "../../ethereum/XENCrypto";
 import mintInfo from "../../ethereum/mintInfo";
-import DXN from "../../ethereum/dbxenerc20"
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import SnackbarNotification from './Snackbar';
 import axios, { Method } from 'axios';
 import web3 from 'web3';
-import { ethers } from "ethers";
-import {
-    Multicall,
-    ContractCallResults,
-    ContractCallContext,
-} from 'ethereum-multicall';
 import Moralis from "moralis";
-import { StringMap } from "i18next";
 import formatAccountName from '../Common/AccountName';
+import { writePerCycle } from "../Common/aws-interaction";
+import { ethers } from "ethers";
 
-const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 const { BigNumber } = require("ethers");
 
 interface XENFTEntry {
@@ -84,8 +78,6 @@ export function MintDbXeNFT(): any {
                     let result = resultArray[i];
                     const resultAttributes: any[] = result.normalized_metadata.attributes;
 
-
-                    console.log(result)
                     if (chain.chainId == "80001") {
                         xenftEntries.push({
                             id: result.token_id,
@@ -102,7 +94,7 @@ export function MintDbXeNFT(): any {
                             VMUs: parseInt(resultAttributes[1].value),
                             cRank: resultAttributes[2].value,
                             AMP: parseInt(resultAttributes[3].value),
-                            EAA: resultAttributes[5].value,
+                            EAA: resultAttributes[4].value,
                             maturityDateTime: resultAttributes[7].value,
                             term: resultAttributes[8].value,
                             xenBurned: resultAttributes[9].value,
@@ -142,7 +134,7 @@ export function MintDbXeNFT(): any {
                                 VMUs: parseInt(resultAttributes[1].value),
                                 cRank: resultAttributes[2].value,
                                 AMP: parseInt(resultAttributes[3].value),
-                                EAA: resultAttributes[5].value,
+                                EAA: resultAttributes[4].value,
                                 maturityDateTime: resultAttributes[7].value,
                                 term: parseInt(resultAttributes[8].value),
                                 xenBurned: resultAttributes[9].value,
@@ -186,13 +178,10 @@ export function MintDbXeNFT(): any {
         const signer = library.getSigner(0)
         const xenftContract = XENFT(signer, chain.xenftAddress);
 
-        console.log("aaa")
-
         try {
             const tx = await xenftContract.setApprovalForAll(chain.dbxenftFactoryAddress, true)
             tx.wait()
                 .then((result: any) => {
-                    console.log(result)
                     setNotificationState({
                         message: "Your succesfully approved contract for handling your XENFTs.", open: true,
                         severity: "success"
@@ -227,29 +216,33 @@ export function MintDbXeNFT(): any {
         setLoading(true)
         const signer = await library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
+        const dbxenftInstance = DBXenft(signer, chain.dbxenftAddress)
         let fee;
 
         try {
             // if (claimStatus == "Redeemed") {
             //     fee = ethers.utils.parseEther("0.01");
             // } else {
-                fee = await calcMintFee(
-                    maturityTs,
-                    VMUs,
-                    EAA,
-                    term,
-                    AMP,
-                    cRank
-                )
+            fee = await calcMintFee(
+                maturityTs,
+                VMUs,
+                EAA,
+                term,
+                AMP,
+                cRank
+            )
             // }
             const overrides = {
                 value: fee,
-                gasLimit: (BigNumber.from("400000"))
+                gasLimit: (BigNumber.from("700000"))
             }
 
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
-                .then((result: any) => {
+                .then(async (result: any) => {
+                    console.log("DBXENFT", Number(result.events[5].args.DBXENFTId))
+                    let currentCycle = await dbxenftFactory.getCurrentCycle();
+                    writePerCycle(currentCycle, Number(result.events[5].args.DBXENFTId))
                     setNotificationState({
                         message: "Your succesfully minted a DBXENFT.", open: true,
                         severity: "success"
@@ -264,7 +257,6 @@ export function MintDbXeNFT(): any {
                     setLoading(false)
                 })
         } catch (error) {
-            console.log(error)
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
                 severity: "info"
@@ -358,170 +350,6 @@ export function MintDbXeNFT(): any {
         return fee
     }
 
-    async function getDBXENFTWithdrawableStake(tokenId: any) {
-        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
-
-        const contractCallContext: ContractCallContext[] = [
-            {
-                reference: 'DBXENFTFactory',
-                contractAddress: chain.dbxenftFactoryAddress,
-                abi,
-                calls: [
-                    { reference: 'getCurrentCycleCall', methodName: 'getCurrentCycle', methodParameters: [] },
-                    { reference: 'getDBXENFTFirstStake', methodName: 'dbxenftFirstStake', methodParameters: [tokenId] },
-                    { reference: 'getDBXENFTSecondStake', methodName: 'dbxenftSecondStake', methodParameters: [tokenId] }
-                ]
-            }
-        ];
-
-        const response: ContractCallResults = await multicall.call(contractCallContext);
-        const currentCycle = response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0]
-        const dbxenftFirstStake = response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0]
-        const dbxenftSecondStake = response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0]
-
-        const contractCallContext2: ContractCallContext[] = [
-            {
-                reference: 'DBXENFTFactory',
-                contractAddress: chain.dbxenftFactoryAddress,
-                abi,
-                calls: [
-                    { reference: 'getDBXENFTFirstStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftFirstStake] },
-                    { reference: 'getDBXENFTSecondStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftSecondStake] },
-                    { reference: 'getDBXENFTWithdrawableStake', methodName: 'dbxenftWithdrawableStake', methodParameters: [tokenId] }
-                ]
-            }
-        ];
-
-        const response2: ContractCallResults = await multicall.call(contractCallContext2);
-        const dbxenftFirstStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0]
-        const dbxenfSecondStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0]
-        const dbxenftWithdrawableStake = response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0]
-
-        let unlockedStake = 0
-
-        if (dbxenftFirstStake != 0 && currentCycle > dbxenftFirstStake) {
-            unlockedStake += dbxenftFirstStakeCycle
-
-            if (dbxenftSecondStake != 0 && currentCycle > dbxenftSecondStake) {
-                unlockedStake += dbxenfSecondStakeCycle
-            }
-        }
-
-        return dbxenftWithdrawableStake + unlockedStake
-    }
-
-    async function getUnclaimedFees(tokenId: any) {
-        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
-
-        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
-        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
-
-
-        const contractCallContext: ContractCallContext[] = [
-            {
-                reference: 'DBXENFTFactory',
-                contractAddress: chain.dbxenftFactoryAddress,
-                abi,
-                calls: [
-                    { reference: 'getCurrentCycleCall', methodName: 'getCurrentCycle', methodParameters: [] },
-                    { reference: 'getDBXENFTAccruedFees', methodName: 'dbxenftAccruedFees', methodParameters: [tokenId] },
-                    { reference: 'getPreviousStartedCycle', methodName: 'previousStartedCycle', methodParameters: [] },
-                    { reference: 'getLastStartedCycle', methodName: 'lastStartedCycle', methodParameters: [] },
-                    { reference: 'getCurrentStartedCycle', methodName: 'currentStartedCycle', methodParameters: [] },
-                    { reference: 'getPendingFees', methodName: 'pendingFees', methodParameters: [] },
-                    { reference: 'getDBXENFTEntryPower', methodName: 'dbxenftEntryPower', methodParameters: [tokenId] },
-                    { reference: 'getEntryCycleReward', methodName: 'rewardPerCycle', methodParameters: [entryCycle] },
-                    { reference: 'getTotalEntryCycleEntryPower', methodName: 'totalEntryPowerPerCycle', methodParameters: [entryCycle] },
-                    { reference: 'getBaseDBXENFTPower', methodName: 'baseDBXeNFTPower', methodParameters: [tokenId] },
-                    { reference: 'getDBXENFTPower', methodName: 'dbxenftPower', methodParameters: [tokenId] },
-                    { reference: 'getLastFeeUpdateCycle', methodName: 'lastFeeUpdateCycle', methodParameters: [tokenId] },
-                    { reference: 'getDBXENFTFirstStake', methodName: 'dbxenftFirstStake', methodParameters: [tokenId] },
-                ]
-            }
-        ];
-
-        const response: ContractCallResults = await multicall.call(contractCallContext);
-        const currentCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
-        let dbxenftAccruedFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
-        let previousStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
-        let lastStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
-        const currentStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
-        const pendingFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
-        const dbxenftEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
-        const entryCycleReward = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
-        const totalEntryCycleEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
-        let baseDBXENFTPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
-        let dbxenftPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
-        const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[11].returnValues[0])
-        let stakeCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[12].returnValues[0])
-
-        if (!currentCycle.eq(currentStartedCycle)) {
-            previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
-            lastStartedCycle = currentStartedCycle
-        }
-
-        const contractCallContext2: ContractCallContext[] = [
-            {
-                reference: 'DBXENFTFactory',
-                contractAddress: chain.dbxenftFactoryAddress,
-                abi,
-                calls: [
-                    { reference: 'getSummedCyclePowers', methodName: 'summedCyclePowers', methodParameters: [lastStartedCycle] },
-                    { reference: 'getCFPPSLastStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastStartedCycle.add(BigNumber.from("1"))] },
-                    { reference: 'getCFPPSPreviousStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [previousStartedCycle] },
-                    { reference: 'getCFPPSLastFeeUpdateCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastFeeUpdateCycle] },
-                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [stakeCycle.add(BigNumber.from("1"))] },
-                    { reference: 'getCycleAccruedFees', methodName: 'cycleAccruedFees', methodParameters: [lastStartedCycle] },
-                    { reference: 'getPendingDXN', methodName: 'pendingDXN', methodParameters: [tokenId] }
-                ]
-            }
-        ];
-
-        const response2: ContractCallResults = await multicall.call(contractCallContext2);
-
-        const summedCyclePowers = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
-        let CFPPSLastStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
-        const CFPPSPreviousStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
-        const CFPPSLastFeeUpdateCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
-        const CFPPSStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
-        const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
-        //const pendingDXN = BigNumber.from("100000000000000000000")
-        const pendingDXN = response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0]
-
-
-
-        if (currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) {
-            const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
-                .div(summedCyclePowers)
-
-            CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
-        }
-
-        if (baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
-            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
-            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
-        }
-
-        if (currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
-            dbxenftAccruedFees = dbxenftAccruedFees.add(
-                dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
-                    .div(BigNumber.from("10000000000000000000000000000000000000000"))
-            )
-
-            if (!pendingDXN.isZero()) {
-                stakeCycle = stakeCycle.sub(BigNumber.from("1"))
-                const extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
-
-                if ((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
-                    dbxenftAccruedFees = dbxenftAccruedFees.add(
-                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle.add(BigNumber.from("1"))))
-                            .div(BigNumber.from("10000000000000000000000000000000000000000"))
-                    )
-                }
-            }
-        }
-    }
-
     async function getNFTRewardInXen(
         maturityTs: number,
         VMUs: number,
@@ -571,6 +399,8 @@ export function MintDbXeNFT(): any {
     const [displayDbxenftDetails, setDisplayDbxenftDetails] = useState(false);
     const [xenftId, setXenftId] = useState();
 
+    const ref = useRef<null | HTMLDivElement>(null);
+
     const handleExpandRow = (id: any) => {
         XENFTs.map((data: any) => {
             if (id == data.id) {
@@ -581,6 +411,7 @@ export function MintDbXeNFT(): any {
                     protocolFee: "0",
                     transactionFee: "0"
                 })
+                ref.current?.scrollIntoView({ behavior: 'smooth' });
             }
         })
     }
@@ -615,15 +446,13 @@ export function MintDbXeNFT(): any {
         let transactionFee;
 
         axios.request(options).then(async (result) => {
-            console.log(result)
             if (result.data.result != undefined) {
                 if (Number(chain.chainId) === 80001) {
                     gasLimitVal = (BigNumber.from("400000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
-                    console.log("transactionFee " + transactionFee);
-                    let protocolFee = 
-                        NFTData.claimStatus == "Redeemed" ? 
+                    let protocolFee =
+                        NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
                             await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
@@ -646,10 +475,9 @@ export function MintDbXeNFT(): any {
         let amp = mintInfoData[2];
         let eea = mintInfoData[3];
 
-        
+
         isApprovedForAll()
             .then((result) => {
-                console.log(NFTData.id)
                 result ?
                     mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus) :
                     approveForAll().then((result) => console.log("XXX", result))
@@ -657,7 +485,7 @@ export function MintDbXeNFT(): any {
     }
 
     return (
-        <div className="content-box">
+        <div className="content-box content-box-table">
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
             <div className="table-view table-responsive-xl">
@@ -669,7 +497,7 @@ export function MintDbXeNFT(): any {
                             <th scope="col">VMUs</th>
                             <th scope="col">Term (days)</th>
                             <th scope="col">Maturiy</th>
-                            <th scope="col">EAA</th>
+                            <th scope="col">EAA (%)</th>
                             <th scope="col">cRank</th>
                             <th scope="col">AMP</th>
                             <th scope="col">xenBurned</th>
@@ -703,6 +531,7 @@ export function MintDbXeNFT(): any {
                                         </button>
                                     </td>
                                 </tr>
+                                <div ref={ref}></div>
                                 {displayXenftDetails && xenftId === data.id ?
                                     <tr className="xenft-details-row">
                                         <td colSpan={displayDbxenftDetails ? 6 : 12}>
@@ -802,7 +631,7 @@ export function MintDbXeNFT(): any {
                                                     <div className="burn-button-container">
                                                         <button className="btn burn-button"
                                                             onClick={() => previewData(data)}>
-                                                            PREVIEW DATA
+                                                            PREVIEW DBXENFT
                                                         </button>
                                                     </div>
                                                 </div>
@@ -819,27 +648,33 @@ export function MintDbXeNFT(): any {
                                                                 </div>
                                                                 <div className="details-container">
                                                                     <div className="row">
-                                                                        <div className="col-4">
+                                                                        <div className="col-6">
                                                                             <p className="label">
                                                                                 Protocol fee
                                                                             </p>
                                                                             <p className="value">
-                                                                                {DBXENFT?.protocolFee.toString()}
+                                                                                {Number(DBXENFT?.protocolFee).toLocaleString('en-US', {
+                                                                                    minimumFractionDigits: 8,
+                                                                                    maximumFractionDigits: 8
+                                                                                })}
                                                                             </p>
                                                                         </div>
-                                                                        <div className="col-4">
+                                                                        <div className="col-6">
                                                                             <p className="label">
                                                                                 Transaction cost
                                                                             </p>
                                                                             <p className="value">
-                                                                                {DBXENFT?.transactionFee.toString()}
+                                                                                {Number(DBXENFT?.transactionFee).toLocaleString('en-US', {
+                                                                                    minimumFractionDigits: 8,
+                                                                                    maximumFractionDigits: 8
+                                                                                })}
                                                                             </p>
                                                                         </div>
                                                                     </div>
                                                                     <div className="row">
                                                                     </div>
                                                                     <div className="row">
-                                                                        <div className="col-4">
+                                                                        <div className="col-6">
                                                                             <p className="label">
                                                                                 Contract
                                                                             </p>
@@ -847,9 +682,7 @@ export function MintDbXeNFT(): any {
                                                                                 0x0a25…fa59
                                                                             </p>
                                                                         </div>
-                                                                        <div className="col-4">
-                                                                        </div>
-                                                                        <div className="col-4">
+                                                                        <div className="col-6">
                                                                             <p className="label">
                                                                                 Chain
                                                                             </p>
@@ -867,11 +700,11 @@ export function MintDbXeNFT(): any {
                                                                 </p>
                                                             </div>
                                                             <div className="burn-button-container">
-                                                            <button className="btn burn-button"
-                                                                onClick={() => handleBurnXenft(data)}>
-                                                                BURN XEN
-                                                            </button>
-                                                        </div>
+                                                                <button className="btn burn-button"
+                                                                    onClick={() => handleBurnXenft(data)}>
+                                                                    WRAP XENFT
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div> :
                                                     <div>
@@ -907,7 +740,7 @@ export function MintDbXeNFT(): any {
                 </div>
                 <LoadingButton className="burn-btn"
                     loadingPosition="end"
-                    onClick={() => getUnclaimedFees(11)} >
+                    onClick={() => console.log("IDK")} >
                     {loading ? <Spinner color={'black'} /> : "Do stuff"}
                 </LoadingButton>
                 <div className="text-down">

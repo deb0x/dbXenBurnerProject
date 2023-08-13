@@ -38,6 +38,7 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         }).then((result) => {
             const response = result.raw;
+            console.log(response)
             const resultArray: any = response.result;
             let dbxenftEntries: DBXENFTEntry[] = [];
 
@@ -69,8 +70,10 @@ export function DbXeNFTList(): any {
                 <div className="row g-5">
                     {DBXENFTs.length ?
                         DBXENFTs.map((xenft, i) => (
-                            <div className="col col-lg-3 col-md-6 card-col" key={i}>
+                            <div className="col col-md-6 card-col" key={i}>
                                 <div className="nft-card">
+
+                                <img src={xenft.image} alt="nft-image" />
                                     <div className="card-row card-header">
                                         <span className="label">tokenID</span>
                                         <span className="value">{xenft.id}</span>
@@ -84,8 +87,8 @@ export function DbXeNFTList(): any {
                                         <span className="label">description</span>
                                         <span className="value">{xenft.description}</span>
                                     </div>
-                                    <div>
-                                        <button type="button" className="btn"
+                                    <div className="detail-button-container">
+                                        <button type="button" className="btn dbxenft-detail-btn"
                                             onClick={() => handleRedirect(xenft.id)}>
                                             Details
                                         </button>

@@ -48,6 +48,7 @@
             height: 100%;
             width: 100%;
             font-family: "Manrope";
+            padding: 15px 0;
             .nft-row {
                 display: flex;
                 justify-content: space-between;
@@ -158,6 +159,16 @@
     }
 }
 
+.theme--dark {
+    .app-container {
+        .main-container {
+            .content-box.content-box-table {
+                overflow: auto;
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
     .text-container-nft {
         height: 50vh;
@@ -177,6 +188,7 @@
         }
     }
     .table-view {
+        height: 55vh;
         .xenft-details-row {
             td {
                 display: block;
