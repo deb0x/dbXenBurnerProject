@@ -4,7 +4,7 @@ import nftImage from "../../photos/xenft.svg";
 import { useState, useEffect, useContext, useRef } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import ChainContext from '../Contexts/ChainContext';
-import DBXENFTFactory from "../../../../scripts/dbxenftFactory";
+import DBXENFTFactory from "../../ethereum/dbxenftFactory.js";
 import DBXenft from "../../ethereum/DBXENFT";
 import XENFT from "../../ethereum/xenTorrent";
 import XENCrypto from "../../ethereum/XENCrypto";
@@ -16,8 +16,8 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
-import { writePerCycle, generateAfterReveal, getIdsMintedPerCycle } from "../Common/aws-interaction";
-import { arrToBufArr } from "ethereumjs-util";
+import { writePerCycle } from "../Common/aws-interaction";
+
 
 const { BigNumber } = require("ethers");
 
@@ -60,90 +60,132 @@ export function MintDbXeNFT(): any {
     }
 
     const getXENFTs = () => {
-
-        Moralis.EvmApi.nft.getWalletNFTs({
-            chain: chain.chainId,
-            format: "decimal",
-            normalizeMetadata: true,
-            tokenAddresses: [chain.xenftAddress],
-            address: account ? account : ""
-        }).then(async (result) => {
-            const response = result.raw;
-            if (response) {
-                const resultArray: any = response.result;
-
+        let resultArray: any;
+        getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
+            const results = result.raw.result;
+            let cursor = result.raw.cursor;
+            if (cursor != null) {
+                while (cursor != null) {
+                    let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.xenftAddress, cursor);
+                    cursor = newPage.raw.cursor;
+                    if (newPage.result?.length != 0 && newPage.result != undefined) {
+                        results?.push(newPage?.raw.result);
+                    }
+                }
+            }
+            resultArray = results?.flat();
+            if (resultArray?.length != 0 && resultArray != undefined) {
                 let xenftEntries: XENFTEntry[] = [];
                 const thisDate = new Date();
+                let dataForCompare = thisDate.getTime();
 
                 for (let i = 0; i < resultArray?.length; i++) {
                     let result = resultArray[i];
-                    const resultAttributes: any[] = result.normalized_metadata.attributes;
-
-                    if (chain.chainId == "80001") {
-                        xenftEntries.push({
-                            id: result.token_id,
-                            claimStatus:
-                                resultAttributes[7].value == "no"
-                                    ? new Date(resultAttributes[6].value * 1000) < new Date()
-                                        ? "Claimable"
-                                        : ` ${daysLeft(
-                                            new Date(resultAttributes[6].value * 1000),
-                                            new Date()
-                                        )} day(s) left`
-                                    : "Redeemed",
-                            class: resultAttributes[0].value,
-                            VMUs: parseInt(resultAttributes[1].value),
-                            cRank: resultAttributes[2].value,
-                            AMP: parseInt(resultAttributes[3].value),
-                            EAA: resultAttributes[4].value,
-                            maturityDateTime: resultAttributes[7].value,
-                            term: resultAttributes[8].value,
-                            xenBurned: resultAttributes[9].value,
-                            category: resultAttributes[10].value,
-                            image: result.normalized_metadata.image
-                        });
-                    } else {
+                    let resultAttributes: any[] = [];
+                    if (result.normalized_metadata?.attributes?.length != undefined) {
+                        if (result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+                            await Moralis.EvmApi.nft.reSyncMetadata({
+                                "chain": "0x13881",
+                                "flag": "uri",
+                                "mode": "async",
+                                "address": chain.xenftAddress,
+                                "tokenId": resultArray[i].token_id
+                            });
+                            let responseMetadata = await Moralis.EvmApi.nft.getNFTMetadata({
+                                "chain": "0x13881",
+                                "format": "decimal",
+                                "normalizeMetadata": true,
+                                "mediaItems": false,
+                                "address": chain.xenftAddress,
+                                "tokenId": resultArray[i].token_id
+                            })
+                            if (responseMetadata?.raw.normalized_metadata?.attributes != undefined) {
+                                resultAttributes = responseMetadata?.raw.normalized_metadata?.attributes;
+                            }
+                        } else {
+                            resultAttributes = result.normalized_metadata.attributes;
+                        }
                         const maturityDateObject = resultAttributes.find(
                             (item) => item.trait_type == "Maturity DateTime"
                         );
-                        const signer = library.getSigner(0)
-                        const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
-                        const XENFTContract = XENFT(signer, chain.xenftAddress);
-                        const isRedeemed = await MintInfoContract.getRedeemed(
-                            await XENFTContract.mintInfo(result.token_id)
-                        )
-
-                        try {
-                            const maturityDate = new Date(maturityDateObject.value);
-
-                            let claimStatus;
-                            if (thisDate < maturityDate) {
-                                const daysToGo = daysLeft(maturityDate, thisDate);
-                                claimStatus = `${daysToGo} days left`;
-                            } else if (isRedeemed) {
-                                claimStatus = "Redeemed";
-                            } else if ((thisDate.getTime() - maturityDate.getTime()) / (1000 * 3600 * 24) >= 6) {
-                                claimStatus = "Penalized"
+                        const maturityDate = new Date(maturityDateObject.value);
+                        let timevalue;
+                        let blackoutTerm = 604800000;
+                        if (dataForCompare > maturityDate.getTime())
+                            timevalue = dataForCompare - maturityDate.getTime();
+                        else
+                            timevalue = maturityDate.getTime() - dataForCompare;
+                        let boolVal = timevalue > blackoutTerm;
+                        if (chain.chainId == "80001") {
+                            if (boolVal) {
+                                xenftEntries.push({
+                                    id: +result.token_id,
+                                    claimStatus:
+                                        resultAttributes[7].value == "no"
+                                            ? new Date(resultAttributes[6].value * 1000) < new Date()
+                                                ? "Claimable"
+                                                : ` ${daysLeft(
+                                                    new Date(resultAttributes[6].value * 1000),
+                                                    new Date()
+                                                )} day(s) left`
+                                            : "Redeemed",
+                                    class: resultAttributes[0].value,
+                                    VMUs: parseInt(resultAttributes[1].value),
+                                    cRank: resultAttributes[2].value,
+                                    AMP: parseInt(resultAttributes[3].value),
+                                    EAA: resultAttributes[4].value,
+                                    maturityDateTime: resultAttributes[7].value,
+                                    term: resultAttributes[8].value,
+                                    xenBurned: resultAttributes[9].value,
+                                    category: resultAttributes[10].value,
+                                    image: result.normalized_metadata.image
+                                });
                             }
-                            else {
-                                claimStatus = "Claimable";
+                        } else {
+                            if (boolVal) {
+                                const maturityDateObject = resultAttributes.find(
+                                    (item) => item.trait_type == "Maturity DateTime"
+                                );
+                                const signer = library.getSigner(0)
+                                const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
+                                const XENFTContract = XENFT(signer, chain.xenftAddress);
+                                const isRedeemed = await MintInfoContract.getRedeemed(
+                                    await XENFTContract.mintInfo(result.token_id)
+                                )
+
+                                try {
+                                    const maturityDate = new Date(maturityDateObject.value);
+                                    console.log(resultAttributes);
+                                    let claimStatus;
+                                    if (thisDate < maturityDate) {
+                                        const daysToGo = daysLeft(maturityDate, thisDate);
+                                        claimStatus = `${daysToGo} days left`;
+                                    } else if (isRedeemed) {
+                                        claimStatus = "Redeemed";
+                                    } else if ((thisDate.getTime() - maturityDate.getTime()) / (1000 * 3600 * 24) >= 6) {
+                                        claimStatus = "Penalized"
+                                    }
+                                    else {
+                                        claimStatus = "Claimable";
+                                    }
+                                    xenftEntries.push({
+                                        id: +result.token_id,
+                                        claimStatus: claimStatus,
+                                        class: resultAttributes[0].value,
+                                        VMUs: parseInt(resultAttributes[1].value),
+                                        cRank: resultAttributes[2].value,
+                                        AMP: parseInt(resultAttributes[3].value),
+                                        EAA: resultAttributes[4].value,
+                                        maturityDateTime: resultAttributes[7].value,
+                                        term: parseInt(resultAttributes[8].value),
+                                        xenBurned: resultAttributes[9].value,
+                                        category: resultAttributes[10].value,
+                                        image: result.normalized_metadata.image
+                                    });
+                                } catch (err) {
+                                    console.log(err);
+                                }
                             }
-                            xenftEntries.push({
-                                id: result.token_id,
-                                claimStatus: claimStatus,
-                                class: resultAttributes[0].value,
-                                VMUs: parseInt(resultAttributes[1].value),
-                                cRank: resultAttributes[2].value,
-                                AMP: parseInt(resultAttributes[3].value),
-                                EAA: resultAttributes[4].value,
-                                maturityDateTime: resultAttributes[7].value,
-                                term: parseInt(resultAttributes[8].value),
-                                xenBurned: resultAttributes[9].value,
-                                category: resultAttributes[10].value,
-                                image: result.normalized_metadata.image
-                            });
-                        } catch (err) {
-                            console.log(err);
                         }
                     }
                 }
@@ -153,6 +195,21 @@ export function MintDbXeNFT(): any {
         })
     }
 
+    async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
+        console.log("CURSOR " + cursor)
+        let cursorData;
+        if (cursor != null)
+            cursorData = cursor.toString()
+        const response = await Moralis.EvmApi.nft.getWalletNFTs({
+            chain: chain,
+            format: "decimal",
+            cursor: cursorData,
+            normalizeMetadata: true,
+            tokenAddresses: [nftAddress],
+            address: account ? account : ""
+        });
+        return response;
+    }
     const daysLeft = (date_1: Date, date_2: Date) => {
 
         let difference = date_1.getTime() - date_2.getTime();
@@ -221,6 +278,7 @@ export function MintDbXeNFT(): any {
         const dbxenftInstance = DBXenft(signer, chain.dbxenftAddress)
         let fee;
 
+        console.log("********************")
         try {
             // if (claimStatus == "Redeemed") {
             //     fee = ethers.utils.parseEther("0.01");
@@ -238,18 +296,26 @@ export function MintDbXeNFT(): any {
                 value: fee,
                 gasLimit: (BigNumber.from("700000"))
             }
-
+            console.log("hersssssssssssssssssssssse");
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
                 .then(async (result: any) => {
-                    console.log("DBXENFT", Number(result.events[5].args.DBXENFTId))
-                    let currentCycle = await dbxenftFactory.getCurrentCycle();
-                    writePerCycle(currentCycle, Number(result.events[5].args.DBXENFTId))
-                    setNotificationState({
-                        message: "Your succesfully minted a DBXENFT.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
+                    console.log(await result.events)
+                    for (let i = 0; i < result.events.length; i++) {
+                        console.log(result.events[i].event);
+                        if (result.events[i].event == "DBXeNFTMinted") {
+                            console.log("DBXENFT", result.events[i].event)
+                            console.log("Number(result.events[i].args.DBXENFTId)", Number(result.events[i].args.DBXENFTId))
+                            let currentCycle = await dbxenftFactory.getCurrentCycle();
+                            console.log("Cyclul curent " + currentCycle);
+                            writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId))
+                            setNotificationState({
+                                message: "Your succesfully minted a DBXENFT.", open: true,
+                                severity: "success"
+                            })
+                            setLoading(false)
+                        }
+                    }
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -419,12 +485,6 @@ export function MintDbXeNFT(): any {
     }
 
     const previewData = async (NFTData: any) => {
-        let arr = await getIdsMintedPerCycle(1);
-        if (arr != undefined) {
-            for (let i = 0; i < arr.length; i++)
-                await generateAfterReveal(arr[i], 234);
-        }
-        console.log(arr[0]);
         setDisplayDbxenftDetails(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);

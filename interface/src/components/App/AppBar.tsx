@@ -33,6 +33,8 @@ import ChainContext from '../Contexts/ChainContext';
 import { Modal } from '@mui/material';
 import SnackbarNotification from './Snackbar';
 import ScreenSize from '../Common/ScreenSize';
+import { useNavigate } from 'react-router-dom';
+import { DASHBOARD_ROUTE, MINTDBXENFT_ROUTE, HOME_ROUTE } from '../Common/routes';
 const tokenSymbol = 'DBXen';
 
 
@@ -64,7 +66,7 @@ export function AppBarComponent(props: any): any {
     const [show, setShow] = useState(false);
     const ref = useRef<any>(null);
     const dimensions = ScreenSize();
-
+    const navigate = useNavigate();
 
     const id = open ? 'simple-popper' : "";
 
@@ -241,6 +243,12 @@ export function AppBarComponent(props: any): any {
         });
     }
 
+    const handleSwitchComponent = () => {
+        window.location.pathname === MINTDBXENFT_ROUTE ?
+            navigate(HOME_ROUTE) :
+            navigate(MINTDBXENFT_ROUTE)
+    }
+
     return (
         <ChainProvider>
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
@@ -265,14 +273,14 @@ export function AppBarComponent(props: any): any {
                     </Box>
                     <Box className="main-menu--right d-flex">
                         {dimensions.width > 768 ?
-                            <button onClick={ props.handleSwitchComponent } className="component-switcher">
-                                <img src={props.selectedIndex === 2 ? dbxen : dbxenft} alt="logo" />
+                            <button onClick={ handleSwitchComponent } className="component-switcher">
+                                <img src={window.location.pathname.includes("dbxenft") ? dbxen : dbxenft} alt="logo" />
                                 <img src={arrow} alt="arrow" />
                             </button>
                             : <></>
                         }
                         {Number(chain.chainId) === 1 && dimensions.width > 768 ?
-                            <button onClick={ props.showDashboard } className="dashboard-btn">
+                            <button onClick={() => navigate(DASHBOARD_ROUTE)} className="dashboard-btn">
                                 Dashboard
                             </button>
                             : <></>

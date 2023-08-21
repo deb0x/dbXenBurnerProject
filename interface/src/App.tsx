@@ -1,4 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -27,10 +29,19 @@ import ChainContext from './components/Contexts/ChainContext';
 import ChainProvider from './components/Contexts/ChainProvider';
 import { Dashboard } from './components/App/Dashboard';
 import DBXen from './ethereum/dbxen';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine } from '@fortawesome/free-solid-svg-icons'
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { DbXeNFT } from './components/App/DbXeNFT';
+import { MintDbXeNFT } from './components/App/MintDbXeNFT';
+import { DbXeNFTList } from './components/App/DbXeNFTList';
+import {
+    BURN_ROUTE,
+    DASHBOARD_ROUTE,
+    MINTDBXENFT_ROUTE,
+    FEES_ROUTE,
+    HOME_ROUTE,
+    DBXENFT_LIST_ROUTE,
+    DBXENFT_ROUTE
+} from './components/Common/routes';
+import { AppBarMobile } from './components/App/AppBarMobile';
+import { DbXeNFTPage } from './components/App/DbXeNFTPage';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
 
@@ -107,7 +118,6 @@ function ContractsDeployed() {
 function App() {
     const context = useWeb3React<ethers.providers.Web3Provider>()
     const { connector, account, activate, library } = context
-    const [selectedIndex, setSelectedIndex] = useState<any>(1);
     // handle logic to recognize the connector currently being activated
     const [activatingConnector, setActivatingConnector] = useState<any>()
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,6 +127,7 @@ function App() {
     const { t } = useTranslation();
     const { chain, setChain }  = useContext(ChainContext)
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
+    // const navigate = useNavigate();
     
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -190,15 +201,6 @@ function App() {
         return errorMsg;
     }
 
-    const handleSwitchComponent = () =>
-    {
-        selectedIndex === 2 ? 
-            setSelectedIndex(1):
-            setSelectedIndex(2)
-    }
-
-    const showDashboard = () => setSelectedIndex(3);
-
     async function getTotalXenBurned(){
         const signer = await library?.getSigner(0)
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
@@ -209,90 +211,110 @@ function App() {
     
     return (
 
-    <ChainProvider>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {!!errorMsg &&
-                <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
-                    {displayErrorMsg(errorMsg)}
-                </p>
-            }
-        </div>
-            <ThemeProvider>
-            { account ? 
-                <div className="app-container container-fluid">
-                    { maintenance === "true" ?
-                        <div className="row main-row maintenance-mode">
-                            <img className="maintenance-img" src={maintenanceImg} alt="maintenance" />
-                            <h1>Maintenance Mode</h1>
-                            <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
-                        </div> :
-                        <div className="row main-row">
-                            <div className="col col-lg-3 col-12 p-0 side-menu-container">
-                                <PermanentDrawer />
-                            </div>
-                            <div className="col col-lg-9 col-12">
-                                <AppBarComponent
-                                    handleSwitchComponent={ handleSwitchComponent }
-                                    showDashboard = { showDashboard }
-                                    selectedIndex = { selectedIndex } />
-                                
-                                <Box className="main-container" sx={{marginTop: 12}}>
-                                {dimensions.width > 768 ? 
-                                    <>
-                                        {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
-                                        {selectedIndex === 2 && <DbXeNFT /> }
-                                        {selectedIndex === 1 && <Stake /> }
-                                    </>
-                                    :
-                                    <>
-                                        {selectedIndex === 0 && <Burn /> }
-                                        {selectedIndex === 1 && <Stake /> }
-                                        {selectedIndex === 2 && <DbXeNFT /> }
-                                        {selectedIndex === 3 && <Dashboard totalXenBurned={ totalXENBurned } /> }
-                                    </>
-                                }
-                                </Box>
-                            </div>
-                        </div>
-                    }
-                    <div className="navigation-mobile">
-                        <div className={`navigation-item ${selectedIndex === 0 ? "active" : ""}`}
-                            onClick={() => setSelectedIndex(0)}>
-                                {t("mobile.mint")}
-                        </div>
-                        { Number(window.ethereum.networkVersion) === 1 ?
-                            <div className={`navigation-item dashboard ${selectedIndex === 3 ? "active" : ""}`}
-                                onClick={() => setSelectedIndex(3)}>
-                                <FontAwesomeIcon icon={faChartLine as IconProp} />
+    <Router>
+        <ChainProvider>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {!!errorMsg &&
+                    <p className='alert alert-danger position-fixed' style={{ marginTop: '4rem', marginBottom: '0' }}>
+                        {displayErrorMsg(errorMsg)}
+                    </p>
+                }
+            </div>
+                <ThemeProvider>
+                { account ? 
+                    <div className="app-container container-fluid">
+                        { maintenance === "true" ?
+                            <div className="row main-row maintenance-mode">
+                                <img className="maintenance-img" src={maintenanceImg} alt="maintenance" />
+                                <h1>Maintenance Mode</h1>
+                                <h4>We're tightening some nuts and bolts round the back. We'll be back up and running soon.</h4>
                             </div> :
-                            <></>
-                        }
-                        <div className={`navigation-item ${selectedIndex === 1 ? "active" : ""}`}
-                            onClick={() => setSelectedIndex(1)}>
-                                {t("mobile.fees")}
-                        </div>
-                        <div className={`navigation-item ${selectedIndex === 2 ? "active" : ""}`}
-                            onClick={() => setSelectedIndex(2)}>
-                                DBXeNFT
-                        </div>
-                    </div>
-                </div> :
-                <div className="app-container p-0 ">
-                    <div className="initial-page">
-                    <DropdownLanguage />
-                        <div className="row">
-                            <div className="col-lg-7 img-container mr-4">
-                                <img className="image--left" src={elephant} alt="elephant" />
-                                <div className="img-content">
-                                    <p>{t("home.connect_text")}</p>
-                                    <p>{t("home.burn_text")}</p>
-                                    <p>{t("home.earn_text")}</p>
+                            <div className="row main-row">
+                                <div className="col col-lg-3 col-12 p-0 side-menu-container">
+                                    <PermanentDrawer />
+                                </div>
+                                <div className="col col-lg-9 col-12">
+                                    <AppBarComponent />
                                     
-                                    <div>
-                                        { (() =>  {
-                                            const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                            const activating = currentConnector === activatingConnector
-                                            const connected = currentConnector === connector
+                                    <Box className="main-container" sx={{marginTop: 12}}>
+                                        <Routes>
+                                            {dimensions.width > 768 ? 
+                                                <>
+                                                    <Route path={ HOME_ROUTE } element={ <Stake /> } />
+                                                </>
+                                                :
+                                                <>
+                                                    <Route path={ HOME_ROUTE } element={ <Burn /> } />
+                                                </>
+                                            }
+                                            <Route path={ BURN_ROUTE } element={ <Burn /> } />
+                                            <Route path={ DASHBOARD_ROUTE } element={ <Dashboard totalXenBurned={ totalXENBurned } /> } />
+                                            <Route path={ MINTDBXENFT_ROUTE } element={ <MintDbXeNFT /> } />
+                                            <Route path={ FEES_ROUTE } element={ <Stake /> } />
+                                            <Route path={ DBXENFT_LIST_ROUTE } element={ <DbXeNFTList /> } />
+                                            <Route path={ DBXENFT_ROUTE } element={ <DbXeNFTPage /> } />
+                                        </Routes>
+                                    </Box>
+                                </div>
+                            </div>
+                        }
+                        <AppBarMobile />
+                    </div> :
+                    <div className="app-container p-0 ">
+                        <div className="initial-page">
+                        <DropdownLanguage />
+                            <div className="row">
+                                <div className="col-lg-7 img-container mr-4">
+                                    <img className="image--left" src={elephant} alt="elephant" />
+                                    <div className="img-content">
+                                        <p>{t("home.connect_text")}</p>
+                                        <p>{t("home.burn_text")}</p>
+                                        <p>{t("home.earn_text")}</p>
+                                        
+                                        <div>
+                                            { (() =>  {
+                                                const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                                const activating = currentConnector === activatingConnector
+                                                const connected = currentConnector === connector
+
+                                                return (
+                                                    <Button variant="contained"
+                                                        key={ConnectorNames.Injected}
+                                                        onClick={!connected ? 
+                                                            () => {
+                                                                setActivatingConnector(currentConnector)
+                                                                activate(currentConnector)
+                                                            } : 
+                                                            handleClick}
+                                                            className="connect-button">
+                                                        
+                                                        { activating ? 
+                                                            <Spinner color={'black'} /> :
+                                                            !connected ? 
+                                                                "Connect" :
+                                                                <span  className="unsupported">
+                                                                    {typeof window.ethereum === 'undefined' ? 
+                                                                        `Check your prerequisites` : 
+                                                                        account === undefined ? "Unsupported network" : ''}
+                                                                </span>
+                                                        }
+                                                    </Button>
+                                                )
+                                            }) ()}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-12 col-lg-5 text-center">
+                                    <div className="text-container">
+                                        <img className="dark-logo" src={deb0xen} alt="logo" />
+                                        <p>
+                                            Community built crypto protocol <br/> contributing to XEN deflation
+                                        </p>
+                                        <div className="connect-mobile">
+                                            { (() =>  {
+                                                const currentConnector = connectorsByName[ConnectorNames.Injected]
+                                                const activating = currentConnector === activatingConnector
+                                                const connected = currentConnector === connector
 
                                             return (
                                                 <Button variant="contained"
@@ -309,11 +331,11 @@ function App() {
                                                     { activating ? 
                                                         <Spinner color={'black'} /> :
                                                         !connected ? 
-                                                            "Connect" :
-                                                            <span  className="unsupported">
+                                                            t("home.connect") :
+                                                            <span>
                                                                 {typeof window.ethereum === 'undefined' ? 
-                                                                    `Check your prerequisites` : 
-                                                                    account === undefined ? "Unsupported network" : ''}
+                                                                    t("home.prerequisites") : 
+                                                                    account === undefined ? t("home.unsupported_network") + ` ${networkName}` : ''}
                                                             </span>
                                                     }
                                                 </Button>
@@ -322,57 +344,18 @@ function App() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-12 col-lg-5 text-center">
-                                <div className="text-container">
-                                    <img className="dark-logo" src={deb0xen} alt="logo" />
-                                    <p>
-                                        Community built crypto protocol <br/> contributing to XEN deflation
-                                    </p>
-                                    <div className="connect-mobile">
-                                        { (() =>  {
-                                            const currentConnector = connectorsByName[ConnectorNames.Injected]
-                                            const activating = currentConnector === activatingConnector
-                                            const connected = currentConnector === connector
-
-                                        return (
-                                            <Button variant="contained"
-                                                key={ConnectorNames.Injected}
-                                                // aria-describedby={id}
-                                                onClick={!connected ? 
-                                                    () => {
-                                                        setActivatingConnector(currentConnector)
-                                                        activate(currentConnector)
-                                                    } : 
-                                                    handleClick}
-                                                    className="connect-button">
-                                                
-                                                { activating ? 
-                                                    <Spinner color={'black'} /> :
-                                                    !connected ? 
-                                                        t("home.connect") :
-                                                        <span>
-                                                            {typeof window.ethereum === 'undefined' ? 
-                                                                t("home.prerequisites") : 
-                                                                account === undefined ? t("home.unsupported_network") + ` ${networkName}` : ''}
-                                                        </span>
-                                                }
-                                            </Button>
-                                        )
-                                    }) ()}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-        <span className={`built-in ${account ? "connected" : ""}`}>
-            built in the
-            &nbsp;
-            <a href="https://homeoftheprodigies.com/" target="_blank">Home of the Prodigies</a>
-        </span>
-        </ThemeProvider>
-    </ChainProvider>
+            }
+            <span className={`built-in ${account ? "connected" : ""}`}>
+                built in the
+                &nbsp;
+                <a href="https://homeoftheprodigies.com/" target="_blank">Home of the Prodigies</a>
+            </span>
+            </ThemeProvider>
+        </ChainProvider>
+    </Router>
   )
 }
 
