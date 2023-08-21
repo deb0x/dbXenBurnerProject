@@ -280,32 +280,6 @@ async function updateLastActiveCycle(cycle) {
     }
 }
 
-// async function writeLastActiveCycle(cycle) {
-//     console.log("write last active cycle:")
-//     let fileName = "lastCycle.txt";
-//     const params = {
-//         Bucket: process.env.REACT_APP_BUCKET_IMAGE,
-//         Key: fileName,
-//     }
-//     try {
-//         let content = cycle.toString();
-//         (async() => {
-//             s3.putObject({
-//                 Bucket: process.env.REACT_APP_BUCKET_IMAGE,
-//                 Key: fileName,
-//                 Body: cycle.toString(),
-//                 "ContentType": "txt",
-//             }).promise();
-//         })();
-//         console.log("NUmer scris: " + content);
-//         console.log("Scris pe fisier");
-
-//     } catch (err) {
-//         console.log(err)
-//     }
-// }
-
-
 // cron.schedule('17 13 18 * * *', async() => {
 //     await generateAfterReveal();
 // });
