@@ -115,6 +115,7 @@
                             background-color: #19D2D2;
                             text-transform: uppercase;
                             font-weight: 500;
+                            padding: 5px 40px;
                         }
                     }
                     .reward-card {
@@ -152,6 +153,25 @@
                         .collect-btn:disabled {
                             border: 2px solid #6B6274;
                             color: #6B6274;
+                        }
+                    }
+                    .back-to-approve {
+                        display: flex;
+                        align-items: center;
+                        margin: 5px 0;
+                        .collect-btn {
+                            font-size: 1.5vh;
+                            color: #F5B700;
+                            background-color: #030328;
+                            border: 2px solid #F5B700;
+                            border-radius: 33px;
+                            box-shadow: none;
+                            padding: 10px 40px;
+                            white-space: nowrap;
+                        }
+                        span.text {
+                            padding-left: 1vh;
+                            color: #F2E9DC;
                         }
                     }
                 }

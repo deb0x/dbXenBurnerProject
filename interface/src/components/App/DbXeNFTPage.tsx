@@ -46,6 +46,7 @@ export function DbXeNFTPage(): any {
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
+        getDBXENFTWithdrawableStake(2)
     }, [chain])
 
     useEffect(() => {
@@ -438,7 +439,9 @@ export function DbXeNFTPage(): any {
             }
         }
 
-        return dbxenftWithdrawableStake + unlockedStake
+        // console.log(BigNumber.from(dbxenftWithdrawableStake) + BigNumber.from(unlockedStake))
+
+        return (Number(dbxenftWithdrawableStake) + Number(unlockedStake))
     }
 
     return (
@@ -460,7 +463,7 @@ export function DbXeNFTPage(): any {
                                 <div className="" key={i}>
                                     <div className="nft-card">
                                         <div className="card-row card-header">
-                                            <img src={nftPlaceholder} alt="nft-placeholder" />
+                                            <img src={xenft.image} alt="nft-placeholder" />
                                         </div>
                                         <div className="card-details">
                                             <div className="dbxenft-power">

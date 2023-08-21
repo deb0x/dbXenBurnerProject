@@ -16,13 +16,9 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
-<<<<<<< HEAD
 import { writePerCycle, generateAfterReveal, getIdsMintedPerCycle } from "../Common/aws-interaction";
 import { arrToBufArr } from "ethereumjs-util";
-=======
-import { writePerCycle } from "../Common/aws-interaction";
 import { ethers } from "ethers";
->>>>>>> 61c600e0a7847a5c625a9a93fcd0db1fd4466bd6
 
 const { BigNumber } = require("ethers");
 
@@ -464,10 +460,7 @@ export function MintDbXeNFT(): any {
                     gasLimitVal = (BigNumber.from("400000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
-<<<<<<< HEAD
                     console.log("transactionFee " + transactionFee);
-=======
->>>>>>> 61c600e0a7847a5c625a9a93fcd0db1fd4466bd6
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
@@ -719,11 +712,7 @@ export function MintDbXeNFT(): any {
                                                             <div className="burn-button-container">
                                                                 <button className="btn burn-button"
                                                                     onClick={() => handleBurnXenft(data)}>
-<<<<<<< HEAD
-                                                                    BURN XEN
-=======
                                                                     WRAP XENFT
->>>>>>> 61c600e0a7847a5c625a9a93fcd0db1fd4466bd6
                                                                 </button>
                                                             </div>
                                                         </div>
