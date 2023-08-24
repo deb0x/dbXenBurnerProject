@@ -49,7 +49,7 @@ export function DbXeNFTPage(): any {
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
-        getDBXENFTWithdrawableStake(id);
+        getDBXENFTTotalAndWithdrawableStake(id);
     }, [chain])
 
     useEffect(() => {
@@ -408,7 +408,7 @@ export function DbXeNFTPage(): any {
         setUnclaimedFees(ethers.utils.formatUnits(dbxenftAccruedFees))
     }
 
-    async function getDBXENFTWithdrawableStake(tokenId: any) {
+    async function getDBXENFTTotalAndWithdrawableStake(tokenId: any) {
         const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
 
         const contractCallContext: ContractCallContext[] = [
@@ -447,11 +447,7 @@ export function DbXeNFTPage(): any {
         const dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
 
         let unlockedStake = BigNumber.from(0)
-
-        console.log(ethers.utils.formatUnits(dbxenftFirstStake))
-        console.log(ethers.utils.formatUnits(dbxenfSecondStakeCycle))
-        console.log(ethers.utils.formatUnits(currentCycle))
-
+        let totalStaked = dbxenftFirstStakeCycle.add(dbxenfSecondStakeCycle).add(dbxenftWithdrawableStake)
         if (!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
             unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
 
@@ -464,8 +460,8 @@ export function DbXeNFTPage(): any {
 
         console.log(ethers.utils.formatEther(totalUnstakedAmount))
 
-        setUserStakedAmount(ethers.utils.formatEther(totalUnstakedAmount))
-
+        setTokenForUnstake(ethers.utils.formatEther(totalUnstakedAmount))
+        setUserStakedAmount(ethers.utils.formatEther(totalStaked))
         // return totalUnstakedAmount
     }
 
