@@ -50,6 +50,7 @@
         "dotenv": "^10.0.0",
         "draftjs-to-html": "^0.9.1",
         "eslint": "^7.11.0",
+        "moralis": "^2.22.5",
         "node-cron": "^3.0.2",
         "solidity-coverage": "^0.8.2"
     }

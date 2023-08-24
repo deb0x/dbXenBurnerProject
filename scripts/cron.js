@@ -5,12 +5,13 @@ import ethers from "ethers"
 import Factory from "./dbxenftFactory.js";
 import dotenv from 'dotenv'
 import BigNumber from 'bignumber.js';
+import Moralis from "moralis";
 dotenv.config()
 
-const dbxenftFactoryAddress = "0xd2d0d9264D4eC70768617CE04Df7E99A8514ea26";
+const dbxenftFactoryAddress = "0x06623F5416C7BD2cE79e332276F718697D0AA39b";
 AWS.config.update({
-    secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-    accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+    secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+    accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
     region: process.env.REACT_APP_REGION,
 })
 const s3 = new AWS.S3();
@@ -70,7 +71,7 @@ async function generateAfterReveal() {
             console.log("newPower")
             console.log(newPower)
             const params = {
-                Bucket: process.env.REACT_APP_BUCKET,
+                Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                 Key: fileName,
             }
             try {
@@ -94,7 +95,7 @@ async function generateAfterReveal() {
 
                 (async() => {
                     s3.putObject({
-                        Bucket: process.env.REACT_APP_BUCKET,
+                        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                         Key: fileName,
                         Body: JSON.stringify(standardMetadata),
                         "ContentType": "application/json",
@@ -144,10 +145,10 @@ async function getIdsMintedPerCycle(cycle) {
     let fileName = cycle + ".txt";
 
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_PER_CYCLE,
+        Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
         Key: fileName,
     }
-    console.log(process.env.REACT_APP_BUCKET_PER_CYCLE);
+    console.log(process.env.REACT_APP_CYCLES_BUCKET_POLYGON);
     let ids;
     let removeNewLine;
     try {
@@ -193,9 +194,9 @@ async function readLastActiveCycle(lastActiveCycle) {
     console.log("READ LAST ACTIVE CYCLE:");
     console.log("INTRU CU CICLUL " + lastActiveCycle);
     let fileName = "lastCycle.txt";
-    console.log(process.env.REACT_APP_BUCKET_IMAGE);
+    console.log(process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON);
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+        Bucket: process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON,
         Key: fileName,
     }
     try {
@@ -228,10 +229,10 @@ async function readLastActiveCycle(lastActiveCycle) {
 async function updateLastActiveCycle(cycle) {
     console.log("UPDATE LAST ACTIVE CYCLE")
     let fileName = "lastCycle.txt";
-    console.log(process.env.REACT_APP_BUCKET_IMAGE);
+    console.log(process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON);
     console.log(cycle);
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+        Bucket: process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON,
         Key: fileName,
     }
     try {
@@ -268,7 +269,7 @@ async function updateLastActiveCycle(cycle) {
         }
         (async() => {
             s3.putObject({
-                Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+                Bucket: process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON,
                 Key: fileName,
                 Body: newJsonData,
                 "ContentType": "txt",
@@ -280,10 +281,124 @@ async function updateLastActiveCycle(cycle) {
     }
 }
 
+async function addMetadataForOmittedId(id) {
+    AWS.config.update({
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
+        region: process.env.REACT_APP_REGION,
+    })
+    const s3 = new AWS.S3();
+    let fileName = id + ".json";
+
+    const params = {
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
+        Key: fileName,
+    }
+
+    try {
+        let response = await s3.getObject(params).promise();
+        let objectData = response.Body.toString('utf-8');
+        console.log("ALREADY FILE EXIST!!!!!!!");
+        console.log("update...........");
+    } catch (err) {
+        console.log(err)
+        if (err.code == "NoSuchKey") {
+            let attributesValue = [{
+                "trait_type": "DBXEN NFT POWER",
+                "value": "0"
+            }]
+            let standardMetadata = {
+                "id": `${id}`,
+                "name": `THIS IS REAL TEST DBXEN NFT #${id}, BUT IS UNREVEAL`,
+                "description": "DBXEN NFT FOR PASSIVE INCOME",
+                "image": "https://imagesfornft.s3.eu-west-3.amazonaws.com/2DBXeNFT_Final+with+writing.jpg",
+                "external_url": `https://dbxen.org/your-dbxenfts/${id}`,
+                "attributes": attributesValue
+            }
+            console.log(JSON.stringify(standardMetadata));
+            (async() => {
+                s3.putObject({
+                    Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
+                    Key: fileName,
+                    Body: JSON.stringify(standardMetadata),
+                    "ContentType": "application/json",
+                }).promise();
+            })();
+            console.log("LAST ACTIVE CYCLE!");
+            console.log("update...........");
+        } else {
+            throw err;
+        }
+    }
+}
+
+async function getLast24HoursIdsMinted() {
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    let factory = Factory(provider, dbxenftFactoryAddress);
+    let currentCycle = Number(await factory.getCurrentCycle());
+    let currentStartedCycle = Number(await factory.currentStartedCycle());
+    let lastStartedCycle = Number(await factory.lastStartedCycle());
+    let lastActiveCycle;
+    if (currentCycle != currentStartedCycle) {
+        lastActiveCycle = currentStartedCycle;
+    } else {
+        lastActiveCycle = lastStartedCycle
+    }
+
+    console.log("se intra iaci1!!!!!!!!!")
+
+    let idsForLastUpdateCycle = await getIdsMintedPerCycle(lastActiveCycle);
+    console.log(" idsForLastUpdateCycle " + idsForLastUpdateCycle);
+    Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
+        .catch((e) => console.log("moralis error"))
+    const response = await Moralis.EvmApi.events.getContractEvents({
+        "chain": "0x13881",
+        "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
+        "fromDate": "2023-08-23T13:46:15.000Z",
+        "address": "0x06623F5416C7BD2cE79e332276F718697D0AA39b",
+        "abi": {
+            "anonymous": false,
+            "inputs": [{
+                    "indexed": true,
+                    "name": "from",
+                    "type": "address",
+                    "internal_type": "address"
+                },
+                {
+                    "indexed": true,
+                    "name": "to",
+                    "type": "address",
+                    "internal_type": "address"
+                },
+                {
+                    "indexed": false,
+                    "name": "amount",
+                    "type": "uint256",
+                    "internal_type": "uint256"
+                }
+            ],
+            "name": "Transfer",
+            "type": "event"
+        }
+    });
+    console.log("response!!!")
+    let responseArray = response.raw.result;
+    let idsFromEvent = [];
+    for (let i = 0; i < responseArray.length; i++) {
+        idsFromEvent.push(+responseArray[i].data.amount);
+    }
+    let differenceArray = [];
+    for (let i = 0; i < idsFromEvent.length; i++) {
+        if (!idsForLastUpdateCycle.includes(idsFromEvent[i].toString())) {
+            differenceArray.push(idsFromEvent[i])
+        }
+    }
+    console.log(differenceArray);
+}
 // cron.schedule('17 13 18 * * *', async() => {
 //     await generateAfterReveal();
 // });
 
-cron.schedule('*/11 * * * *', async() => {
-    await generateAfterReveal(1);
+cron.schedule('*/1 * * * *', async() => {
+    await getLast24HoursIdsMinted()
 });

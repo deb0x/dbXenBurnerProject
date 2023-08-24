@@ -278,7 +278,7 @@ export function MintDbXeNFT(): any {
         const dbxenftInstance = DBXenft(signer, chain.dbxenftAddress)
         let fee;
 
-        console.log("********************")
+        console.log("*********MINT MINT MINT********sss***")
         try {
             // if (claimStatus == "Redeemed") {
             //     fee = ethers.utils.parseEther("0.01");
@@ -291,10 +291,9 @@ export function MintDbXeNFT(): any {
                 AMP,
                 cRank
             )
-            // }
             const overrides = {
                 value: fee,
-                gasLimit: (BigNumber.from("700000"))
+                gasLimit: (BigNumber.from("1700000"))
             }
             console.log("hersssssssssssssssssssssse");
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
@@ -308,7 +307,7 @@ export function MintDbXeNFT(): any {
                             console.log("Number(result.events[i].args.DBXENFTId)", Number(result.events[i].args.DBXENFTId))
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
                             console.log("Cyclul curent " + currentCycle);
-                            writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId))
+                            await writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId))
                             setNotificationState({
                                 message: "Your succesfully minted a DBXENFT.", open: true,
                                 severity: "success"
