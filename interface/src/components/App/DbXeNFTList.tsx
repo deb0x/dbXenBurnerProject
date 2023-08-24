@@ -130,7 +130,7 @@ export function DbXeNFTList(): any {
                         )) 
                         :
                         <div className="empty-container">
-                            <span>You don't have any XENFTs</span>
+                            <span>You don't have any DBXENFTs</span>
                         </div>
                     }
                 </div>

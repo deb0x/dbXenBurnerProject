@@ -529,7 +529,7 @@ export function MintDbXeNFT(): any {
         })
     }
 
-    const handleBurnXenft = async (NFTData: any) => {
+    const handleWrapXenft = async (NFTData: any) => {
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -554,6 +554,16 @@ export function MintDbXeNFT(): any {
                         NFTData.cRank, NFTData.claimStatus
                     ) :
                     approveForAll()
+            }).then(() => {
+                mintDBXENFT(
+                    NFTData.id,
+                    Number(maturityTs),
+                    Number(NFTData.VMUs),
+                    eea,
+                    Number(term),
+                    Number(amp),
+                    NFTData.cRank, NFTData.claimStatus
+                )
             })
     }
 
@@ -812,7 +822,7 @@ export function MintDbXeNFT(): any {
                                                             </div>
                                                             <div className="burn-button-container">
                                                                 <button className="btn burn-button"
-                                                                    onClick={() => handleBurnXenft(data)}>
+                                                                    onClick={() => handleWrapXenft(data)}>
                                                                     WRAP XENFT
                                                                 </button>
                                                             </div>
