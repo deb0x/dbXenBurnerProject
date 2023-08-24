@@ -1,4 +1,6 @@
-{
+import { ethers } from "ethers";
+
+const { abi } = {
     "_format": "hh-sol-artifact-1",
     "contractName": "DBXeNFTFactory",
     "sourceName": "contracts/DBXeNFTFactory.sol",
@@ -828,4 +830,8 @@
             ]
         }
     }
+}
+
+export default (signerOrProvider, address) => {
+    return new ethers.Contract(address, abi, signerOrProvider);
 }

@@ -11,7 +11,7 @@ import evmos from "../../photos/icons/evmos.svg";
 import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
     polygon: {
@@ -301,12 +301,12 @@ export default function ChainSetter(props: any) {
                         setChain({
                             deb0xAddress: "0x0E792967c96e14247ca787D31705537a62D5f95b",
                             deb0xViewsAddress: "0x82D197ED51f4290F8F152D297e1ae13947FeBA61",
-                            deb0xERC20Address: "0xeCfBEa573c667c58A2b35e9DA7c5de4EE81d2abc",
+                            deb0xERC20Address: "0x8072f9b55fA3077AbE0B03588E4e90fF8cB707e0",
                             xenCryptoAddress: "0xF230D614e75aE05dF44075CaB230Fa67F10D8dCD",
-                            dbxenftFactoryAddress: "0x1Ee075c785C3853FCFe4E248905e094bdd7d74B8",
-                            dbxenftAddress: "0xb55C23a0984f9dDAB4B216A36F8B59dEc5e04e10",
+                            dbxenftFactoryAddress: "0xd2d0d9264D4eC70768617CE04Df7E99A8514ea26",
+                            dbxenftAddress: "0xe88C6149b626C12f88EeB29fB658c3D9666eaA28",
                             xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
-                            mintInfoAddress: "0x62721a50b7e2c9c0d0f3b2fed4b2b55209470831",
+                            mintInfoAddress: "0xb182C13E021e18766384E6a943D32c8b28E74ff3",
                             chainId: parseInt(result, 16),
                             chainName: "Mumbai",
                             currency: "MATIC",

@@ -1,5 +1,3 @@
-import { type } from "os";
-
 const AWS = require("aws-sdk");
 const cron = require("node-cron");
 require('dotenv').config()
@@ -21,6 +19,9 @@ async function generateBeforeReveal(cycle, id) {
     try {
         let response = await s3.getObject(params).promise();
         let objectData = response.Body.toString('utf-8');
+        console.log("ALREADY FILE EXIST!!!!!!!");
+        console.log(await writeLastActiveCycle(cycle));
+        console.log("update...........");
     } catch (err) {
         console.log(err)
         if (err.code == "NoSuchKey") {
@@ -54,7 +55,60 @@ async function generateBeforeReveal(cycle, id) {
     }
 }
 
-async function writeLastActiveCycle(cycle) {
+// async function writeLastActiveCycle(cycle) {
+//     console.log("here se intra!");
+//     AWS.config.update({
+//         secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
+//         accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+//         region: process.env.REACT_APP_REGION,
+//     })
+//     const s3 = new AWS.S3();
+//     let fileName = "lastCycle.txt";
+//     const params = {
+//         Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+//         Key: fileName,
+//     }
+
+//     try {
+//         let response = await s3.getObject(params).promise();
+//         let objectData = response.Body.toString('utf-8');
+//         console.log(objectData);
+//         console.log(typeof(objectData));
+//         console.log(typeof(cycle));
+//         if (Number(objectData) == -1) {
+//             let content = cycle.toString();
+//             (async() => {
+//                 s3.putObject({
+//                     Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+//                     Key: fileName,
+//                     Body: cycle.toString(),
+//                     "ContentType": "txt",
+//                 }).promise();
+//             })();
+//         } else {
+//             return Number(objectData);
+//         }
+//     } catch (err) {
+//         console.log(err)
+//         if (err.code == "NoSuchKey") {
+//             let content = cycle.toString();
+//             let newFileName = cycle.toString();
+//             (async() => {
+//                 s3.putObject({
+//                     Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+//                     Key: fileName,
+//                     Body: cycle.toString(),
+//                     "ContentType": "txt",
+//                 }).promise();
+//             })();
+//             return cycle;
+//         } else {
+//             throw err;
+//         }
+//     }
+// }
+
+export async function writeLastActiveCycle(cycle) {
     console.log("here se intra!");
     AWS.config.update({
         secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
@@ -68,39 +122,51 @@ async function writeLastActiveCycle(cycle) {
         Key: fileName,
     }
 
+    let ids;
+    let removeNewLine;
     try {
         let response = await s3.getObject(params).promise();
         let objectData = response.Body.toString('utf-8');
-        console.log(objectData);
-        console.log(typeof(objectData));
-        console.log(typeof(cycle));
-        if (Number(objectData) < cycle) {
-            let content = cycle.toString();
+        console.log("Se intra aici!!!!");
+        console.log(objectData)
+        let data = objectData.split('\n');
+        console.log(data);
+        console.log(data.length)
+        console.log(data.length - 1)
+        console.log(data[data.length - 2]);
+        console.log(JSON.parse(data[data.length - 2]));
+        if ((JSON.parse(data[data.length - 2])).cycle != cycle) {
+            console.log("DIFERIT");
+            let initContent = objectData.concat(`{"cycle": ${cycle},"alreadyUpdated": false}`);
+            console.log(initContent)
+            let content = initContent.concat('\n')
+            console.log(content);
             (async() => {
                 s3.putObject({
                     Bucket: process.env.REACT_APP_BUCKET_IMAGE,
                     Key: fileName,
-                    Body: cycle.toString(),
+                    Body: content,
                     "ContentType": "txt",
                 }).promise();
             })();
         } else {
-            return Number(objectData);
+            console.log("exista deja ");
         }
     } catch (err) {
         console.log(err)
         if (err.code == "NoSuchKey") {
-            let content = cycle.toString();
-            let newFileName = cycle.toString();
+            console.log(err)
+            console.log("ghggggggggggggggggggggggggggggg");
+            let content = (`{"cycle": ${cycle},"alreadyUpdated": false}`).concat("\n")
+            console.log(content);
             (async() => {
                 s3.putObject({
                     Bucket: process.env.REACT_APP_BUCKET_IMAGE,
                     Key: fileName,
-                    Body: cycle.toString(),
+                    Body: content,
                     "ContentType": "txt",
                 }).promise();
             })();
-            return cycle;
         } else {
             throw err;
         }

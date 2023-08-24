@@ -37,6 +37,7 @@ export function DbXeNFTList(): any {
             tokenAddresses: [chain.dbxenftAddress],
             address: account ? account : ""
         }).then((result) => {
+            
             const response = result.raw;
             console.log(response)
             const resultArray: any = response.result;
@@ -45,16 +46,47 @@ export function DbXeNFTList(): any {
             if(response) {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let result = resultArray[i];
-                    const resultAttributes: any[] = result.normalized_metadata;
     
-                    dbxenftEntries.push({
-                        id: result.token_id,
-                        name: result.normalized_metadata.name,
-                        description: result.normalized_metadata.description,
-                        image: result.normalized_metadata.image
-                    });
+                    if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+                        Moralis.EvmApi.nft.reSyncMetadata({
+                            chain: chain.chainId,
+                            "flag": "uri",
+                            "mode": "async",
+                            "address": chain.dbxenftAddress,
+                            "tokenId": resultArray[i].token_id
+                        }).then(() => {
+                            Moralis.EvmApi.nft.getNFTMetadata({
+                                chain: chain.chainId,
+                                "format": "decimal",
+                                "normalizeMetadata": true,
+                                "mediaItems": false,
+                                "address": chain.dbxenftAddress,
+                                "tokenId": resultArray[i].token_id
+                            }).then((result: any) => {
+                                if(result.raw.normalized_metadata.attributes.length > 0) {
+                                    dbxenftEntries.push({
+                                        id: result.raw.token_id,
+                                        name: result.raw.name,
+                                        description: result.raw.description,
+                                        image: result.raw.image
+                                    });
+                                }
+                            })
+                            
+                        });
+                    } else {
+                        dbxenftEntries.push({
+                            id: result.token_id,
+                            name: result.normalized_metadata.name,
+                            description: result.normalized_metadata.description,
+                            image: result.normalized_metadata.image
+                        });
+                    }
+                    
                 }
                 setDBXENFTs(dbxenftEntries);
+
+                console.log(DBXENFTs)
             }
             
         })
@@ -70,7 +102,7 @@ export function DbXeNFTList(): any {
                 <div className="row g-5">
                     {DBXENFTs.length ?
                         DBXENFTs.map((xenft, i) => (
-                            <div className="col col-md-6 card-col" key={i}>
+                            <div className="col col-md-3 card-col" key={i}>
                                 <div className="nft-card">
 
                                 <img src={xenft.image} alt="nft-image" />

@@ -278,7 +278,7 @@ export function Stake(props: any): any {
                             </Typography>
                             <p className='my-2 counter'>
                                 {t("fees.counter")}
-                                <Countdown date={Date.now() + endDate} renderer={renderer} />
+                                {/* <Countdown date={Date.now() + endDate} renderer={renderer} /> */}
                             </p>
                         </div>
                         <div className='col-12 col-md-4 d-flex justify-content-end align-items-start'>
@@ -533,7 +533,7 @@ export function Stake(props: any): any {
                             </Typography>
                             <p className='my-2 counter'>
                                 {t("rewards.counter")}
-                                <Countdown date={Date.now() + endDate} renderer={renderer} />
+                                {/* <Countdown date={Date.now() + endDate} renderer={renderer} /> */}
                             </p>
                         </div>
                         <div className='col-12 col-md-2 d-flex justify-content-end align-items-start'>
@@ -687,7 +687,6 @@ export function Stake(props: any): any {
                     setTotalStaked(ethers.utils.formatEther(totalSupply))
                 })
             })
-
         }
 
         async function approveStaking() {
