@@ -5,6 +5,11 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
+@font-face {
+    font-family: 'Manrope';
+    src: url('../src/fonts/Manrope-Regular.ttf');
+}
+
 #root {
     height: 100vh;
     overflow: hidden;

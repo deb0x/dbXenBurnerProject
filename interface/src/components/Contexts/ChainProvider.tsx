@@ -33,6 +33,10 @@ const ChainProvider = ( { children }: Props ) => {
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
                             deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                            dbxenftFactoryAddress: "0x0a5449f006bc137EE65Ad8D6256b611E3B49198a",
+                            dbxenftAddress: "0x674CF2C03260943e49d6c658CcAf6BFf2D59dB82",
+                            xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                            mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             chainId: parseInt(result, 16),
                             chainName: "polygon",
                             currency: "MATIC",
@@ -148,16 +152,16 @@ const ChainProvider = ( { children }: Props ) => {
                         setChain({
                             deb0xAddress: "0x0E792967c96e14247ca787D31705537a62D5f95b",
                             deb0xViewsAddress: "0x82D197ED51f4290F8F152D297e1ae13947FeBA61",
-                            deb0xERC20Address: "0xeCfBEa573c667c58A2b35e9DA7c5de4EE81d2abc",
+                            deb0xERC20Address: "0x8072f9b55fA3077AbE0B03588E4e90fF8cB707e0",
                             xenCryptoAddress: "0xF230D614e75aE05dF44075CaB230Fa67F10D8dCD",
-                            dbxenftFactoryAddress: "0x5FA482dd7A8eE5ff4d44c72113626A721b4F4316",
-                            dbxenftAddress: "0x1B51D7f974e98800afF491c3347E8C248dD4573c",
+                            dbxenftFactoryAddress: "0xd2d0d9264D4eC70768617CE04Df7E99A8514ea26",
+                            dbxenftAddress: "0xe88C6149b626C12f88EeB29fB658c3D9666eaA28",
                             xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
-                            mintInfoAddress: "0xd47faeb4ec3432568fa93df528b237d103a78e88",
+                            mintInfoAddress: "0xb182C13E021e18766384E6a943D32c8b28E74ff3",
                             chainId: parseInt(result, 16),
                             chainName: "Mumbai",
                             currency: "MATIC",
-                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            priceURL: "https://polygon-mumbai.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "mumDXN"
                         })
                         break;

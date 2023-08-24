@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "Decentralized Private Mail Protocol",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "build": "rollup -c",
         "test": "npx hardhat test",
@@ -43,10 +44,13 @@
     "dependencies": {
         "@openzeppelin/contracts": "^4.7.3",
         "abdk-libraries-solidity": "^3.1.0",
+        "aws-sdk": "^2.1426.0",
+        "bignumber.js": "^9.1.1",
         "defender-relay-client": "^1.31.1",
         "dotenv": "^10.0.0",
         "draftjs-to-html": "^0.9.1",
         "eslint": "^7.11.0",
+        "node-cron": "^3.0.2",
         "solidity-coverage": "^0.8.2"
     }
 }
