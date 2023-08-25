@@ -302,8 +302,6 @@ export function MintDbXeNFT(): any {
                 .then(async (result: any) => {
                     for (let i = 0; i < result.events.length; i++) {
                         if (result.events[i].event == "DBXeNFTMinted") {
-                            console.log("DBXENFT", result.events[i].event)
-                            console.log("Number(result.events[i].args.DBXENFTId)", Number(result.events[i].args.DBXENFTId))
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
                             writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId))
                             setNotificationState({

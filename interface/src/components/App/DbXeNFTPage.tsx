@@ -462,7 +462,6 @@ export function DbXeNFTPage(): any {
 
         setTokenForUnstake(ethers.utils.formatEther(totalUnstakedAmount))
         setUserStakedAmount(ethers.utils.formatEther(totalStaked))
-        // return totalUnstakedAmount
     }
 
     return (
@@ -577,7 +576,7 @@ export function DbXeNFTPage(): any {
                                             <Grid className="max-btn-container" item>
                                                 <Button className="max-btn"
                                                     size="small" variant="contained" color="error"
-                                                    onClick={() => setAmountToUnstake("1")}>
+                                                    onClick={() => setAmountToUnstake(tokensForUnstake)}>
                                                     MAX
                                                 </Button>
                                             </Grid>
