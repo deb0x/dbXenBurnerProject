@@ -1,23 +1,25 @@
 import AWS from 'aws-sdk/global.js';
 import S3 from 'aws-sdk/clients/s3.js';
-import cron from 'node-cron'
-import ethers from "ethers"
+import cron from 'node-cron';
+import { JsonRpcProvider } from 'ethers';
+import { ethers, formatUnits, formatEther } from 'ethers';
 import Factory from "./dbxenftFactory.js";
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import BigNumber from 'bignumber.js';
 import Moralis from "moralis";
-dotenv.config()
+import ElasticInference from 'aws-sdk/clients/elasticinference.js';
+dotenv.config();
 
 const dbxenftFactoryAddress = "0x06623F5416C7BD2cE79e332276F718697D0AA39b";
 AWS.config.update({
     secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
     accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
     region: process.env.REACT_APP_REGION,
-})
+});
 const s3 = new AWS.S3();
 
 async function generateAfterReveal() {
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    const provider = new JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
     let factory = Factory(provider, dbxenftFactoryAddress);
     // let currentCycle = Number(await factory.currentCycle());
     let currentCycle = Number(await factory.getCurrentCycle());
@@ -117,7 +119,6 @@ async function generateAfterReveal() {
         }
     }
     console.log("se scrie pe fisier");
-
 }
 
 function getImage(power) {
@@ -333,19 +334,20 @@ async function addMetadataForOmittedId(id) {
 }
 
 async function getLast24HoursIdsMinted() {
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    console.log("Testing#1");
+    const provider = new JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
     let factory = Factory(provider, dbxenftFactoryAddress);
     let currentCycle = Number(await factory.getCurrentCycle());
     let currentStartedCycle = Number(await factory.currentStartedCycle());
     let lastStartedCycle = Number(await factory.lastStartedCycle());
     let lastActiveCycle;
+    console.log("Testing#2");
+    console.log(currentCycle);
     if (currentCycle != currentStartedCycle) {
         lastActiveCycle = currentStartedCycle;
     } else {
         lastActiveCycle = lastStartedCycle
     }
-
-    console.log("se intra iaci1!!!!!!!!!")
 
     let idsForLastUpdateCycle = await getIdsMintedPerCycle(lastActiveCycle);
     console.log(" idsForLastUpdateCycle " + idsForLastUpdateCycle);
@@ -393,12 +395,179 @@ async function getLast24HoursIdsMinted() {
             differenceArray.push(idsFromEvent[i])
         }
     }
+    console.log("3232");
     console.log(differenceArray);
+    writeIds(differenceArray, idsForLastUpdateCycle, lastActiveCycle);
 }
+
+async function writeIds(differenceArray, idsForLastUpdateCycle, cycle) {
+    AWS.config.update({
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
+        region: process.env.REACT_APP_REGION,
+    })
+
+    const s3 = new AWS.S3();
+    let fileName = cycle.toString() + ".txt";
+    const params = {
+        Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
+        Key: fileName,
+    }
+    let content = ""
+    if (idsForLastUpdateCycle != null)
+        content = idsForLastUpdateCycle.toString() + "," + differenceArray.toString() + ",";
+    else
+        content = differenceArray.toString() + ",";
+
+    try {
+        (async() => {
+            s3.putObject({
+                Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
+                Key: fileName,
+                Body: content,
+                "ContentType": "txt",
+            }).promise();
+            await generateAfterRevealForMissedIDS(cycle, differenceArray);
+        })();
+    } catch (err) {
+        console.log(err)
+        if (err.code == "NoSuchKey") {
+            let newFileName = cycle.toString() + ".txt";
+            (async() => {
+                s3.putObject({
+                    Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
+                    Key: newFileName,
+                    Body: content,
+                    "ContentType": "txt",
+                }).promise();
+                await generateAfterRevealForMissedIDS(cycle, differenceArray);
+            })();
+        } else {
+            throw err;
+        }
+    }
+}
+
+async function generateAfterRevealForMissedIDS(cycle, differenceArray) {
+    console.log("generete pe after reveal!!!");
+    console.log(differenceArray);
+    console.log(differenceArray);
+    const provider = new JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    let factory = Factory(provider, dbxenftFactoryAddress);
+    let currentCycle = Number(await factory.getCurrentCycle());
+    let currentStartedCycle = Number(await factory.currentStartedCycle());
+    let lastStartedCycle = Number(await factory.lastStartedCycle());
+    console.log("currentCycle " + currentCycle);
+    console.log("currentStartedCycle " + currentStartedCycle);
+    console.log("lastStartedCycle " + lastStartedCycle);
+    let lastActiveCycle;
+    if (currentCycle != currentStartedCycle) {
+        lastActiveCycle = currentStartedCycle;
+    } else {
+        lastActiveCycle = lastStartedCycle
+    }
+    console.log("parametru pe functie " + lastActiveCycle)
+    if (cycle != -1) {
+        console.log("here")
+        console.log("*****************************")
+        let ids = differenceArray;
+        console.log("id uri mintate deja " + ids);
+        console.log("##################################")
+        console.log("##################################")
+        for (let i = 0; i < ids.length; i++) {
+            console.log(ids[i]);
+            let fileName = ids[i] + ".json";
+            console.log("************************************");
+            console.log(fileName);
+            console.log(ids[i]);
+            let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
+            console.log("here")
+            console.log(ids[i]);
+            console.log(tokenEntryCycle)
+            console.log("there");
+            const result = String((await factory.dbxenftEntryPower(ids[i]))); // Replace this with your actual contract call
+            console.log(result)
+            const formattedValue = formatEther(result); // Convert to human-readable format
+            console.log("*****")
+            console.log(result);
+            console.log(formattedValue)
+            console.log("**************")
+            console.log(Number(tokenEntryCycle))
+            console.log(tokenEntryCycle);
+            console.log("*****")
+            console.log("dbxenftEntryPower");
+            console.log((dbxenftEntryPower));
+            const result2 = BigNumber((await factory.rewardPerCycle(ids[i]))) // Replace this with your actual contract call
+                //const regularNumber2 = Number(result2); // Convert BigInt to regular number
+            console.log(result2);
+            const rewardPerCycle = ethers.utils.formatEther(result2.toString()); // Convert to human-readable format
+
+            //let rewardPerCycle = ethers.utils.formatEther(Number(await factory.rewardPerCycle(tokenEntryCycle)))
+            console.log("rewardPerCycle");
+            console.log(rewardPerCycle);
+            //let totalEntryPowerPerCycle = ethers.utils.formatEther(Number(await factory.totalEntryPowerPerCycle(tokenEntryCycle)))
+            const result3 = BigNumber((await factory.totalEntryPowerPerCycle(ids[i]))); // Replace this with your actual contract call
+            console.log(result3);
+            // const regularNumber3 = Number(result3); // Convert BigInt to regular number
+            const totalEntryPowerPerCycle = ethers.utils.formatEther(result3.toString()); // Convert to human-readable format
+            console.log("totalEntryPowerPerCycle")
+            console.log(totalEntryPowerPerCycle)
+            console.log("ggggg");
+            console.log(mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString()))
+            let newPower = mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString())
+            console.log("************************************")
+            console.log("newPower")
+            console.log(newPower)
+            const params = {
+                Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
+                Key: fileName,
+            }
+            try {
+                let response = await s3.getObject(params).promise();
+                let objectData = response.Body.toString('utf-8');
+                let attributesValue = [{
+                        "trait_type": "DBXEN NFT POWER",
+                        "value": newPower.toString()
+                    }]
+                    //let imageLink = getImage(newPower);
+                let imageLink = "https://imagesfornft.s3.eu-west-3.amazonaws.com/Screenshot+from+2023-07-05+16-28-05.png"
+                let standardMetadata = {
+                    "id": `${ids[i]}`,
+                    "name": `THIS IS REAL TEST DBXEN NFT #${ids[i]}, NOW REVEAL!`,
+                    "description": "DBXEN NFT FOR PASSIVE INCOME and reveal",
+                    "image": imageLink,
+                    "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
+                    "attributes": attributesValue
+                }
+                console.log(JSON.stringify(standardMetadata));
+
+                (async() => {
+                    s3.putObject({
+                        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
+                        Key: fileName,
+                        Body: JSON.stringify(standardMetadata),
+                        "ContentType": "application/json",
+                    }).promise();
+                })();
+                console.log("L-AM URCAT!!!!");
+            } catch (err) {
+                console.log(err)
+                if (err.code == "NoSuchKey") {
+                    console.log("IMPOSIBIL SA NU AVEM FISIER AICI LA UPDATE!!!")
+                } else {
+                    throw err;
+                }
+            }
+        }
+    }
+    console.log("se scrie pe fisier");
+}
+
+
 // cron.schedule('17 13 18 * * *', async() => {
 //     await generateAfterReveal();
 // });
 
 cron.schedule('*/1 * * * *', async() => {
-    await getLast24HoursIdsMinted()
+    await getLast24HoursIdsMinted();
 });

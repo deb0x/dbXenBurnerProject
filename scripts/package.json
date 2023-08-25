@@ -1,0 +1,21 @@
+{
+    "name": "scripts",
+    "version": "1.0.0",
+    "description": "",
+    "main": "cron.js",
+    "type": "module",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1443.0",
+        "bignumber.js": "^9.1.1",
+        "dotenv": "^16.3.1",
+        "ethers": "^6.7.1",
+        "moralis": "^2.22.5",
+        "node-cron": "^3.0.2"
+    }
+}

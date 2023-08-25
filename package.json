@@ -34,7 +34,7 @@
         "eth-sig-util": "^3.0.0",
         "ethereum-waffle": "^3.4.0",
         "ethereumjs-util": "^7.1.5",
-        "ethers": "^5.6.1",
+        "ethers": "^5.7.2",
         "hardhat": "^2.8.0",
         "hardhat-gas-reporter": "^1.0.9",
         "react-error-overlay": "^6.0.9",
