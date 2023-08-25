@@ -28,7 +28,7 @@ export function Burn(): any {
     const [valueAndFee, setValueAndFee] = useState<any>();
     const [totalBatchApproved, setBatchApproved] = useState<number>();
     const [maxAvailableBatch, setMaxBatch] = useState<number>(0);
-    const { chain }  = useContext(ChainContext)
+    const { chain } = useContext(ChainContext)
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -53,15 +53,15 @@ export function Burn(): any {
     async function getAllowanceForAccount() {
         const signer = library.getSigner(0)
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
-        await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) =>{
+        await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) => {
             let batchApproved = Number(ethers.utils.formatEther(amount)) / 2500000;
             setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
                 setApproveBurn(false) :
                 setApproveBurn(true)
-                setBalance();
-            })
-   
+            setBalance();
+        })
+
     }
 
     async function setBalance() {
@@ -72,7 +72,7 @@ export function Burn(): any {
 
         await xenContract.balanceOf(account).then((balance: any) => {
             number = ethers.utils.formatEther(balance);
-            setMaxBatch(Math.trunc(Number(number)/1))
+            setMaxBatch(Math.trunc(Number(number) / 1))
             checkBalance(number.toString())
             setLoading(false);
         })
@@ -97,90 +97,104 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if(Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000){
+                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000) {
                         await axios.request(options).then((result) => {
-                            if(result.data.result != undefined){
+                            if (result.data.result != undefined) {
+                                console.log(result.data.result);
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
-                            let protocol_fee = value * (1 - 0.00005 * value);
-                            let gasLimitVal = 0;
-                            if (Number(chain.chainId) === 84531) {
-                                console.log(price, protocol_fee)
-                                numberBatchesBurnedInCurrentCycle != 0 ?
-                                    gasLimitVal = (BigNumber.from("500000")) :
-                                    gasLimitVal = (BigNumber.from("700000"))
-                            }
-                            if ((Number(chain.chainId)) === 1) {
-                                numberBatchesBurnedInCurrentCycle != 0 ?
-                                gasLimitVal = (BigNumber.from("270000")) :
-                                gasLimitVal = (BigNumber.from("300000"))
-                            } 
-                            if ((Number(chain.chainId)) === 137){
-                                numberBatchesBurnedInCurrentCycle != 0 ?
-                                    gasLimitVal = (BigNumber.from("350000")) :
-                                    gasLimitVal = (BigNumber.from("500000"))
-                            } else {
+                                let protocol_fee = value * (1 - 0.00005 * value);
+                                let gasLimitVal = 0;
+                                if (Number(chain.chainId) === 84531) {
+                                    console.log(price)
+                                    console.log(protocol_fee)
                                     numberBatchesBurnedInCurrentCycle != 0 ?
-                                    gasLimitVal = (BigNumber.from("500000")) :
-                                    gasLimitVal = (BigNumber.from("700000"))
-                            }
-                            setCurrentGasLimit(gasLimitVal);
-                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
-                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-
-                            setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
-                            setMaticValue(fee.toFixed(4));
-                            setTotalCost(totalValue.toFixed(4));
+                                        gasLimitVal = (BigNumber.from("500000")) :
+                                        gasLimitVal = (BigNumber.from("700000"))
+                                }
+                                if ((Number(chain.chainId)) === 1) {
+                                    numberBatchesBurnedInCurrentCycle != 0 ?
+                                        gasLimitVal = (BigNumber.from("270000")) :
+                                        gasLimitVal = (BigNumber.from("300000"))
+                                }
+                                if ((Number(chain.chainId)) === 137) {
+                                    numberBatchesBurnedInCurrentCycle != 0 ?
+                                        gasLimitVal = (BigNumber.from("350000")) :
+                                        gasLimitVal = (BigNumber.from("500000"))
+                                } else {
+                                    numberBatchesBurnedInCurrentCycle != 0 ?
+                                        gasLimitVal = (BigNumber.from("500000")) :
+                                        gasLimitVal = (BigNumber.from("700000"))
+                                }
+                                console.log("herse")
+                                console.log(price)
+                                console.log(protocol_fee)
+                                console.log("here")
+                                setCurrentGasLimit(gasLimitVal);
+                                let fee;
+                                let totalValue;
+                                if (Number(chain.chainId) === 84531) {
+                                    fee = gasLimitVal * price * protocol_fee / 100000000;
+                                    totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                } else {
+                                    fee = gasLimitVal * price * protocol_fee / 1000000000;
+                                    totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                }
+                                console.log("FEE ", fee)
+                                console.log("totalValue ", protocol_fee)
+                                setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                                setMaticValue(fee.toFixed(4));
+                                setTotalCost(totalValue.toFixed(4));
                             }
                         })
                     } else {
-                        if(Number(chain.chainId) === 56){
-                        let price = 5;
-                        let protocol_fee = value * (1 - 0.00005 * value);
-                        let gasLimitVal = 0;
-                        numberBatchesBurnedInCurrentCycle != 0 ?
-                            gasLimitVal = (BigNumber.from("350000")) :
-                            gasLimitVal = (BigNumber.from("500000"))
-                   
-                        setCurrentGasLimit(gasLimitVal);
-                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
-                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-                        setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
-                        setMaticValue(fee.toFixed(4));
-                        setTotalCost(totalValue.toFixed(4));
+                        if (Number(chain.chainId) === 56) {
+                            let price = 5;
+                            let protocol_fee = value * (1 - 0.00005 * value);
+                            let gasLimitVal = 0;
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("350000")) :
+                                gasLimitVal = (BigNumber.from("500000"))
+
+                            setCurrentGasLimit(gasLimitVal);
+                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                            setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                            setMaticValue(fee.toFixed(4));
+                            setTotalCost(totalValue.toFixed(4));
+                        }
+                        if (Number(chain.chainId) === 2000) {
+                            let price = 250;
+                            let protocol_fee = value * (1 - 0.00005 * value);
+                            let gasLimitVal = 0;
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("350000")) :
+                                gasLimitVal = (BigNumber.from("500000"))
+
+                            setCurrentGasLimit(gasLimitVal);
+                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                            setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
+                            setMaticValue(fee.toFixed(5));
+                            setTotalCost(totalValue.toFixed(5));
+                        }
+                        if (Number(chain.chainId) === 66) {
+                            let price = 0.1;
+                            let protocol_fee = value * (1 - 0.00005 * value);
+                            let gasLimitVal = 0;
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("350000")) :
+                                gasLimitVal = (BigNumber.from("500000"))
+
+                            setCurrentGasLimit(gasLimitVal);
+                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                            setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
+                            setMaticValue(fee.toFixed(5));
+                            setTotalCost(totalValue.toFixed(5));
+                        }
+
                     }
-                    if(Number(chain.chainId) === 2000){
-                        let price = 250;
-                        let protocol_fee = value * (1 - 0.00005 * value);
-                        let gasLimitVal = 0;
-                        numberBatchesBurnedInCurrentCycle != 0 ?
-                            gasLimitVal = (BigNumber.from("350000")) :
-                            gasLimitVal = (BigNumber.from("500000"))
-                   
-                        setCurrentGasLimit(gasLimitVal);
-                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
-                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-                        setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
-                        setMaticValue(fee.toFixed(5));
-                        setTotalCost(totalValue.toFixed(5));
-                    }
-                    if(Number(chain.chainId) === 66){
-                        let price = 0.1;
-                        let protocol_fee = value * (1 - 0.00005 * value);
-                        let gasLimitVal = 0;
-                        numberBatchesBurnedInCurrentCycle != 0 ?
-                            gasLimitVal = (BigNumber.from("350000")) :
-                            gasLimitVal = (BigNumber.from("500000"))
-                
-                        setCurrentGasLimit(gasLimitVal);
-                        let fee = gasLimitVal * price * protocol_fee / 1000000000;
-                        let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-                        setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
-                        setMaticValue(fee.toFixed(5));
-                        setTotalCost(totalValue.toFixed(5));
-                    }
-                    
-                }
-            })
+                })
         })
     }
 
@@ -189,13 +203,13 @@ export function Burn(): any {
         const signer = library.getSigner(0)
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress)
         let amountToApprove = 0;
-            if(totalBatchApproved != undefined){
-                if(value > totalBatchApproved){
-                    amountToApprove = value - totalBatchApproved;
-                }
+        if (totalBatchApproved != undefined) {
+            if (value > totalBatchApproved) {
+                amountToApprove = value - totalBatchApproved;
             }
+        }
         try {
-            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove*2500000).toString()))
+            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove * 2500000).toString()))
             tx.wait()
                 .then((result: any) => {
                     getAllowanceForAccount();
@@ -222,7 +236,7 @@ export function Burn(): any {
     }
 
     async function burnXEN() {
-        if(valueAndFee === undefined){
+        if (valueAndFee === undefined) {
             estimationValues();
         }
         else {
@@ -231,7 +245,7 @@ export function Burn(): any {
             const deb0xContract = DBXen(signer, chain.deb0xAddress)
             let gasLimitIntervalValue = gasLimit
             let currentValue = valueAndFee.fee;
-  
+
             try {
                 const overrides =
                 {
@@ -342,17 +356,17 @@ export function Burn(): any {
                     </div>
                 </div>
                 {approveBurn ?
-                maxAvailableBatch < value ?
-                    <LoadingButton className="burn-btn"
-                    loadingPosition="end"
-                    disabled={true}>
-                    {loading ? <Spinner color={'black'} /> : "Insufficient XEN balance"}
-                </LoadingButton> :
-                    <LoadingButton className="burn-btn"
-                        loadingPosition="end"
-                        onClick={() => burnXEN()} >
-                        {loading ? <Spinner color={'black'} /> : t("burn.burn_button")}
-                    </LoadingButton> :
+                    maxAvailableBatch < value ?
+                        <LoadingButton className="burn-btn"
+                            loadingPosition="end"
+                            disabled={true}>
+                            {loading ? <Spinner color={'black'} /> : "Insufficient XEN balance"}
+                        </LoadingButton> :
+                        <LoadingButton className="burn-btn"
+                            loadingPosition="end"
+                            onClick={() => burnXEN()} >
+                            {loading ? <Spinner color={'black'} /> : t("burn.burn_button")}
+                        </LoadingButton> :
                     balanceGratherThanZero === '0.0' || balanceGratherThanZero === '0' ?
                         <LoadingButton className="burn-btn"
                             loadingPosition="end"
