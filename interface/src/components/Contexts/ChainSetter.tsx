@@ -11,7 +11,8 @@ import evmos from "../../photos/icons/evmos.svg";
 import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import base from "../../photos/icons/base.png";
+import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
     polygon: {
@@ -123,6 +124,17 @@ const networks: any = {
         },
         rpcUrls: ['https://eth-rpc.gateway.pokt.network'],
         blockExplorerUrls: ['https://etherscan.io'] 
+    },
+    base: {
+        chainId: `0x${Number(84531).toString(16)}`,
+        chainName: 'Base',
+        nativeCurrency: {
+            name: 'Base',
+            symbol: 'ETH',
+            decimals: 18
+        },
+        rpcUrls: ['https://base-goerli.blockpi.network/v1/rpc/public'],
+        blockExplorerUrls: ['https://goerli.basescan.org'] 
     }
 };
 
@@ -282,6 +294,19 @@ export default function ChainSetter(props: any) {
                             dxnTokenName: "vvDXN"
                         })
                         break;
+                    case 84531:
+                        setChain({
+                            deb0xAddress: "0x4893dF206d9583705D789e7eb2Faa3E32bC98Ae6",
+                            deb0xViewsAddress: "0xE4E4e1A6c2220F8666b75cf1Fb8eECA764884498",
+                            deb0xERC20Address: "0x9419e4AFc214A9093a0a241Bb31929EA26082284",
+                            xenCryptoAddress: "0x9A74084370c9A43fA0b9B0185d64968870ec531f",
+                            chainId: parseInt(result, 16),
+                            chainName: "Base",
+                            currency: "ETH",
+                            priceURL: "https://base-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "bDXN"
+                        })
+                        break;
                 }
             });
         } catch (err: any) {
@@ -391,6 +416,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="ethpow" src={ethpow} className="ethpow"/>
                         Switch to EthereumPoW
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("base")}
+                        className="btn"
+                    >
+                        <img alt="base" src={base} className="base"/>
+                        Switch to Base
                     </button>
                 </Popper>
             </div>

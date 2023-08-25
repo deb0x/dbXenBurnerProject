@@ -10,7 +10,6 @@ import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/dbxenViews";
 import DBXenERC20 from "../../ethereum/dbxenerc20"
 import Popper from '@mui/material/Popper';
-import ClickAwayListener from '@mui/base/ClickAwayListener';
 import '../../componentsStyling/appBar.scss';
 import copyIcon from '../../photos/icons/copy-1.svg';
 import walletIcon from '../../photos/icons/wallet.svg';
@@ -30,7 +29,7 @@ import DropdownLanguage from '../DropdownLanguage';
 import ChainProvider from '../Contexts/ChainProvider';
 import ChainSetter from '../Contexts/ChainSetter';
 import ChainContext from '../Contexts/ChainContext';
-import { Modal } from '@mui/material';
+import { ClickAwayListener, Modal } from '@mui/material';
 import SnackbarNotification from './Snackbar';
 import ScreenSize from '../Common/ScreenSize';
 const tokenSymbol = 'DBXen';

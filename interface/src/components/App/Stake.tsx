@@ -341,7 +341,7 @@ export function Stake(props: any): any {
                                     minimumFractionDigits: 10,
                                     maximumFractionDigits: 10
                                 })}
-                            </strong> DXN
+                            </strong> {chain.dxnTokenName}
                         </Typography>
                         {/* <Typography className="data-height">
                             Total XEN burned in previous cycle: <strong>{previousCycleXENBurned}</strong>
@@ -977,7 +977,7 @@ export function Stake(props: any): any {
                                 {Number(userStakedAmount).toLocaleString('en-US', {
                                     minimumFractionDigits: 10,
                                     maximumFractionDigits: 10
-                                })} DXN</strong>
+                                })} {chain.dxnTokenName}</strong>
                         </Typography>
                     </div>
                     <div className="col-6 px-3">
@@ -990,7 +990,7 @@ export function Stake(props: any): any {
                                 {Number(userUnstakedAmount).toLocaleString('en-US', {
                                     minimumFractionDigits: 10,
                                     maximumFractionDigits: 10
-                                })} DXN</strong>
+                                })} {chain.dxnTokenName}</strong>
                         </Typography>
                     </div>
                     {approved && <Grid className="amount-row px-3" container>
@@ -1061,7 +1061,7 @@ export function Stake(props: any): any {
                             <strong>{Number(tokensForUnstake).toLocaleString('en-US', {
                                     minimumFractionDigits: 10,
                                     maximumFractionDigits: 10
-                                })} DXN</strong>
+                                })} {chain.dxnTokenName}</strong>
                         </Typography>
                     </div>
                     {/* <div className="col-6 px-3">
@@ -1137,7 +1137,7 @@ export function Stake(props: any): any {
                     </Typography>
                     <Typography variant="h4">
                         <img className="logo" src={token} />
-                        {totalStaked} DXN
+                        {totalStaked} {chain.dxnTokenName}
                     </Typography>
                 </CardContent>
             </Card>
