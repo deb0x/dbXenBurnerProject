@@ -595,7 +595,7 @@ export function DbXeNFTPage(): any {
             }
         }
 
-        console.log(baseDBXENFTPower, dbxenftPower)
+        console.log(ethers.utils.formatEther(baseDBXENFTPower), ethers.utils.formatEther(dbxenftPower))
 
         dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
         setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))

@@ -50,11 +50,16 @@ export function MintDbXeNFT(): any {
     const [loading, setLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
+    const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
 
     useEffect(() => {
         startMoralis();
         getXENFTs();
     }, [chain])
+
+    useEffect(() => {
+        getXENFTs();
+    }, [xeNFTWrapped])
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
@@ -528,6 +533,7 @@ export function MintDbXeNFT(): any {
     }
 
     const handleWrapXenft = async (NFTData: any) => {
+        setLoading(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -550,18 +556,11 @@ export function MintDbXeNFT(): any {
                         Number(term),
                         Number(amp),
                         NFTData.cRank, NFTData.claimStatus
-                    ) :
+                    ).then(() => {
+                        setXeNFTWrapped(true);
+                        setLoading(false);
+                    }) :
                     approveForAll()
-            }).then(() => {
-                mintDBXENFT(
-                    NFTData.id,
-                    Number(maturityTs),
-                    Number(NFTData.VMUs),
-                    eea,
-                    Number(term),
-                    Number(amp),
-                    NFTData.cRank, NFTData.claimStatus
-                )
             })
     }
 
@@ -819,10 +818,14 @@ export function MintDbXeNFT(): any {
                                                                 </p>
                                                             </div>
                                                             <div className="burn-button-container">
-                                                                <button className="btn burn-button"
+                                                                <LoadingButton
+                                                                    className="btn burn-button"
+                                                                    loading={loading}
+                                                                    variant="contained"
+                                                                    type="button"
                                                                     onClick={() => handleWrapXenft(data)}>
                                                                     WRAP XENFT
-                                                                </button>
+                                                                </LoadingButton>
                                                             </div>
                                                         </div>
                                                     </div> :
@@ -840,7 +843,7 @@ export function MintDbXeNFT(): any {
                             </>
                         ))}
                         {emptyRows > 0 && (
-                            <tr style={{ height: 34 * emptyRows }}>
+                            <tr style={{ height: 44.5 * emptyRows }}>
                                 <td colSpan={3} />
                             </tr>
                         )}
@@ -848,6 +851,7 @@ export function MintDbXeNFT(): any {
                     <tfoot>
                         <TablePagination
                             rowsPerPageOptions={[10, 25, { label: 'All', value: -1 }]}
+                            colSpan={3}
                             count={XENFTs.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
