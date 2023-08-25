@@ -464,7 +464,6 @@ export function DbXeNFTPage(): any {
 
         setTokenForUnstake(ethers.utils.formatEther(totalUnstakedAmount))
         setUserStakedAmount(ethers.utils.formatEther(totalStaked))
-        // return totalUnstakedAmount
     }
 
     async function getUpdatedDBXENFTData(tokenId: any) {
