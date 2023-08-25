@@ -304,7 +304,7 @@ export default function ChainSetter(props: any) {
                             chainName: "Base",
                             currency: "ETH",
                             priceURL: "https://base-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "bDXN"
+                            dxnTokenName: "cbDXN"
                         })
                         break;
                 }

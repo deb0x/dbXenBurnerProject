@@ -100,23 +100,18 @@ export function Burn(): any {
                     if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000) {
                         await axios.request(options).then((result) => {
                             if (result.data.result != undefined) {
-                                console.log(result.data.result);
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                                 let protocol_fee = value * (1 - 0.00005 * value);
                                 let gasLimitVal = 0;
                                 if (Number(chain.chainId) === 84531) {
-                                    console.log(price)
-                                    console.log(protocol_fee)
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("500000")) :
                                         gasLimitVal = (BigNumber.from("700000"))
-                                }
-                                if ((Number(chain.chainId)) === 1) {
+                                } else if ((Number(chain.chainId)) === 1) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("270000")) :
                                         gasLimitVal = (BigNumber.from("300000"))
-                                }
-                                if ((Number(chain.chainId)) === 137) {
+                                } else if ((Number(chain.chainId)) === 137) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("350000")) :
                                         gasLimitVal = (BigNumber.from("500000"))
@@ -125,10 +120,6 @@ export function Burn(): any {
                                         gasLimitVal = (BigNumber.from("500000")) :
                                         gasLimitVal = (BigNumber.from("700000"))
                                 }
-                                console.log("herse")
-                                console.log(price)
-                                console.log(protocol_fee)
-                                console.log("here")
                                 setCurrentGasLimit(gasLimitVal);
                                 let fee;
                                 let totalValue;
@@ -139,8 +130,6 @@ export function Burn(): any {
                                     fee = gasLimitVal * price * protocol_fee / 1000000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
                                 }
-                                console.log("FEE ", fee)
-                                console.log("totalValue ", protocol_fee)
                                 setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
                                 setMaticValue(fee.toFixed(4));
                                 setTotalCost(totalValue.toFixed(4));
@@ -273,7 +262,6 @@ export function Burn(): any {
                         setLoading(false)
                     })
             } catch (error: any) {
-                console.log(error.message)
                 setNotificationState({
                     message: "You rejected the transaction.",
                     open: true,
