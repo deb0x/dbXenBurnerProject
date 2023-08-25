@@ -76,6 +76,9 @@ export function PermanentDrawer(props: any): any {
             case 10001:
                 setBaseUrl("https://www.oklink.com/ethw/address/")
                 break;
+            case 8453:
+                setBaseUrl("https://basescan.org/address/")
+                break;
         }
     }, [])
 
