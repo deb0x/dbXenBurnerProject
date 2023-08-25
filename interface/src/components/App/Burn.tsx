@@ -72,7 +72,7 @@ export function Burn(): any {
 
         await xenContract.balanceOf(account).then((balance: any) => {
             number = ethers.utils.formatEther(balance);
-            setMaxBatch(Math.trunc(Number(number) / 1))
+            setMaxBatch(Math.trunc(Number(number) / 2500000))
             checkBalance(number.toString())
             setLoading(false);
         })
