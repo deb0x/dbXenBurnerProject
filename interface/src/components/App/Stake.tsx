@@ -48,6 +48,7 @@ export function Stake(props: any): any {
     const dateMoonbeam: any = new Date(Date.UTC(2023, 12, 17, 12, 3, 30, 0));
     const dateEvmos: any = new Date(Date.UTC(2023, 12, 17, 12, 16, 48, 0));
     const dateEthereumPow: any = new Date(Date.UTC(2023, 12, 17, 12, 24, 59, 0));
+    const dateBase: any = new Date(Date.UTC(2023, 12, 17, 19, 0, 43, 0));
     const now: any = Date.now();
     const { t } = useTranslation();
     const [endDate, setEndDate] = useState<any>();
@@ -109,6 +110,9 @@ export function Stake(props: any): any {
                 break;
             case 10001:
                 setEndDate(dateEthereumPow.getTime() - now);
+                break;
+            case 8453:
+                setEndDate(dateBase.getTime() - now);
                 break;
         }
     }

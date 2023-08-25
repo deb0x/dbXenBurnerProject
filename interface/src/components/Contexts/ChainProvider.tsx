@@ -144,17 +144,17 @@ const ChainProvider = ( { children }: Props ) => {
                             dxnTokenName: "vvDXN"
                         })
                         break;
-                    case 84531:
+                    case 8453:
                         setChain({
-                            deb0xAddress: "0x4893dF206d9583705D789e7eb2Faa3E32bC98Ae6",
-                            deb0xViewsAddress: "0xE4E4e1A6c2220F8666b75cf1Fb8eECA764884498",
-                            deb0xERC20Address: "0x9419e4AFc214A9093a0a241Bb31929EA26082284",
-                            xenCryptoAddress: "0x9A74084370c9A43fA0b9B0185d64968870ec531f",
+                            deb0xAddress: "0x30782c020FE90614f08a863B41CbB07A2D2D94fF",
+                            deb0xViewsAddress: "0xF3281221bA95af0C5BBcBd2474cE8C090233133b",
+                            deb0xERC20Address: "0x9430A7e6283Fb704Fd1D9302868Bc39d16FE82Ba",
+                            xenCryptoAddress: "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5",
                             chainId: parseInt(result, 16),
                             chainName: "Base",
                             currency: "ETH",
                             priceURL: "https://base-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "bDXN"
+                            dxnTokenName: "cbDXN"
                         })
                         break;
                 }

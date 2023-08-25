@@ -103,7 +103,7 @@ export function Burn(): any {
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                                 let protocol_fee = value * (1 - 0.00005 * value);
                                 let gasLimitVal = 0;
-                                if (Number(chain.chainId) === 84531) {
+                                if (Number(chain.chainId) === 8453) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("500000")) :
                                         gasLimitVal = (BigNumber.from("700000"))
@@ -123,7 +123,7 @@ export function Burn(): any {
                                 setCurrentGasLimit(gasLimitVal);
                                 let fee;
                                 let totalValue;
-                                if (Number(chain.chainId) === 84531) {
+                                if (Number(chain.chainId) === 8453) {
                                     fee = gasLimitVal * price * protocol_fee / 100000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
                                 } else {
