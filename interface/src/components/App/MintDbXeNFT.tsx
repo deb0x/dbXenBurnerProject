@@ -485,6 +485,7 @@ export function MintDbXeNFT(): any {
     }
 
     const previewData = async (NFTData: any) => {
+        console.log(NFTData)
         setDisplayDbxenftDetails(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
@@ -514,6 +515,7 @@ export function MintDbXeNFT(): any {
         let transactionFee;
 
         axios.request(options).then(async (result) => {
+            console.log(result)
             if (result.data.result != undefined) {
                 if (Number(chain.chainId) === 80001) {
                     gasLimitVal = (BigNumber.from("400000"));
@@ -739,12 +741,6 @@ export function MintDbXeNFT(): any {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div className="power">
-                                                        <p className="label">DBXen power</p>
-                                                        <p className="value">
-                                                            299994830.049458 $DXN
-                                                        </p>
                                                     </div>
                                                     <div className="burn-button-container">
                                                         <button className="btn burn-button"

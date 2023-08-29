@@ -57,15 +57,17 @@ export function DbXeNFTPage(): any {
     useEffect(() => {
         console.log(approved)
         setStakeAmount();
-    }, [amountToStake]);
+        getDBXENFTTotalAndWithdrawableStake(id)
+        setUnstakedAmount();
+    }, [amountToStake, amountToUnstake]);
 
     useEffect(() => {
         setUnstakedAmount()
     }, [userUnstakedAmount]);
 
-    // useEffect(() => {
-    //     getUnclaimedFees(id)
-    // }, [unclaimedFees])
+    useEffect(() => {
+        getUnclaimedFees(id)
+    }, [unclaimedFees])
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
@@ -154,6 +156,7 @@ export function DbXeNFTPage(): any {
                         severity: "success"
                     })
                     setLoading(false)
+                    setAmountToStake("")
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -187,6 +190,7 @@ export function DbXeNFTPage(): any {
                         severity: "success"
                     })
                     setLoading(false)
+                    setAmountToUnstake("")
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -627,8 +631,12 @@ export function DbXeNFTPage(): any {
                                         </div>
                                         <div className="card-details">
                                             <div className="dbxenft-power">
-                                                <span className="label">Dbxen power</span>
-                                                <span className="value">299994830.049458</span>
+                                                <span className="label">DBXENFT base power</span>
+                                                <span className="value">{baseDBXENFTPower}</span>
+                                            </div>
+                                            <div className="dbxenft-power">
+                                                <span className="label">DBXENFT total power</span>
+                                                <span className="value">{dbxenftPower}</span>
                                             </div>
                                             <div className="card-row">
                                                 <span className="label">tokenID</span>

@@ -20,6 +20,10 @@
                     }
                     .value {
                         white-space: nowrap;
+                        width: 100%;
+                        overflow: hidden;
+                        padding-left: 10px;
+                        text-overflow: ellipsis;
                     }
                 }
                 .detail-button-container {
