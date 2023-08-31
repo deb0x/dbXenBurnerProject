@@ -496,7 +496,8 @@ export function DbXeNFTPage(): any {
                     { reference: 'getDBXENFTPower', methodName: 'dbxenftPower', methodParameters: [tokenId] },
                     { reference: 'getLastFeeUpdateCycle', methodName: 'lastFeeUpdateCycle', methodParameters: [tokenId] },
                     { reference: 'getDBXENFTFirstStake', methodName: 'dbxenftFirstStake', methodParameters: [tokenId] },
-                    { reference: 'getDBXENFTSecondStake', methodName: 'dbxenftSecondStake', methodParameters: [tokenId] }
+                    { reference: 'getDBXENFTSecondStake', methodName: 'dbxenftSecondStake', methodParameters: [tokenId] },
+                    { reference: 'getLastPowerUpdateCycle', methodName: 'lastPowerUpdateCycle', methodParameters: [tokenId] }
                 ]
             }
         ];
@@ -516,6 +517,7 @@ export function DbXeNFTPage(): any {
         const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[11].returnValues[0])
         const dbxenftFirstStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[12].returnValues[0])
         const dbxenftSecondStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[13].returnValues[0])
+        const lastPowerUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[14].returnValues[0])
 
         if(!currentCycle.eq(currentStartedCycle)) {
             previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
@@ -532,12 +534,13 @@ export function DbXeNFTPage(): any {
                     { reference: 'getCFPPSLastStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastStartedCycle.add(BigNumber.from("1"))] },
                     { reference: 'getCFPPSPreviousStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [previousStartedCycle] },
                     { reference: 'getCFPPSLastFeeUpdateCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastFeeUpdateCycle] },
-                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftFirstStake.add(BigNumber.from("1"))] },
+                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftFirstStake] },
                     { reference: 'getCycleAccruedFees', methodName: 'cycleAccruedFees', methodParameters: [lastStartedCycle] },
                     { reference: 'getPendingDXN', methodName: 'pendingDXN', methodParameters: [tokenId] },
                     { reference: 'getDBXENFTFirstStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftFirstStake] },
                     { reference: 'getDBXENFTSecondStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftSecondStake] },
-                    { reference: 'getDBXENFTWithdrawableStake', methodName: 'dbxenftWithdrawableStake', methodParameters: [tokenId] }
+                    { reference: 'getDBXENFTWithdrawableStake', methodName: 'dbxenftWithdrawableStake', methodParameters: [tokenId] },
+                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftSecondStake] }
                 ]
             }
         ];
@@ -548,17 +551,18 @@ export function DbXeNFTPage(): any {
         let CFPPSLastStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
         const CFPPSPreviousStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
         const CFPPSLastFeeUpdateCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
-        const CFPPSStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        const CFPPSStakeCycleFirstStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
         const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
         //const pendingDXN = BigNumber.from("100000000000000000000")
         const pendingDXN = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
         const dbxenftFirstStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
         const dbxenfSecondStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
         let dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
+        const CFPPSStakeCycleSecondStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
     
         
 
-        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) {
+        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
             const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
             .div(summedCyclePowers)
 
@@ -570,6 +574,12 @@ export function DbXeNFTPage(): any {
             dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
         }
 
+        let extraPower = BigNumber.from(0)
+        if(currentCycle.gt(lastPowerUpdateCycle) && !pendingDXN.isZero()) {
+            extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+            dbxenftPower = dbxenftPower.add(extraPower)
+        }
+
         if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
             dbxenftAccruedFees = dbxenftAccruedFees.add(
                 dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
@@ -577,8 +587,15 @@ export function DbXeNFTPage(): any {
             )
 
             if(!pendingDXN.isZero()) {
-                let stakeCycle = dbxenftFirstStake.sub(BigNumber.from("1"))
-                const extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+                let stakeCycle, CFPPSStakeCycle
+                if(!dbxenftSecondStake.isZero()) {
+                    stakeCycle = dbxenftSecondStake
+                    CFPPSStakeCycle = CFPPSStakeCycleSecondStake
+                } else {
+                    stakeCycle = dbxenftFirstStake
+                    CFPPSStakeCycle = CFPPSStakeCycleFirstStake
+                }
+                
 
                 if((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
                     dbxenftAccruedFees = dbxenftAccruedFees.add(
