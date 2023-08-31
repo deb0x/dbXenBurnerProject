@@ -3,26 +3,30 @@ const cron = require("node-cron");
 require('dotenv').config()
 
 async function generateBeforeReveal(cycle, id) {
+    console.log("12222222222sss222321");
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
     const s3 = new AWS.S3();
     let fileName = id + ".json";
 
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET,
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
         Key: fileName,
     }
 
     try {
         let response = await s3.getObject(params).promise();
+        console.log("response");
+        console.log(response)
         let objectData = response.Body.toString('utf-8');
         console.log("ALREADY FILE EXIST!!!!!!!");
         console.log(await writeLastActiveCycle(cycle));
         console.log("update...........");
     } catch (err) {
+        console.log("EROARE EROARE EROARE!!!!")
         console.log(err)
         if (err.code == "NoSuchKey") {
             let attributesValue = [{
@@ -40,9 +44,10 @@ async function generateBeforeReveal(cycle, id) {
             console.log(JSON.stringify(standardMetadata));
             (async() => {
                 s3.putObject({
-                    Bucket: process.env.REACT_APP_BUCKET,
+                    Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                     Key: fileName,
                     Body: JSON.stringify(standardMetadata),
+                    Tagging: 'public=yes',
                     "ContentType": "application/json",
                 }).promise();
             })();
@@ -111,14 +116,14 @@ async function generateBeforeReveal(cycle, id) {
 export async function writeLastActiveCycle(cycle) {
     console.log("here se intra!");
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
     const s3 = new AWS.S3();
     let fileName = "lastCycle.txt";
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
         Key: fileName,
     }
 
@@ -143,7 +148,7 @@ export async function writeLastActiveCycle(cycle) {
             console.log(content);
             (async() => {
                 s3.putObject({
-                    Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+                    Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                     Key: fileName,
                     Body: content,
                     "ContentType": "txt",
@@ -161,7 +166,7 @@ export async function writeLastActiveCycle(cycle) {
             console.log(content);
             (async() => {
                 s3.putObject({
-                    Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+                    Bucket: process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON,
                     Key: fileName,
                     Body: content,
                     "ContentType": "txt",
@@ -175,15 +180,15 @@ export async function writeLastActiveCycle(cycle) {
 
 export async function generateAfterReveal(id, power) {
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
     const s3 = new AWS.S3();
     let fileName = id + ".json";
 
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET,
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
         Key: fileName,
     }
 
@@ -206,7 +211,7 @@ export async function generateAfterReveal(id, power) {
 
         (async() => {
             s3.putObject({
-                Bucket: process.env.REACT_APP_BUCKET,
+                Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                 Key: fileName,
                 Body: JSON.stringify(standardMetadata),
                 "ContentType": "application/json",
@@ -225,15 +230,15 @@ export async function generateAfterReveal(id, power) {
 
 export async function getIdsMintedPerCycle(cycle) {
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
     const s3 = new AWS.S3();
     let fileName = cycle + ".txt";
 
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_PER_CYCLE,
+        Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
         Key: fileName,
     }
     let ids;
@@ -261,104 +266,18 @@ export async function getIdsMintedPerCycle(cycle) {
     return [];
 }
 
-
-// async function updateData(cycle) {
-//     const fs = require("fs");
-//     let ids = [];
-//     let lastActiveCycle = await readLastActiveCycle();
-//     console.log("jere  eeee");
-//     console.log(lastActiveCycle);
-//     if (lastActiveCycle.lastCycle == 1) {
-//         if (fs.existsSync(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`)) {
-//             console.log("avem id de pe 1");
-//             await fs.readFile(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`, 'utf-8', async(err, data) => {
-//                 if (err) {
-//                     throw err;
-//                 } else {
-//                     ids = data.split(' ');
-//                     console.log("am id ul ");
-//                     console.log(ids);
-//                     for (let i = 0; i < ids.length; i++) {
-//                         console.log("Ssssss")
-//                         const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
-//                         console.log(params);
-//                         const response = await s3.getObject(params).promise() // await the promise
-//                         const fileContent = response.Body.toString('utf-8');
-//                         const jsonType = JSON.parse(fileContent);
-//                         console.log("Actual content!");
-//                         await generateAfterReveal(jsonType.id, 11, 22);
-//                         await writeLastActiveCycle(cycle);
-//                     }
-//                 }
-//             })
-//         }
-//     }
-//     if (lastActiveCycle.lastCycle < cycle) {
-//         const fs = require("fs");
-//         console.log("E mai mic intradevar ");
-//         if (fs.existsSync(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`)) {
-//             console.log("avem id uri");
-//             await fs.readFile(`./idsPerCycle/${lastActiveCycle.lastCycle}.txt`, 'utf-8', async(err, data) => {
-//                 if (err) {
-//                     throw err;
-//                 } else {
-//                     console.log("AICI AGAIN?");
-//                     console.log(data)
-//                     ids = data.split(' ');
-//                     console.log("am id ul ");
-//                     console.log(ids);
-//                     for (let i = 0; i < ids.length; i++) {
-//                         console.log("Ssssss")
-//                         const params = { Bucket: process.env.BUCKET, Key: ids[i].toString() + '.json' }
-//                         console.log(params);
-//                         const response = await s3.getObject(params).promise() // await the promise
-//                         const fileContent = response.Body.toString('utf-8');
-//                         const jsonType = JSON.parse(fileContent);
-//                         console.log("Actual content!");
-//                         await generateAfterReveal(jsonType.id, 11, 22);
-//                         await writeLastActiveCycle(cycle);
-//                     }
-//                 }
-//             })
-//         }
-//     }
-// }
-
-// export async function writeNewId(cycle, id) {
-//     const fs = require("fs");
-//     console.log(cycle);
-//     console.log(id);
-//     if (!fs.existsSync(`./idsPerCycle/${cycle}.txt`)) {
-//         console.log("Se intra aici!");
-//         await fs.writeFile(`./idsPerCycle/${cycle}.txt`, id + " ");
-//         await generateBeforeReveal(id);
-//         await writeLastActiveCycle(cycle);
-//     } else {
-//         await fs.readFile(`./idsPerCycle/${cycle}.txt`, 'utf-8', async(err, data) => {
-//             if (err) {
-//                 throw err;
-//             } else {
-//                 let ids = data.split(' ');
-//                 if (!ids.includes(id.toString())) {
-//                     await fs.appendFileSync(`./idsPerCycle/${cycle}.txt`, " " + id);
-//                     await generateBeforeReveal(id);
-//                     await writeLastActiveCycle(cycle);
-//                 }
-//             }
-//         })
-//     }
-// }
 async function idsAlreadyMinted(id) {
     console.log("here se intra pe ids!");
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
+
     const s3 = new AWS.S3();
     let fileName = "allIdsMinted.txt";
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
         Key: fileName,
     }
     let ids;
@@ -379,7 +298,7 @@ async function idsAlreadyMinted(id) {
             ids.push(id);
             (async() => {
                 s3.putObject({
-                    Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+                    Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
                     Key: fileName,
                     Body: ids.toString(),
                     "ContentType": "txt",
@@ -397,7 +316,7 @@ async function idsAlreadyMinted(id) {
             let content = id.toString();
             (async() => {
                 s3.putObject({
-                    Bucket: process.env.REACT_APP_BUCKET_IMAGE,
+                    Bucket: process.env.REACT_APP_MINTEDIDS_ACTIVE_CYCLES_POLYGON,
                     Key: fileName,
                     Body: content,
                     "ContentType": "txt",
@@ -413,18 +332,22 @@ async function idsAlreadyMinted(id) {
 }
 
 export async function writePerCycle(cycle, id) {
+    console.log("INTRU AICI !!!!!");
     AWS.config.update({
-        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET,
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY,
+        secretAccessKey: process.env.REACT_APP_ACCESS_SECRET_POLYGON,
+        accessKeyId: process.env.REACT_APP_ACCESS_KEY_POLYGON,
         region: process.env.REACT_APP_REGION,
     })
+
+
     const s3 = new AWS.S3();
     let fileName = cycle.toString() + ".txt";
     const params = {
-        Bucket: process.env.REACT_APP_BUCKET_PER_CYCLE,
+        Bucket: process.env.REACT_APP_METADATA_BUCKET_POLYGON,
         Key: fileName,
     }
     let idsMinted = await idsAlreadyMinted(id);
+    console.log("sssssssssssssssssssssssssssssssssssssssssss")
     console.log(idsMinted);
     let ids;
     let removeNewLine;
@@ -446,7 +369,7 @@ export async function writePerCycle(cycle, id) {
                 ids.push(id);
                 (async() => {
                     s3.putObject({
-                        Bucket: process.env.REACT_APP_BUCKET_PER_CYCLE,
+                        Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
                         Key: fileName,
                         Body: ids.toString(),
                         "ContentType": "txt",
@@ -461,7 +384,7 @@ export async function writePerCycle(cycle, id) {
                 let newFileName = cycle.toString() + ".txt";
                 (async() => {
                     s3.putObject({
-                        Bucket: process.env.REACT_APP_BUCKET_PER_CYCLE,
+                        Bucket: process.env.REACT_APP_CYCLES_BUCKET_POLYGON,
                         Key: newFileName,
                         Body: content,
                         "ContentType": "txt",
