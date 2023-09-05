@@ -575,6 +575,7 @@ export function DbXeNFTPage(): any {
         }
 
         let extraPower = BigNumber.from(0)
+        const dbxenftPowerBeforeExtraPower = dbxenftPower 
         if(currentCycle.gt(lastPowerUpdateCycle) && !pendingDXN.isZero()) {
             extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
             dbxenftPower = dbxenftPower.add(extraPower)
@@ -582,7 +583,7 @@ export function DbXeNFTPage(): any {
 
         if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
             dbxenftAccruedFees = dbxenftAccruedFees.add(
-                dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
+                dbxenftPowerBeforeExtraPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
                 .div(BigNumber.from("10000000000000000000000000000000000000000"))
             )
 
@@ -597,9 +598,9 @@ export function DbXeNFTPage(): any {
                 }
                 
 
-                if((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
+                if(lastStartedCycle.gt(stakeCycle.sub(BigNumber.from("1")))) {
                     dbxenftAccruedFees = dbxenftAccruedFees.add(
-                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle.add(BigNumber.from("1"))))
+                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle))
                         .div(BigNumber.from("10000000000000000000000000000000000000000"))
                     )
                 }
@@ -623,6 +624,7 @@ export function DbXeNFTPage(): any {
         setUserStakedAmount(ethers.utils.formatEther(totalStaked))
         setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
         setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
+        setUnclaimedFees(ethers.utils.formatUnits(dbxenftAccruedFees))
     }
 
     return (
