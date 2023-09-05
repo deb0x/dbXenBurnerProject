@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
 import './App.css';
 import { 
     Web3ReactProvider,
@@ -127,7 +126,6 @@ function App() {
     const { t } = useTranslation();
     const { chain, setChain }  = useContext(ChainContext)
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
-    // const navigate = useNavigate();
     
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 

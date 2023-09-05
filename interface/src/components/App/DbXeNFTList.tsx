@@ -37,7 +37,6 @@ export function DbXeNFTList(): any {
             tokenAddresses: [chain.dbxenftAddress],
             address: account ? account : ""
         }).then((result) => {
-            
             const response = result.raw;
             console.log(response)
             const resultArray: any = response.result;
@@ -85,11 +84,9 @@ export function DbXeNFTList(): any {
                     
                 }
                 setDBXENFTs(dbxenftEntries);
-
                 console.log(DBXENFTs)
             }
-            
-        })
+        }).catch((err) => console.log(err))
     }
 
     const handleRedirect = (id: any) => {

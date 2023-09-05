@@ -5,8 +5,12 @@
         margin-bottom: 0;
     }
     // display: none;
-    table {
+    .table {
+        background-color: transparent;
+        color: #fff;
         font-family: "Karla";
+        --bs-table-bg: transparent;
+        --bs-table-color: #fff;
         thead {
             color: #62CFD0;
             tr {
