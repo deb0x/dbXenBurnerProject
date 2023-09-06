@@ -33,8 +33,13 @@ import { ClickAwayListener, Modal } from '@mui/material';
 import SnackbarNotification from './Snackbar';
 import ScreenSize from '../Common/ScreenSize';
 import { useNavigate } from 'react-router-dom';
-import { DASHBOARD_ROUTE, MINTDBXENFT_ROUTE, HOME_ROUTE } from '../Common/routes';
-const tokenSymbol = 'DBXen';
+import {
+    DASHBOARD_ROUTE,
+    MINTDBXENFT_ROUTE,
+    HOME_ROUTE,
+    DBXENFT_LIST_ROUTE
+} from '../Common/routes';
+import backButton from "../../photos/icons/back-button.svg";
 
 
 const tokenDecimals = 18;
@@ -66,6 +71,7 @@ export function AppBarComponent(props: any): any {
     const ref = useRef<any>(null);
     const dimensions = ScreenSize();
     const navigate = useNavigate();
+    const [url, setUrl] = useState(window.location.pathname.split('/').pop())
 
     const id = open ? 'simple-popper' : "";
 
@@ -81,6 +87,11 @@ export function AppBarComponent(props: any): any {
     useEffect(() => {
         setTheme(localStorage.getItem('globalTheme'));
     }, []);
+
+    useEffect(() => {
+        setUrl(window.location.pathname.split('/').pop())
+        console.log("URL", url)
+    }, [window.location.pathname]);
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId => 
@@ -243,7 +254,7 @@ export function AppBarComponent(props: any): any {
     }
 
     const handleSwitchComponent = () => {
-        window.location.pathname === MINTDBXENFT_ROUTE ?
+        window.location.pathname.includes("dbxenft") ?
             navigate(HOME_ROUTE) :
             navigate(MINTDBXENFT_ROUTE)
     }
@@ -378,6 +389,17 @@ export function AppBarComponent(props: any): any {
                         </ClickAwayListener>
                     </Box>
                 </div>
+                {
+                    url ?
+                        window.location.pathname.includes("your-dbxenfts") && 
+                        url.length > 0 && url !== "your-dbxenfts" ?
+                            <button className="back-button btn" onClick={() => navigate(DBXENFT_LIST_ROUTE)}>
+                                <img src={backButton} alt="backButton" />
+                                back
+                            </button> :
+                            <></> 
+                        : null
+                }
             </>
             <Modal open={show} onClose={() => setShow(false)}>
                 <Box ref={ref} className="modal-box--donate">

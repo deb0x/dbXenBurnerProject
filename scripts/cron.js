@@ -121,23 +121,23 @@ async function generateAfterReveal() {
 
 function getImage(power) {
     if (power >= 0 && power <= 500)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_1.jpg";
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_1.png";
     if (power > 500 && power <= 1000)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_2.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_2.png"
     if (power > 1000 && power <= 2500)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_3.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_3.png"
     if (power > 2500 && power <= 5000)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_4.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_4.png"
     if (power > 5000 && power <= 7500)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_5.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_5.png"
     if (power > 7500 && power <= 10000)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_6.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/4DBXeNFT_6.png"
     if (power > 10000 && power <= 12500)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/5DBXeNFT_5.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/5DBXeNFT_5.png"
     if (power > 12500 && power <= 15000)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/5DBXeNFT_6.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/5DBXeNFT_6.png"
     if (power > 15000)
-        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/6DBXeNFT_6.jpg"
+        return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/6DBXeNFT_6.png"
 }
 
 async function getIdsMintedPerCycle(cycle) {

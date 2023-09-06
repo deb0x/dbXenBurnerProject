@@ -74,6 +74,16 @@
                 }
             }
         }
+        .back-button {
+            background-color: transparent;
+            color: #ECBA3F;
+            display: flex;
+            align-items: center;
+            img {
+                margin-right: 5px;
+                width: 15px;
+            }
+        }
         @media (max-width: 768px) {
             .app-bar--top {
                 height: auto;

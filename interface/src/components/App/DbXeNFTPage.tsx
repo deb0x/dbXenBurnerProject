@@ -45,19 +45,20 @@ export function DbXeNFTPage(): any {
     const [tokensForUnstake, setTokenForUnstake] = useState("");
     const [backButton, setBack] = useState<Boolean | null>(false);
     const [unclaimedFees, setUnclaimedFees] = useState("0.0");
-    const [baseDBXENFTPower, setBaseDBXENFTPower] = useState("")
-    const [dbxenftPower, setDBXENFTPower] = useState("")
+    const [baseDBXENFTPower, setBaseDBXENFTPower] = useState("");
+    const [dbxenftPower, setDBXENFTPower] = useState("");
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
         getUpdatedDBXENFTData(id);
+        getUnclaimedFees(id);
     }, [chain])
 
     useEffect(() => {
         console.log(approved)
         setStakeAmount();
-        getDBXENFTTotalAndWithdrawableStake(id)
+        getUpdatedDBXENFTData(id)
         setUnstakedAmount();
     }, [amountToStake, amountToUnstake]);
 
@@ -263,14 +264,15 @@ export function DbXeNFTPage(): any {
                         message: "You succesfully claimed your fees.", open: true,
                         severity: "success"
                     })
-                    setLoading(false)
+                    setClaimLoading(false)
+                    setUnclaimedFees("0.0")
                 })
                 .catch((error: any) => {
                     setNotificationState({
                         message: "Claiming your fees was unsuccesful!", open: true,
                         severity: "error"
                     })
-                    setLoading(false)
+                    setClaimLoading(false)
                 })
         }).catch((error: any) => {
             setNotificationState({

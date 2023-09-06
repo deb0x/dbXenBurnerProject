@@ -307,7 +307,7 @@ export function MintDbXeNFT(): any {
             // }
             const overrides = {
                 value: fee,
-                gasLimit: (BigNumber.from("700000"))
+                gasLimit: (BigNumber.from("1000000"))
             }
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
@@ -619,10 +619,6 @@ export function MintDbXeNFT(): any {
                             <th scope="col">VMUs</th>
                             <th scope="col">Term (days)</th>
                             <th scope="col">Maturiy</th>
-                            <th scope="col">EAA (%)</th>
-                            <th scope="col">cRank</th>
-                            <th scope="col">AMP</th>
-                            <th scope="col">xenBurned</th>
                             <th scope="col">Category</th>
                             <th scope="col">Class</th>
                             <th scope="col"></th>
@@ -640,10 +636,6 @@ export function MintDbXeNFT(): any {
                                     <td>{data.VMUs}</td>
                                     <td>{data.term}</td>
                                     <td>{data.maturityDateTime}</td>
-                                    <td>{data.EAA}</td>
-                                    <td>{data.cRank}</td>
-                                    <td>{data.AMP}</td>
-                                    <td>{data.xenBurned}</td>
                                     <td>{data.category}</td>
                                     <td>{data.class}</td>
                                     <td>
