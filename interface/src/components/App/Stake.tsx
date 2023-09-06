@@ -687,7 +687,6 @@ export function Stake(props: any): any {
                     setTotalStaked(ethers.utils.formatEther(totalSupply))
                 })
             })
-
         }
 
         async function approveStaking() {

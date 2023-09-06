@@ -11,7 +11,7 @@ import evmos from "../../photos/icons/evmos.svg";
 import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
-import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
     polygon: {
@@ -303,8 +303,8 @@ export default function ChainSetter(props: any) {
                             deb0xViewsAddress: "0x82D197ED51f4290F8F152D297e1ae13947FeBA61",
                             deb0xERC20Address: "0x8072f9b55fA3077AbE0B03588E4e90fF8cB707e0",
                             xenCryptoAddress: "0xF230D614e75aE05dF44075CaB230Fa67F10D8dCD",
-                            dbxenftFactoryAddress: "0x06623F5416C7BD2cE79e332276F718697D0AA39b",
-                            dbxenftAddress: "0xCc4108C7EB3D63b93739AAFdCAcc6377DBC86740",
+                            dbxenftFactoryAddress: "0x0754795792A2B3Eda57010371B3576573A34eba5",
+                            dbxenftAddress: "0x00a5B253fA4a6d953fbb3B882fc7F2c4857c7c2D",
                             xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
                             mintInfoAddress: "0x2c1c89ce0537A5565da812A9afdBee0184851612",
                             chainId: parseInt(result, 16),

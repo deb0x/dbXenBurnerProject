@@ -1,11 +1,16 @@
 .table-view {
     width: 100%;
+    height: 75vh;
     p {
         margin-bottom: 0;
     }
     // display: none;
-    table {
+    .table {
+        background-color: transparent;
+        color: #fff;
         font-family: "Karla";
+        --bs-table-bg: transparent;
+        --bs-table-color: #fff;
         thead {
             color: #62CFD0;
             tr {
@@ -65,9 +70,11 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    padding-bottom: 35px;
                     .img-container {
+                        width: 20%;
                         img {
-                            width: 35%;
+                            width: 100%;
                         }
                     }
                     .details-container {
@@ -92,6 +99,52 @@
                         font-size: 20px;
                     }
                 }
+                .burn-button-container {
+                    .burn-button.btn {
+                        border: 1px solid #62CFD0;
+                        &:hover {
+                            background-color: transparent;
+                            color: #fff;
+                        }
+                        .MuiLoadingButton-loadingIndicator {
+                            left: 45%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .MuiTablePagination-toolbar {
+        gap: 10px;
+        .MuiTablePagination-spacer {
+            display: none;
+        }
+        .MuiTablePagination-selectLabel,
+        .MuiTablePagination-displayedRows {
+            margin: 0;
+            color: #fff;
+        }
+        .MuiTablePagination-select {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            background-color: transparent;
+            color: #fff;
+        }
+        .MuiTablePagination-actions {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            text-align: center;
+        }
+        .MuiTablePagination-actions>button {
+            margin: 0 8px;
+            border: transparent;
+            border-radius: 4px;
+            background-color: transparent;
+            color: #fff;
+            &:disabled {
+                opacity: 0.3;
             }
         }
     }

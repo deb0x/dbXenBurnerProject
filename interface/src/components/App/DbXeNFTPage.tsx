@@ -34,24 +34,33 @@ export function DbXeNFTPage(): any {
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
+    const [claimLoading, setClaimLoading] = useState(false);
     const [notificationState, setNotificationState] = useState({});
     const [alignment, setAlignment] = useState("stake");
     const [approved, setApproved] = useState<Boolean | null>(false);
     const [amountToStake, setAmountToStake] = useState("");
     const [userUnstakedAmount, setUserUnstakedAmount] = useState("");
+    const [userStakedAmount, setUserStakedAmount] = useState("");
     const [amountToUnstake, setAmountToUnstake] = useState("")
+    const [tokensForUnstake, setTokenForUnstake] = useState("");
     const [backButton, setBack] = useState<Boolean | null>(false);
     const [unclaimedFees, setUnclaimedFees] = useState("0.0");
+    const [baseDBXENFTPower, setBaseDBXENFTPower] = useState("");
+    const [dbxenftPower, setDBXENFTPower] = useState("");
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
+        getUpdatedDBXENFTData(id);
+        getUnclaimedFees(id);
     }, [chain])
 
     useEffect(() => {
         console.log(approved)
         setStakeAmount();
-    }, [amountToStake]);
+        getUpdatedDBXENFTData(id)
+        setUnstakedAmount();
+    }, [amountToStake, amountToUnstake]);
 
     useEffect(() => {
         setUnstakedAmount()
@@ -135,7 +144,11 @@ export function DbXeNFTPage(): any {
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress);
 
-        dbxenftFactory.stake(amountToStake, tokenId).then((tx: any) => {
+        const overrides = {
+            value: ethers.utils.parseEther((Number(amountToStake) * 0.001).toString())
+        }
+
+        dbxenftFactory.stake(ethers.utils.parseEther(amountToStake).toString(), tokenId, overrides).then((tx: any) => {
             tx.wait()
                 .then((result: any) => {
                     console.log(result)
@@ -144,6 +157,7 @@ export function DbXeNFTPage(): any {
                         severity: "success"
                     })
                     setLoading(false)
+                    setAmountToStake("")
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -168,7 +182,7 @@ export function DbXeNFTPage(): any {
 
         try {
 
-            const tx = await dbxenftFactory.unstake(tokenId, amount)
+            const tx = await dbxenftFactory.unstake(tokenId, ethers.utils.parseEther(amount).toString())
             await tx.wait()
                 .then((result: any) => {
                     console.log(result)
@@ -177,6 +191,7 @@ export function DbXeNFTPage(): any {
                         severity: "success"
                     })
                     setLoading(false)
+                    setAmountToUnstake("")
                 })
                 .catch((error: any) => {
                     setNotificationState({
@@ -219,15 +234,26 @@ export function DbXeNFTPage(): any {
     }
 
     async function setUnstakedAmount() {
-        const deb0xERC20Contract = await DBXenERC20(library, chain.deb0xERC20Address)
-        const balance = await deb0xERC20Contract.balanceOf(account).then((balance: any) => {
+        const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+        deb0xERC20Contract.balanceOf(account).then((balance: any) => {
             let number = ethers.utils.formatEther(balance);
             setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
         })
     }
 
+    // async function setTokensForUnstakedAmount() {
+    //     const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+    //     deb0xERC20Contract.dbxenftWithdrawableStake(account).then((balance: any) => {
+    //         setTokenForUnstake(ethers.utils.formatEther(balance.toString()));
+    //     })
+    // }
+
+    // useEffect(() => {
+    //     setTokensForUnstakedAmount()
+    // }, []);
+
     function claimFees(tokenId: any) {
-        setLoading(true)
+        setClaimLoading(true)
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
 
@@ -238,21 +264,22 @@ export function DbXeNFTPage(): any {
                         message: "You succesfully claimed your fees.", open: true,
                         severity: "success"
                     })
-                    setLoading(false)
+                    setClaimLoading(false)
+                    setUnclaimedFees("0.0")
                 })
                 .catch((error: any) => {
                     setNotificationState({
                         message: "Claiming your fees was unsuccesful!", open: true,
                         severity: "error"
                     })
-                    setLoading(false)
+                    setClaimLoading(false)
                 })
         }).catch((error: any) => {
             setNotificationState({
                 message: "You rejected the transaction. Your fees haven't been claimed.", open: true,
                 severity: "info"
             })
-            setLoading(false)
+            setClaimLoading(false)
         })
     }
 
@@ -389,7 +416,7 @@ export function DbXeNFTPage(): any {
         setUnclaimedFees(ethers.utils.formatUnits(dbxenftAccruedFees))
     }
 
-    async function getDBXENFTWithdrawableStake(tokenId: any) {
+    async function getDBXENFTTotalAndWithdrawableStake(tokenId: any) {
         const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
 
         const contractCallContext: ContractCallContext[] = [
@@ -406,10 +433,9 @@ export function DbXeNFTPage(): any {
         ];
 
         const response: ContractCallResults = await multicall.call(contractCallContext);
-        const currentCycle = response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0]
-        const dbxenftFirstStake = response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0]
-        const dbxenftSecondStake = response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0]
-
+        const currentCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        const dbxenftFirstStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        const dbxenftSecondStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
         const contractCallContext2: ContractCallContext[] = [
             {
                 reference: 'DBXENFTFactory',
@@ -424,21 +450,181 @@ export function DbXeNFTPage(): any {
         ];
 
         const response2: ContractCallResults = await multicall.call(contractCallContext2);
-        const dbxenftFirstStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0]
-        const dbxenfSecondStakeCycle = response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0]
-        const dbxenftWithdrawableStake = response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0]
+        const dbxenftFirstStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        const dbxenfSecondStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        const dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
 
-        let unlockedStake = 0
+        let unlockedStake = BigNumber.from(0)
+        let totalStaked = dbxenftFirstStakeCycle.add(dbxenfSecondStakeCycle).add(dbxenftWithdrawableStake)
+        if (!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
+            unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
 
-        if (dbxenftFirstStake != 0 && currentCycle > dbxenftFirstStake) {
-            unlockedStake += dbxenftFirstStakeCycle
-
-            if (dbxenftSecondStake != 0 && currentCycle > dbxenftSecondStake) {
-                unlockedStake += dbxenfSecondStakeCycle
+            if (!dbxenftSecondStake.isZero() && currentCycle.gt(dbxenftSecondStake)) {
+                unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
             }
         }
 
-        return dbxenftWithdrawableStake + unlockedStake
+        let totalUnstakedAmount = BigNumber.from(dbxenftWithdrawableStake).add(unlockedStake)
+
+        console.log(ethers.utils.formatEther(totalUnstakedAmount))
+
+        setTokenForUnstake(ethers.utils.formatEther(totalUnstakedAmount))
+        setUserStakedAmount(ethers.utils.formatEther(totalStaked))
+    }
+
+    async function getUpdatedDBXENFTData(tokenId: any) {
+        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
+
+        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
+        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+
+
+        const contractCallContext: ContractCallContext[] = [
+            {
+                reference: 'DBXENFTFactory',
+                contractAddress: chain.dbxenftFactoryAddress,
+                abi,
+                calls: [
+                    { reference: 'getCurrentCycleCall', methodName: 'getCurrentCycle', methodParameters: [] },
+                    { reference: 'getDBXENFTAccruedFees', methodName: 'dbxenftAccruedFees', methodParameters: [tokenId] },
+                    { reference: 'getPreviousStartedCycle', methodName: 'previousStartedCycle', methodParameters: [] },
+                    { reference: 'getLastStartedCycle', methodName: 'lastStartedCycle', methodParameters: [] },
+                    { reference: 'getCurrentStartedCycle', methodName: 'currentStartedCycle', methodParameters: [] },
+                    { reference: 'getPendingFees', methodName: 'pendingFees', methodParameters: [] },
+                    { reference: 'getDBXENFTEntryPower', methodName: 'dbxenftEntryPower', methodParameters: [tokenId] },
+                    { reference: 'getEntryCycleReward', methodName: 'rewardPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getTotalEntryCycleEntryPower', methodName: 'totalEntryPowerPerCycle', methodParameters: [entryCycle] },
+                    { reference: 'getBaseDBXENFTPower', methodName: 'baseDBXeNFTPower', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTPower', methodName: 'dbxenftPower', methodParameters: [tokenId] },
+                    { reference: 'getLastFeeUpdateCycle', methodName: 'lastFeeUpdateCycle', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTFirstStake', methodName: 'dbxenftFirstStake', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTSecondStake', methodName: 'dbxenftSecondStake', methodParameters: [tokenId] },
+                    { reference: 'getLastPowerUpdateCycle', methodName: 'lastPowerUpdateCycle', methodParameters: [tokenId] }
+                ]
+            }
+        ];
+
+        const response: ContractCallResults = await multicall.call(contractCallContext);
+        const currentCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        let dbxenftAccruedFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        let previousStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+        let lastStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+        const currentStartedCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        const pendingFees = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
+        const dbxenftEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
+        const entryCycleReward = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
+        const totalEntryCycleEntryPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
+        let baseDBXENFTPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
+        let dbxenftPower = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
+        const lastFeeUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[11].returnValues[0])
+        const dbxenftFirstStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[12].returnValues[0])
+        const dbxenftSecondStake = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[13].returnValues[0])
+        const lastPowerUpdateCycle = BigNumber.from(response.results.DBXENFTFactory.callsReturnContext[14].returnValues[0])
+
+        if(!currentCycle.eq(currentStartedCycle)) {
+            previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
+            lastStartedCycle = currentStartedCycle
+        }
+
+        const contractCallContext2: ContractCallContext[] = [
+            {
+                reference: 'DBXENFTFactory',
+                contractAddress: chain.dbxenftFactoryAddress,
+                abi,
+                calls: [
+                    { reference: 'getSummedCyclePowers', methodName: 'summedCyclePowers', methodParameters: [lastStartedCycle] },
+                    { reference: 'getCFPPSLastStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastStartedCycle.add(BigNumber.from("1"))] },
+                    { reference: 'getCFPPSPreviousStartedCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [previousStartedCycle] },
+                    { reference: 'getCFPPSLastFeeUpdateCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [lastFeeUpdateCycle] },
+                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftFirstStake] },
+                    { reference: 'getCycleAccruedFees', methodName: 'cycleAccruedFees', methodParameters: [lastStartedCycle] },
+                    { reference: 'getPendingDXN', methodName: 'pendingDXN', methodParameters: [tokenId] },
+                    { reference: 'getDBXENFTFirstStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftFirstStake] },
+                    { reference: 'getDBXENFTSecondStakeCycle', methodName: 'dbxenftStakeCycle', methodParameters: [tokenId, dbxenftSecondStake] },
+                    { reference: 'getDBXENFTWithdrawableStake', methodName: 'dbxenftWithdrawableStake', methodParameters: [tokenId] },
+                    { reference: 'getCFPPSStakeCycle', methodName: 'cycleFeesPerPowerSummed', methodParameters: [dbxenftSecondStake] }
+                ]
+            }
+        ];
+
+        const response2: ContractCallResults = await multicall.call(contractCallContext2);
+
+        const summedCyclePowers = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+        let CFPPSLastStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+        const CFPPSPreviousStartedCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+        const CFPPSLastFeeUpdateCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+        const CFPPSStakeCycleFirstStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
+        const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
+        //const pendingDXN = BigNumber.from("100000000000000000000")
+        const pendingDXN = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
+        const dbxenftFirstStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
+        const dbxenfSecondStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
+        let dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
+        const CFPPSStakeCycleSecondStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
+    
+        
+
+        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
+            const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
+            .div(summedCyclePowers)
+
+            CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
+        }
+
+        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
+            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
+        }
+
+        let extraPower = BigNumber.from(0)
+        if(currentCycle.gt(lastPowerUpdateCycle) && !pendingDXN.isZero()) {
+            extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+            dbxenftPower = dbxenftPower.add(extraPower)
+        }
+
+        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
+            dbxenftAccruedFees = dbxenftAccruedFees.add(
+                dbxenftPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
+                .div(BigNumber.from("10000000000000000000000000000000000000000"))
+            )
+
+            if(!pendingDXN.isZero()) {
+                let stakeCycle, CFPPSStakeCycle
+                if(!dbxenftSecondStake.isZero()) {
+                    stakeCycle = dbxenftSecondStake
+                    CFPPSStakeCycle = CFPPSStakeCycleSecondStake
+                } else {
+                    stakeCycle = dbxenftFirstStake
+                    CFPPSStakeCycle = CFPPSStakeCycleFirstStake
+                }
+                
+
+                if((!lastStartedCycle.eq(stakeCycle)) && (!currentStartedCycle.eq(lastStartedCycle))) {
+                    dbxenftAccruedFees = dbxenftAccruedFees.add(
+                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle.add(BigNumber.from("1"))))
+                        .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                    )
+                }
+            }
+        }
+        let unlockedStake = BigNumber.from(0)
+        let totalStaked = dbxenftFirstStakeCycle.add(dbxenfSecondStakeCycle).add(dbxenftWithdrawableStake)
+
+        if(!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
+            unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
+
+            if(!dbxenftSecondStake.isZero() && currentCycle.gt(dbxenftSecondStake)) {
+                unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
+            }
+        }
+
+        console.log(ethers.utils.formatEther(baseDBXENFTPower), ethers.utils.formatEther(dbxenftPower))
+
+        dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
+        setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
+        setUserStakedAmount(ethers.utils.formatEther(totalStaked))
+        setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
+        setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
     }
 
     return (
@@ -460,12 +646,16 @@ export function DbXeNFTPage(): any {
                                 <div className="" key={i}>
                                     <div className="nft-card">
                                         <div className="card-row card-header">
-                                            <img src={nftPlaceholder} alt="nft-placeholder" />
+                                            <img src={xenft.image} alt="nft-placeholder" />
                                         </div>
                                         <div className="card-details">
                                             <div className="dbxenft-power">
-                                                <span className="label">Dbxen power</span>
-                                                <span className="value">299994830.049458</span>
+                                                <span className="label">DBXENFT base power</span>
+                                                <span className="value">{baseDBXENFTPower}</span>
+                                            </div>
+                                            <div className="dbxenft-power">
+                                                <span className="label">DBXENFT total power</span>
+                                                <span className="value">{dbxenftPower}</span>
                                             </div>
                                             <div className="card-row">
                                                 <span className="label">tokenID</span>
@@ -506,20 +696,34 @@ export function DbXeNFTPage(): any {
                                             </Grid>
                                         }
                                         {approved ?
-                                            <button className="stake-btn" type="button" onClick={() => stake(xenft.id)}>Stake</button> :
-                                            <button className="approve-btn" type="button" onClick={() => approveDXN()}>Approve</button>
+                                            <LoadingButton
+                                                className="stake-btn"
+                                                loading={loading}
+                                                variant="contained"
+                                                type="button"
+                                                onClick={() => stake(xenft.id)}>
+                                                Stake
+                                            </LoadingButton> :
+                                            <LoadingButton
+                                                className="approve-btn"
+                                                loading={loading}
+                                                variant="contained"
+                                                type="button"
+                                                onClick={() => approveDXN()}>
+                                                Approve
+                                            </LoadingButton>
                                         }
                                         {backButton &&
                                             <div className="back-to-approve">
                                                 <LoadingButton
                                                     className="collect-btn"
-                                                    loading={false}
+                                                    loading={loading}
                                                     variant="contained"
                                                     onClick={backToApprove}>
                                                     Back
                                                 </LoadingButton>
                                                 <span className="text">
-                                                    Your input value is grather than your current approved value!
+                                                    Your input value is greater than your current approved value!
                                                     Back to input or approve!
                                                 </span>
                                             </div>
@@ -539,12 +743,19 @@ export function DbXeNFTPage(): any {
                                             <Grid className="max-btn-container" item>
                                                 <Button className="max-btn"
                                                     size="small" variant="contained" color="error"
-                                                    onClick={() => setAmountToUnstake("1")}>
+                                                    onClick={() => setAmountToUnstake(tokensForUnstake)}>
                                                     MAX
                                                 </Button>
                                             </Grid>
                                         </Grid>
-                                        <button className="unstake-btn" type="button" onClick={() => unstake(xenft.id, 10)}>Unstake</button>
+                                        <LoadingButton
+                                            className="unstake-btn"
+                                            loading={loading}
+                                            variant="contained"
+                                            type="button"
+                                            onClick={() => unstake(xenft.id, amountToUnstake)}>
+                                            Unstake
+                                        </LoadingButton>
                                     </div>
                                 }
                             </CardActions>
@@ -567,6 +778,34 @@ export function DbXeNFTPage(): any {
                                 </strong>
                             </p>
                         </div>
+                        <div className="tokens-in-wallet">
+                            <img className="display-element" src={walletLight} alt="wallet" />
+                            <p className="">
+                                Your staked amount:
+                            </p>
+                            <p className="" >
+                                <strong>
+                                    {Number(userStakedAmount).toLocaleString('en-US', {
+                                        minimumFractionDigits: 10,
+                                        maximumFractionDigits: 10
+                                    })} DXN
+                                </strong>
+                            </p>
+                        </div>
+                        <div className="tokens-in-wallet">
+                            <img className="display-element" src={walletLight} alt="wallet" />
+                            <p className="">
+                                Available to unstake:
+                            </p>
+                            <p className="" >
+                                <strong>
+                                    {Number(tokensForUnstake).toLocaleString('en-US', {
+                                        minimumFractionDigits: 10,
+                                        maximumFractionDigits: 10
+                                    })} DXN
+                                </strong>
+                            </p>
+                        </div>
                         <div className="fees">
                             <img className="display-element" src={coinBagLight} alt="coinbag" />
                             <p className="">
@@ -578,7 +817,7 @@ export function DbXeNFTPage(): any {
                             <LoadingButton
                                 className="collect-btn"
                                 disabled={unclaimedFees == "0.0"}
-                                loading={loading}
+                                loading={claimLoading}
                                 variant="contained"
                                 onClick={() => claimFees(id)}>
                                 Claim

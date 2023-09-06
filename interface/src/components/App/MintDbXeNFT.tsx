@@ -1,6 +1,6 @@
 import "../../componentsStyling/dbxenft.scss";
 import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
-import nftImage from "../../photos/xenft.svg";
+import nftImage from "../../photos/Nft-dbxen.png";
 import { useState, useEffect, useContext, useRef } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import ChainContext from '../Contexts/ChainContext';
@@ -17,7 +17,9 @@ import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
 import { writePerCycle } from "../Common/aws-interaction";
-
+import { arrToBufArr } from "ethereumjs-util";
+import { ethers } from "ethers";
+import { TablePagination } from '@mui/base';
 
 const { BigNumber } = require("ethers");
 
@@ -48,11 +50,22 @@ export function MintDbXeNFT(): any {
     const [loading, setLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
+    const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
+    const [xeNFTWrapApproved, setXeNFTWrapAppeoved] = useState<boolean>()
 
     useEffect(() => {
         startMoralis();
         getXENFTs();
-    }, [chain])
+        isApprovedForAll()
+            .then((result: any) => result ? 
+                setXeNFTWrapAppeoved(true) : 
+                setXeNFTWrapAppeoved(false)
+            )
+    }, [chain, account])
+
+    useEffect(() => {
+        getXENFTs();
+    }, [xeNFTWrapped])
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
@@ -245,6 +258,7 @@ export function MintDbXeNFT(): any {
                         message: "Your succesfully approved contract for handling your XENFTs.", open: true,
                         severity: "success"
                     })
+                    setXeNFTWrapAppeoved(true)
                     setLoading(false)
                 })
                 .catch((error: any) => {
@@ -291,23 +305,19 @@ export function MintDbXeNFT(): any {
                 AMP,
                 cRank
             )
+            let fee2 = ethers.utils.parseEther("0.31"); 
             const overrides = {
-                value: fee,
-                gasLimit: (BigNumber.from("1700000"))
+                value: fee2,
+                gasLimit: (BigNumber.from("1200000"))
             }
-            console.log("hersssssssssssssssssssssse");
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
                 .then(async (result: any) => {
-                    console.log(await result.events)
                     for (let i = 0; i < result.events.length; i++) {
-                        console.log(result.events[i].event);
                         if (result.events[i].event == "DBXeNFTMinted") {
-                            console.log("DBXENFT", result.events[i].event)
-                            console.log("Number(result.events[i].args.DBXENFTId)", Number(result.events[i].args.DBXENFTId))
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
                             console.log("Cyclul curent " + currentCycle);
-                            await writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId))
+                            await writePerCycle(currentCycle, Number(result.events[i].args.DBXENFTId), maturityTs)
                             setNotificationState({
                                 message: "Your succesfully minted a DBXENFT.", open: true,
                                 severity: "success"
@@ -531,7 +541,8 @@ export function MintDbXeNFT(): any {
         })
     }
 
-    const handleBurnXenft = async (NFTData: any) => {
+    const handleWrapXenft = async (NFTData: any) => {
+        setLoading(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -546,17 +557,63 @@ export function MintDbXeNFT(): any {
         isApprovedForAll()
             .then((result) => {
                 result ?
-                    mintDBXENFT(NFTData.id, Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank, NFTData.claimStatus) :
-                    approveForAll().then((result) => console.log("XXX", result))
+                    mintDBXENFT(
+                        NFTData.id,
+                        Number(maturityTs),
+                        Number(NFTData.VMUs),
+                        eea,
+                        Number(term),
+                        Number(amp),
+                        NFTData.cRank, NFTData.claimStatus
+                    ).then(() => {
+                        setXeNFTWrapped(true);
+                        setLoading(false);
+                    }) :
+                    approveForAll()
             })
     }
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleChangePage = (
+        event: React.MouseEvent<HTMLButtonElement> | null,
+        newPage: number,
+    ) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const emptyRows =
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - XENFTs.length) : 0;
+
+    // const [sorting, setSorting] = useState({ key: XENFTs.id , ascending: true });
+    const [currentUsers, setCurrentUsers] = useState(XENFTs);
+
+    // useEffect(() => {
+    //     const currentUsersCopy = [...currentUsers];
+
+    //     const sortedCurrentUsers = currentUsersCopy.sort((a, b) => {
+    //       return a[sorting.key as keyof typeof XENFTs].localeCompare(b[sorting.key]);
+    //     });
+    
+    //     setCurrentUsers(
+    //       sorting.ascending ? sortedCurrentUsers : sortedCurrentUsers.reverse()
+    //     );
+    // }, [currentUsers, sorting]);
 
     return (
         <div className="content-box content-box-table">
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
             <div className="table-view table-responsive-xl">
-                <table className="table">
+                <table className="table" aria-label="custom pagination table">
                     <thead>
                         <tr>
                             <th scope="col">Token ID</th>
@@ -564,17 +621,16 @@ export function MintDbXeNFT(): any {
                             <th scope="col">VMUs</th>
                             <th scope="col">Term (days)</th>
                             <th scope="col">Maturiy</th>
-                            <th scope="col">EAA (%)</th>
-                            <th scope="col">cRank</th>
-                            <th scope="col">AMP</th>
-                            <th scope="col">xenBurned</th>
                             <th scope="col">Category</th>
                             <th scope="col">Class</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {XENFTs.map((data: any, i: any) =>
+                        {(rowsPerPage > 0
+                            ? XENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            : XENFTs
+                        ).map((data: any, i: any) => (
                             <>
                                 <tr key={i}>
                                     <td>{data.id}</td>
@@ -582,130 +638,25 @@ export function MintDbXeNFT(): any {
                                     <td>{data.VMUs}</td>
                                     <td>{data.term}</td>
                                     <td>{data.maturityDateTime}</td>
-                                    <td>{data.EAA}</td>
-                                    <td>{data.cRank}</td>
-                                    <td>{data.AMP}</td>
-                                    <td>{data.xenBurned}</td>
                                     <td>{data.category}</td>
                                     <td>{data.class}</td>
                                     <td>
                                         <button
                                             className="detail-btn"
                                             type="button"
-                                            onClick={() => handleExpandRow(data.id)}
+                                            onClick={() => {
+                                                handleExpandRow(data.id);
+                                                previewData(data)
+                                            }}
                                         >
-                                            Details
+                                            PREVIEW DBXENFT
                                         </button>
                                     </td>
                                 </tr>
                                 <div ref={ref}></div>
-                                {displayXenftDetails && xenftId === data.id ?
                                     <tr className="xenft-details-row">
-                                        <td colSpan={displayDbxenftDetails ? 6 : 12}>
-                                            <div className="detailed-view row">
-                                                <div className="col xenft-container">
-                                                    <div className="xenft-details">
-                                                        <div className="img-container">
-                                                            <img src={data.image} alt="nft-image" />
-                                                        </div>
-                                                        <div className="details-container">
-                                                            <div className="row">
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        Matures on
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.maturityDateTime}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        cRank
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.cRank}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        AMP
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.AMP}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="row">
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        Category
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.category}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        Class
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.class}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        VMUs
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.VMUs}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="row">
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        Contract
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {formatAccountName(chain.xenftAddress)}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        EAA
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {data.EAA}
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-4">
-                                                                    <p className="label">
-                                                                        Chain
-                                                                    </p>
-                                                                    <p className="value">
-                                                                        {chain.chainName}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="power">
-                                                        <p className="label">DBXen power</p>
-                                                        <p className="value">
-                                                            299994830.049458 $DXN
-                                                        </p>
-                                                    </div>
-                                                    <div className="burn-button-container">
-                                                        <button className="btn burn-button"
-                                                            onClick={() => previewData(data)}>
-                                                            PREVIEW DBXENFT
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        {displayDbxenftDetails ?
-                                            <td colSpan={displayDbxenftDetails ? 6 : 12}>
+                                        {displayDbxenftDetails && xenftId === data.id ?
+                                            <td colSpan={12}>
                                                 {DBXENFT != null ?
                                                     <div className="detailed-view row">
                                                         <div className="col xenft-container">
@@ -760,17 +711,18 @@ export function MintDbXeNFT(): any {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div className="power">
-                                                                <p className="label">DBXen power</p>
-                                                                <p className="value">
-                                                                    299994830.049458 $DXN
-                                                                </p>
-                                                            </div>
                                                             <div className="burn-button-container">
-                                                                <button className="btn burn-button"
-                                                                    onClick={() => handleBurnXenft(data)}>
-                                                                    WRAP XENFT
-                                                                </button>
+                                                                <LoadingButton
+                                                                    className="btn burn-button"
+                                                                    loading={loading}
+                                                                    variant="contained"
+                                                                    type="button"
+                                                                    onClick={() => handleWrapXenft(data)}>
+                                                                        { xeNFTWrapApproved ? 
+                                                                            "WRAP XENFT" : "APPROVE" 
+                                                                        }
+                                                                    
+                                                                </LoadingButton>
                                                             </div>
                                                         </div>
                                                     </div> :
@@ -781,13 +733,35 @@ export function MintDbXeNFT(): any {
                                             </td> :
                                             <></>
                                         }
-                                    </tr> :
-                                    <></>
-                                }
+
+                                    </tr>
                             </>
-                        )
-                        }
+                        ))}
+                        {emptyRows > 0 && (
+                            <tr style={{ height: 44.5 * emptyRows }}>
+                                <td colSpan={3} />
+                            </tr>
+                        )}
                     </tbody>
+                    <tfoot>
+                        <TablePagination
+                            rowsPerPageOptions={[10, 25, { label: 'All', value: -1 }]}
+                            colSpan={3}
+                            count={XENFTs.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            slotProps={{
+                                select: {
+                                    'aria-label': 'rows per page',
+                                },
+                                actions: {
+                                    showFirstButton: true,
+                                    showLastButton: true,
+                                },
+                            }}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage} />
+                    </tfoot>
                 </table>
             </div>
 
