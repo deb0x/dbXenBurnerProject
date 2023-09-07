@@ -33,19 +33,22 @@ export function DbXeNFTList(): any {
     }
 
     const getDBXeNFTs = () => {
-        Moralis.EvmApi.nft.getWalletNFTs({
-            chain: chain.chainId,
-            format: "decimal",
-            normalizeMetadata: true,
-            tokenAddresses: [chain.dbxenftAddress],
-            address: account ? account : ""
-        })
-            .then((result) => {
-                const response = result.raw;
-                console.log(response)
-                const resultArray: any = response.result;
-
-                if(response) {
+        let resultArray: any;
+ 
+        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (result) => {
+            const results = result.raw.result;
+            let cursor = result.raw.cursor;
+            if (cursor != null) {
+                while (cursor != null) {
+                    let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
+                    cursor = newPage.raw.cursor;
+                    if (newPage.result?.length != 0 && newPage.result != undefined) {
+                        results?.push(newPage?.raw.result);
+                    }
+                }
+            }
+            resultArray = results?.flat();
+            if (resultArray?.length != 0 && resultArray != undefined) {
                     for (let i = 0; i < resultArray?.length; i++) {
                         let result = resultArray[i];
         
@@ -102,6 +105,21 @@ export function DbXeNFTList(): any {
             })
             .then(() => setDBXENFTs(dbxenftEntries))
             .catch((err) => console.log(err))
+    }
+
+    async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
+        let cursorData;
+        if (cursor != null)
+            cursorData = cursor.toString()
+        const response = await Moralis.EvmApi.nft.getWalletNFTs({
+            chain: chain,
+            format: "decimal",
+            cursor: cursorData,
+            normalizeMetadata: true,
+            tokenAddresses: [nftAddress],
+            address: account ? account : ""
+        });
+        return response;
     }
 
     const handleRedirect = (id: any) => {
