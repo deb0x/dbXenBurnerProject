@@ -9,6 +9,7 @@ import XENFT from "./DBXENFT.js";
 import dotenv from 'dotenv';
 import BigNumber from 'bignumber.js';
 import Moralis from "moralis";
+import fetch from "node-fetch";
 dotenv.config();
 
 const dbxenftFactoryAddress = "0x0754795792A2B3Eda57010371B3576573A34eba5";
@@ -46,12 +47,12 @@ function mulDiv(x, y, denominator) {
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
         .catch((e) => console.log("moralis error"))
-    let dateForParam = subMinutes(new Date(), 11);
+    let dateForParam = subMinutes(new Date(), 110);
     const response = await Moralis.EvmApi.events.getContractEvents({
         "chain": "0x13881",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
         "fromDate": `${dateForParam}`,
-        "address": "0x0754795792A2B3Eda57010371B3576573A34eba5",
+        "address": `${dbxenftFactoryAddress}`,
         "abi": {
             "anonymous": false,
             "inputs": [{
@@ -115,7 +116,9 @@ async function generateAfterReveal() {
                 "trait_type": "MATURITY DATE",
                 "value": new Date(maturityTs * 1000).toString(),
             }, ]
-            let imageLink = "https://imagesfornft.s3.eu-west-3.amazonaws.com/Screenshot+from+2023-07-05+16-28-05.png"
+
+            let imageLink = getImage(newPower);
+
             let standardMetadata = {
                 "id": `${ids[i]}`,
                 "name": `THIS IS REAL TEST DBXEN NFT #${ids[i]}, NOW REVEAL!`,
@@ -149,6 +152,27 @@ async function generateAfterReveal() {
     }
 }
 
-cron.schedule('*/11 * * * *', async() => {
+cron.schedule('*/1 * * * *', async() => {
     await generateAfterReveal();
 });
+
+function getImage(power) {
+    if (power >= 0 && power <= 500)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_1.jpg";
+    if (power > 500 && power <= 1000)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_2.jpg"
+    if (power > 1000 && power <= 2500)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_3.jpg"
+    if (power > 2500 && power <= 5000)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_4.jpg"
+    if (power > 5000 && power <= 7500)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_5.jpg"
+    if (power > 7500 && power <= 10000)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/4DBXeNFT_6.jpg"
+    if (power > 10000 && power <= 12500)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/5DBXeNFT_5.jpg"
+    if (power > 12500 && power <= 15000)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/5DBXeNFT_6.jpg"
+    if (power > 15000)
+        return "https://imagesfornft.s3.eu-west-3.amazonaws.com/6DBXeNFT_6.jpg"
+}
