@@ -34,7 +34,7 @@
         "eth-sig-util": "^3.0.0",
         "ethereum-waffle": "^3.4.0",
         "ethereumjs-util": "^7.1.5",
-        "ethers": "^5.6.1",
+        "ethers": "^5.7.2",
         "hardhat": "^2.8.0",
         "hardhat-gas-reporter": "^1.0.9",
         "react-error-overlay": "^6.0.9",
@@ -50,6 +50,7 @@
         "dotenv": "^10.0.0",
         "draftjs-to-html": "^0.9.1",
         "eslint": "^7.11.0",
+        "moralis": "^2.22.5",
         "node-cron": "^3.0.2",
         "solidity-coverage": "^0.8.2"
     }

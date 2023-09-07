@@ -273,6 +273,45 @@ $randomNumber: random(4);
             }
         }
     }
+
+    .MuiTablePagination-toolbar {
+        gap: 10px;
+        .MuiTablePagination-spacer {
+            display: none;
+        }
+        .MuiTablePagination-selectLabel,
+        .MuiTablePagination-displayedRows {
+            margin: 0;
+            color: #fff;
+        }
+        .MuiTablePagination-select {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            background-color: transparent;
+            color: #fff;
+        }
+        .MuiTablePagination-menuItem {
+            color: #F2E9DC;
+            background: #030328;
+        }
+        .MuiTablePagination-actions {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            text-align: center;
+        }
+        .MuiTablePagination-actions>button {
+            margin: 0 8px;
+            border: transparent;
+            border-radius: 4px;
+            background-color: transparent;
+            color: #fff;
+            &:disabled {
+                opacity: 0.3;
+            }
+        }
+    }
 }
 
 .chain-popper,

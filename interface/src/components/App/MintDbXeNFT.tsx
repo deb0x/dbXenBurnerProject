@@ -16,7 +16,7 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
-import { writePerCycle, generateAfterReveal, getIdsMintedPerCycle } from "../Common/aws-interaction";
+import { writePerCycle} from "../Common/aws-interaction";
 import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
@@ -334,38 +334,6 @@ export function MintDbXeNFT(): any {
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
-                severity: "info"
-            })
-            setLoading(false)
-        }
-    }
-
-    async function claimXen(tokenId: any) {
-        setLoading(true)
-        const signer = await library.getSigner(0)
-        const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
-
-        try {
-
-            const tx = await dbxenftFactory.claimXen(tokenId)
-            await tx.wait()
-                .then((result: any) => {
-                    setNotificationState({
-                        message: "You succesfully claimed your Xen.", open: true,
-                        severity: "success"
-                    })
-                    setLoading(false)
-                })
-                .catch((error: any) => {
-                    setNotificationState({
-                        message: "Claiming your Xen was unsuccesful!", open: true,
-                        severity: "error"
-                    })
-                    setLoading(false)
-                })
-        } catch (error) {
-            setNotificationState({
-                message: "You rejected the transaction. Your Xen haven't been claimed.", open: true,
                 severity: "info"
             })
             setLoading(false)
@@ -779,7 +747,7 @@ export function MintDbXeNFT(): any {
                 </div>
                 <LoadingButton className="burn-btn"
                     loadingPosition="end"
-                    onClick={() => console.log("IDK")} >
+                    onClick={() => console.log("")} >
                     {loading ? <Spinner color={'black'} /> : "Do stuff"}
                 </LoadingButton>
                 <div className="text-down">

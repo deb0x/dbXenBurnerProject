@@ -5,8 +5,8 @@
                 width: 95%;
                 margin: 0 auto;
                 border-radius: 0;
+                height: 69px;
                 .card-container {
-                    border: 1px solid #19D2D2;
                     border-bottom-right-radius: 45px;
                     width: 100%;
                     height: 100%;
@@ -37,7 +37,7 @@
                         }
                     }
                     .stake-card {
-                        border-right: 1px solid #19D2D2;
+                        border: 1px solid #19D2D2;
                         border-top-right-radius: 0;
                         border-bottom-right-radius: 0;
                         .nft-card {
@@ -116,9 +116,22 @@
                             font-weight: 500;
                             padding: 5px 40px;
                         }
+
+                        .tokens-in-wallet {
+                            color: #fff;
+                            display: flex;
+                            justify-content: center;
+                            .label {
+                                margin: 0 5px;
+                            }
+                        }
                     }
                     .reward-card {
                         border-bottom-right-radius: 45px;
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                        border: 1px solid #19D2D2;
+                        border-left: none;
                         .tokens-in-wallet {
                             color: #fff;
                         }
