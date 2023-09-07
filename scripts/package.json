@@ -11,12 +11,14 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@ankr.com/ankr.js": "^0.4.0",
         "aws-sdk": "^2.1443.0",
         "bignumber.js": "^9.1.1",
         "dotenv": "^16.3.1",
         "ethers": "^6.7.1",
         "moralis": "^2.22.5",
         "node-cron": "^3.0.2",
-        "node-fetch": "^3.3.2"
+        "node-fetch": "^3.3.2",
+        "web3": "^4.1.1"
     }
 }
