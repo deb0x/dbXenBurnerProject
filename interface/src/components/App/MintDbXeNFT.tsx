@@ -209,7 +209,6 @@ export function MintDbXeNFT(): any {
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
-        console.log("CURSOR " + cursor)
         let cursorData;
         if (cursor != null)
             cursorData = cursor.toString()
