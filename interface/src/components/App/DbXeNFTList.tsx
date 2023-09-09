@@ -34,8 +34,8 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
- 
-        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (result) => {
+
+        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (result: any) => {
             const results = result.raw.result;
             let cursor = result.raw.cursor;
             if (cursor != null) {
@@ -48,13 +48,17 @@ export function DbXeNFTList(): any {
                 }
             }
             resultArray = results?.flat();
+            
             if (resultArray?.length != 0 && resultArray != undefined) {
                     for (let i = 0; i < resultArray?.length; i++) {
                         let result = resultArray[i];
-        
-                        if(result.normalized_metadata.attributes === null ||
-                                result.normalized_metadata.attributes.length === 0)
+                        console.log("sss")
+                        console.log(result);
+                        if( resultArray[i].token_id === null ||
+                                result.normalized_metadata.attributes.length === 0 || 
+                                result.normalized_metadata.image.includes("Final+with+writing"))
                         {
+                            console.log("SERGssssIU")
                             Moralis.EvmApi.nft.reSyncMetadata({
                                 chain: chain.chainId,
                                 "flag": "uri",
@@ -99,12 +103,12 @@ export function DbXeNFTList(): any {
                         }
                         
                     }
-                    // setDBXENFTs(dbxenftEntries);
+                    setDBXENFTs(dbxenftEntries);
                     console.log("SIIIZEEE", dbxenftEntries.length)
                 }
             })
-            .then(() => setDBXENFTs(dbxenftEntries))
-            .catch((err) => console.log(err))
+            // .then(() => setDBXENFTs(dbxenftEntries))
+            // .catch((err) => console.log(err))
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {

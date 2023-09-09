@@ -34,6 +34,7 @@ interface XENFTEntry {
     maturityDateTime: Date;
     term: number;
     xenBurned: string;
+    estimatedXen: number,
     category: string;
     image: string;
 }
@@ -129,6 +130,7 @@ export function MintDbXeNFT(): any {
                         else
                             timevalue = maturityDate.getTime() - dataForCompare;
                         let boolVal = timevalue > blackoutTerm;
+
                         if (chain.chainId == "80001") {
                             if (boolVal) {
                                 xenftEntries.push({
@@ -150,6 +152,7 @@ export function MintDbXeNFT(): any {
                                     maturityDateTime: resultAttributes[7].value,
                                     term: resultAttributes[8].value,
                                     xenBurned: resultAttributes[9].value,
+                                    estimatedXen:0,
                                     category: resultAttributes[10].value,
                                     image: result.normalized_metadata.image
                                 });
@@ -165,7 +168,7 @@ export function MintDbXeNFT(): any {
                                 const isRedeemed = await MintInfoContract.getRedeemed(
                                     await XENFTContract.mintInfo(result.token_id)
                                 )
-
+                        
                                 try {
                                     const maturityDate = new Date(maturityDateObject.value);
                                     console.log(resultAttributes);
@@ -192,6 +195,7 @@ export function MintDbXeNFT(): any {
                                         maturityDateTime: resultAttributes[7].value,
                                         term: parseInt(resultAttributes[8].value),
                                         xenBurned: resultAttributes[9].value,
+                                        estimatedXen:0,
                                         category: resultAttributes[10].value,
                                         image: result.normalized_metadata.image
                                     });
@@ -586,6 +590,7 @@ export function MintDbXeNFT(): any {
                             <th scope="col">VMUs</th>
                             <th scope="col">Term (days)</th>
                             <th scope="col">Maturiy</th>
+                            <th scope="col">Exstimated XEN</th>
                             <th scope="col">Category</th>
                             <th scope="col">Class</th>
                             <th scope="col"></th>
@@ -603,6 +608,7 @@ export function MintDbXeNFT(): any {
                                     <td>{data.VMUs}</td>
                                     <td>{data.term}</td>
                                     <td>{data.maturityDateTime}</td>
+                                    <td>{data.estimatedXen}</td>
                                     <td>{data.category}</td>
                                     <td>{data.class}</td>
                                     <td>
