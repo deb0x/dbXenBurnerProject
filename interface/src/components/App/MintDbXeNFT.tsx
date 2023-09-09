@@ -34,7 +34,7 @@ interface XENFTEntry {
     maturityDateTime: Date;
     term: number;
     xenBurned: string;
-    estimatedXen: number,
+    estimatedXen: string,
     category: string;
     image: string;
 }
@@ -130,7 +130,7 @@ export function MintDbXeNFT(): any {
                         else
                             timevalue = maturityDate.getTime() - dataForCompare;
                         let boolVal = timevalue > blackoutTerm;
-
+                        let xenEstimated = await getNFTRewardInXen(Number(maturityDate), Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
                         if (chain.chainId == "80001") {
                             if (boolVal) {
                                 xenftEntries.push({
@@ -152,7 +152,7 @@ export function MintDbXeNFT(): any {
                                     maturityDateTime: resultAttributes[7].value,
                                     term: resultAttributes[8].value,
                                     xenBurned: resultAttributes[9].value,
-                                    estimatedXen:0,
+                                    estimatedXen:(ethers.utils.formatEther((xenEstimated.toString()))),
                                     category: resultAttributes[10].value,
                                     image: result.normalized_metadata.image
                                 });
@@ -171,7 +171,6 @@ export function MintDbXeNFT(): any {
                         
                                 try {
                                     const maturityDate = new Date(maturityDateObject.value);
-                                    console.log(resultAttributes);
                                     let claimStatus;
                                     if (thisDate < maturityDate) {
                                         const daysToGo = daysLeft(maturityDate, thisDate);
@@ -195,7 +194,7 @@ export function MintDbXeNFT(): any {
                                         maturityDateTime: resultAttributes[7].value,
                                         term: parseInt(resultAttributes[8].value),
                                         xenBurned: resultAttributes[9].value,
-                                        estimatedXen:0,
+                                        estimatedXen:(ethers.utils.formatEther((xenEstimated.toString()))),
                                         category: resultAttributes[10].value,
                                         image: result.normalized_metadata.image
                                     });
@@ -226,6 +225,7 @@ export function MintDbXeNFT(): any {
         });
         return response;
     }
+    
     const daysLeft = (date_1: Date, date_2: Date) => {
 
         let difference = date_1.getTime() - date_2.getTime();
