@@ -8,7 +8,7 @@ import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
 
 interface DBXENFTEntry {
-    id: number;
+    id: string;
     description: string
     name: string;
     image: string;
@@ -33,75 +33,91 @@ export function DbXeNFTList(): any {
     }
 
     const getDBXeNFTs = () => {
-        Moralis.EvmApi.nft.getWalletNFTs({
-            chain: chain.chainId,
-            format: "decimal",
-            normalizeMetadata: true,
-            tokenAddresses: [chain.dbxenftAddress],
-            address: account ? account : ""
-        })
-            .then((result) => {
-                const response = result.raw;
-                console.log(response)
-                const resultArray: any = response.result;
+        let resultArray: any;
 
-                if(response) {
-                    for (let i = 0; i < resultArray?.length; i++) {
-                        let result = resultArray[i];
-        
-                        if(result.normalized_metadata.attributes === null ||
-                                result.normalized_metadata.attributes.length === 0)
-                        {
-                            Moralis.EvmApi.nft.reSyncMetadata({
-                                chain: chain.chainId,
-                                "flag": "uri",
-                                "mode": "async",
-                                "address": chain.dbxenftAddress,
-                                "tokenId": resultArray[i].token_id
-                            })
-                                .then((result) => {
-                                    console.log("before get", result)
-                                    Moralis.EvmApi.nft.getNFTMetadata({
-                                        chain: chain.chainId,
-                                        "format": "decimal",
-                                        "normalizeMetadata": true,
-                                        "mediaItems": false,
-                                        "address": chain.dbxenftAddress,
-                                        "tokenId": resultArray[i].token_id
-                                    }).then((result: any) => {
-                                        if(result.raw.normalized_metadata.attributes.length > 0) {
-                                            dbxenftEntries.push({
-                                                id: result.raw.token_id,
-                                                name: result.raw.name,
-                                                description: result.raw.description,
-                                                image: result.raw.image
-                                            });
-                                        } else {
-                                            dbxenftEntries.push({
-                                                id: result.raw.token_id,
-                                                name: `THIS IS REAL TEST DBXEN NFT #${result.raw.token_id}, BUT IS UNREVEAL`,
-                                                description: "DBXEN NFT FOR PASSIVE INCOME",
-                                                image: nftImage
-                                            });
-                                        }
-                                    }).catch((error) => error)
-                                })
+        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (y: any) => {
+            const results = y.raw.result;
+            let cursor = y.raw.cursor;
+            if (cursor != null) {
+                while (cursor != null) {
+                    let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
+                    cursor = newPage.raw.cursor;
+                    if (newPage.result?.length != 0 && newPage.result != undefined) {
+                        results?.push(newPage?.raw.result);
+                    }
+                }
+            }
+            resultArray = results?.flat();
+            const nfts = [];
+            
+            if (resultArray?.length != 0 && resultArray != undefined) {
+                for (let i = 0; i < resultArray?.length; i++) {
+                    let x = resultArray[i];
+                    if( resultArray[i].token_id === null ||
+                            x.normalized_metadata.attributes.length === 0 || 
+                            x.normalized_metadata.image.includes("beforeReveal"))
+                    {
+                        const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
+                            chain: chain.chainId,
+                            "flag": "uri",
+                            "mode": "async",
+                            "address": chain.dbxenftAddress,
+                            "tokenId": resultArray[i].token_id
+                        });
+                        const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
+                            chain: chain.chainId,
+                            "format": "decimal",
+                            "normalizeMetadata": true,
+                            "mediaItems": false,
+                            "address": chain.dbxenftAddress,
+                            "tokenId": resultArray[i].token_id
+                        });
+                        if (!nftMeta) {
+                            continue;
+                        }
+                        if(nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                            nfts.push({
+                                id: nftMeta.raw.token_id,
+                                name: nftMeta.raw.name,
+                                description: nftMeta.raw.normalized_metadata.description || "",
+                                image: nftMeta.raw.normalized_metadata.image || ""
+                            });
                         } else {
-                            dbxenftEntries.push({
-                                id: result.token_id,
-                                name: result.normalized_metadata.name,
-                                description: result.normalized_metadata.description,
-                                image: result.normalized_metadata.image
+                            nfts.push({
+                                id: nftMeta.raw.token_id,
+                                name: `THIS IS REAL TEST DBXEN NFT #${nftMeta.raw.token_id}, BUT IS UNREVEAL`,
+                                description: "DBXEN NFT FOR PASSIVE INCOME",
+                                image: nftImage
                             });
                         }
-                        
+                    } else {
+                        nfts.push({
+                            id: y.token_id,
+                            name: y.normalized_metadata.name,
+                            description: y.normalized_metadata.description,
+                            image: y.normalized_metadata.image
+                        });
                     }
-                    // setDBXENFTs(dbxenftEntries);
-                    console.log("SIIIZEEE", dbxenftEntries.length)
                 }
-            })
-            .then(() => setDBXENFTs(dbxenftEntries))
-            .catch((err) => console.log(err))
+            }
+            setDBXENFTs(nfts);
+        })
+    }
+
+    async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
+        let cursorData;
+        if (cursor != null)
+            cursorData = cursor.toString()
+        const response = await Moralis.EvmApi.nft.getWalletNFTs({
+            chain: chain,
+            format: "decimal",
+            cursor: cursorData,
+            normalizeMetadata: true,
+            tokenAddresses: [nftAddress],
+            address: account ? account : ""
+        });
+        console.log(response)
+        return response;
     }
 
     const handleRedirect = (id: any) => {

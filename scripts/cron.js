@@ -46,13 +46,39 @@ function mulDiv(x, y, denominator) {
 
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-        .catch((e) => console.log("moralis error"))
-    let dateForParam = subMinutes(new Date(), 40320);
+        .catch((e) => console.log("Moralis Error"))
+    let dateForParam = subMinutes(new Date(), 10);
+    let results = [];
+    await getIdsFromEvent(null, dateForParam).then(async(result) => {
+        for (let i = 0; i < result.raw.result.length; i++) {
+            results.push(result.raw.result[i].data.amount);
+        }
+        let cursor = result.raw.cursor;
+        if (cursor != null) {
+            while (cursor != null) {
+                let newPage = await getIdsFromEvent(cursor, dateForParam);
+                cursor = newPage.raw.cursor;
+                if (newPage.result.length != 0 && newPage.result != undefined) {
+                    for (let i = 0; i < newPage.raw.result.length; i++) {
+                        results.push(newPage.raw.result[i].data.amount);
+                    }
+                }
+            }
+        }
+    })
+    return results;
+}
+
+async function getIdsFromEvent(cursor, dateForParam) {
+    let cursorData;
+    if (cursor != null)
+        cursorData = cursor.toString()
     const response = await Moralis.EvmApi.events.getContractEvents({
         "chain": "0x13881",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
-        "fromDate": `${dateForParam}`,
-        "address": "0x0754795792A2B3Eda57010371B3576573A34eba5",
+        "cursor": cursorData,
+        "fromDate": dateForParam,
+        "address": dbxenftFactoryAddress,
         "abi": {
             "anonymous": false,
             "inputs": [{
@@ -78,12 +104,7 @@ async function getLast24HoursIdsMinted() {
             "type": "event"
         }
     });
-    let responseArray = response.raw.result;
-    let idsFromEvent = [];
-    for (let i = 0; i < responseArray.length; i++) {
-        idsFromEvent.push(+responseArray[i].data.amount);
-    }
-    return idsFromEvent;
+    return response;
 }
 
 async function generateAfterReveal() {
@@ -170,6 +191,6 @@ function getImage(power) {
         return "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/6DBXeNFT_6.png"
 }
 
-cron.schedule('*/15 * * * *', async() => {
+cron.schedule('*/10 * * * *', async() => {
     await generateAfterReveal();
 });

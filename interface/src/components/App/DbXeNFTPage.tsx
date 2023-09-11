@@ -26,13 +26,14 @@ interface DBXENFTEntry {
     description: string
     name: string;
     image: string;
+    maturityDate: Date
 }
 
 export function DbXeNFTPage(): any {
     const context = useWeb3React();
     const { account, library } = context
     const { chain } = useContext(ChainContext);
-    const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
+    const [DBXENFT, setDBXENFT] = useState<DBXENFTEntry[]>([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [claimLoading, setClaimLoading] = useState(false);
@@ -48,14 +49,15 @@ export function DbXeNFTPage(): any {
     const [unclaimedFees, setUnclaimedFees] = useState("0.0");
     const [baseDBXENFTPower, setBaseDBXENFTPower] = useState("");
     const [dbxenftPower, setDBXENFTPower] = useState("");
-    const [unclaimedXen, setUnclaimedXen] = useState("0.0")
+    const [unclaimedXen, setUnclaimedXen] = useState("0.0");
+    const [nftMaturityDate, setNftMaturityDate] = useState<Date>();
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
         getUpdatedDBXENFTData(id);
         getUnclaimedFees(id);
-    }, [chain])
+    }, [chain, account])
 
     useEffect(() => {
         console.log(approved)
@@ -93,23 +95,30 @@ export function DbXeNFTPage(): any {
                 let result = resultArray[i];
                 const resultAttributes: any[] = result.normalized_metadata;
                 if (result.token_id == id) {
-                    if(result.normalized_metadata.attributes === null) {
+                    console.log(result.normalized_metadata.attributes)
+                    if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+                        console.log("HERE")
                         dbxenftEntries.push({
                             id: result.token_id,
                             name: `THIS IS REAL TEST DBXEN NFT #${result.token_id}, BUT IS UNREVEAL`,
                             description: "DBXEN NFT FOR PASSIVE INCOME",
-                            image: nftImage
+                            image: nftImage,
+                            maturityDate: new Date()
                         });
+                        setNftMaturityDate(new Date());
                     } else {
+                        console.log("here")
                         dbxenftEntries.push({
                             id: result.token_id,
                             name: result.normalized_metadata.name,
                             description: result.normalized_metadata.description,
-                            image: result.normalized_metadata.image
+                            image: result.normalized_metadata.image,
+                            maturityDate: result.normalized_metadata.attributes[2].value
                         });
+                        setNftMaturityDate(result.normalized_metadata.attributes[2].value);
                     }
                 }
-                setDBXENFTs(dbxenftEntries);
+                setDBXENFT(dbxenftEntries);
             }
 
         })
@@ -684,7 +693,7 @@ export function DbXeNFTPage(): any {
                         <ToggleButton className="tab-button" value="stake">Stake</ToggleButton>
                         <ToggleButton className="tab-button" value="unstake">Unstake</ToggleButton>
                     </ToggleButtonGroup>
-                    {DBXENFTs.map((xenft, i) => (
+                    {DBXENFT.map((xenft, i) => (
                         <>
                             <CardContent>
                                 <div className="" key={i}>
@@ -702,16 +711,20 @@ export function DbXeNFTPage(): any {
                                                 <span className="value">{dbxenftPower}</span>
                                             </div>
                                             <div className="card-row">
-                                                <span className="label">tokenID</span>
+                                                <span className="label">tokenID: </span>
                                                 <span className="value">{xenft.id}</span>
                                             </div>
                                             <div className="card-row">
-                                                <span className="label">name</span>
+                                                <span className="label">name: </span>
                                                 <span className="value">{xenft.name}</span>
                                             </div>
                                             <div className="card-row">
-                                                <span className="label">description</span>
+                                                <span className="label">description: </span>
                                                 <span className="value">{xenft.description}</span>
+                                            </div>
+                                            <div className="card-row">
+                                                <span className="label">matures on: </span>
+                                                <span className="value">{new Date(xenft.maturityDate).toLocaleString()}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -880,7 +893,7 @@ export function DbXeNFTPage(): any {
                             </p>
                             <LoadingButton
                                 className="collect-btn"
-                                disabled={unclaimedXen == "0.0"}
+                                disabled={nftMaturityDate && new Date(nftMaturityDate).toUTCString > new Date().toUTCString}
                                 loading={claimLoading}
                                 variant="contained"
                                 onClick={() => claimXen(id)}>

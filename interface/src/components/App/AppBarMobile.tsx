@@ -8,7 +8,8 @@ import {
     BURN_ROUTE,
     DASHBOARD_ROUTE,
     MINTDBXENFT_ROUTE,
-    FEES_ROUTE
+    FEES_ROUTE,
+    DBXENFT_LIST_ROUTE
 } from "../Common/routes";
 
 export function AppBarMobile(): any {
@@ -37,7 +38,11 @@ export function AppBarMobile(): any {
             </div>
             <div className={`navigation-item ${location === MINTDBXENFT_ROUTE ? "active" : ""}`}
                 onClick={() => navigate(MINTDBXENFT_ROUTE)}>
-                    DBXeNFT
+                    Mint DBXeNFT
+            </div>
+            <div className={`navigation-item ${location === DBXENFT_LIST_ROUTE ? "active" : ""}`}
+                onClick={() => navigate(DBXENFT_LIST_ROUTE)}>
+                    Your DBXeNFTs
             </div>
         </div>
     )

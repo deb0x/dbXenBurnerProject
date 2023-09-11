@@ -583,7 +583,7 @@ $randomNumber: random(4);
             min-height: 100vh;
             padding: 25px 10px;
             .app-container {
-                height: 85vh;
+                height: 87vh;
                 border-radius: 25px;
                 header {
                     background-color: transparent;
@@ -627,8 +627,8 @@ $randomNumber: random(4);
                     width: 100%;
                     bottom: 0;
                     justify-content: space-around;
-                    height: 10vh;
-                    font-size: 3vh;
+                    height: 8vh;
+                    font-size: 1.5vh;
                     background-color: #051645;
                     z-index: 999;
                     .navigation-item {

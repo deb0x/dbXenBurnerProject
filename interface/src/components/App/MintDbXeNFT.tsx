@@ -51,7 +51,9 @@ export function MintDbXeNFT(): any {
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
     const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
-    const [xeNFTWrapApproved, setXeNFTWrapAppeoved] = useState<boolean>()
+    const [xeNFTWrapApproved, setXeNFTWrapAppeoved] = useState<boolean>();
+    const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress);
+    const [currentRewardPower, setCurrentRewardPower] = useState<any>();
 
     useEffect(() => {
         startMoralis();
@@ -61,6 +63,7 @@ export function MintDbXeNFT(): any {
                 setXeNFTWrapAppeoved(true) : 
                 setXeNFTWrapAppeoved(false)
             )
+        currentCycleTotalPower();
     }, [chain, account])
 
     useEffect(() => {
@@ -70,6 +73,22 @@ export function MintDbXeNFT(): any {
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch((e) => console.log("moralis error"))
+    }
+
+    const currentCycleTotalPower = () => {
+        dbxenftFactory.getCurrentCycle().then((currentCycle: any) => {
+            dbxenftFactory.rewardPerCycle(currentCycle).then((result: any) => {
+                if(ethers.utils.formatEther(result) === "0.0") {
+                    dbxenftFactory.lastCycleReward().then((result: any) => {
+                        setCurrentRewardPower(
+                            ethers.utils.formatEther(result.add(result.div(ethers.utils.parseEther("1"))))
+                        );
+                    })
+                } else {
+                    setCurrentRewardPower(ethers.utils.formatEther(result))
+                }
+            })
+        })
     }
 
     const getXENFTs = () => {
@@ -168,7 +187,6 @@ export function MintDbXeNFT(): any {
 
                                 try {
                                     const maturityDate = new Date(maturityDateObject.value);
-                                    console.log(resultAttributes);
                                     let claimStatus;
                                     if (thisDate < maturityDate) {
                                         const daysToGo = daysLeft(maturityDate, thisDate);
@@ -209,7 +227,6 @@ export function MintDbXeNFT(): any {
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
-        console.log("CURSOR " + cursor)
         let cursorData;
         if (cursor != null)
             cursorData = cursor.toString()
@@ -234,14 +251,12 @@ export function MintDbXeNFT(): any {
         const xenftContract = XENFT(library, chain.xenftAddress);
         const approvedAddress = await xenftContract.getApproved(tokenId)
         const isApproved = approvedAddress == chain.dbxenftFactoryAddress
-        console.log(isApproved)
         return isApproved
     }
 
     async function isApprovedForAll() {
         const xenftContract = XENFT(library, chain.xenftAddress);
         const isApprovedForAll = await xenftContract.isApprovedForAll(account, chain.dbxenftFactoryAddress)
-        console.log(isApprovedForAll)
         return isApprovedForAll
     }
 
@@ -579,6 +594,15 @@ export function MintDbXeNFT(): any {
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
             <div className="table-view table-responsive-xl">
+                <div>
+                    <p>Total power in this cycle:&nbsp;
+                        {Number(currentRewardPower).toLocaleString('en-US', {
+                            minimumFractionDigits: 8,
+                            maximumFractionDigits: 8
+                        })}
+                    </p>
+                    <p>Next cycle in: hh:mm:ss</p>
+                </div>
                 <table className="table" aria-label="custom pagination table">
                     <thead>
                         <tr>
