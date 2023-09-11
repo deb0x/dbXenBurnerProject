@@ -12,7 +12,7 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x0754795792A2B3Eda57010371B3576573A34eba5";
+const dbxenftFactoryAddress = "0x7e9857bf22C09aEF4F23E2EaBA95b2A0Ab9eAE85";
 const mintInfoAddress = "0x2c1c89ce0537A5565da812A9afdBee0184851612";
 const xenftAddress = "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48";
 
@@ -52,7 +52,7 @@ async function getLast24HoursIdsMinted() {
         "chain": "0x13881",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
         "fromDate": `${dateForParam}`,
-        "address": "0x0754795792A2B3Eda57010371B3576573A34eba5",
+        "address": "0x7e9857bf22C09aEF4F23E2EaBA95b2A0Ab9eAE85",
         "abi": {
             "anonymous": false,
             "inputs": [{
