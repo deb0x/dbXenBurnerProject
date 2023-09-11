@@ -20,7 +20,7 @@ const putStorageObject = (data) =>
     fetch(STORAGE_EP + "PutObjectCommand", createApiOptions(data))
     .then((result) => result.json());
 
-export async function writePerCycle(cycle, id, maturityTs) {
+export async function writePerCycle(id, maturityTs) {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
     let factory = Factory(provider, dbxenftFactoryAddress);
     let dbxenftEntryPower = ethers.utils.formatEther((await factory.dbxenftEntryPower(id)));
@@ -37,7 +37,7 @@ export async function writePerCycle(cycle, id, maturityTs) {
             "id": `${id}`,
             "name": `THIS IS REAL TEST DBXEN NFT #${id}, BUT IS UNREVEAL`,
             "description": "DBXEN NFT FOR PASSIVE INCOME",
-            "image": "https://imagesfornft.s3.eu-west-3.amazonaws.com/2DBXeNFT_Final+with+writing.jpg",
+            "image": "https://deboxnft-assets-polygon.s3.eu-west-1.amazonaws.com/dbxenNft-beforeReveal.png",
             "external_url": `https://dbxen.org/your-dbxenfts/${id}`,
             "attributes": [{
                 "trait_type": "DBXEN NFT POWER",
