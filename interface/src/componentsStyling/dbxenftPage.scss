@@ -61,11 +61,11 @@
                                 }
                                 .card-row {
                                     display: flex;
-                                    align-items: center;
                                     justify-content: space-between;
                                     color: #B7B7CA;
                                     .label {
                                         font-weight: 100;
+                                        margin-right: 5px;
                                     }
                                     .value {
                                         font-weight: 500;
@@ -202,7 +202,7 @@
                     padding: 0;
                     border-radius: 0;
                     .card-container {
-                        height: 57vh;
+                        height: 53vh;
                         overflow-y: auto;
                         overflow-x: hidden;
                         margin-left: 0;
