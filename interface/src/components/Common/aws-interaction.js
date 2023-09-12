@@ -32,7 +32,6 @@ export async function writePerCycle(id, maturityTs) {
     }
     let objectData = await getStorageObject(params);
 
-    console.log(objectData.client_error.Code)
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,

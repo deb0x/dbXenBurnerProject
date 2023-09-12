@@ -66,7 +66,6 @@ export function DbXeNFTList(): any {
                             "address": chain.dbxenftAddress,
                             "tokenId": resultArray[i].token_id
                         });
-                        console.log(syncMeta.raw.status)
                         const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
                             chain: chain.chainId,
                             "format": "decimal",
@@ -94,7 +93,6 @@ export function DbXeNFTList(): any {
                             });
                         }
                     } else {
-                        console.log(getNFTResult.raw)
                         nfts.push({
                             id: results[i].token_id,
                             name: results[i].normalized_metadata.name ,
@@ -106,7 +104,6 @@ export function DbXeNFTList(): any {
             }
             setDBXENFTs(nfts);
             setLoading(false);
-            console.log(DBXENFTs)
         })
     }
 
@@ -122,7 +119,6 @@ export function DbXeNFTList(): any {
             tokenAddresses: [nftAddress],
             address: account ? account : ""
         });
-        console.log(response)
         return response;
     }
 
