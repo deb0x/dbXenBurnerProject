@@ -26,7 +26,7 @@ interface DBXENFTEntry {
     description: string
     name: string;
     image: string;
-    maturityDate: Date
+    maturityDate?: Date
 }
 
 export function DbXeNFTPage(): any {
@@ -94,20 +94,17 @@ export function DbXeNFTPage(): any {
             for (let i = 0; i < resultArray?.length; i++) {
                 let result = resultArray[i];
                 const resultAttributes: any[] = result.normalized_metadata;
+                console.log(resultAttributes)
                 if (result.token_id == id) {
-                    console.log(result.normalized_metadata.attributes)
                     if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
-                        console.log("HERE")
+                        console.log("xxx")
                         dbxenftEntries.push({
                             id: result.token_id,
                             name: `THIS IS REAL TEST DBXEN NFT #${result.token_id}, BUT IS UNREVEAL`,
                             description: "DBXEN NFT FOR PASSIVE INCOME",
                             image: nftImage,
-                            maturityDate: new Date()
                         });
-                        setNftMaturityDate(new Date());
                     } else {
-                        console.log("here")
                         dbxenftEntries.push({
                             id: result.token_id,
                             name: result.normalized_metadata.name,
@@ -119,6 +116,8 @@ export function DbXeNFTPage(): any {
                     }
                 }
                 setDBXENFT(dbxenftEntries);
+                console.log(result)
+
             }
 
         })
@@ -694,7 +693,7 @@ export function DbXeNFTPage(): any {
                         <ToggleButton className="tab-button" value="stake">Stake</ToggleButton>
                         <ToggleButton className="tab-button" value="unstake">Unstake</ToggleButton>
                     </ToggleButtonGroup>
-                    {DBXENFT.map((xenft, i) => (
+                    {DBXENFT.map((xenft: any, i: any) => (
                         <>
                             <CardContent>
                                 <div className="" key={i}>

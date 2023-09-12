@@ -49,6 +49,12 @@
     }
 }
 
+.content-box.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @media (max-width: 768px) {
     .card-view {
         height: 53vh;

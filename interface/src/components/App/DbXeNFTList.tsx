@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
+import { Spinner } from './Spinner';
 
 interface DBXENFTEntry {
     id: string;
@@ -20,6 +21,7 @@ export function DbXeNFTList(): any {
     const { chain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
 
     useEffect(() => {
@@ -34,10 +36,11 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
+        setLoading(true)
 
-        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (y: any) => {
-            const results = y.raw.result;
-            let cursor = y.raw.cursor;
+        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
+            const results = getNFTResult.raw.result;
+            let cursor = getNFTResult.raw.cursor;
             if (cursor != null) {
                 while (cursor != null) {
                     let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
@@ -49,13 +52,12 @@ export function DbXeNFTList(): any {
             }
             resultArray = results?.flat();
             const nfts = [];
-            
             if (resultArray?.length != 0 && resultArray != undefined) {
                 for (let i = 0; i < resultArray?.length; i++) {
-                    let x = resultArray[i];
+                    let resultArrayElement = resultArray[i];
                     if( resultArray[i].token_id === null ||
-                            x.normalized_metadata.attributes.length === 0 || 
-                            x.normalized_metadata.image.includes("beforeReveal"))
+                            resultArrayElement.normalized_metadata.attributes.length === 0 || 
+                            resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
                     {
                         const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
                             chain: chain.chainId,
@@ -64,6 +66,7 @@ export function DbXeNFTList(): any {
                             "address": chain.dbxenftAddress,
                             "tokenId": resultArray[i].token_id
                         });
+                        console.log(syncMeta.raw.status)
                         const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
                             chain: chain.chainId,
                             "format": "decimal",
@@ -91,16 +94,19 @@ export function DbXeNFTList(): any {
                             });
                         }
                     } else {
+                        console.log(getNFTResult.raw)
                         nfts.push({
-                            id: y.token_id,
-                            name: y.normalized_metadata.name,
-                            description: y.normalized_metadata.description,
-                            image: y.normalized_metadata.image
+                            id: results[i].token_id,
+                            name: results[i].normalized_metadata.name ,
+                            description: results[i].normalized_metadata.description,
+                            image: results[i].normalized_metadata.image
                         });
                     }
                 }
             }
             setDBXENFTs(nfts);
+            setLoading(false);
+            console.log(DBXENFTs)
         })
     }
 
@@ -142,66 +148,69 @@ export function DbXeNFTList(): any {
     };
 
     return (
-        <div className="content-box">
-            <div className="card-view">
-                <div className="row g-5">
-                    {DBXENFTs.length ?
-                        (rowsPerPage > 0
-                            ? DBXENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            : DBXENFTs
-                        ).map((xenft: any, i: any) => (
-                            <div className="col col-md-3 card-col" key={i}>
-                                <div className="nft-card">
+        <div className={`content-box ${loading ? "loading" : ""}`}>
+            { loading ? 
+                <Spinner color={'white'} /> :
+                <div className="card-view">
+                    <div className="row g-5">
+                        {DBXENFTs.length ?
+                            (rowsPerPage > 0
+                                ? DBXENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : DBXENFTs
+                            ).map((xenft: any, i: any) => (
+                                <div className="col col-md-3 card-col" key={i}>
+                                    <div className="nft-card">
 
-                                <img src={xenft.image} alt="nft-image" />
-                                    <div className="card-row card-header">
-                                        <span className="label">tokenID</span>
-                                        <span className="value">{xenft.id}</span>
-                                    </div>
-                                    <div className="divider"></div>
-                                    <div className="card-row">
-                                        <span className="label">name</span>
-                                        <span className="value">{xenft.name}</span>
-                                    </div>
-                                    <div className="card-row">
-                                        <span className="label">description</span>
-                                        <span className="value">{xenft.description}</span>
-                                    </div>
-                                    <div className="detail-button-container">
-                                        <button type="button" className="btn dbxenft-detail-btn"
-                                            onClick={() => handleRedirect(xenft.id)}>
-                                            Details
-                                        </button>
+                                    <img src={xenft.image} alt="nft-image" />
+                                        <div className="card-row card-header">
+                                            <span className="label">tokenID</span>
+                                            <span className="value">{xenft.id}</span>
+                                        </div>
+                                        <div className="divider"></div>
+                                        <div className="card-row">
+                                            <span className="label">name</span>
+                                            <span className="value">{xenft.name}</span>
+                                        </div>
+                                        <div className="card-row">
+                                            <span className="label">description</span>
+                                            <span className="value">{xenft.description}</span>
+                                        </div>
+                                        <div className="detail-button-container">
+                                            <button type="button" className="btn dbxenft-detail-btn"
+                                                onClick={() => handleRedirect(xenft.id)}>
+                                                Details
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            )) 
+                            :
+                            <div className="empty-container">
+                                <span>You don't have any DBXENFTs</span>
                             </div>
-                        )) 
-                        :
-                        <div className="empty-container">
-                            <span>You don't have any DBXENFTs</span>
-                        </div>
+                        }
+                    </div>
+                    { DBXENFTs.length > 0 &&
+                        <TablePagination
+                            rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
+                            colSpan={3}
+                            count={DBXENFTs.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            slotProps={{
+                                select: {
+                                    'aria-label': 'rows per page',
+                                },
+                                actions: {
+                                    showFirstButton: true,
+                                    showLastButton: true,
+                                },
+                            }}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage} />
                     }
                 </div>
-                { DBXENFTs.length > 0 &&
-                    <TablePagination
-                        rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
-                        colSpan={3}
-                        count={DBXENFTs.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        slotProps={{
-                            select: {
-                                'aria-label': 'rows per page',
-                            },
-                            actions: {
-                                showFirstButton: true,
-                                showLastButton: true,
-                            },
-                        }}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage} />
-                }
-            </div>
+            }
         </div>
     );
 }
