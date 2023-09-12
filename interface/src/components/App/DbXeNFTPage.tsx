@@ -405,8 +405,9 @@ export function DbXeNFTPage(): any {
 
             CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
         }
-
+        console.log(currentCycle, entryCycle)
         if (baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            console.log(dbxenftEntryPower, entryCycleReward, totalEntryCycleEntryPower)
             baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
             dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
         }
