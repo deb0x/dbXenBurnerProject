@@ -14,13 +14,14 @@ const RPC_URLS: { [chainId: number]: string } = {
     9001:'https://evmos-evm.publicnode.com',
     2000:'https://rpc.dogechain.dog',
     10001:'https://mainnet.ethereumpow.org',
-    80001:'https://polygon-mumbai.g.alchemy.com/v2/mHR3HgJxtdjCrBdRznKLgvpjpMsmWB0T'
+    80001:'https://polygon-mumbai.g.alchemy.com/v2/mHR3HgJxtdjCrBdRznKLgvpjpMsmWB0T',
+    8453: 'https://developer-access-mainnet.base.org'
 }
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 137, 43114, 56, 250, 1284, 66, 9001, 2000,10001, 80001 ] })
+export const injected = new InjectedConnector({ supportedChainIds: [1, 137, 43114, 56, 250, 1284, 66, 9001, 2000, 10001, 8453 ] })
 
 export const network = new NetworkConnector({
     urls: {1: RPC_URLS[1], 137: RPC_URLS[137], 43114: RPC_URLS[43114], 56: RPC_URLS[56],  250: RPC_URLS[250], 1284: RPC_URLS[1284],
-        66: RPC_URLS[66],  9001: RPC_URLS[9001],  2000: RPC_URLS[2000], 10001: RPC_URLS[10001], 80001: RPC_URLS[80001]}, 
+        66: RPC_URLS[66],  9001: RPC_URLS[9001],  2000: RPC_URLS[2000], 10001: RPC_URLS[10001], 8453: RPC_URLS[8453]},
     defaultChainId: 137
 })
