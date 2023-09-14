@@ -149,20 +149,25 @@ export function MintDbXeNFT(): any {
                         else
                             timevalue = maturityDate.getTime() - dataForCompare;
                         let boolVal = timevalue > blackoutTerm;
-                        let xenEstimated = await getNFTRewardInXen(Number(maturityDate), Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
-                        let formattedMaturityDate = new Date(resultAttributes[5].value + resultAttributes[7].value)
+                        // const MintInfoContract = mintInfo(library, chain.mintInfoAddress);
+                        // const XENFTContract = XENFT(library, chain.xenftAddress);
+                        // const eaa = await MintInfoContract.getEAA(
+                        //     await XENFTContract.mintInfo(result.token_id)
+                        // )
+                        let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
+                        //let formattedMaturityDate = new Date(resultAttributes[5].value + resultAttributes[7].value)
                         if (chain.chainId == "80001") {
                             if (boolVal) {
                                 xenftEntries.push({
                                     id: +result.token_id,
-                                    claimStatus:
+                                    claimStatus:"",
                                         // resultAttributes[7].value == "no"
-                                            formattedMaturityDate < new Date()
-                                                ? "Claimable"
-                                                : ` ${daysLeft(
-                                                    formattedMaturityDate,
-                                                    new Date()
-                                                )} day(s) left`,
+                                            // formattedMaturityDate < new Date()
+                                            //     ? "Claimable"
+                                            //     : ` ${daysLeft(
+                                            //         formattedMaturityDate,
+                                            //         new Date()
+                                            //     )} day(s) left`,
                                             // : "Redeemed",
                                     class: resultAttributes[0].value,
                                     VMUs: parseInt(resultAttributes[1].value),
@@ -172,37 +177,34 @@ export function MintDbXeNFT(): any {
                                     maturityDateTime: resultAttributes[7].value,
                                     term: resultAttributes[8].value,
                                     xenBurned: resultAttributes[9].value,
-                                    estimatedXen:(ethers.utils.formatEther((xenEstimated.toString()))),
+                                    estimatedXen: ethers.utils.formatEther(xenEstimated),
                                     category: resultAttributes[10].value,
                                     image: result.normalized_metadata.image
                                 });
                             }
                         } else {
                             if (boolVal) {
-                                const maturityDateObject = resultAttributes.find(
-                                    (item) => item.trait_type == "Maturity DateTime"
-                                );
-                                const signer = library.getSigner(0)
-                                const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
-                                const XENFTContract = XENFT(signer, chain.xenftAddress);
-                                const isRedeemed = await MintInfoContract.getRedeemed(
-                                    await XENFTContract.mintInfo(result.token_id)
-                                )
+                                // const maturityDateObject = resultAttributes.find(
+                                //     (item) => item.trait_type == "Maturity DateTime"
+                                // );
+                                // const isRedeemed = await MintInfoContract.getRedeemed(
+                                //     await XENFTContract.mintInfo(result.token_id)
+                                // )
 
                                 try {
-                                    const maturityDate = new Date(maturityDateObject.value);
-                                    let claimStatus;
-                                    if (thisDate < maturityDate) {
-                                        const daysToGo = daysLeft(maturityDate, thisDate);
-                                        claimStatus = `${daysToGo} days left`;
-                                    } else if (isRedeemed) {
-                                        claimStatus = "Redeemed";
-                                    } else if ((thisDate.getTime() - maturityDate.getTime()) / (1000 * 3600 * 24) >= 6) {
-                                        claimStatus = "Penalized"
-                                    }
-                                    else {
-                                        claimStatus = "Claimable";
-                                    }
+                                    // const maturityDate = new Date(maturityDateObject.value);
+                                    let claimStatus = "";
+                                    // if (thisDate < maturityDate) {
+                                    //     const daysToGo = daysLeft(maturityDate, thisDate);
+                                    //     claimStatus = `${daysToGo} days left`;
+                                    // } else if (isRedeemed) {
+                                    //     claimStatus = "Redeemed";
+                                    // } else if ((thisDate.getTime() - maturityDate.getTime()) / (1000 * 3600 * 24) >= 6) {
+                                    //     claimStatus = "Penalized"
+                                    // }
+                                    // else {
+                                    //     claimStatus = "Claimable";
+                                    // }
                                     xenftEntries.push({
                                         id: +result.token_id,
                                         claimStatus: claimStatus,
@@ -214,7 +216,7 @@ export function MintDbXeNFT(): any {
                                         maturityDateTime: resultAttributes[7].value,
                                         term: parseInt(resultAttributes[8].value),
                                         xenBurned: resultAttributes[9].value,
-                                        estimatedXen:(ethers.utils.formatEther((xenEstimated.toString()))),
+                                        estimatedXen:(ethers.utils.formatEther(xenEstimated)),
                                         category: resultAttributes[10].value,
                                         image: result.normalized_metadata.image
                                     });
@@ -430,13 +432,13 @@ export function MintDbXeNFT(): any {
             AMP
             * (Math.floor(Math.max(Math.log2(cRankDelta), 1) * factor) / factor)
             * (Number.isFinite(term) ? term : term)
-            * ((parseInt(EAA) + 1) / 1_000)
+            * (1 + parseInt(EAA) / 1_000)
         )
 
         let pen = 0
         const currentTimestamp = getTimestampInSeconds()
         if (currentTimestamp > maturityTs) {
-            pen = calcPenalty(getTimestampInSeconds() - maturityTs)
+            pen = calcPenalty(currentTimestamp - maturityTs)
         }
         const rew = Math.floor((reward * (100 - pen)) / 100);
         return BigNumber.from(rew).mul(BigNumber.from(VMUs)).mul(BigNumber.from(1e18.toString()))
@@ -485,8 +487,9 @@ export function MintDbXeNFT(): any {
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
         let term = mintInfoData[0];
         let maturityTs = mintInfoData[1];
-        let amp = mintInfoData[2];
-        let eea = mintInfoData[3];
+        let amp = mintInfoData[3];
+        let eea = mintInfoData[4];
+        let isRedeemed = mintInfoData[8];
 
         let priceURL = chain.priceURL;
         let method: Method = 'POST';
@@ -514,7 +517,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea, Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -598,7 +601,7 @@ export function MintDbXeNFT(): any {
                             <thead>
                                 <tr>
                                     <th scope="col">Token ID</th>
-                                    <th scope="col">Status</th>
+                                    {/* <th scope="col">Status</th> */}
                                     <th scope="col">VMUs</th>
                                     <th scope="col">Term (days)</th>
                                     <th scope="col">Maturiy</th>
@@ -614,7 +617,7 @@ export function MintDbXeNFT(): any {
                                     <>
                                         <tr key={i}>
                                             <td>{data.id}</td>
-                                            <td>{data.claimStatus}</td>
+                                            {/* <td>{data.claimStatus}</td> */}
                                             <td>{data.VMUs}</td>
                                             <td>{data.term}</td>
                                             <td>{data.maturityDateTime}</td>
