@@ -20,6 +20,7 @@ import { writePerCycle} from "../Common/aws-interaction";
 import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
+import Countdown, { zeroPad } from "react-countdown";
 
 const { BigNumber } = require("ethers");
 
@@ -57,6 +58,9 @@ export function MintDbXeNFT(): any {
     const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress);
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
+    const [endDate, setEndDate] = useState<any>();
+    const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 14, 8, 37, 0));
+    const now: any = Date.now();
 
     useEffect(() => {
         startMoralis();
@@ -76,6 +80,22 @@ export function MintDbXeNFT(): any {
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch((e) => console.log("moralis error"))
+    }
+
+    useEffect(() => {
+        timer();
+    }, [])
+
+    useEffect(() => {
+        timer();
+    }, [chain.chainId])
+
+    function timer() {
+        switch (Number(chain.chainId)) {
+            case 137:
+                setEndDate(datePolygon.getTime() - now);
+                break;
+        }
     }
 
     const currentCycleTotalPower = () => {
@@ -333,7 +353,6 @@ export function MintDbXeNFT(): any {
                 cRank
             )
 
-            console.log("fee", ethers.utils.formatEther(fee))
             // }
             const overrides = {
                 value: fee,
@@ -421,7 +440,7 @@ export function MintDbXeNFT(): any {
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(1_000_000_000))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
-        return fee
+        return fee.add(fee.div(10))
     }
 
     async function getNFTRewardInXen(
@@ -474,7 +493,6 @@ export function MintDbXeNFT(): any {
 
     const handleExpandRow = (id: any) => {
         XENFTs.map((data: any) => {
-            console.log(id == data.id)
             if (id == data.id) {
                 setXenftId(data.id);
                 setDisplayDbxenftDetails(!displayDbxenftDetails);
@@ -590,6 +608,23 @@ export function MintDbXeNFT(): any {
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - XENFTs.length) : 0;
 
+    const renderer = ({ hours, minutes, seconds, completed }: any) => {
+        if (completed) {
+            // Render a complete state
+            return (
+                <span>
+                    ~ {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                </span>
+            );
+        } else {
+            // Render a countdown
+            return (
+                <span>
+                    ~ {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+                </span>
+            );
+        }
+    };
 
     return (
         <div className={`content-box content-box-table ${initLoading ? "loading" : ""}`}>
@@ -606,7 +641,7 @@ export function MintDbXeNFT(): any {
                                     maximumFractionDigits: 8
                                 })}
                             </p>
-                            <p>Next cycle in: hh:mm:ss</p>
+                            <p>Next cycle in: <Countdown date={Date.now() + endDate} renderer={renderer} /></p>
                         </div>
                         { XENFTs.length > 0 ?
                             <table className="table" aria-label="custom pagination table">
