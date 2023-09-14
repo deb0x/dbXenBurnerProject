@@ -16,6 +16,7 @@ import ChainContext from '../Contexts/ChainContext';
 import "i18next";
 import { useTranslation } from 'react-i18next';
 import DBXen from "../../ethereum/dbxen"
+import { DBXENFT_LIST_ROUTE, FEES_ROUTE, HOME_ROUTE, MINTDBXENFT_ROUTE } from '../Common/routes';
 
 declare global {
     interface Window {
@@ -45,7 +46,7 @@ export function PermanentDrawer(props: any): any {
     }, [activatingConnector, connector])
 
     useEffect(() => {
-        switch(Number(chain.chainId)) {
+        switch (Number(chain.chainId)) {
             case 1:
                 setBaseUrl("https://etherscan.io/address/")
                 break;
@@ -88,7 +89,7 @@ export function PermanentDrawer(props: any): any {
 
     useEffect(() => {
         xenBurned();
-    },[]);
+    }, []);
 
     const xenBurned = async () => {
         await getTotalXenBurned().then((result: any) => {
@@ -96,22 +97,22 @@ export function PermanentDrawer(props: any): any {
         })
     }
 
-    async function getTotalXenBurned(){
+    async function getTotalXenBurned() {
         const signer = await library.getSigner(0)
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
         let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
-        let batchBurned =numberBatchesBurnedInCurrentCycle.toNumber();
+        let batchBurned = numberBatchesBurnedInCurrentCycle.toNumber();
         return batchBurned * 2500000;
     }
 
-    function floorPrecised(number:any) {
+    function floorPrecised(number: any) {
         var power = Math.pow(10, 2);
         return (Math.floor(parseFloat(number) * power) / power).toString();
     }
 
     async function totalAmountStaked() {
         const deb0xContract = DBXen(library, chain.deb0xAddress)
-        const currentCycle= await deb0xContract.currentStartedCycle()
+        const currentCycle = await deb0xContract.currentStartedCycle()
         const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
         const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
         setTotalStaked(floorPrecised(ethers.utils.formatEther(currentStake.sub(pendingStakeWithdrawal))))
@@ -133,7 +134,7 @@ export function PermanentDrawer(props: any): any {
                             <div className="img"></div>
                         </div>
                         <Box className="main-menu--left">
-                            <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp; 
+                            <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp;
                                 {Number(totalStaked).toLocaleString('en-US', {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
@@ -142,7 +143,14 @@ export function PermanentDrawer(props: any): any {
                                 {t("app_bar.xen_burned")}: {totalXENBurned}
                             </p>
                         </Box>
-                        <Burn />
+                        {window.location.pathname === HOME_ROUTE || window.location.pathname === FEES_ROUTE ?
+                            <Burn /> :
+                            <div className="dbxenft-menu">
+                                <a href={MINTDBXENFT_ROUTE}>XENFTs LIST</a>
+                                <a href={DBXENFT_LIST_ROUTE}> YOUR DBXENFTs</a>
+                            </div>
+                        }
+
                         <div className="content">
                             <div className="social-media">
                                 <a href="https://twitter.com/DBXen_crypto" target="_blank" className="logo-text-color">
@@ -162,21 +170,21 @@ export function PermanentDrawer(props: any): any {
                                 <div className="row">
                                     <span className="col-6">DBXen: </span>
                                     <a className="col-6" target="_blank"
-                                        href={baseUrl+chain.deb0xAddress}>
+                                        href={baseUrl + chain.deb0xAddress}>
                                         {formatAccountName(chain.deb0xAddress)}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenERC20: </span>
                                     <a className="col-6" target="_blank"
-                                        href={baseUrl+chain.deb0xERC20Address}>
+                                        href={baseUrl + chain.deb0xERC20Address}>
                                         {formatAccountName(chain.deb0xERC20Address)}
                                     </a>
                                 </div>
                                 <div className="row">
                                     <span className="col-6">DBXenViews:</span>
                                     <a className="col-6" target="_blank"
-                                        href={baseUrl+chain.deb0xViewsAddress}>
+                                        href={baseUrl + chain.deb0xViewsAddress}>
                                         {formatAccountName(chain.deb0xViewsAddress)}
                                     </a>
                                 </div>

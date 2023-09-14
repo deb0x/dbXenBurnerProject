@@ -1,0 +1,264 @@
+.theme--dark {
+    .app-container {
+        .main-container {
+            .dbxenft-page.content-box {
+                width: 95%;
+                margin: 0 auto;
+                border-radius: 0;
+                height: 70vh;
+                .card-container {
+                    border-bottom-right-radius: 45px;
+                    width: 100%;
+                    height: 100%;
+                    .card {
+                        background-color: #03033C;
+                        .button-group {
+                            border: 1px solid #19D2D2;
+                            border-radius: 32px;
+                            margin: 15px 0;
+                            .tab-button {
+                                width: 50%;
+                                color: #19D2D2;
+                                padding: 0;
+                                font-size: 12px;
+                                &.Mui-selected {
+                                    background-color: #19D2D2;
+                                    color: #030339;
+                                }
+                                &.Mui-selected:first-child {
+                                    border-top-left-radius: 32px;
+                                    border-bottom-left-radius: 32px;
+                                }
+                                &.Mui-selected:last-child {
+                                    border-top-right-radius: 32px;
+                                    border-bottom-right-radius: 32px;
+                                }
+                            }
+                        }
+                    }
+                    .stake-card {
+                        border: 1px solid #19D2D2;
+                        border-top-right-radius: 0;
+                        border-bottom-right-radius: 0;
+                        .nft-card {
+                            .card-header {
+                                text-align: center;
+                                img {
+                                    width: 50%;
+                                }
+                            }
+                            .card-details {
+                                font-size: 14px;
+                                .dbxenft-power {
+                                    color: #62CFD0;
+                                    .label {
+                                        font-size: 12px;
+                                        opacity: 0.4;
+                                        display: block;
+                                    }
+                                    .value {
+                                        font-weight: 500;
+                                    }
+                                }
+                                .card-row {
+                                    display: flex;
+                                    justify-content: space-between;
+                                    color: #B7B7CA;
+                                    .label {
+                                        font-weight: 100;
+                                        margin-right: 5px;
+                                    }
+                                    .value {
+                                        font-weight: 500;
+                                        text-align: right;
+                                    }
+                                }
+                            }
+                        }
+
+                        .amount-row {
+                            align-items: center;
+                            margin: 5px 0 15px 0;
+                            padding: 0;
+                            flex-flow: nowrap;
+                            fieldset {
+                                border-color: #f2e9dc;
+                                border-radius: 50px;
+                                .legend {
+                                    display: none;
+                                }
+                            }
+                            input {
+                                padding: 5px 10px;
+                                color: #F2E9DC;
+                            }
+                            input,
+                            &::placeholder {
+                                color: t('text');
+                            }
+                        }
+                        .max-btn {
+                            padding: 2px 20px;
+                            border: 2px solid #19D2D2;
+                            background-color: transparent;
+                            color: t('text');
+                            font-size: 1.5vh;
+                            border-radius: 25px;
+                            margin-left: 10px;
+                            box-shadow: none;
+                        }
+                        .stake-btn,
+                        .approve-btn,
+                        .unstake-btn {
+                            width: 100%;
+                            border: 1px solid #19D2D2;
+                            border-radius: 40px;
+                            background-color: #19D2D2;
+                            text-transform: uppercase;
+                            font-weight: 500;
+                            padding: 5px 40px;
+                        }
+
+                        .stake-container {
+                            width: 100%;
+                            padding-top: 16px;
+                            border-top: 1px solid rgba(25, 210, 210, 0.2);
+                            .tokens-in-wallet {
+                                color: #fff;
+                                display: flex;
+                                padding-left: 5px;
+                                padding-bottom: 10px;
+                                .label {
+                                    margin: 0 5px;
+                                }
+                                
+                            }
+                            .amount-row {
+                                width: 100%;
+                                .MuiGrid-item.input {
+                                    width: 100%;
+                                    .MuiInputBase-root {
+                                        width: 100%;
+                                        input {
+                                            width: 100%;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .reward-card {
+                        border-bottom-right-radius: 45px;
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                        border: 1px solid #19D2D2;
+                        border-left: none;
+                        .tokens-in-wallet {
+                            color: #fff;
+                            padding: 15px 0;
+                            border-bottom: 1px solid rgba(25, 210, 210, 0.2);
+                        }
+                        .native-fees {
+                            border-bottom: 1px solid rgba(25, 210, 210, 0.2);
+                        }
+                        .fees {
+                            color: #fff;
+                            padding: 15px 0;
+                        }
+                        .collect-btn {
+                            font-size: 1.5vh;
+                            color: #F5B700;
+                            background-color: transparent;
+                            border: 2px solid #F5B700;
+                            border-radius: 33px;
+                            box-shadow: none;
+                            padding: 10px 40px;
+                            white-space: nowrap;
+                            margin: 10px 0;
+                            .MuiLoadingButton-loadingIndicator {
+                                color: #F5B700;
+                                margin: 0 5px 2px 0;
+                                .MuiCircularProgress-root {
+                                    width: 20px !important;
+                                    height: 20px !important;
+                                }
+                            }
+                        }
+                        .MuiLoadingButton-loadingIndicator {
+                            color: t('text');
+                            position: relative;
+                            left: 0;
+                            transform: none;
+                        }
+                        .collect-btn:disabled {
+                            border: 2px solid #6B6274;
+                            color: #6B6274;
+                        }
+                    }
+                    .back-to-approve {
+                        display: flex;
+                        align-items: center;
+                        margin: 5px 0;
+                        .collect-btn {
+                            font-size: 1.5vh;
+                            color: #F5B700;
+                            background-color: #030328;
+                            border: 2px solid #F5B700;
+                            border-radius: 33px;
+                            box-shadow: none;
+                            padding: 10px 40px;
+                            white-space: nowrap;
+                        }
+                        span.text {
+                            padding-left: 1vh;
+                            color: #F2E9DC;
+                        }
+                    }
+                }
+            }
+        }
+    }
+} 
+
+@media (max-width: 768px) {
+
+    .theme--dark {
+        .app-container {
+            .main-container {
+                .dbxenft-page.content-box {
+                    width: 100%;
+                    padding: 0;
+                    border-radius: 0;
+                    .card-container {
+                        height: 53vh;
+                        overflow-y: auto;
+                        overflow-x: hidden;
+                        margin-left: 0;
+                        margin-right: 0;
+                        border-bottom-right-radius: 0;
+                        border: none;
+                        .card {
+                            padding: 15px 0;
+                        }
+                        .stake-card {
+                            border-right: none;
+                            border-bottom: 1px solid #19D2D2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #root .theme {
+        .app-container {
+            .main-container {
+                .dbxenft-page.content-box {
+                    border-radius: 0;
+                }
+            }
+        }
+    }
+
+    
+}
