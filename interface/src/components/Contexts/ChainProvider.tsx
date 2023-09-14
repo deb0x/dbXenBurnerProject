@@ -31,7 +31,7 @@ const ChainProvider = ( { children }: Props ) => {
                         setChain({
                             deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                            deb0xERC20Address: "0x8Ee4Ba0FBB205C0B3b4E66d9caD34B943a5649cF",
+                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
                             dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
                             dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
