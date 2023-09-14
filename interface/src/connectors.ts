@@ -14,6 +14,7 @@ const RPC_URLS: { [chainId: number]: string } = {
     9001:'https://evmos-evm.publicnode.com',
     2000:'https://rpc.dogechain.dog',
     10001:'https://mainnet.ethereumpow.org',
+    80001:'https://polygon-mumbai.g.alchemy.com/v2/mHR3HgJxtdjCrBdRznKLgvpjpMsmWB0T',
     8453: 'https://developer-access-mainnet.base.org'
 }
 

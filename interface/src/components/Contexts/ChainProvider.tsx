@@ -31,8 +31,12 @@ const ChainProvider = ( { children }: Props ) => {
                         setChain({
                             deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                            deb0xERC20Address: "0x8Ee4Ba0FBB205C0B3b4E66d9caD34B943a5649cF",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                            dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
+                            dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
+                            xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                            mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             chainId: parseInt(result, 16),
                             chainName: "polygon",
                             currency: "MATIC",
@@ -142,6 +146,23 @@ const ChainProvider = ( { children }: Props ) => {
                             currency: "ETHW",
                             priceURL: "https://mainnet.ethereumpow.org",
                             dxnTokenName: "vvDXN"
+                        })
+                        break;
+                    case 80001:
+                        setChain({
+                            deb0xAddress: "0x0E792967c96e14247ca787D31705537a62D5f95b",
+                            deb0xViewsAddress: "0x82D197ED51f4290F8F152D297e1ae13947FeBA61",
+                            deb0xERC20Address: "0x8072f9b55fA3077AbE0B03588E4e90fF8cB707e0",
+                            xenCryptoAddress: "0xF230D614e75aE05dF44075CaB230Fa67F10D8dCD",
+                            dbxenftFactoryAddress: "0x81b0b217ca5F3c70b5240ecc0Ae5CE92891dE556",
+                            dbxenftAddress: "0x00f977b06902289DCe154780E38cDdc9345136ec",
+                            xenftAddress: "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48",
+                            mintInfoAddress: "0x49b441334CA6A159f422bFDd62d638f5942332C0",
+                            chainId: parseInt(result, 16),
+                            chainName: "Mumbai",
+                            currency: "MATIC",
+                            priceURL: "https://polygon-mumbai.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "mumDXN"
                         })
                         break;
                     case 8453:

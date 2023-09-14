@@ -1,0 +1,73 @@
+.card-view {
+    height: 75vh;
+    .empty {
+        height: 100%;
+    }
+    .empty-container {
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .row {
+        .card-col {
+            .nft-card {
+                height: 100%;
+                padding: 15px;
+                background: #03033C;
+                position: relative;
+                img {
+                    width: 100%;
+                }
+                .card-row {
+                    font-size: 14px;
+                    display: flex;
+                    justify-content: space-between;
+                    .label {
+                        opacity: 0.4;
+                        white-space: nowrap;
+                    }
+                    .value {
+                        white-space: nowrap;
+                        width: 100%;
+                        overflow: hidden;
+                        padding-left: 10px;
+                        text-overflow: ellipsis;
+                    }
+                }
+                .detail-button-container {
+                    padding-top: 15px;
+                    text-align: center;
+                    .dbxenft-detail-btn {
+                        background-color: transparent;
+                        border: 1px solid #19D2D2;
+                        color: #fff;
+                        border-radius: 25px;
+                        font-size: 14px;
+                        width: 100%;
+                    }
+                }
+                .divider {
+                    border-bottom: 0.5px solid #fff;
+                    box-shadow: 0px 1px 3px #D742F3;
+                    width: 100%;
+                    margin: 10px 0;
+                }
+            }
+        }
+    }
+}
+
+.content-box.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .card-view {
+        height: 53vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}

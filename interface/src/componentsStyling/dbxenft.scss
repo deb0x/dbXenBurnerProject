@@ -1,7 +1,22 @@
 .table-view {
     width: 100%;
-    display: none;
-    table {
+    height: 75vh;
+    p {
+        margin-bottom: 0;
+    }
+    // display: none;
+    .empty-list {
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .table {
+        background-color: transparent;
+        color: #fff;
+        font-family: "Karla";
+        --bs-table-bg: transparent;
+        --bs-table-color: #fff;
         thead {
             color: #62CFD0;
             tr {
@@ -39,12 +54,84 @@
             }
         }
     }
+    .xenft-details-row {
+        .detailed-view {
+            height: 100%;
+            width: 100%;
+            font-family: "Manrope";
+            padding: 15px 0;
+            .nft-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .nft-id {
+                    font-size: 30px;
+                }
+                .nft-details {
+                    font-size: 14px;
+                }
+            }
+            .xenft-container {
+                .xenft-details {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding-bottom: 15px;
+                    .img-container {
+                        width: 20%;
+                        img {
+                            width: 100%;
+                        }
+                    }
+                    .details-container {
+                        font-size: 14px;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-around;
+                        .label {
+                            opacity: 0.4;
+                        }
+                    }
+                }
+                .power {
+                    color: #62CFD0;
+                    .label {
+                        opacity: 0.4;
+                        font-size: 14px;
+                    }
+                    .value {
+                        font-weight: 600;
+                        font-size: 20px;
+                    }
+                }
+                .burn-button-container {
+                    .burn-button.btn {
+                        border: 1px solid #62CFD0;
+                        &:hover {
+                            background-color: transparent;
+                            color: #fff;
+                        }
+                        .MuiLoadingButton-loadingIndicator {
+                            left: 45%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.content-box.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .text-container-nft {
     height: 75vh;
     width: 100%;
-    display: flex;
+    display: none;
     justify-content: space-between;
     align-items: center;
     text-align: center;
@@ -101,6 +188,16 @@
     }
 }
 
+.theme--dark {
+    .app-container {
+        .main-container {
+            .content-box.content-box-table {
+                overflow: auto;
+            }
+        }
+    }
+}
+
 @media (max-width: 768px) {
     .text-container-nft {
         height: 50vh;
@@ -117,6 +214,21 @@
 
         .card {
             width: 80%;
+        }
+    }
+    .table-view {
+        height: 55vh;
+        .xenft-details-row {
+            td {
+                display: block;
+            }
+            .detailed-view {
+                .xenft-container {
+                    .xenft-details {
+                        display: -webkit-inline-box;
+                    }
+                }
+            }
         }
     }
 }

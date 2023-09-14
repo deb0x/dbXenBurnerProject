@@ -1,0 +1,6 @@
+{
+    "name": "THIS IS REAL TEST DBXEN NFT #${this.id}",
+    "description": "DBXEN NFT FOR PASSIVE INCOME",
+    "image": "https://imagesfornft.s3.eu-west-3.amazonaws.com/Screenshot+from+2023-07-05+16-28-05.png",
+    "external_url": "https://dbxen.org/your-dbxenfts/${this.id}"
+}

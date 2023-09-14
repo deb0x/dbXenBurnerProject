@@ -5,6 +5,11 @@ $randomNumber: random(4);
     src: url('../src/fonts/Karla/Karla-Regular.ttf');
 }
 
+@font-face {
+    font-family: 'Manrope';
+    src: url('../src/fonts/Manrope-Regular.ttf');
+}
+
 #root {
     height: 100vh;
     overflow: hidden;
@@ -265,6 +270,45 @@ $randomNumber: random(4);
             }
             p {
                 font-size: 60px;
+            }
+        }
+    }
+
+    .MuiTablePagination-toolbar {
+        gap: 10px;
+        .MuiTablePagination-spacer {
+            display: none;
+        }
+        .MuiTablePagination-selectLabel,
+        .MuiTablePagination-displayedRows {
+            margin: 0;
+            color: #fff;
+        }
+        .MuiTablePagination-select {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            background-color: transparent;
+            color: #fff;
+        }
+        .MuiTablePagination-menuItem {
+            color: #F2E9DC;
+            background: #030328;
+        }
+        .MuiTablePagination-actions {
+            padding: 2px;
+            border: 1px solid #62CFD0;
+            border-radius: 50px;
+            text-align: center;
+        }
+        .MuiTablePagination-actions>button {
+            margin: 0 8px;
+            border: transparent;
+            border-radius: 4px;
+            background-color: transparent;
+            color: #fff;
+            &:disabled {
+                opacity: 0.3;
             }
         }
     }
@@ -540,7 +584,7 @@ $randomNumber: random(4);
             min-height: 100vh;
             padding: 25px 10px;
             .app-container {
-                height: 85vh;
+                height: 87vh;
                 border-radius: 25px;
                 header {
                     background-color: transparent;
@@ -584,8 +628,8 @@ $randomNumber: random(4);
                     width: 100%;
                     bottom: 0;
                     justify-content: space-around;
-                    height: 10vh;
-                    font-size: 3vh;
+                    height: 8vh;
+                    font-size: 1.5vh;
                     background-color: #051645;
                     z-index: 999;
                     .navigation-item {
