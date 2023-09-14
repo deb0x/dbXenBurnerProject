@@ -5,6 +5,12 @@
         margin-bottom: 0;
     }
     // display: none;
+    .empty-list {
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .table {
         background-color: transparent;
         color: #fff;
@@ -70,7 +76,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding-bottom: 35px;
+                    padding-bottom: 15px;
                     .img-container {
                         width: 20%;
                         img {
@@ -116,7 +122,11 @@
     }
 }
 
-
+.content-box.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .text-container-nft {
     height: 75vh;

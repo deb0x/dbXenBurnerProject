@@ -8,7 +8,7 @@ const { formatUnits, formatEther } = require('ethers');
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
 const IMAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/assets/";
 const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-metadata-polygon"
-const dbxenftFactoryAddress = "0x81b0b217ca5F3c70b5240ecc0Ae5CE92891dE556";
+const dbxenftFactoryAddress = "0xD320EbfD902489F84b2F96bEcb2b109943ED480F";
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -22,7 +22,7 @@ const putStorageObject = (data) =>
     .then((result) => result.json());
 
 export async function writePerCycle(id, maturityTs) {
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    const provider = new ethers.providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com");
     let factory = Factory(provider, dbxenftFactoryAddress);
     let dbxenftEntryPower = ethers.utils.formatEther((await factory.dbxenftEntryPower(id)));
     let fileName = id + ".json";
@@ -35,8 +35,8 @@ export async function writePerCycle(id, maturityTs) {
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,
-            "name": `THIS IS REAL TEST DBXEN NFT #${id}, BUT IS UNREVEAL`,
-            "description": "DBXEN NFT FOR PASSIVE INCOME",
+            "name": "UNREVEALED ARTWORK",
+            "description": "",
             "image": "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/dbxenNft-beforeReveal.png",
             "external_url": `https://dbxen.org/your-dbxenfts/${id}`,
             "attributes": [{

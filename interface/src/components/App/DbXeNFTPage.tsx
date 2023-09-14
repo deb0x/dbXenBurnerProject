@@ -9,7 +9,6 @@ import { BigNumber, ethers } from "ethers";
 import { Button, Card, CardActions, CardContent, Grid, OutlinedInput, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import "../../componentsStyling/dbxenftPage.scss";
-import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
 import coinBagLight from "../../photos/icons/coin-bag-solid--light.svg";
 import walletLight from "../../photos/icons/wallet--light.svg";
 import DBXenERC20 from "../../ethereum/dbxenerc20";
@@ -99,8 +98,8 @@ export function DbXeNFTPage(): any {
                     if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
                         dbxenftEntries.push({
                             id: result.token_id,
-                            name: `THIS IS REAL TEST DBXEN NFT #${result.token_id}, BUT IS UNREVEAL`,
-                            description: "DBXEN NFT FOR PASSIVE INCOME",
+                            name: "UNREVEALED ARTWORK",
+                            description: "",
                             image: nftImage,
                         });
                     } else {
@@ -150,6 +149,7 @@ export function DbXeNFTPage(): any {
             })
             setLoading(false)
         }
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     const stake = (tokenId: any) => {
@@ -185,6 +185,7 @@ export function DbXeNFTPage(): any {
             })
             setLoading(false)
         })
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     async function unstake(tokenId: any, amount: any) {
@@ -218,6 +219,7 @@ export function DbXeNFTPage(): any {
             })
             setLoading(false)
         }
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     const setStakeAmount = () => {
@@ -280,6 +282,7 @@ export function DbXeNFTPage(): any {
             })
             setClaimLoading(false)
         })
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     const backToApprove = () => {
@@ -486,6 +489,8 @@ export function DbXeNFTPage(): any {
             })
             setClaimXenLoading(false)
         }
+
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     async function isXenftRedeemed(dbxenftId: any) {
@@ -539,10 +544,6 @@ export function DbXeNFTPage(): any {
                                                 <span className="value">{xenft.name}</span>
                                             </div>
                                             <div className="card-row">
-                                                <span className="label">description: </span>
-                                                <span className="value">{xenft.description}</span>
-                                            </div>
-                                            <div className="card-row">
                                                 <span className="label">matures on: </span>
                                                 <span className="value">{new Date(xenft.maturityDate).toLocaleString()}</span>
                                             </div>
@@ -552,7 +553,7 @@ export function DbXeNFTPage(): any {
                             </CardContent>
                             <CardActions>
                                 {alignment === "stake" ?
-                                    <div>
+                                    <div className="stake-container">
                                         {approved &&
                                         <>
                                             <div className="tokens-in-wallet">
@@ -563,14 +564,14 @@ export function DbXeNFTPage(): any {
                                                 <p className="m-0" >
                                                     <strong>
                                                         {Number(userStakedAmount).toLocaleString('en-US', {
-                                                            minimumFractionDigits: 8,
-                                                            maximumFractionDigits: 8
+                                                            minimumFractionDigits: 4,
+                                                            maximumFractionDigits: 4
                                                         })} DXN
                                                     </strong>
                                                 </p>
                                             </div>
                                             <Grid className="amount-row" container>
-                                                <Grid item>
+                                                <Grid className="input" item>
                                                     <OutlinedInput id="outlined-basic"
                                                         placeholder="amount to stake"
                                                         type="number"
@@ -622,7 +623,7 @@ export function DbXeNFTPage(): any {
                                             </div>
                                         }
                                     </div> :
-                                    <div>
+                                    <div className="stake-container">
                                         <div className="tokens-in-wallet">
                                             <img className="display-element" src={coinBagLight} alt="wallet" />
                                             <p className="label">
@@ -631,14 +632,14 @@ export function DbXeNFTPage(): any {
                                             <p className="mb-0" >
                                                 <strong>
                                                     {Number(tokensForUnstake).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 8,
-                                                        maximumFractionDigits: 8
+                                                        minimumFractionDigits: 4,
+                                                        maximumFractionDigits: 4
                                                     })} DXN
                                                 </strong>
                                             </p>
                                         </div>
                                         <Grid className="amount-row" container>
-                                            <Grid item>
+                                            <Grid className="input" item>
                                                 <OutlinedInput value={amountToUnstake}
                                                     id="outlined-basic"
                                                     className="max-field"
@@ -673,24 +674,24 @@ export function DbXeNFTPage(): any {
                     <CardContent>
                         <div className="tokens-in-wallet">
                             <img className="display-element" src={walletLight} alt="wallet" />
-                            <p className="">
-                                Your tokens in wallet:
+                            <p className="mb-0">
+                                DXN tokens in your wallet:
                             </p>
-                            <p className="" >
+                            <p className="m-0" >
                                 <strong>
                                     {Number(userUnstakedAmount).toLocaleString('en-US', {
-                                        minimumFractionDigits: 8,
-                                        maximumFractionDigits: 8
-                                    })} DXN
+                                        minimumFractionDigits: 4,
+                                        maximumFractionDigits: 4
+                                    })} {chain.dxnTokenName}
                                 </strong>
                             </p>
                         </div>
-                        <div className="fees">
+                        <div className="fees native-fees">
                             <img className="display-element" src={coinBagLight} alt="coinbag" />
-                            <p className="">
+                            <p className="m-0">
                                 Your unclaimed fees:
                             </p>
-                            <p className="" >
+                            <p className="m-0" >
                                 {unclaimedFees} {chain.currency}
                             </p>
                             <LoadingButton
@@ -703,12 +704,12 @@ export function DbXeNFTPage(): any {
                             </LoadingButton>
                         </div>
 
-                        <div className="fees">
+                        <div className="fees xen-fees">
                             <img className="display-element" src={coinBagLight} alt="coinbag" />
-                            <p className="">
+                            <p className="m-0">
                                 Your unclaimed XEN:
                             </p>
-                            <p className="" >
+                            <p className="m-0" >
                                 {unclaimedXen}
                             </p>
                             <LoadingButton

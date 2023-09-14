@@ -1,5 +1,14 @@
 .card-view {
     height: 75vh;
+    .empty {
+        height: 100%;
+    }
+    .empty-container {
+        height: 90%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
     .row {
         .card-col {
             .nft-card {

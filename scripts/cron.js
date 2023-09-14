@@ -1,8 +1,6 @@
-import AWS from 'aws-sdk/global.js';
-import S3 from 'aws-sdk/clients/s3.js';
 import cron from 'node-cron';
 import { JsonRpcProvider } from 'ethers';
-import { ethers, formatUnits, formatEther } from 'ethers';
+import { formatEther } from 'ethers';
 import Factory from "./dbxenftFactory.js";
 import mintInfo from "./mintInfo.js";
 import XENFT from "./DBXENFT.js";
@@ -12,9 +10,9 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x81b0b217ca5F3c70b5240ecc0Ae5CE92891dE556";
-const mintInfoAddress = "0x2c1c89ce0537A5565da812A9afdBee0184851612";
-const xenftAddress = "0xd78FDA2e353C63bb0d7F6DF58C67a46dD4BBDd48";
+const dbxenftFactoryAddress = "0xD320EbfD902489F84b2F96bEcb2b109943ED480F";
+const mintInfoAddress = "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4";
+const xenftAddress = "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
 const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-metadata-polygon"
@@ -47,7 +45,7 @@ function mulDiv(x, y, denominator) {
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
         .catch((e) => console.log("Moralis Error"))
-    let dateForParam = subMinutes(new Date(), 10);
+    let dateForParam = subMinutes(new Date(), 3000);
     let results = [];
     await getIdsFromEvent(null, dateForParam).then(async(result) => {
         for (let i = 0; i < result.raw.result.length; i++) {
@@ -74,7 +72,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
     if (cursor != null)
         cursorData = cursor.toString()
     const response = await Moralis.EvmApi.events.getContractEvents({
-        "chain": "0x13881",
+        "chain": "137",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
         "cursor": cursorData,
         "fromDate": dateForParam,
@@ -108,7 +106,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider("https://polygon-mumbai.blockpi.network/v1/rpc/public");
+    const provider = new JsonRpcProvider("https://rpc-mainnet.maticvigil.com");
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
@@ -139,8 +137,8 @@ async function generateAfterReveal() {
             }, ]
             let standardMetadata = {
                 "id": `${ids[i]}`,
-                "name": `THIS IS REAL TEST DBXEN NFT #${ids[i]}, NOW REVEAL!`,
-                "description": "DBXEN NFT FOR PASSIVE INCOME and reveal",
+                "name": "DBXeNFT: Cool art & Trustless Daily Yield",
+                "description": "",
                 "image": getImage(newPower),
                 "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
                 "attributes": attributesValue
@@ -191,6 +189,6 @@ function getImage(power) {
         return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/6DBXeNFT_6.png"
 }
 
-cron.schedule('*/10 * * * *', async() => {
+cron.schedule('*/1 * * * *', async() => {
     await generateAfterReveal();
 });

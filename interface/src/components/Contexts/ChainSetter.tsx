@@ -180,10 +180,10 @@ export default function ChainSetter(props: any) {
                         setChain({
                             deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                            deb0xERC20Address: "0x8Ee4Ba0FBB205C0B3b4E66d9caD34B943a5649cF",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                            dbxenftFactoryAddress: "0x0a5449f006bc137EE65Ad8D6256b611E3B49198a",
-                            dbxenftAddress: "0xf706360bD48F4Dd322DFB0A80F0766D257ac60cf",
+                            dbxenftFactoryAddress: "0xD320EbfD902489F84b2F96bEcb2b109943ED480F",
+                            dbxenftAddress: "0xc62A1F78A5E53Cb11FEd4BC09eCc5166d31FfA64",
                             xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
                             mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             chainId: parseInt(result, 16),
@@ -423,13 +423,6 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="ethpow" src={ethpow} className="ethpow"/>
                         Switch to EthereumPoW
-                    </button>
-                    <button
-                        onClick={() => handleNetworkSwitch("mumbai")}
-                        className="btn"
-                    >
-                        <img alt="polygon" src={polygon} className="polygon"/>
-                        Switch to Polygon Mumbai
                     </button>
                 </Popper>
             </div>

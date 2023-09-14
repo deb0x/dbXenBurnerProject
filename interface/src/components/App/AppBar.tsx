@@ -282,7 +282,7 @@ export function AppBarComponent(props: any): any {
                         </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        {dimensions.width > 768 ?
+                        {dimensions.width > 768 && chain.chainId == "137" ?
                             <button onClick={ handleSwitchComponent } className="component-switcher">
                                 <img src={window.location.pathname.includes("dbxenft") ? dbxen : dbxenft} alt="logo" />
                                 <img src={arrow} alt="arrow" />

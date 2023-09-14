@@ -52,11 +52,13 @@ export function DbXeNFTList(): any {
             }
             resultArray = results?.flat();
             const nfts = [];
+            console.log(results)
             if (resultArray?.length != 0 && resultArray != undefined) {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
                     if( resultArray[i].token_id === null ||
-                            resultArrayElement.normalized_metadata.attributes.length === 0 || 
+                            resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                            resultArrayElement.normalized_metadata.image === null ||
                             resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
                     {
                         const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
@@ -87,8 +89,8 @@ export function DbXeNFTList(): any {
                         } else {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
-                                name: `THIS IS REAL TEST DBXEN NFT #${nftMeta.raw.token_id}, BUT IS UNREVEAL`,
-                                description: "DBXEN NFT FOR PASSIVE INCOME",
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
                                 image: nftImage
                             });
                         }
@@ -148,7 +150,7 @@ export function DbXeNFTList(): any {
             { loading ? 
                 <Spinner color={'white'} /> :
                 <div className="card-view">
-                    <div className="row g-5">
+                    <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0
                                 ? DBXENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -166,10 +168,6 @@ export function DbXeNFTList(): any {
                                         <div className="card-row">
                                             <span className="label">name</span>
                                             <span className="value">{xenft.name}</span>
-                                        </div>
-                                        <div className="card-row">
-                                            <span className="label">description</span>
-                                            <span className="value">{xenft.description}</span>
                                         </div>
                                         <div className="detail-button-container">
                                             <button type="button" className="btn dbxenft-detail-btn"

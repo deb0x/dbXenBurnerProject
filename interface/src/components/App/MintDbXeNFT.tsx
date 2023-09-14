@@ -49,12 +49,14 @@ export function MintDbXeNFT(): any {
     const { chain } = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({});
     const [loading, setLoading] = useState(false);
+    const [initLoading, setInitLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
     const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
     const [xeNFTWrapApproved, setXeNFTWrapAppeoved] = useState<boolean>();
     const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress);
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
+    const [isRedeemed, setIsRedeemed] = useState<boolean>();
 
     useEffect(() => {
         startMoralis();
@@ -94,6 +96,7 @@ export function MintDbXeNFT(): any {
 
     const getXENFTs = () => {
         let resultArray: any;
+        setInitLoading(true)
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
             const results = result.raw.result;
             let cursor = result.raw.cursor;
@@ -118,19 +121,19 @@ export function MintDbXeNFT(): any {
                     if (result.normalized_metadata?.attributes?.length != undefined) {
                         if (result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
                             await Moralis.EvmApi.nft.reSyncMetadata({
-                                "chain": "0x13881",
+                                "chain": chain.chainId,
                                 "flag": "uri",
                                 "mode": "async",
                                 "address": chain.xenftAddress,
                                 "tokenId": resultArray[i].token_id
                             });
                             let responseMetadata = await Moralis.EvmApi.nft.getNFTMetadata({
-                                "chain": "0x13881",
+                                "chain": chain.chainId,
                                 "format": "decimal",
                                 "normalizeMetadata": true,
                                 "mediaItems": false,
                                 "address": chain.xenftAddress,
-                                "tokenId": resultArray[i].token_id
+                                "tokenId": resultArray[i].token_idFs
                             })
                             if (responseMetadata?.raw.normalized_metadata?.attributes != undefined) {
                                 resultAttributes = responseMetadata?.raw.normalized_metadata?.attributes;
@@ -155,7 +158,9 @@ export function MintDbXeNFT(): any {
                         //     await XENFTContract.mintInfo(result.token_id)
                         // )
                         let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
-                        //let formattedMaturityDate = new Date(resultAttributes[5].value + resultAttributes[7].value)
+                        //let formattedMaturityDate = new
+                        //Date(resultAttributes[5].value +
+                        //resultAttributes[7].value)
                         if (chain.chainId == "80001") {
                             if (boolVal) {
                                 xenftEntries.push({
@@ -228,7 +233,7 @@ export function MintDbXeNFT(): any {
                     }
                 }
                 setXENFTs(xenftEntries);
-                setLoading(false);
+                setInitLoading(false);
             }
         })
     }
@@ -297,6 +302,7 @@ export function MintDbXeNFT(): any {
             })
             setLoading(false)
         }
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     async function mintDBXENFT(
@@ -326,6 +332,8 @@ export function MintDbXeNFT(): any {
                 AMP,
                 cRank
             )
+
+            console.log("fee", ethers.utils.formatEther(fee))
             // }
             const overrides = {
                 value: fee,
@@ -360,6 +368,7 @@ export function MintDbXeNFT(): any {
             })
             setLoading(false)
         }
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     function calcMaturityDays(term: any, maturityTs: any) {
@@ -460,26 +469,27 @@ export function MintDbXeNFT(): any {
         return Math.floor(Date.now() / 1000)
     }
 
-    const [displayXenftDetails, setDisplayXenftDetails] = useState(false);
     const [displayDbxenftDetails, setDisplayDbxenftDetails] = useState(false);
     const [xenftId, setXenftId] = useState();
 
     const handleExpandRow = (id: any) => {
         XENFTs.map((data: any) => {
+            console.log(id == data.id)
             if (id == data.id) {
                 setXenftId(data.id);
-                setDisplayXenftDetails(!displayXenftDetails);
-                setDisplayDbxenftDetails(false);
+                setDisplayDbxenftDetails(!displayDbxenftDetails);
                 setDBXNFT({
                     protocolFee: "0",
                     transactionFee: "0"
                 })
+            } else {
+                if(displayDbxenftDetails == false)
+                    setDisplayDbxenftDetails(true)
             }
         })
     }
 
     const previewData = async (NFTData: any) => {
-        setDisplayDbxenftDetails(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -489,7 +499,7 @@ export function MintDbXeNFT(): any {
         let maturityTs = mintInfoData[1];
         let amp = mintInfoData[3];
         let eea = mintInfoData[4];
-        let isRedeemed = mintInfoData[8];
+        setIsRedeemed(mintInfoData[8]);
 
         let priceURL = chain.priceURL;
         let method: Method = 'POST';
@@ -510,7 +520,7 @@ export function MintDbXeNFT(): any {
 
         axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
-                if (Number(chain.chainId) === 80001) {
+                if (Number(chain.chainId) === 137) {
                     gasLimitVal = (BigNumber.from("400000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
@@ -523,7 +533,7 @@ export function MintDbXeNFT(): any {
                         transactionFee: transactionFee.toString()
                     })
 
-                    // console.log("protocol fee", ethers.utils.formatEther(protocolFee))
+                    console.log(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                 }
             }
         })
@@ -538,9 +548,8 @@ export function MintDbXeNFT(): any {
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
         let term = mintInfoData[0];
         let maturityTs = mintInfoData[1];
-        let amp = mintInfoData[2];
-        let eea = mintInfoData[3];
-
+        let amp = mintInfoData[3];
+        let eea = mintInfoData[4];
 
         isApprovedForAll()
             .then((result) => {
@@ -583,10 +592,12 @@ export function MintDbXeNFT(): any {
 
 
     return (
-        <div className="content-box content-box-table">
+        <div className={`content-box content-box-table ${initLoading ? "loading" : ""}`}>
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
-                { chain.chainId == "80001" ?
+                {initLoading ? 
+                    <Spinner color={'white'} /> :
+                    chain.chainId == "137" ?
                     <div className="table-view table-responsive-xl">
                         <div>
                             <p>Total power in this cycle:&nbsp;
@@ -597,154 +608,170 @@ export function MintDbXeNFT(): any {
                             </p>
                             <p>Next cycle in: hh:mm:ss</p>
                         </div>
-                        <table className="table" aria-label="custom pagination table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Token ID</th>
-                                    {/* <th scope="col">Status</th> */}
-                                    <th scope="col">VMUs</th>
-                                    <th scope="col">Term (days)</th>
-                                    <th scope="col">Maturiy</th>
-                                    <th scope="col">Estimated XEN</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(rowsPerPage > 0
-                                    ? XENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : XENFTs
-                                ).map((data: any, i: any) => (
-                                    <>
-                                        <tr key={i}>
-                                            <td>{data.id}</td>
-                                            {/* <td>{data.claimStatus}</td> */}
-                                            <td>{data.VMUs}</td>
-                                            <td>{data.term}</td>
-                                            <td>{data.maturityDateTime}</td>
-                                            <td>{data.estimatedXen}</td>
-                                            <td>
-                                                <button
-                                                    className="detail-btn"
-                                                    type="button"
-                                                    onClick={() => {
-                                                        handleExpandRow(data.id);
-                                                        previewData(data)
-                                                    }}
-                                                >
-                                                    PREVIEW DBXENFT
-                                                </button>
-                                            </td>
-                                        </tr>
-                                            <tr className="xenft-details-row">
-                                                {displayDbxenftDetails && xenftId === data.id ?
-                                                    <td colSpan={12}>
-                                                    {DBXENFT != null ?
-                                                        <div className="detailed-view row">
-                                                            <div className="col xenft-container">
-                                                                <div className="xenft-details">
-                                                                    <div className="img-container">
-                                                                        <img src={nftImage} alt="nft-image" />
-                                                                    </div>
-                                                                    <div className="details-container">
-                                                                        <div className="row">
-                                                                            <div className="col-6">
-                                                                                <p className="label">
-                                                                                    Protocol fee
-                                                                                </p>
-                                                                                <p className="value">
-                                                                                    {Number(DBXENFT?.protocolFee).toLocaleString('en-US', {
-                                                                                        minimumFractionDigits: 10,
-                                                                                        maximumFractionDigits: 10
-                                                                                    })}
-                                                                                </p>
-                                                                            </div>
-                                                                            <div className="col-6">
-                                                                                <p className="label">
-                                                                                    Transaction cost
-                                                                                </p>
-                                                                                <p className="value">
-                                                                                    {Number(DBXENFT?.transactionFee).toLocaleString('en-US', {
-                                                                                        minimumFractionDigits: 8,
-                                                                                        maximumFractionDigits: 8
-                                                                                    })}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="row">
-                                                                        </div>
-                                                                        <div className="row">
-                                                                            <div className="col-6">
-                                                                                <p className="label">
-                                                                                    Contract
-                                                                                </p>
-                                                                                <p className="value">
-                                                                                    0x0a25…fa59
-                                                                                </p>
-                                                                            </div>
-                                                                            <div className="col-6">
-                                                                                <p className="label">
-                                                                                    Chain
-                                                                                </p>
-                                                                                <p className="value">
-                                                                                    {chain.chainName}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="burn-button-container">
-                                                                    <LoadingButton
-                                                                        className="btn burn-button"
-                                                                        loading={loading}
-                                                                        variant="contained"
-                                                                        type="button"
-                                                                        onClick={() => handleWrapXenft(data)}>
-                                                                            { xeNFTWrapApproved ? 
-                                                                                "WRAP XENFT" : "APPROVE" 
-                                                                            }
-                                                                        
-                                                                    </LoadingButton>
-                                                                </div>
-                                                            </div>
-                                                        </div> :
-                                                        <div>
-                                                            <p>Wait for date please</p>
-                                                        </div>
-                                                    }
-                                                    </td>
-                                                    :
-                                                    <></>
-                                                }
-
-                                            </tr>
-                                    </>
-                                ))}
-                                {emptyRows > 0 && (
-                                    <tr style={{ height: 44.5 * emptyRows }}>
-                                        <td colSpan={3} />
+                        { XENFTs.length > 0 ?
+                            <table className="table" aria-label="custom pagination table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Token ID</th>
+                                        {/* <th scope="col">Status</th> */}
+                                        <th scope="col">VMUs</th>
+                                        <th scope="col">Term (days)</th>
+                                        <th scope="col">Maturiy</th>
+                                        <th scope="col">Estimated XEN</th>
+                                        <th scope="col"></th>
                                     </tr>
-                                )}
-                            </tbody>
-                            <tfoot>
-                                <TablePagination
-                                    rowsPerPageOptions={[10, 25, { label: 'All', value: -1 }]}
-                                    colSpan={3}
-                                    count={XENFTs.length}
-                                    rowsPerPage={rowsPerPage}
-                                    page={page}
-                                    slotProps={{
-                                        select: {
-                                            'aria-label': 'rows per page',
-                                        },
-                                        actions: {
-                                            showFirstButton: true,
-                                            showLastButton: true,
-                                        },
-                                    }}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage} />
-                            </tfoot>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {(rowsPerPage > 0
+                                        ? XENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        : XENFTs
+                                    ).map((data: any, i: any) => (
+                                        <>
+                                            <tr key={i}>
+                                                <td>{data.id}</td>
+                                                {/* <td>{data.claimStatus}</td> */}
+                                                <td>{data.VMUs}</td>
+                                                <td>{data.term}</td>
+                                                <td>{data.maturityDateTime}</td>
+                                                <td>{data.estimatedXen}</td>
+                                                <td>
+                                                    <button
+                                                        className="detail-btn"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setXenftId(data.id);
+                                                            setDisplayDbxenftDetails(!displayDbxenftDetails);
+                                                            setDBXNFT({
+                                                                protocolFee: "0",
+                                                                transactionFee: "0"
+                                                            })
+                                                            previewData(data)
+                                                            // setXenftId(data.id)
+                                                        }}
+                                                    >
+                                                        PREVIEW DBXENFT
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                                <tr className="xenft-details-row">
+                                                    {displayDbxenftDetails && xenftId === data.id ?
+                                                        <td colSpan={12}>
+                                                        {DBXENFT != null ?
+                                                            <div className="detailed-view row">
+                                                                <div className="col xenft-container">
+                                                                    <div className="xenft-details">
+                                                                        <div className="img-container">
+                                                                            <img src={nftImage} alt="nft-image" />
+                                                                        </div>
+                                                                        <div className="details-container">
+                                                                            <div className="row">
+                                                                                <div className="col-6">
+                                                                                    <p className="label">
+                                                                                        Protocol fee
+                                                                                    </p>
+                                                                                    <p className="value">
+                                                                                        {Number(DBXENFT?.protocolFee).toLocaleString('en-US', {
+                                                                                            minimumFractionDigits: 10,
+                                                                                            maximumFractionDigits: 10
+                                                                                        })}
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div className="col-6">
+                                                                                    <p className="label">
+                                                                                        Transaction cost
+                                                                                    </p>
+                                                                                    <p className="value">
+                                                                                        {Number(DBXENFT?.transactionFee).toLocaleString('en-US', {
+                                                                                            minimumFractionDigits: 8,
+                                                                                            maximumFractionDigits: 8
+                                                                                        })}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="row">
+                                                                            </div>
+                                                                            <div className="row">
+                                                                                <div className="col-6">
+                                                                                    <p className="label">
+                                                                                        Contract
+                                                                                    </p>
+                                                                                    <p className="value">
+                                                                                        0x0a25…fa59
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div className="col-6">
+                                                                                    <p className="label">
+                                                                                        Chain
+                                                                                    </p>
+                                                                                    <p className="value">
+                                                                                        {chain.chainName}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    {isRedeemed ? 
+                                                                        <p className="mb-3">This XENFT is redeemed. You will get a power of 1.</p> :
+                                                                        <p className="mb-3">Your Base Power will be calculated at the end of the cycle.</p>
+                                                                    }
+                                                                    <div className="burn-button-container">
+                                                                        <LoadingButton
+                                                                            className="btn burn-button"
+                                                                            loading={loading}
+                                                                            variant="contained"
+                                                                            type="button"
+                                                                            onClick={() => handleWrapXenft(data)}>
+                                                                                { xeNFTWrapApproved ? 
+                                                                                    "WRAP XENFT" : "APPROVE" 
+                                                                                }
+                                                                            
+                                                                        </LoadingButton>
+                                                                    </div>
+                                                                </div>
+                                                            </div> :
+                                                            <div>
+                                                                <p>Wait for date please</p>
+                                                            </div>
+                                                        }
+                                                        </td>
+                                                        :
+                                                        <></>
+                                                    }
+
+                                                </tr>
+                                        </>
+                                    ))}
+                                    {emptyRows > 0 && (
+                                        <tr style={{ height: 44.5 * emptyRows }}>
+                                            <td colSpan={3} />
+                                        </tr>
+                                    )}
+                                </tbody>
+                                <tfoot>
+                                    <TablePagination
+                                        rowsPerPageOptions={[10, 25, { label: 'All', value: -1 }]}
+                                        colSpan={3}
+                                        count={XENFTs.length}
+                                        rowsPerPage={rowsPerPage}
+                                        page={page}
+                                        slotProps={{
+                                            select: {
+                                                'aria-label': 'rows per page',
+                                            },
+                                            actions: {
+                                                showFirstButton: true,
+                                                showLastButton: true,
+                                            },
+                                        }}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={handleChangeRowsPerPage} />
+                                </tfoot>
+                            </table> :
+                            <div className="empty-list">
+                                <p>You don't have any XENFT</p>
+                            </div>
+                        }
+                        
                     </div> : 
                     <div className="text-container-nft">
                         <div className="upper-container">

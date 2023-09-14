@@ -5,7 +5,7 @@
                 width: 95%;
                 margin: 0 auto;
                 border-radius: 0;
-                height: 69px;
+                height: 70vh;
                 .card-container {
                     border-bottom-right-radius: 45px;
                     width: 100%;
@@ -48,6 +48,7 @@
                                 }
                             }
                             .card-details {
+                                font-size: 14px;
                                 .dbxenft-power {
                                     color: #62CFD0;
                                     .label {
@@ -69,6 +70,7 @@
                                     }
                                     .value {
                                         font-weight: 500;
+                                        text-align: right;
                                     }
                                 }
                             }
@@ -117,12 +119,31 @@
                             padding: 5px 40px;
                         }
 
-                        .tokens-in-wallet {
-                            color: #fff;
-                            display: flex;
-                            justify-content: center;
-                            .label {
-                                margin: 0 5px;
+                        .stake-container {
+                            width: 100%;
+                            padding-top: 16px;
+                            border-top: 1px solid rgba(25, 210, 210, 0.2);
+                            .tokens-in-wallet {
+                                color: #fff;
+                                display: flex;
+                                padding-left: 5px;
+                                padding-bottom: 10px;
+                                .label {
+                                    margin: 0 5px;
+                                }
+                                
+                            }
+                            .amount-row {
+                                width: 100%;
+                                .MuiGrid-item.input {
+                                    width: 100%;
+                                    .MuiInputBase-root {
+                                        width: 100%;
+                                        input {
+                                            width: 100%;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -134,9 +155,15 @@
                         border-left: none;
                         .tokens-in-wallet {
                             color: #fff;
+                            padding: 15px 0;
+                            border-bottom: 1px solid rgba(25, 210, 210, 0.2);
+                        }
+                        .native-fees {
+                            border-bottom: 1px solid rgba(25, 210, 210, 0.2);
                         }
                         .fees {
-                            color: #fff
+                            color: #fff;
+                            padding: 15px 0;
                         }
                         .collect-btn {
                             font-size: 1.5vh;
@@ -147,6 +174,7 @@
                             box-shadow: none;
                             padding: 10px 40px;
                             white-space: nowrap;
+                            margin: 10px 0;
                             .MuiLoadingButton-loadingIndicator {
                                 color: #F5B700;
                                 margin: 0 5px 2px 0;
