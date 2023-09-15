@@ -356,7 +356,7 @@ export function MintDbXeNFT(): any {
             // }
             const overrides = {
                 value: fee,
-                gasLimit: (BigNumber.from("3500000"))
+                gasLimit: (BigNumber.from("7000000"))
             }
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
