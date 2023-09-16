@@ -57,9 +57,10 @@ export function DbXeNFTList(): any {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
                     if( resultArray[i].token_id === null ||
-                            resultArrayElement.normalized_metadata.attributes.length === 0 ||
-                            resultArrayElement.normalized_metadata.image === null ||
-                            resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
+                        results[i].token_id > "1100" && results[i].token_id < "1200" ||
+                        resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                        resultArrayElement.normalized_metadata.image === null ||
+                        resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
                     {
                         const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
                             chain: chain.chainId,
