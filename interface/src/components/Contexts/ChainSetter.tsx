@@ -12,7 +12,7 @@ import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
 import base from "../../photos/icons/base.png";
-import optimism from "../../photos/icons/op.svg";
+import optimism from "../../photos/icons/op.png";
 import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
@@ -147,6 +147,17 @@ const networks: any = {
         },
         rpcUrls: ['https://developer-access-mainnet.base.org'],
         blockExplorerUrls: ['https://goerli.basescan.org'] 
+    },
+    optimism: {
+        chainId: `0x${Number(10).toString(16)}`,
+        chainName: 'Optimism',
+        nativeCurrency: {
+            name: 'Optimism',
+            symbol: 'ETH',
+            decimals: 18
+        },
+        rpcUrls: ['https://optimism.llamarpc.com'],
+        blockExplorerUrls: ['https://optimistic.etherscan.io'] 
     }
 };
 
