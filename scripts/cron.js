@@ -9,6 +9,11 @@ import BigNumber from 'bignumber.js';
 import Moralis from "moralis";
 import fetch from "node-fetch";
 import fs from "fs";
+import { abi } from "./dbxenftFactory.js"
+import { createWatcher } from '@makerdao/multicall';
+import {
+    Multicall,
+} from 'ethereum-multicall';
 dotenv.config();
 
 const dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
@@ -111,74 +116,105 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
+    // const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
+    const provider = new providers.MulticallProvider(new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`))
+    console.log("process.env.REACT_APP_INFURA_KEY " + process.env.REACT_APP_INFURA_KEY);
+    console.log(provider)
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
-    console.log(ids.length);
-    console.log(ids);
-    for (let i = ids.length - 1; i > 0; i--) {
-        console.log("TOKEN ID: " + ids[i])
-        let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
-        console.log("XENFTID " + XENFTID);
-        let mintInforesult = await XENFTContract.mintInfo(XENFTID);
-        console.log("Mint info result: " + mintInforesult);
-        let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
-        console.log("Mint info data: " + mintInfoData);
-        let maturityTs = Number(mintInfoData[1]);
-        let fileName = ids[i] + ".json";
-        let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
-        console.log("tokenEntryCycle " + tokenEntryCycle);
-        let dbxenftEntryPower = formatEther((await factory.dbxenftEntryPower(ids[i])))
-        console.log("dbxenftEntryPower " + dbxenftEntryPower);
-        let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle))
-        console.log("rewardPerCycle " + rewardPerCycle);
-        let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle))
-        console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle);
-        let newPower = mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString())
-        console.log("NEW POWER!!! " + newPower);
+    // console.log(ids.length);
+    // console.log(ids);
+    // const multicallAddress = '0x80C7DD1E1c941711f4D1d40EdF44837087D103b7';
+    // const multicall = new Multicall({ ethersProvider: provider, tryAggregate: true, contractAddress: multicallAddress });
+    // for (let i = ids.length - 1; i > 0; i--) {
+    //     const entryCycle = await factory.tokenEntryCycle(ids[i])
+    //     const contractCallContext = [{
+    //         reference: 'DBXENFTFactory',
+    //         contractAddress: '0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e',
+    //         abi,
+    //         calls: [
+    //             { reference: 'getDbxenftUnderlyingXENFT', methodName: 'dbxenftUnderlyingXENFT', methodParameters: [ids[i]] },
+    //             { reference: 'getdbxenftEntryPower', methodName: 'dbxenftEntryPower', methodParameters: [ids[i]] },
+    //             { reference: 'getrewardPerCycle', methodName: 'rewardPerCycle', methodParameters: [entryCycle] },
+    //             { reference: 'gettotalEntryPowerPerCycle', methodName: 'totalEntryPowerPerCycle', methodParameters: [entryCycle] },
+    //         ]
+    //     }];
+    console.log(contractCallContext);
+    console.log("here test")
+    const response = await multicall.call(contractCallContext);
+    const XENFTID = Number(response.results.DBXENFTFactory.callsReturnContext[0].returnValues[0])
+    console.log("XENFTID " + XENFTID);
+    let dbxenftEntryPower = formatEther(response.results.DBXENFTFactory.callsReturnContext[1].returnValues[0])
+    console.log("dbxenftEntryPower " + dbxenftEntryPower);
+    const rewardPerCycle = formatEther(response.results.DBXENFTFactory.callsReturnContext[2].returnValues[0])
+    console.log("rewardPerCycle " + rewardPerCycle);
+    const totalEntryPowerPerCycle = formatEther(response.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
+    console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle);
+    console.log("final test")
+    console.log("****************")
 
-        try {
-            let attributesValue = [{
-                "trait_type": "DBXEN NFT POWER",
-                "value": newPower.toString()
-            }, {
-                "trait_type": "ESTIMATED XEN",
-                "value": dbxenftEntryPower.toString(),
-            }, {
-                "trait_type": "MATURITY DATE",
-                "value": new Date(maturityTs * 1000).toString(),
-            }, ]
-            let standardMetadata = {
-                "id": `${ids[i]}`,
-                "name": "DBXeNFT: Cool art & Trustless Daily Yield",
-                "description": "",
-                "image": getImage(newPower),
-                "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
-                "attributes": attributesValue
-            }
-            console.log(JSON.stringify(standardMetadata));
-            const params = {
-                Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
-                Key: fileName,
-                Body: JSON.stringify(standardMetadata),
-                Tagging: 'public=yes',
-                "ContentType": "application/json",
-            };
 
-            // putStorageObject(params)
-            //     .then((result) => {
-            //         console.log(result)
-            //     }).catch((error) => console.log(error));
+    console.log("TOKEN ID: " + ids[i])
+    let XENFTID2 = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
+    console.log("XENFTID " + XENFTID2);
+    let mintInforesult = await XENFTContract.mintInfo(XENFTID2);
+    console.log("Mint info result: " + mintInforesult);
+    let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+    console.log("Mint info data: " + mintInfoData);
+    let maturityTs = Number(mintInfoData[1]);
+    let fileName = ids[i] + ".json";
+    let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
+    console.log("tokenEntryCycle " + tokenEntryCycle);
+    let dbxenftEntryPower2 = formatEther((await factory.dbxenftEntryPower(ids[i])))
+    console.log("dbxenftEntryPower " + dbxenftEntryPower2);
+    let rewardPerCycle2 = formatEther(await factory.rewardPerCycle(tokenEntryCycle))
+    console.log("rewardPerCycle " + rewardPerCycle2);
+    let totalEntryPowerPerCycle2 = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle))
+    console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle2);
+    let newPower = mulDiv(dbxenftEntryPower2.toString(), rewardPerCycle2.toString(), totalEntryPowerPerCycle2.toString())
+    console.log("NEW POWER!!! " + newPower);
 
-        } catch (err) {
-            console.log(err)
-            if (err.client_error.Code == "NoSuchKey") {
-                console.log("ERROR AT UPDATE!!!")
-            } else {
-                throw err;
-            }
+    try {
+        let attributesValue = [{
+            "trait_type": "DBXEN NFT POWER",
+            "value": newPower.toString()
+        }, {
+            "trait_type": "ESTIMATED XEN",
+            "value": dbxenftEntryPower.toString(),
+        }, {
+            "trait_type": "MATURITY DATE",
+            "value": new Date(maturityTs * 1000).toString(),
+        }, ]
+        let standardMetadata = {
+            "id": `${ids[i]}`,
+            "name": "DBXeNFT: Cool art & Trustless Daily Yield",
+            "description": "",
+            "image": getImage(newPower),
+            "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
+            "attributes": attributesValue
+        }
+        console.log(JSON.stringify(standardMetadata));
+        const params = {
+            Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
+            Key: fileName,
+            Body: JSON.stringify(standardMetadata),
+            Tagging: 'public=yes',
+            "ContentType": "application/json",
+        };
+
+        // putStorageObject(params)
+        //     .then((result) => {
+        //         console.log(result)
+        //     }).catch((error) => console.log(error));
+
+    } catch (err) {
+        console.log(err)
+        if (err.client_error.Code == "NoSuchKey") {
+            console.log("ERROR AT UPDATE!!!")
+        } else {
+            throw err;
         }
     }
 }
@@ -204,6 +240,6 @@ function getImage(power) {
         return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/6DBXeNFT_6.png"
 }
 
-cron.schedule('*/1 * * * *', async() => {
-    await generateAfterReveal()
-}, { networkCheckTimeout: 50 });
+// cron.schedule('*/1 * * * *', async() => {
+await generateAfterReveal()
+    // }, { networkCheckTimeout: 50 });

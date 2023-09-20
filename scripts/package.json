@@ -11,9 +11,11 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@0xsequence/multicall": "^1.2.3",
         "aws-sdk": "^2.1443.0",
         "bignumber.js": "^9.1.1",
         "dotenv": "^16.3.1",
+        "ethereum-multicall": "^2.19.0",
         "ethers": "^6.7.1",
         "moralis": "^2.22.5",
         "node-cron": "^3.0.2",
