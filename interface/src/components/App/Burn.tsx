@@ -97,7 +97,7 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000) {
+                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000 && Number(chain.chainId) != 10) {
                         await axios.request(options).then((result) => {
                             if (result.data.result != undefined) {
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
@@ -181,7 +181,22 @@ export function Burn(): any {
                             setMaticValue(fee.toFixed(5));
                             setTotalCost(totalValue.toFixed(5));
                         }
+                        if (Number(chain.chainId) === 10) {
+                            console.log("aici intru!!!!");
+                            let price = 0.001;
+                            let protocol_fee = value * (1 - 0.00005 * value);
+                            let gasLimitVal = 0;
+                            numberBatchesBurnedInCurrentCycle != 0 ?
+                                gasLimitVal = (BigNumber.from("350000")) :
+                                gasLimitVal = (BigNumber.from("500000"))
 
+                            setCurrentGasLimit(gasLimitVal);
+                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                            setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
+                            setMaticValue(fee.toFixed(5));
+                            setTotalCost(totalValue.toFixed(5));
+                        }
                     }
                 })
         })

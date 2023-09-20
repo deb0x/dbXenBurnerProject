@@ -12,6 +12,7 @@ import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
 import base from "../../photos/icons/base.png";
+import optimism from "../../photos/icons/op.svg";
 import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
@@ -455,6 +456,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="base" src={base} className="base"/>
                         Switch to Base
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("optimism")}
+                        className="btn"
+                    >
+                        <img alt="optimism" src={optimism} className="optimism"/>
+                        Switch to Optimism
                     </button>
                 </Popper>
             </div>
