@@ -1,0 +1,5 @@
+{
+    "networkCheckTimeout": 10,
+    "networkCheckTimeoutnewtrkCheckTimeout": 20,
+    "timeoutBlocks": 30
+}

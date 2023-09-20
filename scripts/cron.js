@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import BigNumber from 'bignumber.js';
 import Moralis from "moralis";
 import fetch from "node-fetch";
+import fs from "fs";
 dotenv.config();
 
 const dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
@@ -16,6 +17,10 @@ const xenftAddress = "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
 const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-metadata-polygon"
+
+const config = JSON.parse(fs.readFileSync("./config.json"));
+
+const networkCheckTimeout = config.networkCheckTimeout;
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -45,7 +50,7 @@ function mulDiv(x, y, denominator) {
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
         .catch((e) => console.log("Moralis Error"))
-    let dateForParam = subMinutes(new Date(), 3000);
+    let dateForParam = subMinutes(new Date(), 7200);
     let results = [];
     await getIdsFromEvent(null, dateForParam).then(async(result) => {
         for (let i = 0; i < result.raw.result.length; i++) {
@@ -106,23 +111,33 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider("https://rpc-mainnet.maticvigil.com");
+    const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
-    for (let i = 0; i < ids.length; i++) {
+    console.log(ids.length);
+    console.log(ids);
+    for (let i = ids.length - 1; i > 0; i--) {
+        console.log("TOKEN ID: " + ids[i])
         let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
+        console.log("XENFTID " + XENFTID);
         let mintInforesult = await XENFTContract.mintInfo(XENFTID);
+        console.log("Mint info result: " + mintInforesult);
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+        console.log("Mint info data: " + mintInfoData);
         let maturityTs = Number(mintInfoData[1]);
         let fileName = ids[i] + ".json";
         let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
+        console.log("tokenEntryCycle " + tokenEntryCycle);
         let dbxenftEntryPower = formatEther((await factory.dbxenftEntryPower(ids[i])))
+        console.log("dbxenftEntryPower " + dbxenftEntryPower);
         let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle))
+        console.log("rewardPerCycle " + rewardPerCycle);
         let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle))
+        console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle);
         let newPower = mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString())
-        console.log("NEW POWER!!!");
+        console.log("NEW POWER!!! " + newPower);
 
         try {
             let attributesValue = [{
@@ -152,10 +167,10 @@ async function generateAfterReveal() {
                 "ContentType": "application/json",
             };
 
-            putStorageObject(params)
-                .then((result) => {
-                    console.log(result)
-                }).catch((error) => console.log(error));
+            // putStorageObject(params)
+            //     .then((result) => {
+            //         console.log(result)
+            //     }).catch((error) => console.log(error));
 
         } catch (err) {
             console.log(err)
@@ -190,5 +205,5 @@ function getImage(power) {
 }
 
 cron.schedule('*/1 * * * *', async() => {
-    await generateAfterReveal();
-});
+    await generateAfterReveal()
+}, { networkCheckTimeout: 50 });
