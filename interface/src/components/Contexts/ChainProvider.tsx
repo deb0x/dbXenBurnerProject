@@ -180,9 +180,9 @@ const ChainProvider = ( { children }: Props ) => {
                         break;
                         case 10:
                             setChain({
-                                deb0xAddress: "0x30782c020FE90614f08a863B41CbB07A2D2D94fF",
-                                deb0xViewsAddress: "0xF3281221bA95af0C5BBcBd2474cE8C090233133b",
-                                deb0xERC20Address: "0x9430A7e6283Fb704Fd1D9302868Bc39d16FE82Ba",
+                                deb0xAddress: "0x0f0Ed0cf4D3b5dA5088bc2FA568dE0294e44c41D",
+                                deb0xViewsAddress: "0xA1675b0703Eca0230a7Dd4cCB21c7CAF93972865",
+                                deb0xERC20Address: "0x68d8Ff691fF65108dbc4b9b03b50fDE5cD7eACDd",
                                 xenCryptoAddress: "0xeB585163DEbB1E637c6D617de3bEF99347cd75c8",
                                 chainId: parseInt(result, 16),
                                 chainName: "Optimism",

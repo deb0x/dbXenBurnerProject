@@ -182,7 +182,6 @@ export function Burn(): any {
                             setTotalCost(totalValue.toFixed(5));
                         }
                         if (Number(chain.chainId) === 10) {
-                            console.log("aici intru!!!!");
                             let price = 0.001;
                             let protocol_fee = value * (1 - 0.00005 * value);
                             let gasLimitVal = 0;
@@ -191,11 +190,11 @@ export function Burn(): any {
                                 gasLimitVal = (BigNumber.from("500000"))
 
                             setCurrentGasLimit(gasLimitVal);
-                            let fee = gasLimitVal * price * protocol_fee / 1000000000;
+                            let fee = gasLimitVal * price * protocol_fee / 10000000;
                             let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-                            setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
-                            setMaticValue(fee.toFixed(5));
-                            setTotalCost(totalValue.toFixed(5));
+                            setValueAndFee({ fee: fee.toFixed(6), total: totalValue.toFixed(6) })
+                            setMaticValue(fee.toFixed(6));
+                            setTotalCost(totalValue.toFixed(6));
                         }
                     }
                 })
@@ -249,7 +248,7 @@ export function Burn(): any {
             const deb0xContract = DBXen(signer, chain.deb0xAddress)
             let gasLimitIntervalValue = gasLimit
             let currentValue = valueAndFee.fee;
-
+            
             try {
                 const overrides =
                 {

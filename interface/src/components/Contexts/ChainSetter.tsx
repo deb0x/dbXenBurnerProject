@@ -340,6 +340,19 @@ export default function ChainSetter(props: any) {
                             dxnTokenName: "cbDXN"
                         })
                         break;
+                        case 10:
+                            setChain({
+                                deb0xAddress: "0x0f0Ed0cf4D3b5dA5088bc2FA568dE0294e44c41D",
+                                deb0xViewsAddress: "0xA1675b0703Eca0230a7Dd4cCB21c7CAF93972865",
+                                deb0xERC20Address: "0x68d8Ff691fF65108dbc4b9b03b50fDE5cD7eACDd",
+                                xenCryptoAddress: "0xeB585163DEbB1E637c6D617de3bEF99347cd75c8",
+                                chainId: parseInt(result, 16),
+                                chainName: "Optimism",
+                                currency: "ETH",
+                                priceURL: "https://optimism-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                                dxnTokenName: "opDXN"
+                            })
+                            break;
                 }
             });
         } catch (err: any) {
