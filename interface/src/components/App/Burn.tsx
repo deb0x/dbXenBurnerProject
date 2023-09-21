@@ -97,7 +97,7 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000 && Number(chain.chainId) != 10) {
+                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000) {
                         await axios.request(options).then((result) => {
                             if (result.data.result != undefined) {
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
@@ -115,7 +115,7 @@ export function Burn(): any {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("350000")) :
                                         gasLimitVal = (BigNumber.from("500000"))
-                                } else {
+                                } else { 
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("500000")) :
                                         gasLimitVal = (BigNumber.from("700000"))
@@ -126,13 +126,22 @@ export function Burn(): any {
                                 if (Number(chain.chainId) === 8453) {
                                     fee = gasLimitVal * price * protocol_fee / 100000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                    setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                                    setMaticValue(fee.toFixed(4));
+                                    setTotalCost(totalValue.toFixed(4));
+                                } else  if (Number(chain.chainId) === 10) {
+                                    fee = gasLimitVal * price * protocol_fee / 100000000;
+                                    totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                    setValueAndFee({ fee: fee.toFixed(6), total: totalValue.toFixed(6) })
+                                    setMaticValue(fee.toFixed(6));
+                                    setTotalCost(totalValue.toFixed(6));
                                 } else {
                                     fee = gasLimitVal * price * protocol_fee / 1000000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                    setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                                    setMaticValue(fee.toFixed(4));
+                                    setTotalCost(totalValue.toFixed(4));
                                 }
-                                setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
-                                setMaticValue(fee.toFixed(4));
-                                setTotalCost(totalValue.toFixed(4));
                             }
                         })
                     } else {
@@ -180,21 +189,6 @@ export function Burn(): any {
                             setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
                             setMaticValue(fee.toFixed(5));
                             setTotalCost(totalValue.toFixed(5));
-                        }
-                        if (Number(chain.chainId) === 10) {
-                            let price = 0.001;
-                            let protocol_fee = value * (1 - 0.00005 * value);
-                            let gasLimitVal = 0;
-                            numberBatchesBurnedInCurrentCycle != 0 ?
-                                gasLimitVal = (BigNumber.from("350000")) :
-                                gasLimitVal = (BigNumber.from("500000"))
-
-                            setCurrentGasLimit(gasLimitVal);
-                            let fee = gasLimitVal * price * protocol_fee / 10000000;
-                            let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
-                            setValueAndFee({ fee: fee.toFixed(6), total: totalValue.toFixed(6) })
-                            setMaticValue(fee.toFixed(6));
-                            setTotalCost(totalValue.toFixed(6));
                         }
                     }
                 })
