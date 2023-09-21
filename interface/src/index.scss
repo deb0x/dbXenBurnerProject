@@ -254,7 +254,6 @@ $randomNumber: random(4);
             // .main-container {
             //     overflow-y: inherit;
             // }
-            
         }
     }
     .initial-page.contracts {
@@ -273,7 +272,6 @@ $randomNumber: random(4);
             }
         }
     }
-
     .MuiTablePagination-toolbar {
         gap: 10px;
         .MuiTablePagination-spacer {
@@ -338,6 +336,7 @@ $randomNumber: random(4);
             margin-right: 10px;
         }
     }
+    .optimism,
     .ethpow,
     .okx,
     .dc,
