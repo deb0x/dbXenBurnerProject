@@ -80,6 +80,9 @@ export function PermanentDrawer(props: any): any {
             case 8453:
                 setBaseUrl("https://basescan.org/address/")
                 break;
+            case 10:
+                setBaseUrl("https://optimistic.etherscan.io/address/")
+                break;
         }
     }, [])
 
