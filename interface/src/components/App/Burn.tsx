@@ -97,7 +97,7 @@ export function Burn(): any {
         await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
             await deb0xContract.cycleTotalBatchesBurned(currentCycle).then(
                 async (numberBatchesBurnedInCurrentCycle: any) => {
-                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000) {
+                    if (Number(chain.chainId) != 56 && Number(chain.chainId) != 66 && Number(chain.chainId) != 2000 && Number(chain.chainId) != 10) {
                         await axios.request(options).then((result) => {
                             if (result.data.result != undefined) {
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
@@ -188,8 +188,7 @@ export function Burn(): any {
                             let totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
                             setValueAndFee({ fee: fee.toFixed(5), total: totalValue.toFixed(5) })
                             setMaticValue(fee.toFixed(5));
-                            setTotalCost(totalValue.toFixed(5));
-                        }
+                            setTotalCost(totalValue.toFixed(5));      
                     }
                 })
         })
