@@ -13,6 +13,7 @@ interface DBXENFTEntry {
     description: string
     name: string;
     image: string;
+    maturity:string;
 }
 
 export function DbXeNFTList(): any {
@@ -85,14 +86,16 @@ export function DbXeNFTList(): any {
                                 id: nftMeta.raw.token_id,
                                 name: nftMeta.raw.name,
                                 description: nftMeta.raw.normalized_metadata.description || "",
-                                image: nftMeta.raw.normalized_metadata.image || ""
+                                image: nftMeta.raw.normalized_metadata.image || "",
+                                maturity: nftMeta.raw.normalized_metadata.attributes[2]
                             });
                         } else {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
-                                image: nftImage
+                                image: nftImage,
+                                maturity:""
                             });
                         }
                     } else {
@@ -100,11 +103,19 @@ export function DbXeNFTList(): any {
                             id: results[i].token_id,
                             name: results[i].normalized_metadata.name ,
                             description: results[i].normalized_metadata.description,
-                            image: results[i].normalized_metadata.image
+                            image: results[i].normalized_metadata.image,
+                            maturity:results[i].normalized_metadata.attributes[2]
                         });
                     }
                 }
             }
+            nfts.sort(
+                (objA: { maturity: { value: string } }, objB: { maturity: { value: string } }) => {
+                    let dateA: Date = new Date(objA.maturity.value);
+                    let dateB: Date = new Date(objB.maturity.value);
+                    return dateA.getTime() - dateB.getTime();
+                }
+            );
             setDBXENFTs(nfts);
             setLoading(false);
         })
