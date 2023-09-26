@@ -27,6 +27,17 @@ const networks: any = {
       rpcUrls: ["https://rpc-mainnet.maticvigil.com"],
       blockExplorerUrls: ["https://polygonscan.com/"]
     },
+    OGpolygon: {
+        chainId: `0x${Number(137).toString(16)}`,
+        chainName: "Polygon Mainnet",
+        nativeCurrency: {
+          name: "MATIC",
+          symbol: "MATIC",
+          decimals: 18
+        },
+        rpcUrls: ["https://rpc-mainnet.maticvigil.com"],
+        blockExplorerUrls: ["https://polygonscan.com/"]
+    },
     avalanche: {
         chainId: `0x${Number(43114).toString(16)}`,
         chainName: "Avalanche Mainnet C-Chain",
@@ -169,7 +180,7 @@ export default function ChainSetter(props: any) {
 
     useEffect(() => {
         window.ethereum.on("chainChanged", networkChanged);
-
+        console.log(chain.chainName)
         return () => {
             window.ethereum.removeListener("chainChanged", networkChanged);
             };
@@ -186,6 +197,7 @@ export default function ChainSetter(props: any) {
                     }
                 ]
             }).then((result: any) => {
+                console.log(result)
                 switch(parseInt(result, 16)) {
                     case 1: 
                         setChain({
@@ -206,12 +218,29 @@ export default function ChainSetter(props: any) {
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
                             deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                            dbxenftFactoryAddress: "0xAb2ff1CE92D377AeB58ECf1De209bbCd7d6e0152",
+                            dbxenftAddress: "0x2899557a09CFcE900afd76F399DeF9375FA909c9",
+                            xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                            mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                            chainId: parseInt(result, 16),
+                            chainName: "polygon",
+                            currency: "MATIC",
+                            priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                            dxnTokenName: "mDXN"
+                        })
+                        break;
+                    case 137-1: 
+                        setChain({
+                            deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                            deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                            deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                            xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
                             dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
                             dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
                             xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
                             mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             chainId: parseInt(result, 16),
-                            chainName: "polygon",
+                            chainName: "OGpolygon",
                             currency: "MATIC",
                             priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
                             dxnTokenName: "mDXN"
@@ -375,8 +404,9 @@ export default function ChainSetter(props: any) {
 
     const handleNetworkSwitch = async (networkName: any) => {
         setError("");
+        console.log(networkName)
         await changeNetwork({ networkName, setError }).then(() => {
-            window.location.reload();
+            // window.location.reload();
         });
     };
 
@@ -417,6 +447,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="polygon" src={polygon} className="polygon"/>
                         Switch to Polygon
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("OGpolygon")}
+                        className="btn"
+                    >
+                        <img alt="polygon" src={polygon} className="polygon"/>
+                        Switch to OG Polygon
                     </button>
                     <button
                         onClick={() => handleNetworkSwitch("avalanche")}

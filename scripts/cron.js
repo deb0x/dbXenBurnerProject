@@ -45,7 +45,7 @@ function mulDiv(x, y, denominator) {
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
         .catch((e) => console.log("Moralis Error"))
-    let dateForParam = subMinutes(new Date(), 3000);
+    let dateForParam = subMinutes(new Date(), 1550);
     let results = [];
     await getIdsFromEvent(null, dateForParam).then(async(result) => {
         for (let i = 0; i < result.raw.result.length; i++) {
@@ -106,23 +106,33 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider("https://rpc-mainnet.maticvigil.com");
+    const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
-    for (let i = 0; i < ids.length; i++) {
+    console.log(ids.length);
+    console.log(ids);
+    for (let i = ids.length - 1; i >= 0; i--) {
+        console.log("TOKEN ID: " + ids[i])
         let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
+        console.log("XENFTID " + XENFTID);
         let mintInforesult = await XENFTContract.mintInfo(XENFTID);
+        console.log("Mint info result: " + mintInforesult);
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+        console.log("Mint info data: " + mintInfoData);
         let maturityTs = Number(mintInfoData[1]);
         let fileName = ids[i] + ".json";
         let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
+        console.log("tokenEntryCycle " + tokenEntryCycle);
         let dbxenftEntryPower = formatEther((await factory.dbxenftEntryPower(ids[i])))
+        console.log("dbxenftEntryPower " + dbxenftEntryPower);
         let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle))
+        console.log("rewardPerCycle " + rewardPerCycle);
         let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle))
+        console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle);
         let newPower = mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString())
-        console.log("NEW POWER!!!");
+        console.log("NEW POWER!!! " + newPower);
 
         try {
             let attributesValue = [{
@@ -189,6 +199,6 @@ function getImage(power) {
         return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/6DBXeNFT_6.png"
 }
 
-cron.schedule('*/1 * * * *', async() => {
+// cron.schedule('9 14 * * *', async() => {
     await generateAfterReveal();
-});
+// });
