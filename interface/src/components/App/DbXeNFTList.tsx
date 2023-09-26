@@ -6,12 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
+import { Spinner } from './Spinner';
+import { parse, compareAsc } from 'date-fns';
 
 interface DBXENFTEntry {
-    id: number;
+    id: string;
     description: string
     name: string;
     image: string;
+    maturity:string;
 }
 
 export function DbXeNFTList(): any {
@@ -20,12 +23,32 @@ export function DbXeNFTList(): any {
     const { chain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
+    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(false)
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
     }, [chain, account])
+
+    useEffect(() => {
+        if (!orderByMaturity) {
+            let sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                let dateA: Date = new Date(a.maturity?.value);
+                let dateB: Date = new Date(b.maturity?.value);
+                return dateA.getTime() - dateB.getTime();
+            });
+            console.log(sortedDBXENFTs)
+            setDBXENFTs(sortedDBXENFTs);
+        } else {
+            const sortedDBXENFTs = [...DBXENFTs].sort((a, b) =>
+            parseInt(a.id) - parseInt(b.id)
+        );
+            console.log(sortedDBXENFTs)
+            setDBXENFTs(sortedDBXENFTs);
+        }
+    }, [orderByMaturity]); 
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
@@ -34,10 +57,11 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
+        setLoading(true)
 
-        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (result: any) => {
-            const results = result.raw.result;
-            let cursor = result.raw.cursor;
+        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
+            const results = getNFTResult.raw.result;
+            let cursor = getNFTResult.raw.cursor;
             if (cursor != null) {
                 while (cursor != null) {
                     let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
@@ -48,67 +72,73 @@ export function DbXeNFTList(): any {
                 }
             }
             resultArray = results?.flat();
-            
+            const nfts = [];
+            console.log(results)
             if (resultArray?.length != 0 && resultArray != undefined) {
-                    for (let i = 0; i < resultArray?.length; i++) {
-                        let result = resultArray[i];
-                        console.log("sss")
-                        console.log(result);
-                        if( resultArray[i].token_id === null ||
-                                result.normalized_metadata.attributes.length === 0 || 
-                                result.normalized_metadata.image.includes("Final+with+writing"))
-                        {
-                            console.log("SERGssssIU")
-                            Moralis.EvmApi.nft.reSyncMetadata({
-                                chain: chain.chainId,
-                                "flag": "uri",
-                                "mode": "async",
-                                "address": chain.dbxenftAddress,
-                                "tokenId": resultArray[i].token_id
-                            })
-                                .then((result) => {
-                                    console.log("before get", result)
-                                    Moralis.EvmApi.nft.getNFTMetadata({
-                                        chain: chain.chainId,
-                                        "format": "decimal",
-                                        "normalizeMetadata": true,
-                                        "mediaItems": false,
-                                        "address": chain.dbxenftAddress,
-                                        "tokenId": resultArray[i].token_id
-                                    }).then((result: any) => {
-                                        if(result.raw.normalized_metadata.attributes.length > 0) {
-                                            dbxenftEntries.push({
-                                                id: result.raw.token_id,
-                                                name: result.raw.name,
-                                                description: result.raw.description,
-                                                image: result.raw.image
-                                            });
-                                        } else {
-                                            dbxenftEntries.push({
-                                                id: result.raw.token_id,
-                                                name: `THIS IS REAL TEST DBXEN NFT #${result.raw.token_id}, BUT IS UNREVEAL`,
-                                                description: "DBXEN NFT FOR PASSIVE INCOME",
-                                                image: nftImage
-                                            });
-                                        }
-                                    }).catch((error) => error)
-                                })
+                for (let i = 0; i < resultArray?.length; i++) {
+                    let resultArrayElement = resultArray[i];
+                    if( resultArray[i].token_id === null ||
+                        results[i].token_id > "2500" && results[i].token_id < "2525" ||
+                        resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                        resultArrayElement.normalized_metadata.image === null ||
+                        resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
+                    {
+                        const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
+                            chain: chain.chainId,
+                            "flag": "uri",
+                            "mode": "async",
+                            "address": chain.dbxenftAddress,
+                            "tokenId": resultArray[i].token_id
+                        });
+                        const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
+                            chain: chain.chainId,
+                            "format": "decimal",
+                            "normalizeMetadata": true,
+                            "mediaItems": false,
+                            "address": chain.dbxenftAddress,
+                            "tokenId": resultArray[i].token_id
+                        });
+                        if (!nftMeta) {
+                            continue;
+                        }
+                        if(nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                            nfts.push({
+                                id: nftMeta.raw.token_id,
+                                name: nftMeta.raw.name,
+                                description: nftMeta.raw.normalized_metadata.description || "",
+                                image: nftMeta.raw.normalized_metadata.image || "",
+                                maturity: nftMeta.raw.normalized_metadata.attributes[2]
+                            });
                         } else {
-                            dbxenftEntries.push({
-                                id: result.token_id,
-                                name: result.normalized_metadata.name,
-                                description: result.normalized_metadata.description,
-                                image: result.normalized_metadata.image
+                            nfts.push({
+                                id: nftMeta.raw.token_id,
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                                maturity:""
                             });
                         }
-                        
+                    } else {
+                        nfts.push({
+                            id: results[i].token_id,
+                            name: results[i].normalized_metadata.name ,
+                            description: results[i].normalized_metadata.description,
+                            image: results[i].normalized_metadata.image,
+                            maturity:results[i].normalized_metadata.attributes[2]
+                        });
                     }
-                    setDBXENFTs(dbxenftEntries);
-                    console.log("SIIIZEEE", dbxenftEntries.length)
                 }
-            })
-            // .then(() => setDBXENFTs(dbxenftEntries))
-            // .catch((err) => console.log(err))
+            }
+            nfts.sort(
+                (objA: { maturity: { value: string } }, objB: { maturity: { value: string } }) => {
+                    let dateA: Date = new Date(objA.maturity.value);
+                    let dateB: Date = new Date(objB.maturity.value);
+                    return dateA.getTime() - dateB.getTime();
+                }
+            );
+            setDBXENFTs(nfts);
+            setLoading(false);
+        })
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
@@ -148,66 +178,70 @@ export function DbXeNFTList(): any {
     };
 
     return (
-        <div className="content-box">
-            <div className="card-view">
-                <div className="row g-5">
-                    {DBXENFTs.length ?
-                        (rowsPerPage > 0
-                            ? DBXENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            : DBXENFTs
-                        ).map((xenft: any, i: any) => (
-                            <div className="col col-md-3 card-col" key={i}>
-                                <div className="nft-card">
+        <div className={`content-box ${loading ? "loading" : ""}`}>
+            { loading ? 
+                <Spinner color={'white'} /> :
+                <div className="card-view">
+                      <button className="btn chain-switcher mb-4"
+                            type="button"
+                            onClick={() => setOrderByMaturity(!orderByMaturity)}>
+                                {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date" }
+                        </button>
+                    <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
+                        {DBXENFTs.length ?
+                            (rowsPerPage > 0
+                                ? DBXENFTs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                : DBXENFTs
+                            ).map((xenft: any, i: any) => (
+                                <div className="col col-md-3 card-col" key={i}>
+                                    <div className="nft-card">
 
-                                <img src={xenft.image} alt="nft-image" />
-                                    <div className="card-row card-header">
-                                        <span className="label">tokenID</span>
-                                        <span className="value">{xenft.id}</span>
-                                    </div>
-                                    <div className="divider"></div>
-                                    <div className="card-row">
-                                        <span className="label">name</span>
-                                        <span className="value">{xenft.name}</span>
-                                    </div>
-                                    <div className="card-row">
-                                        <span className="label">description</span>
-                                        <span className="value">{xenft.description}</span>
-                                    </div>
-                                    <div className="detail-button-container">
-                                        <button type="button" className="btn dbxenft-detail-btn"
-                                            onClick={() => handleRedirect(xenft.id)}>
-                                            Details
-                                        </button>
+                                    <img src={xenft.image} alt="nft-image" />
+                                        <div className="card-row card-header">
+                                            <span className="label">tokenID</span>
+                                            <span className="value">{xenft.id}</span>
+                                        </div>
+                                        <div className="divider"></div>
+                                        <div className="card-row">
+                                            <span className="label">name</span>
+                                            <span className="value">{xenft.name}</span>
+                                        </div>
+                                        <div className="detail-button-container">
+                                            <button type="button" className="btn dbxenft-detail-btn"
+                                                onClick={() => handleRedirect(xenft.id)}>
+                                                Details
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                            )) 
+                            :
+                            <div className="empty-container">
+                                <span>You don't have any DBXENFTs</span>
                             </div>
-                        )) 
-                        :
-                        <div className="empty-container">
-                            <span>You don't have any DBXENFTs</span>
-                        </div>
+                        }
+                    </div>
+                    { DBXENFTs.length > 0 &&
+                        <TablePagination
+                            rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
+                            colSpan={3}
+                            count={DBXENFTs.length}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            slotProps={{
+                                select: {
+                                    'aria-label': 'rows per page',
+                                },
+                                actions: {
+                                    showFirstButton: true,
+                                    showLastButton: true,
+                                },
+                            }}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage} />
                     }
                 </div>
-                { DBXENFTs.length > 0 &&
-                    <TablePagination
-                        rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
-                        colSpan={3}
-                        count={DBXENFTs.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        slotProps={{
-                            select: {
-                                'aria-label': 'rows per page',
-                            },
-                            actions: {
-                                showFirstButton: true,
-                                showLastButton: true,
-                            },
-                        }}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage} />
-                }
-            </div>
+            }
         </div>
     );
 }
