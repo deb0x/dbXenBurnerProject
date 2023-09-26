@@ -146,7 +146,7 @@ async function generateAfterReveal() {
             let result = getImage(newPower, counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8, counter9);
             let standardMetadata = {
                 "id": `${ids[i]}`,
-                "name": "DBXeNFT: Cool art & Trustless Daily Yield",
+                "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
                 "image": result.link,
                 "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
