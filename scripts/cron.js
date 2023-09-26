@@ -156,32 +156,59 @@ async function generateAfterReveal() {
 
             switch (result.value) {
                 case 1:
-                    counter1++
-                    break;
+                    if (counter1 + 1 > 10000)
+                        counter1 = 1;
+                    else
+                        counter1++
+                        break;
                 case 2:
-                    counter2++
-                    break;
+                    if (counter2 + 1 > 1000)
+                        counter2 = 1
+                    else
+                        counter2++
+                        break;
                 case 3:
-                    counter3++
-                    break;
+                    if (counter3 + 1 > 1000)
+                        counter3 = 1
+                    else
+                        counter3++
+                        break;
                 case 4:
-                    counter4++
-                    break;
+                    if (counter4 + 1 > 1000)
+                        counter4 = 1
+                    else
+                        counter4++
+                        break;
                 case 5:
-                    counter5++
-                    break;
+                    if (counter5 + 1 > 1000)
+                        counter5 = 1
+                    else
+                        counter5++
+                        break;
                 case 6:
-                    counter6++
-                    break;
+                    if (counter6 + 1 > 1000)
+                        counter6 = 1
+                    else
+                        counter6++
+                        break;
                 case 7:
-                    counter7++
-                    break;
+                    if (counter7 + 1 > 1000)
+                        counter7 = 1
+                    else
+                        counter7++
+                        break;
                 case 8:
-                    counter8++
-                    break;
+                    if (counter8 + 1 > 1000)
+                        counter8 = 1
+                    else
+                        counter8++
+                        break;
                 case 9:
-                    counter9++
-                    break;
+                    if (counter9 + 1 > 1000)
+                        counter9 = 1
+                    else
+                        counter9++
+                        break;
                 default:
                     console.log("Default case")
                     break;
