@@ -49,7 +49,7 @@ export function Stake(props: any): any {
     const dateEvmos: any = new Date(Date.UTC(2023, 12, 17, 12, 16, 48, 0));
     const dateEthereumPow: any = new Date(Date.UTC(2023, 12, 17, 12, 24, 59, 0));
     const dateBase: any = new Date(Date.UTC(2023, 12, 17, 19, 0, 43, 0));
-    const dateOP: any = new Date(Date.UTC(2023, 12, 17, 19, 0, 43, 0));
+    const dateOP: any = new Date(Date.UTC(2023, 12, 17, 14, 0, 23, 0));
     const now: any = Date.now();
     const { t } = useTranslation();
     const [endDate, setEndDate] = useState<any>();
