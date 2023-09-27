@@ -19,16 +19,18 @@ interface DBXENFTEntry {
 export function DbXeNFTList(): any {
     const context = useWeb3React();
     const { account } = context
-    const { chain } = useContext(ChainContext);
+    const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
     let [orderByMaturity, setOrderByMaturity] = useState<boolean>(false)
+    const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
+        console.log(showOGDBXeNFT)
     }, [chain, account])
 
     useEffect(() => {
@@ -51,6 +53,40 @@ export function DbXeNFTList(): any {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch(() => console.log("moralis error"))
     }
+
+    useEffect(() => {
+        showOGDBXeNFT ?
+            setChain({
+                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
+                dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
+                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                chainId: 137,
+                chainName: "polygon",
+                currency: "MATIC",
+                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                dxnTokenName: "mDXN"
+            }) :
+            setChain({
+                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                dbxenftFactoryAddress: "0xAb2ff1CE92D377AeB58ECf1De209bbCd7d6e0152",
+                dbxenftAddress: "0x2899557a09CFcE900afd76F399DeF9375FA909c9",
+                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                chainId: 137,
+                chainName: "polygon",
+                currency: "MATIC",
+                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                dxnTokenName: "mDXN"
+            })
+    }, [showOGDBXeNFT])
 
     const getDBXeNFTs = () => {
         let resultArray: any;
@@ -182,6 +218,13 @@ export function DbXeNFTList(): any {
                         onClick={() => setOrderByMaturity(!orderByMaturity)}>
                         {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
                     </button>
+                    { chain.chainId == "137" ? 
+                        <button className="btn chain-switcher mb-4"
+                            type="button"
+                            onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
+                                {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
+                        </button> : <></>
+                    }
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0

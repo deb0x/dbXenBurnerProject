@@ -12,6 +12,7 @@ import dc from "../../photos/icons/dc.svg";
 import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
 import base from "../../photos/icons/base.png";
+import optimism from "../../photos/icons/op.png";
 import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
@@ -146,6 +147,17 @@ const networks: any = {
         },
         rpcUrls: ['https://developer-access-mainnet.base.org'],
         blockExplorerUrls: ['https://goerli.basescan.org'] 
+    },
+    optimism: {
+        chainId: `0x${Number(10).toString(16)}`,
+        chainName: 'Optimism',
+        nativeCurrency: {
+            name: 'Optimism',
+            symbol: 'ETH',
+            decimals: 18
+        },
+        rpcUrls: ['https://optimism.llamarpc.com'],
+        blockExplorerUrls: ['https://optimistic.etherscan.io'] 
     }
 };
 
@@ -157,7 +169,6 @@ export default function ChainSetter(props: any) {
 
     useEffect(() => {
         window.ethereum.on("chainChanged", networkChanged);
-
         return () => {
             window.ethereum.removeListener("chainChanged", networkChanged);
             };
@@ -194,8 +205,8 @@ export default function ChainSetter(props: any) {
                             deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
                             deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                             xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                            dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
-                            dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
+                            dbxenftFactoryAddress: "0xAb2ff1CE92D377AeB58ECf1De209bbCd7d6e0152",
+                            dbxenftAddress: "0x2899557a09CFcE900afd76F399DeF9375FA909c9",
                             xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
                             mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             chainId: parseInt(result, 16),
@@ -339,6 +350,19 @@ export default function ChainSetter(props: any) {
                             dxnTokenName: "cbDXN"
                         })
                         break;
+                    case 10:
+                        setChain({
+                            deb0xAddress: "0x2A9C55b6Dc56da178f9f9a566F1161237b73Ba66",
+                            deb0xViewsAddress: "0x72Ec36D3593ba1fc7Aa5dFDc1ADdf551FE599837",
+                            deb0xERC20Address: "0xc418B123885d732ED042b16e12e259741863F723",
+                            xenCryptoAddress: "0xeB585163DEbB1E637c6D617de3bEF99347cd75c8",
+                            chainId: parseInt(result, 16),
+                            chainName: "Optimism",
+                            currency: "ETH",
+                            priceURL: "https://optimism-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            dxnTokenName: "opDXN"
+                        })
+                        break;
                 }
             });
         } catch (err: any) {
@@ -351,7 +375,7 @@ export default function ChainSetter(props: any) {
     const handleNetworkSwitch = async (networkName: any) => {
         setError("");
         await changeNetwork({ networkName, setError }).then(() => {
-            window.location.reload();
+            // window.location.reload();
         });
     };
 
@@ -455,6 +479,13 @@ export default function ChainSetter(props: any) {
                     >
                         <img alt="base" src={base} className="base"/>
                         Switch to Base
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("optimism")}
+                        className="btn"
+                    >
+                        <img alt="optimism" src={optimism} className="optimism"/>
+                        Switch to Optimism
                     </button>
                 </Popper>
             </div>
