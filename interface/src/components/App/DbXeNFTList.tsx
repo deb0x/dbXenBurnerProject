@@ -13,26 +13,80 @@ interface DBXENFTEntry {
     description: string
     name: string;
     image: string;
+    maturity: string;
 }
 
 export function DbXeNFTList(): any {
     const context = useWeb3React();
     const { account } = context
-    const { chain } = useContext(ChainContext);
+    const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
+    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(false)
+    const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
+        console.log(showOGDBXeNFT)
     }, [chain, account])
+
+    useEffect(() => {
+        if (!orderByMaturity) {
+            const sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                    let dateA: Date = new Date(a.maturity);
+                    let dateB: Date = new Date(b.maturity);
+                    return dateA.getTime() - dateB.getTime();
+            });
+            setDBXENFTs(sortedDBXENFTs);
+        } else {
+            const sortedDBXENFTs = [...DBXENFTs].sort((a, b) =>
+                parseInt(a.id) - parseInt(b.id)
+            );
+            setDBXENFTs(sortedDBXENFTs);
+        }
+    }, [orderByMaturity]);
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch(() => console.log("moralis error"))
     }
+
+    useEffect(() => {
+        showOGDBXeNFT ?
+            setChain({
+                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
+                dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
+                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                chainId: 137,
+                chainName: "polygon",
+                currency: "MATIC",
+                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                dxnTokenName: "mDXN"
+            }) :
+            setChain({
+                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                dbxenftFactoryAddress: "0xAb2ff1CE92D377AeB58ECf1De209bbCd7d6e0152",
+                dbxenftAddress: "0x2899557a09CFcE900afd76F399DeF9375FA909c9",
+                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                chainId: 137,
+                chainName: "polygon",
+                currency: "MATIC",
+                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                dxnTokenName: "mDXN"
+            })
+    }, [showOGDBXeNFT])
 
     const getDBXeNFTs = () => {
         let resultArray: any;
@@ -56,12 +110,11 @@ export function DbXeNFTList(): any {
             if (resultArray?.length != 0 && resultArray != undefined) {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
-                    if( resultArray[i].token_id === null ||
+                    if (resultArray[i].token_id === null ||
                         results[i].token_id > "2500" && results[i].token_id < "2525" ||
                         resultArrayElement.normalized_metadata.attributes.length === 0 ||
                         resultArrayElement.normalized_metadata.image === null ||
-                        resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
-                    {
+                        resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
                         const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
                             chain: chain.chainId,
                             "flag": "uri",
@@ -80,31 +133,40 @@ export function DbXeNFTList(): any {
                         if (!nftMeta) {
                             continue;
                         }
-                        if(nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                        if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
                                 name: nftMeta.raw.name,
                                 description: nftMeta.raw.normalized_metadata.description || "",
-                                image: nftMeta.raw.normalized_metadata.image || ""
+                                image: nftMeta.raw.normalized_metadata.image || "",
+                                maturity: nftMeta.raw.normalized_metadata.attributes[2].value
                             });
                         } else {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
-                                image: nftImage
+                                image: nftImage,
+                                maturity: ""
                             });
                         }
                     } else {
                         nfts.push({
                             id: results[i].token_id,
-                            name: results[i].normalized_metadata.name ,
+                            name: results[i].normalized_metadata.name,
                             description: results[i].normalized_metadata.description,
-                            image: results[i].normalized_metadata.image
+                            image: results[i].normalized_metadata.image,
+                            maturity: results[i].normalized_metadata.attributes[2].value
                         });
                     }
                 }
             }
+            console.log(nfts)
+            nfts.sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                let dateA: Date = new Date(a.maturity);
+                let dateB: Date = new Date(b.maturity);
+                return dateA.getTime() - dateB.getTime();
+            });
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -148,9 +210,21 @@ export function DbXeNFTList(): any {
 
     return (
         <div className={`content-box ${loading ? "loading" : ""}`}>
-            { loading ? 
+            {loading ?
                 <Spinner color={'white'} /> :
                 <div className="card-view">
+                    <button className="btn chain-switcher mb-4 me-2"
+                        type="button"
+                        onClick={() => setOrderByMaturity(!orderByMaturity)}>
+                        {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
+                    </button>
+                    { chain.chainId == "137" ? 
+                        <button className="btn chain-switcher mb-4"
+                            type="button"
+                            onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
+                                {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
+                        </button> : <></>
+                    }
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0
@@ -178,14 +252,14 @@ export function DbXeNFTList(): any {
                                         </div>
                                     </div>
                                 </div>
-                            )) 
+                            ))
                             :
                             <div className="empty-container">
                                 <span>You don't have any DBXENFTs</span>
                             </div>
                         }
                     </div>
-                    { DBXENFTs.length > 0 &&
+                    {DBXENFTs.length > 0 &&
                         <TablePagination
                             rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
                             colSpan={3}
