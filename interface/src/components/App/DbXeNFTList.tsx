@@ -213,7 +213,7 @@ export function DbXeNFTList(): any {
             {loading ?
                 <Spinner color={'white'} /> :
                 <div className="card-view">
-                    <button className="btn chain-switcher mb-4"
+                    <button className="btn chain-switcher mb-4 me-2"
                         type="button"
                         onClick={() => setOrderByMaturity(!orderByMaturity)}>
                         {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
