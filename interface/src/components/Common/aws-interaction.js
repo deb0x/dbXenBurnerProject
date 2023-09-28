@@ -7,7 +7,7 @@ const { formatUnits, formatEther } = require('ethers');
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
 const IMAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/assets/";
-const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-metadata-polygon"
+const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-polygon"
 const dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
 
 const createApiOptions = (data) =>
