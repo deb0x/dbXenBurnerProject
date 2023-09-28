@@ -135,7 +135,6 @@ export function DbXeNFTPage(): any {
                     setLoading(false)
                 })
                 .catch((error: any) => {
-                    console.log(error)
                     setNotificationState({
                         message: "Contract couldn't be approved for accepting your DXN!", open: true,
                         severity: "error"
