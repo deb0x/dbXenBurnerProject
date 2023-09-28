@@ -90,7 +90,6 @@ export function AppBarComponent(props: any): any {
 
     useEffect(() => {
         setUrl(window.location.pathname.split('/').pop())
-        console.log("URL", url)
     }, [window.location.pathname]);
 
     useEffect(() => {

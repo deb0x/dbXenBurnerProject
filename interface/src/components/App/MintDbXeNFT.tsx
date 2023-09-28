@@ -59,7 +59,7 @@ export function MintDbXeNFT(): any {
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
     const [endDate, setEndDate] = useState<any>();
-    const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 14, 8, 37, 0));
+    const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 17, 48, 8, 0));
     const now: any = Date.now();
 
     useEffect(() => {
@@ -550,8 +550,6 @@ export function MintDbXeNFT(): any {
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
                     })
-
-                    console.log(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                 }
             }
         })

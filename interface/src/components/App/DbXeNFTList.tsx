@@ -24,13 +24,12 @@ export function DbXeNFTList(): any {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
-    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(false)
     const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
+    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(true)
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
-        console.log(showOGDBXeNFT)
     }, [chain, account])
 
     useEffect(() => {
@@ -76,8 +75,8 @@ export function DbXeNFTList(): any {
                 deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
                 deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
                 xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                dbxenftFactoryAddress: "0xAb2ff1CE92D377AeB58ECf1De209bbCd7d6e0152",
-                dbxenftAddress: "0x2899557a09CFcE900afd76F399DeF9375FA909c9",
+                dbxenftFactoryAddress: "0x2C435D6d4c61b0eCd9BB9862e73a597242A81f23",
+                dbxenftAddress: "0x3Db6839d741aCFC9eE8C01Bd75D7F5dB4cD95138",
                 xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
                 mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                 chainId: 137,
@@ -106,7 +105,6 @@ export function DbXeNFTList(): any {
             }
             resultArray = results?.flat();
             const nfts = [];
-            console.log(results)
             if (resultArray?.length != 0 && resultArray != undefined) {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
@@ -161,12 +159,10 @@ export function DbXeNFTList(): any {
                     }
                 }
             }
-            console.log(nfts)
-            nfts.sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
-                let dateA: Date = new Date(a.maturity);
-                let dateB: Date = new Date(b.maturity);
-                return dateA.getTime() - dateB.getTime();
+            nfts.sort((a, b) => {
+               return parseInt(a.id) - parseInt(b.id)
             });
+            
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -216,7 +212,7 @@ export function DbXeNFTList(): any {
                     <button className="btn chain-switcher mb-4 me-2"
                         type="button"
                         onClick={() => setOrderByMaturity(!orderByMaturity)}>
-                        {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
+                        {orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
                     </button>
                     { chain.chainId == "137" ? 
                         <button className="btn chain-switcher mb-4"
@@ -224,7 +220,7 @@ export function DbXeNFTList(): any {
                             onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
                                 {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
                         </button> : <></>
-                    }
+                    }                    
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0
