@@ -13,6 +13,7 @@ interface DBXENFTEntry {
     description: string
     name: string;
     image: string;
+    maturity: string;
 }
 
 export function DbXeNFTList(): any {
@@ -24,12 +25,29 @@ export function DbXeNFTList(): any {
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
     const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
+    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(false)
 
     useEffect(() => {
         startMoralis();
         getDBXeNFTs();
         console.log(showOGDBXeNFT)
     }, [chain, account])
+
+    useEffect(() => {
+        if (!orderByMaturity) {
+            const sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                    let dateA: Date = new Date(a.maturity);
+                    let dateB: Date = new Date(b.maturity);
+                    return dateA.getTime() - dateB.getTime();
+            });
+            setDBXENFTs(sortedDBXENFTs);
+        } else {
+            const sortedDBXENFTs = [...DBXENFTs].sort((a, b) =>
+                parseInt(a.id) - parseInt(b.id)
+            );
+            setDBXENFTs(sortedDBXENFTs);
+        }
+    }, [orderByMaturity]);
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
@@ -92,12 +110,11 @@ export function DbXeNFTList(): any {
             if (resultArray?.length != 0 && resultArray != undefined) {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
-                    if( resultArray[i].token_id === null ||
+                    if (resultArray[i].token_id === null ||
                         results[i].token_id > "2500" && results[i].token_id < "2525" ||
                         resultArrayElement.normalized_metadata.attributes.length === 0 ||
                         resultArrayElement.normalized_metadata.image === null ||
-                        resultArrayElement.normalized_metadata.image.includes("beforeReveal"))
-                    {
+                        resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
                         const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
                             chain: chain.chainId,
                             "flag": "uri",
@@ -116,31 +133,40 @@ export function DbXeNFTList(): any {
                         if (!nftMeta) {
                             continue;
                         }
-                        if(nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                        if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
                                 name: nftMeta.raw.name,
                                 description: nftMeta.raw.normalized_metadata.description || "",
-                                image: nftMeta.raw.normalized_metadata.image || ""
+                                image: nftMeta.raw.normalized_metadata.image || "",
+                                maturity: nftMeta.raw.normalized_metadata.attributes[2].value
                             });
                         } else {
                             nfts.push({
                                 id: nftMeta.raw.token_id,
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
-                                image: nftImage
+                                image: nftImage,
+                                maturity: ""
                             });
                         }
                     } else {
                         nfts.push({
                             id: results[i].token_id,
-                            name: results[i].normalized_metadata.name ,
+                            name: results[i].normalized_metadata.name,
                             description: results[i].normalized_metadata.description,
-                            image: results[i].normalized_metadata.image
+                            image: results[i].normalized_metadata.image,
+                            maturity: results[i].normalized_metadata.attributes[2].value
                         });
                     }
                 }
             }
+            console.log(nfts)
+            nfts.sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                let dateA: Date = new Date(a.maturity);
+                let dateB: Date = new Date(b.maturity);
+                return dateA.getTime() - dateB.getTime();
+            });
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -184,17 +210,21 @@ export function DbXeNFTList(): any {
 
     return (
         <div className={`content-box ${loading ? "loading" : ""}`}>
-            { loading ? 
+            {loading ?
                 <Spinner color={'white'} /> :
                 <div className="card-view">
+                    <button className="btn chain-switcher mb-4 me-2"
+                        type="button"
+                        onClick={() => setOrderByMaturity(!orderByMaturity)}>
+                        {!orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
+                    </button>
                     { chain.chainId == "137" ? 
                         <button className="btn chain-switcher mb-4"
                             type="button"
                             onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
                                 {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
                         </button> : <></>
-                    }
-                    
+                    }                    
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0
@@ -222,14 +252,14 @@ export function DbXeNFTList(): any {
                                         </div>
                                     </div>
                                 </div>
-                            )) 
+                            ))
                             :
                             <div className="empty-container">
                                 <span>You don't have any DBXENFTs</span>
                             </div>
                         }
                     </div>
-                    { DBXENFTs.length > 0 &&
+                    {DBXENFTs.length > 0 &&
                         <TablePagination
                             rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
                             colSpan={3}
