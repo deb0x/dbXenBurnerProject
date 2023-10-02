@@ -10,12 +10,12 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();
 
-const dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
+const dbxenftFactoryAddress = "0x2C435D6d4c61b0eCd9BB9862e73a597242A81f23";
 const mintInfoAddress = "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4";
 const xenftAddress = "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-metadata-polygon"
+const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-polygon"
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -45,7 +45,7 @@ function mulDiv(x, y, denominator) {
 async function getLast24HoursIdsMinted() {
     Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
         .catch((e) => console.log("Moralis Error"))
-    let dateForParam = subMinutes(new Date(), 1550);
+    let dateForParam = subMinutes(new Date(), 25 * 60);
     let results = [];
     await getIdsFromEvent(null, dateForParam).then(async(result) => {
         for (let i = 0; i < result.raw.result.length; i++) {
@@ -111,28 +111,26 @@ async function generateAfterReveal() {
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
-    console.log(ids.length);
-    console.log(ids);
-    for (let i = ids.length - 1; i >= 0; i--) {
-        console.log("TOKEN ID: " + ids[i])
+    let counter1 = 1;
+    let counter2 = 1;
+    let counter3 = 1;
+    let counter4 = 1;
+    let counter5 = 1;
+    let counter6 = 1;
+    let counter7 = 1;
+    let counter8 = 1;
+    let counter9 = 1;
+    for (let i = ids.length - 1; i > 0; i--) {
         let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
-        console.log("XENFTID " + XENFTID);
         let mintInforesult = await XENFTContract.mintInfo(XENFTID);
-        console.log("Mint info result: " + mintInforesult);
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
-        console.log("Mint info data: " + mintInfoData);
         let maturityTs = Number(mintInfoData[1]);
         let fileName = ids[i] + ".json";
         let tokenEntryCycle = Number(await factory.tokenEntryCycle(ids[i]));
-        console.log("tokenEntryCycle " + tokenEntryCycle);
         let dbxenftEntryPower = formatEther((await factory.dbxenftEntryPower(ids[i])))
-        console.log("dbxenftEntryPower " + dbxenftEntryPower);
         let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle))
-        console.log("rewardPerCycle " + rewardPerCycle);
         let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle))
-        console.log("totalEntryPowerPerCycle " + totalEntryPowerPerCycle);
         let newPower = mulDiv(dbxenftEntryPower.toString(), rewardPerCycle.toString(), totalEntryPowerPerCycle.toString())
-        console.log("NEW POWER!!! " + newPower);
 
         try {
             let attributesValue = [{
@@ -145,15 +143,77 @@ async function generateAfterReveal() {
                 "trait_type": "MATURITY DATE",
                 "value": new Date(maturityTs * 1000).toString(),
             }, ]
+            let result = getImage(newPower, counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8, counter9);
             let standardMetadata = {
                 "id": `${ids[i]}`,
-                "name": "DBXeNFT: Cool art & Trustless Daily Yield",
+                "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
-                "image": getImage(newPower),
+                "image": result.link,
                 "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
                 "attributes": attributesValue
             }
+
             console.log(JSON.stringify(standardMetadata));
+
+            switch (result.value) {
+                case 1:
+                    if (counter1 + 1 > 10000)
+                        counter1 = 1;
+                    else
+                        counter1++
+                        break;
+                case 2:
+                    if (counter2 + 1 > 10000)
+                        counter2 = 1
+                    else
+                        counter2++
+                        break;
+                case 3:
+                    if (counter3 + 1 > 10000)
+                        counter3 = 1
+                    else
+                        counter3++
+                        break;
+                case 4:
+                    if (counter4 + 1 > 10000)
+                        counter4 = 1
+                    else
+                        counter4++
+                        break;
+                case 5:
+                    if (counter5 + 1 > 10000)
+                        counter5 = 1
+                    else
+                        counter5++
+                        break;
+                case 6:
+                    if (counter6 + 1 > 6000)
+                        counter6 = 1
+                    else
+                        counter6++
+                        break;
+                case 7:
+                    if (counter7 + 1 > 6000)
+                        counter7 = 1
+                    else
+                        counter7++
+                        break;
+                case 8:
+                    if (counter8 + 1 > 3500)
+                        counter8 = 1
+                    else
+                        counter8++
+                        break;
+                case 9:
+                    if (counter9 + 1 > 2500)
+                        counter9 = 1
+                    else
+                        counter9++
+                        break;
+                default:
+                    console.log("Default case")
+                    break;
+            }
             const params = {
                 Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
                 Key: fileName,
@@ -178,27 +238,27 @@ async function generateAfterReveal() {
     }
 }
 
-function getImage(power) {
+function getImage(power, counter1, counter2, counter3, counter4, counter5, counter6, counter7, counter8, counter9) {
     if (power >= 0 && power <= 500)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_1.png";
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-0-500/[0-500]_DBXENFT_${counter1}.png`, value: 1 }
     if (power > 500 && power <= 1000)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_2.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-501-1000/[500-1000]_DBXENFT_${counter2}.png`, value: 2 }
     if (power > 1000 && power <= 2500)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_3.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-1001-2500/[1000_2500]_DBXENFT_${counter3}.png`, value: 3 }
     if (power > 2500 && power <= 5000)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_4.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-2501-5000/[2500_5000]_DBXENFT_${counter4}.png`, value: 4 }
     if (power > 5000 && power <= 7500)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_5.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-5001-7500/[5000-7500]_DBXENFT_${counter5}.png`, value: 5 }
     if (power > 7500 && power <= 10000)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/4DBXeNFT_6.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-7501-10000/[7501-10000]_DBXENFT_${counter6}.png`, value: 6 }
     if (power > 10000 && power <= 12500)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/5DBXeNFT_5.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-10001-12500/[10001-12500]_DBXENFT${counter7}.png`, value: 7 }
     if (power > 12500 && power <= 15000)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/5DBXeNFT_6.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-12501-15000/[12501-15000]_DBXENFT_${counter8}.png`, value: 8 }
     if (power > 15000)
-        return "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/6DBXeNFT_6.png"
+        return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-15000/[15000]_DBXENFT_${counter9}.png`, value: 9 }
 }
 
-// cron.schedule('9 14 * * *', async() => {
+cron.schedule('8 48 17 * * *', async() => {
     await generateAfterReveal();
-// });
+});
