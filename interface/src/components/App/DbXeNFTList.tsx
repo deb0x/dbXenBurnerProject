@@ -35,9 +35,9 @@ export function DbXeNFTList(): any {
     useEffect(() => {
         if (!orderByMaturity) {
             const sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
-                    let dateA: Date = new Date(a.maturity);
-                    let dateB: Date = new Date(b.maturity);
-                    return dateA.getTime() - dateB.getTime();
+                let dateA: Date = new Date(a.maturity);
+                let dateB: Date = new Date(b.maturity);
+                return dateA.getTime() - dateB.getTime();
             });
             setDBXENFTs(sortedDBXENFTs);
         } else {
@@ -50,48 +50,70 @@ export function DbXeNFTList(): any {
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch(() => console.log("moralis error"))
+            .catch((error) => console.log(error))
     }
 
     useEffect(() => {
-        showOGDBXeNFT ?
+        console.log("Dassssdsssssssssssas")
+        console.log(chain.chainId)
+        if (chain.chainId == "137") {
+            showOGDBXeNFT ?
+                setChain({
+                    deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                    deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                    deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                    xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                    dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
+                    dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
+                    xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                    mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                    chainId: 137,
+                    chainName: "polygon",
+                    currency: "MATIC",
+                    priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                    dxnTokenName: "mDXN"
+                }) :
+                setChain({
+                    deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+                    deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+                    deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+                    xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+                    dbxenftFactoryAddress: "0x2C435D6d4c61b0eCd9BB9862e73a597242A81f23",
+                    dbxenftAddress: "0x3Db6839d741aCFC9eE8C01Bd75D7F5dB4cD95138",
+                    xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
+                    mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
+                    chainId: 137,
+                    chainName: "polygon",
+                    currency: "MATIC",
+                    priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
+                    dxnTokenName: "mDXN"
+                })
+        } else {
+            console.log("gggggggggggsssggggggggggsg");
             setChain({
-                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
-                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
-                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
-                dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
-                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
-                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
-                chainId: 137,
-                chainName: "polygon",
-                currency: "MATIC",
-                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-                dxnTokenName: "mDXN"
-            }) :
-            setChain({
-                deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
-                deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
-                deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
-                xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
-                dbxenftFactoryAddress: "0x2C435D6d4c61b0eCd9BB9862e73a597242A81f23",
-                dbxenftAddress: "0x3Db6839d741aCFC9eE8C01Bd75D7F5dB4cD95138",
-                xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
-                mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
-                chainId: 137,
-                chainName: "polygon",
-                currency: "MATIC",
-                priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-                dxnTokenName: "mDXN"
+                deb0xAddress: "0x2A9C55b6Dc56da178f9f9a566F1161237b73Ba66",
+                deb0xViewsAddress: "0x72Ec36D3593ba1fc7Aa5dFDc1ADdf551FE599837",
+                deb0xERC20Address: "0xc418B123885d732ED042b16e12e259741863F723",
+                xenCryptoAddress: "0xeF4B763385838FfFc708000f884026B8c0434275",
+                dbxenftFactoryAddress: "0x6Efe5C5E291d86B038B2069BBec1961c6E0104b4",
+                dbxenftAddress: "0x8Ba9eA5231DF99E8631A5EE6937D8C6d190dA3aE",
+                xenftAddress: "0x94d9e02d115646dfc407abde75fa45256d66e043",
+                mintInfoAddress: "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6",
+                chainId: 250,
+                chainName: "fantom",
+                currency: "FTM",
+                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                dxnTokenName: "fmDXN"
             })
-    }, [showOGDBXeNFT])
+        }
+    }, [showOGDBXeNFT, chain.chainId])
 
     const getDBXeNFTs = () => {
+        console.log("Sssssssdsss");
         let resultArray: any;
         setLoading(true)
-
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
+            console.log();
             const results = getNFTResult.raw.result;
             let cursor = getNFTResult.raw.cursor;
             if (cursor != null) {
@@ -159,10 +181,11 @@ export function DbXeNFTList(): any {
                     }
                 }
             }
+            console.log(nfts)
             nfts.sort((a, b) => {
-               return parseInt(a.id) - parseInt(b.id)
+                return parseInt(a.id) - parseInt(b.id)
             });
-            
+
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -214,13 +237,13 @@ export function DbXeNFTList(): any {
                         onClick={() => setOrderByMaturity(!orderByMaturity)}>
                         {orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
                     </button>
-                    { chain.chainId == "137" ? 
+                    {chain.chainId == "137" ? 
                         <button className="btn chain-switcher mb-4"
                             type="button"
                             onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
-                                {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
+                            {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
                         </button> : <></>
-                    }                    
+                    }
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
                         {DBXENFTs.length ?
                             (rowsPerPage > 0
@@ -230,7 +253,7 @@ export function DbXeNFTList(): any {
                                 <div className="col col-md-3 card-col" key={i}>
                                     <div className="nft-card">
 
-                                    <img src={xenft.image} alt="nft-image" />
+                                        <img src={xenft.image} alt="nft-image" />
                                         <div className="card-row card-header">
                                             <span className="label">tokenID</span>
                                             <span className="value">{xenft.id}</span>

@@ -160,7 +160,7 @@ export function AppBarComponent(props: any): any {
     }
 
     async function totalAmountStaked() {
-        const deb0xContract = DBXen(library, chain.deb0xAddress)
+        const deb0xContract =  DBXen(library, chain.deb0xAddress)
         const currentCycle= await deb0xContract.currentStartedCycle()
         const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
         const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
@@ -253,6 +253,7 @@ export function AppBarComponent(props: any): any {
     }
 
     const handleSwitchComponent = () => {
+        console.log("DSsadadasda");
         window.location.pathname.includes("dbxenft") ?
             navigate(HOME_ROUTE) :
             navigate(MINTDBXENFT_ROUTE)
@@ -281,7 +282,7 @@ export function AppBarComponent(props: any): any {
                         </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        {dimensions.width > 768 && chain.chainId == "137" ?
+                        {(dimensions.width > 768 && (chain.chainId == "137"|| chain.chainId == "250")) ?
                             <button onClick={ handleSwitchComponent } className="component-switcher">
                                 <img src={window.location.pathname.includes("dbxenft") ? dbxen : dbxenft} alt="logo" />
                                 <img src={arrow} alt="arrow" />

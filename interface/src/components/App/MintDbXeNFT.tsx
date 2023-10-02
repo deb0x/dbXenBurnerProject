@@ -79,7 +79,7 @@ export function MintDbXeNFT(): any {
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch((e) => console.log("moralis error"))
+            .catch((e) => console.log(e))
     }
 
     useEffect(() => {
@@ -115,6 +115,7 @@ export function MintDbXeNFT(): any {
     }
 
     const getXENFTs = () => {
+        console.log("Sssssssssssssssdddddssssssssssssssssssssssssssssssss")
         let resultArray: any;
         setInitLoading(true)
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
@@ -130,6 +131,7 @@ export function MintDbXeNFT(): any {
                 }
             }
             resultArray = results?.flat();
+            console.log(resultArray)
             if (resultArray?.length != 0 && resultArray != undefined) {
                 let xenftEntries: XENFTEntry[] = [];
                 const thisDate = new Date();
@@ -252,13 +254,17 @@ export function MintDbXeNFT(): any {
                         }
                     }
                 }
+                console.log(xenftEntries);
                 setXENFTs(xenftEntries);
+                setInitLoading(false);
+            } else {
                 setInitLoading(false);
             }
         })
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
+        console.log(chain,nftAddress,cursor)
         let cursorData;
         if (cursor != null)
             cursorData = cursor.toString()
@@ -270,6 +276,7 @@ export function MintDbXeNFT(): any {
             tokenAddresses: [nftAddress],
             address: account ? account : ""
         });
+        console.log(response)
         return response;
     }
     const daysLeft = (date_1: Date, date_2: Date) => {
@@ -630,7 +637,7 @@ export function MintDbXeNFT(): any {
                 setNotificationState={setNotificationState} />
                 {initLoading ? 
                     <Spinner color={'white'} /> :
-                    chain.chainId == "137" ?
+                    (chain.chainId == "137" ||chain.chainId == "250")?
                     <div className="table-view table-responsive-xl">
                         <div>
                             <p>Total power in this cycle:&nbsp;
