@@ -649,7 +649,7 @@ export function MintDbXeNFT(): any {
                                         {/* <th scope="col">Status</th> */}
                                         <th scope="col">VMUs</th>
                                         <th scope="col">Term (days)</th>
-                                        <th scope="col">Maturiy</th>
+                                        <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
                                     </tr>

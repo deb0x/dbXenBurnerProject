@@ -109,7 +109,7 @@ export function DbXeNFTList(): any {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
                     if (resultArray[i].token_id === null ||
-                        results[i].token_id > "2500" && results[i].token_id < "2525" ||
+                        results[i].token_id >= "1" && results[i].token_id <= "15" ||
                         resultArrayElement.normalized_metadata.attributes.length === 0 ||
                         resultArrayElement.normalized_metadata.image === null ||
                         resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
