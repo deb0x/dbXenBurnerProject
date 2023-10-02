@@ -8,8 +8,11 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     src: url('../../src/fonts/Karla/Karla-Regular.ttf');
 }
 .theme--dark {
-    .img {
+    .img.dbxen {
         background-image: url('../photos/white_dbxen.svg');
+    }
+    .img.dbxenft {
+        background-image: url('../photos/icons/dbxenft.svg');
     }
 }
 
@@ -19,6 +22,9 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
         height: 100%;
         background-repeat: no-repeat;
         background-position: center;
+    }
+    .img.dbxenft {
+        background-size: contain;
     }
 }
 

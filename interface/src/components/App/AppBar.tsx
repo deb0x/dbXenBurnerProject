@@ -263,7 +263,7 @@ export function AppBarComponent(props: any): any {
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             <>
                 <div className="app-bar--top">
-                    <img className="logo" src={logo} alt="logo" />
+                    <img className="logo" src={window.location.pathname.includes("dbxenft") ? dbxenft : logo} alt="logo" />
                     <Box className="main-menu--left">
                         <button type="button" onClick={() => setShow(!show)} className="donate-btn">
                             <span>Donate</span>
