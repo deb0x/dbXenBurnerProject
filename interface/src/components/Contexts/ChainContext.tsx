@@ -2,10 +2,10 @@ import { createContext } from "react";
 
 export const initialChain = {
     chain: {
-        deb0xAddress: "0x2A9C55b6Dc56da178f9f9a566F1161237b73Ba66",
-        deb0xViewsAddress: "0x72Ec36D3593ba1fc7Aa5dFDc1ADdf551FE599837",
-        deb0xERC20Address: "0xc418B123885d732ED042b16e12e259741863F723",
-        xenCryptoAddress: "0xeF4B763385838FfFc708000f884026B8c0434275",
+        deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
+        deb0xViewsAddress: "0x93CC648eE2fBf366DD5d8D354C0946bE6ee4936c",
+        deb0xERC20Address: "0x47DD60FA40A050c0677dE19921Eb4cc512947729",
+        xenCryptoAddress: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
         dbxenftFactoryAddress: "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e",
         dbxenftAddress: "0x618f9B6d3D1a55Eb90D72e4747d61AE6ecE95f97",
         xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
