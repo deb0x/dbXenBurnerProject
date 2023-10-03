@@ -253,7 +253,6 @@ export function AppBarComponent(props: any): any {
     }
 
     const handleSwitchComponent = () => {
-        console.log("DSsadadasda");
         window.location.pathname.includes("dbxenft") ?
             navigate(HOME_ROUTE) :
             navigate(MINTDBXENFT_ROUTE)
