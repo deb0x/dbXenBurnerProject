@@ -72,7 +72,7 @@ export function AppBarComponent(props: any): any {
     const dimensions = ScreenSize();
     const navigate = useNavigate();
     const [url, setUrl] = useState(window.location.pathname.split('/').pop())
-
+    const supportedChains = [137,56,250,43114];
     const id = open ? 'simple-popper' : "";
 
     if(library){
@@ -281,7 +281,7 @@ export function AppBarComponent(props: any): any {
                         </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        {(dimensions.width > 768 && (chain.chainId == "137"|| chain.chainId == "250")) ?
+                        {(dimensions.width > 768 && supportedChains.includes(Number(chain.chainId))) ?
                             <button onClick={ handleSwitchComponent } className="component-switcher">
                                 <img src={window.location.pathname.includes("dbxenft") ? dbxen : dbxenft} alt="logo" />
                                 <img src={arrow} alt="arrow" />

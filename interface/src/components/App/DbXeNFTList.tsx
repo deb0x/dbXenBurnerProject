@@ -49,8 +49,10 @@ export function DbXeNFTList(): any {
     }, [orderByMaturity]);
 
     const startMoralis = () => {
-        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-        .catch(() => console.log("moralis error"))
+        if (!Moralis.Core.isStarted) {
+            Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
+                .catch(() => console.log("Moralis error"))
+        }
     }
 
     useEffect(() => {
@@ -86,24 +88,8 @@ export function DbXeNFTList(): any {
                     priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
                     dxnTokenName: "mDXN"
                 })
-        } else {
-            setChain({
-                deb0xAddress: "0x2A9C55b6Dc56da178f9f9a566F1161237b73Ba66",
-                deb0xViewsAddress: "0x72Ec36D3593ba1fc7Aa5dFDc1ADdf551FE599837",
-                deb0xERC20Address: "0xc418B123885d732ED042b16e12e259741863F723",
-                xenCryptoAddress: "0xeF4B763385838FfFc708000f884026B8c0434275",
-                dbxenftFactoryAddress: "0x6Efe5C5E291d86B038B2069BBec1961c6E0104b4",
-                dbxenftAddress: "0x8Ba9eA5231DF99E8631A5EE6937D8C6d190dA3aE",
-                xenftAddress: "0x94d9e02d115646dfc407abde75fa45256d66e043",
-                mintInfoAddress: "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6",
-                chainId: 250,
-                chainName: "fantom",
-                currency: "FTM",
-                priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                dxnTokenName: "fmDXN"
-            })
-        }
-    }, [showOGDBXeNFT, chain.chainId])
+        } 
+    }, [showOGDBXeNFT])
 
     const getDBXeNFTs = () => {
         let resultArray: any;
@@ -231,11 +217,11 @@ export function DbXeNFTList(): any {
                         onClick={() => setOrderByMaturity(!orderByMaturity)}>
                         {orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
                     </button>
-                    {chain.chainId == "137" ? 
+                    {chain.chainId == "137" ?
                         <button className="btn chain-switcher mb-4"
                             type="button"
                             onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
-                            {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon" }
+                            {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon"}
                         </button> : <></>
                     }
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
