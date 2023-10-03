@@ -115,7 +115,6 @@ export function MintDbXeNFT(): any {
     }
 
     const getXENFTs = () => {
-        console.log("Sssssssssssssssdddddssssssssssssssssssssssssssssssss")
         let resultArray: any;
         setInitLoading(true)
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
@@ -131,7 +130,6 @@ export function MintDbXeNFT(): any {
                 }
             }
             resultArray = results?.flat();
-            console.log(resultArray)
             if (resultArray?.length != 0 && resultArray != undefined) {
                 let xenftEntries: XENFTEntry[] = [];
                 const thisDate = new Date();
@@ -254,7 +252,6 @@ export function MintDbXeNFT(): any {
                         }
                     }
                 }
-                console.log(xenftEntries);
                 setXENFTs(xenftEntries);
                 setInitLoading(false);
             } else {
@@ -264,7 +261,6 @@ export function MintDbXeNFT(): any {
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
-        console.log(chain,nftAddress,cursor)
         let cursorData;
         if (cursor != null)
             cursorData = cursor.toString()
@@ -276,7 +272,6 @@ export function MintDbXeNFT(): any {
             tokenAddresses: [nftAddress],
             address: account ? account : ""
         });
-        console.log(response)
         return response;
     }
     const daysLeft = (date_1: Date, date_2: Date) => {

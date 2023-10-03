@@ -50,7 +50,7 @@ export function DbXeNFTList(): any {
 
     const startMoralis = () => {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch((error) => console.log(error))
+        .catch(() => console.log("moralis error"))
     }
 
     useEffect(() => {
