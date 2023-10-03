@@ -15,7 +15,7 @@ const mintInfoAddress = "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6";
 const xenftAddress = "0x94d9e02d115646dfc407abde75fa45256d66e043";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-fantom,"
+const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-fantom"
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
