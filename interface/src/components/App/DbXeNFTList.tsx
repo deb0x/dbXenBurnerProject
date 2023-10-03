@@ -54,8 +54,6 @@ export function DbXeNFTList(): any {
     }
 
     useEffect(() => {
-        console.log("Dassssdsssssssssssas")
-        console.log(chain.chainId)
         if (chain.chainId == "137") {
             showOGDBXeNFT ?
                 setChain({
@@ -89,7 +87,6 @@ export function DbXeNFTList(): any {
                     dxnTokenName: "mDXN"
                 })
         } else {
-            console.log("gggggggggggsssggggggggggsg");
             setChain({
                 deb0xAddress: "0x2A9C55b6Dc56da178f9f9a566F1161237b73Ba66",
                 deb0xViewsAddress: "0x72Ec36D3593ba1fc7Aa5dFDc1ADdf551FE599837",
@@ -109,11 +106,9 @@ export function DbXeNFTList(): any {
     }, [showOGDBXeNFT, chain.chainId])
 
     const getDBXeNFTs = () => {
-        console.log("Sssssssdsss");
         let resultArray: any;
         setLoading(true)
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
-            console.log();
             const results = getNFTResult.raw.result;
             let cursor = getNFTResult.raw.cursor;
             if (cursor != null) {
@@ -181,7 +176,6 @@ export function DbXeNFTList(): any {
                     }
                 }
             }
-            console.log(nfts)
             nfts.sort((a, b) => {
                 return parseInt(a.id) - parseInt(b.id)
             });
