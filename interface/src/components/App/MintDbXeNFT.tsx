@@ -556,7 +556,6 @@ export function MintDbXeNFT(): any {
 
         axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
-                console.log(chain.chainId)
                 if (chainForGas.includes(Number(chain.chainId))) {
                     gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
@@ -570,7 +569,6 @@ export function MintDbXeNFT(): any {
                         transactionFee: transactionFee.toString()
                     })
                 }
-                console.log("heres")
                 if (Number(chain.chainId) === 56) {
                     gasLimitVal = (BigNumber.from("450000"));
                     price = 5;

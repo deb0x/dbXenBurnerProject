@@ -593,7 +593,6 @@ export function Stake(props: any): any {
             event: React.MouseEvent<HTMLElement>,
             newAlignment: string,
         ) => {
-            console.log(newAlignment);
             setAlignment(newAlignment);
             gaEventTracker(newAlignment + " tab");
         };
