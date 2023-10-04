@@ -75,8 +75,10 @@ export function DbXeNFTPage(): any {
     }, [unclaimedFees, unclaimedXen])
 
     const startMoralis = () => {
-        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch(() => console.log("moralis error"))
+        if (!Moralis.Core.isStarted) {
+            Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
+                .catch(() => console.log("Moralis error"))
+        }
     }
 
     const getDBXeNFTs = () => {
