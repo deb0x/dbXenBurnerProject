@@ -15,7 +15,7 @@ const mintInfoAddress = "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5";
 const xenftAddress = "0x1Ac17FFB8456525BfF46870bba7Ed8772ba063a5";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const REACT_APP_METADATA_BUCKET_BSC = "deboxnft-minting-bsc"
+const METADATA_BUCKET_BSC = "deboxnft-minting-bsc"
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -149,7 +149,7 @@ async function generateAfterReveal() {
                 "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
                 "image": result.link,
-                "external_url": `https://dbxen.org/your-dbxenfts/${REACT_APP_METADATA_BUCKET_BSC}/${ids[i]}`,
+                "external_url": `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_BSC}/${ids[i]}`,
                 "attributes": attributesValue
             }
 
@@ -215,7 +215,7 @@ async function generateAfterReveal() {
                     break;
             }
             const params = {
-                Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
+                Bucket: METADATA_BUCKET_BSC,
                 Key: fileName,
                 Body: JSON.stringify(standardMetadata),
                 Tagging: 'public=yes',
