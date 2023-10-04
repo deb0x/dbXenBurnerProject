@@ -78,8 +78,10 @@ export function MintDbXeNFT(): any {
     }, [xeNFTWrapped])
 
     const startMoralis = () => {
-        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch((e) => console.log("moralis error"))
+        if (!Moralis.Core.isStarted) {
+            Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
+                .catch(() => console.log("Moralis error"))
+        }
     }
 
     useEffect(() => {
