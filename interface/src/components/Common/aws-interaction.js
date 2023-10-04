@@ -22,26 +22,26 @@ const putStorageObject = (data) =>
 export async function writePerCycle(id, maturityTs, chainId) {
     let rpcUrl;
     let dbxenftFactoryAddress;
-    let REACT_APP_METADATA_BUCKET_POLYGON;
+    let REACT_APP_METADATA_BUCKET;
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
-        REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-polygon";
+        REACT_APP_METADATA_BUCKET = "deboxnft-minting-polygon";
     }
     if (chainId == 250) {
         rpcUrl = "https://endpoints.omniatech.io/v1/fantom/mainnet/public";
         dbxenftFactoryAddress = "0x6Efe5C5E291d86B038B2069BBec1961c6E0104b4";
-        REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-fantom";
+        REACT_APP_METADATA_BUCKET = "deboxnft-minting-fantom";
     }
     if (chainId == 43114) {
         rpcUrl = "https://avalanche-mainnet.infura.io";
         dbxenftFactoryAddress = "0x3a32215fCAf645a45cfC676A98167d50a87FfD9E";
-        REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-avax";
+        REACT_APP_METADATA_BUCKET = "deboxnft-minting-avax";
     }
     if (chainId == 56) {
         rpcUrl = "https://bsc.rpc.blxrbdn.com";
         dbxenftFactoryAddress = "0x9495E72348D57A9E8d248793598a3399e3AC0a5c";
-        REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-bsc";
+        REACT_APP_METADATA_BUCKET = "deboxnft-minting-bsc";
     }
 
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
@@ -50,7 +50,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
     let fileName = id + ".json";
 
     const params = {
-        Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
+        Bucket: REACT_APP_METADATA_BUCKET,
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
@@ -61,7 +61,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
             "name": "UNREVEALED ARTWORK",
             "description": "",
             "image": "https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-polygon/dbxenNft-beforeReveal.png",
-            "external_url": `https://dbxen.org/your-dbxenfts/${id}`,
+            "external_url": `https://dbxen.org/your-dbxenfts/${REACT_APP_METADATA_BUCKET}/${id}`,
             "attributes": [{
                 "trait_type": "DBXEN NFT POWER",
                 "value": "0"
@@ -75,7 +75,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
         }
 
         const params = {
-            Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
+            Bucket: REACT_APP_METADATA_BUCKET,
             Key: fileName,
             Body: JSON.stringify(standardMetadata),
             Tagging: 'public=yes',

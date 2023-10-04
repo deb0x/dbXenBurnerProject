@@ -149,7 +149,7 @@ async function generateAfterReveal() {
                 "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
                 "image": result.link,
-                "external_url": `https://dbxen.org/your-dbxenfts/${ids[i]}`,
+                "external_url": `https://dbxen.org/your-dbxenfts/${REACT_APP_METADATA_BUCKET_POLYGON}/${ids[i]}`,
                 "attributes": attributesValue
             }
 

@@ -21,6 +21,8 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
+const chainForGas = [137,250,43114];
+const supportedChains = [137,56,250,43114];
 
 const { BigNumber } = require("ethers");
 
@@ -554,7 +556,8 @@ export function MintDbXeNFT(): any {
 
         axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
-                if (Number(chain.chainId) === 137 || Number(chain.chainId) === 43114 || Number(chain.chainId) === 250) {
+                console.log(chain.chainId)
+                if (chainForGas.includes(Number(chain.chainId))) {
                     gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
@@ -567,6 +570,7 @@ export function MintDbXeNFT(): any {
                         transactionFee: transactionFee.toString()
                     })
                 }
+                console.log("heres")
                 if (Number(chain.chainId) === 56) {
                     gasLimitVal = (BigNumber.from("450000"));
                     price = 5;
@@ -659,7 +663,7 @@ export function MintDbXeNFT(): any {
                 setNotificationState={setNotificationState} />
             {initLoading ?
                 <Spinner color={'white'} /> :
-                (chain.chainId == "137" || chain.chainId == "250" || chain.chainId == "43114" || chain.chainId == "56") ?
+                (supportedChains.includes(Number(chain.chainId))) ?
                     <div className="table-view table-responsive-xl">
                         <div>
                             <p>Total power in this cycle:&nbsp;
