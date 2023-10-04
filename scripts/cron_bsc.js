@@ -10,12 +10,12 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x2C435D6d4c61b0eCd9BB9862e73a597242A81f23";
-const mintInfoAddress = "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4";
-const xenftAddress = "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5";
+const dbxenftFactoryAddress = "0x9495E72348D57A9E8d248793598a3399e3AC0a5c";
+const mintInfoAddress = "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5";
+const xenftAddress = "0x1Ac17FFB8456525BfF46870bba7Ed8772ba063a5";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const REACT_APP_METADATA_BUCKET_POLYGON = "deboxnft-minting-polygon"
+const METADATA_BUCKET_BSC = "deboxnft-minting-bsc"
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -72,7 +72,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
     if (cursor != null)
         cursorData = cursor.toString()
     const response = await Moralis.EvmApi.events.getContractEvents({
-        "chain": "137",
+        "chain": "56",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
         "cursor": cursorData,
         "fromDate": dateForParam,
@@ -106,7 +106,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
+    const provider = new JsonRpcProvider(`https://bsc-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
@@ -120,7 +120,7 @@ async function generateAfterReveal() {
     let counter7 = 1;
     let counter8 = 1;
     let counter9 = 1;
-    for (let i = ids.length - 1; i > 0; i--) {
+    for (let i = ids.length - 1; i >= 0; i--) {
         let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(ids[i]));
         let mintInforesult = await XENFTContract.mintInfo(XENFTID);
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
@@ -149,7 +149,7 @@ async function generateAfterReveal() {
                 "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
                 "image": result.link,
-                "external_url": `https://dbxen.org/your-dbxenfts/${REACT_APP_METADATA_BUCKET_POLYGON}/${ids[i]}`,
+                "external_url": `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_BSC}/${ids[i]}`,
                 "attributes": attributesValue
             }
 
@@ -215,7 +215,7 @@ async function generateAfterReveal() {
                     break;
             }
             const params = {
-                Bucket: REACT_APP_METADATA_BUCKET_POLYGON,
+                Bucket: METADATA_BUCKET_BSC,
                 Key: fileName,
                 Body: JSON.stringify(standardMetadata),
                 Tagging: 'public=yes',
