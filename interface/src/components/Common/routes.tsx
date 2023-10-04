@@ -5,3 +5,4 @@ export const BURN_ROUTE = "/burn";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const DBXENFT_LIST_ROUTE = "/your-dbxenfts";
 export const DBXENFT_ROUTE = "/your-dbxenfts/:id";
+export const DBXENFT_EXTERNAL_ROUTE = "/your-dbxenfts/:bucketName/:id";
