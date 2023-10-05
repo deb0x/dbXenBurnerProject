@@ -98,7 +98,6 @@ export function DbXeNFT(): any {
             const overrides = {
                 value: fee
             }
-            console.log(ethers.utils.formatEther(fee))
 
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
