@@ -382,7 +382,7 @@ export function MintDbXeNFT(): any {
                     for (let i = 0; i < result.events.length; i++) {
                         if (result.events[i].event == "DBXeNFTMinted") {
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
-                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs, chain.chainId)
+                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs, Number(chain.chainId))
                             setNotificationState({
                                 message: "Your succesfully minted a DBXENFT.", open: true,
                                 severity: "success"
@@ -460,6 +460,37 @@ export function MintDbXeNFT(): any {
 
         return fee.add(fee.div(10))
     }
+
+    async function calcMintFeeBSC(
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string
+    ) {
+        const estReward: any = await getNFTRewardInXen(
+            maturityTs,
+            VMUs,
+            EAA,
+            term,
+            AMP,
+            cRank
+        )
+
+        const maturityDays = calcMaturityDays(term, maturityTs)
+        const daysReduction = 11389 * maturityDays
+        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
+        const difference = 10_000_000 - maxSubtrahend
+        const maxPctReduction = Math.max(difference, 5_000_000)
+        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
+        const minFee = BigNumber.from(1e15)
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(2_000_000_000))
+        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
+
+        return fee.add(fee.div(10))
+    }
+
 
     async function getNFTRewardInXen(
         maturityTs: number,
@@ -576,7 +607,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFeeBSC(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
