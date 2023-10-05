@@ -26,7 +26,7 @@ export function DbXeNFTList(): any {
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
     const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
-    let [orderByMaturity, setOrderByMaturity] = useState<boolean>(true)
+    let [orderByTokenID, setOrderByMaturity] = useState<boolean>(true)
 
     useEffect(() => {
         startMoralis();
@@ -34,7 +34,7 @@ export function DbXeNFTList(): any {
     }, [chain, account])
 
     useEffect(() => {
-        if (!orderByMaturity) {
+        if (!orderByTokenID) {
             const sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
                 let dateA: Date = new Date(a.maturity);
                 let dateB: Date = new Date(b.maturity);
@@ -47,7 +47,7 @@ export function DbXeNFTList(): any {
             );
             setDBXENFTs(sortedDBXENFTs);
         }
-    }, [orderByMaturity]);
+    }, [orderByTokenID]);
 
     const startMoralis = () => {
         if (!Moralis.Core.isStarted) {
@@ -178,7 +178,6 @@ export function DbXeNFTList(): any {
             nfts.sort((a, b) => {
                 return parseInt(a.id) - parseInt(b.id)
             });
-
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -227,8 +226,8 @@ export function DbXeNFTList(): any {
                 <div className="card-view">
                     <button className="btn chain-switcher mb-4 me-2"
                         type="button"
-                        onClick={() => setOrderByMaturity(!orderByMaturity)}>
-                        {orderByMaturity ? "Order by Token ID" : "Order by Maturity Date"}
+                        onClick={() => setOrderByMaturity(!orderByTokenID)}>
+                        {orderByTokenID ? "Order by Maturity Date" : "Order by Token ID"}
                     </button>
                     {chain.chainId == "137" ?
                         <button className="btn chain-switcher mb-4"
