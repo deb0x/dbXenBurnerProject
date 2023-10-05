@@ -362,15 +362,25 @@ export function MintDbXeNFT(): any {
             // if (claimStatus == "Redeemed") {
             //     fee = ethers.utils.parseEther("0.01");
             // } else {
-            fee = await calcMintFee(
-                maturityTs,
-                VMUs,
-                EAA,
-                term,
-                AMP,
-                cRank
-            )
-
+            if(Number(chain.chainId) == 56){
+                fee = await calcMintFeeBSC(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                )
+            } else {
+                fee = await calcMintFee(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                )
+        }
             // }
             const overrides = {
                 value: fee,
