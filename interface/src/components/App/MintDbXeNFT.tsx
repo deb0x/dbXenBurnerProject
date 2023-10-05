@@ -16,11 +16,13 @@ import axios, { Method } from 'axios';
 import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
-import { writePerCycle} from "../Common/aws-interaction";
+import { writePerCycle } from "../Common/aws-interaction";
 import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
+const chainForGas = [137,250,43114];
+const supportedChains = [137,56,250,43114];
 
 const { BigNumber } = require("ethers");
 
@@ -59,15 +61,18 @@ export function MintDbXeNFT(): any {
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
     const [endDate, setEndDate] = useState<any>();
-    const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 14, 8, 37, 0));
+    const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 17, 48, 8, 0));
+    const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 16, 48, 8, 0));
+    const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 15, 48, 8, 0));
+    const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 17, 48, 8, 0));
     const now: any = Date.now();
 
     useEffect(() => {
         startMoralis();
         getXENFTs();
         isApprovedForAll()
-            .then((result: any) => result ? 
-                setXeNFTWrapAppeoved(true) : 
+            .then((result: any) => result ?
+                setXeNFTWrapAppeoved(true) :
                 setXeNFTWrapAppeoved(false)
             )
         currentCycleTotalPower();
@@ -78,8 +83,10 @@ export function MintDbXeNFT(): any {
     }, [xeNFTWrapped])
 
     const startMoralis = () => {
-        Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
-            .catch((e) => console.log("moralis error"))
+        if (!Moralis.Core.isStarted) {
+            Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
+                .catch((e) => console.log("Moralis error"))
+        }
     }
 
     useEffect(() => {
@@ -95,13 +102,22 @@ export function MintDbXeNFT(): any {
             case 137:
                 setEndDate(datePolygon.getTime() - now);
                 break;
+            case 43114:
+                setEndDate(dateAvax.getTime() - now);
+                break;
+            case 56:
+                setEndDate(dateBsc.getTime() - now);
+                break;
+            case 250:
+                setEndDate(dateFantom.getTime() - now);
+                break;
         }
     }
 
     const currentCycleTotalPower = () => {
         dbxenftFactory.getCurrentCycle().then((currentCycle: any) => {
             dbxenftFactory.rewardPerCycle(currentCycle).then((result: any) => {
-                if(ethers.utils.formatEther(result) === "0.0") {
+                if (ethers.utils.formatEther(result) === "0.0") {
                     dbxenftFactory.lastCycleReward().then((result: any) => {
                         setCurrentRewardPower(
                             ethers.utils.formatEther(result.add(result.div(ethers.utils.parseEther("1"))))
@@ -185,15 +201,15 @@ export function MintDbXeNFT(): any {
                             if (boolVal) {
                                 xenftEntries.push({
                                     id: +result.token_id,
-                                    claimStatus:"",
-                                        // resultAttributes[7].value == "no"
-                                            // formattedMaturityDate < new Date()
-                                            //     ? "Claimable"
-                                            //     : ` ${daysLeft(
-                                            //         formattedMaturityDate,
-                                            //         new Date()
-                                            //     )} day(s) left`,
-                                            // : "Redeemed",
+                                    claimStatus: "",
+                                    // resultAttributes[7].value == "no"
+                                    // formattedMaturityDate < new Date()
+                                    //     ? "Claimable"
+                                    //     : ` ${daysLeft(
+                                    //         formattedMaturityDate,
+                                    //         new Date()
+                                    //     )} day(s) left`,
+                                    // : "Redeemed",
                                     class: resultAttributes[0].value,
                                     VMUs: parseInt(resultAttributes[1].value),
                                     cRank: resultAttributes[2].value,
@@ -241,7 +257,7 @@ export function MintDbXeNFT(): any {
                                         maturityDateTime: resultAttributes[7].value,
                                         term: parseInt(resultAttributes[8].value),
                                         xenBurned: resultAttributes[9].value,
-                                        estimatedXen:(ethers.utils.formatEther(xenEstimated)),
+                                        estimatedXen: (ethers.utils.formatEther(xenEstimated)),
                                         category: resultAttributes[10].value,
                                         image: result.normalized_metadata.image
                                     });
@@ -253,6 +269,8 @@ export function MintDbXeNFT(): any {
                     }
                 }
                 setXENFTs(xenftEntries);
+                setInitLoading(false);
+            } else {
                 setInitLoading(false);
             }
         })
@@ -364,7 +382,7 @@ export function MintDbXeNFT(): any {
                     for (let i = 0; i < result.events.length; i++) {
                         if (result.events[i].event == "DBXeNFTMinted") {
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
-                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs)
+                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs, chain.chainId)
                             setNotificationState({
                                 message: "Your succesfully minted a DBXENFT.", open: true,
                                 severity: "success"
@@ -501,7 +519,7 @@ export function MintDbXeNFT(): any {
                     transactionFee: "0"
                 })
             } else {
-                if(displayDbxenftDetails == false)
+                if (displayDbxenftDetails == false)
                     setDisplayDbxenftDetails(true)
             }
         })
@@ -538,8 +556,8 @@ export function MintDbXeNFT(): any {
 
         axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
-                if (Number(chain.chainId) === 137) {
-                    gasLimitVal = (BigNumber.from("400000"));
+                if (chainForGas.includes(Number(chain.chainId))) {
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
@@ -550,8 +568,19 @@ export function MintDbXeNFT(): any {
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
                     })
-
-                    console.log(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                }
+                if (Number(chain.chainId) === 56) {
+                    gasLimitVal = (BigNumber.from("450000"));
+                    price = 5;
+                    transactionFee = gasLimitVal * price / 1000000000;
+                    let protocolFee =
+                        NFTData.claimStatus == "Redeemed" ?
+                            "0.001" :
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                    setDBXNFT({
+                        protocolFee: ethers.utils.formatEther(protocolFee),
+                        transactionFee: transactionFee.toString()
+                    })
                 }
             }
         })
@@ -630,9 +659,9 @@ export function MintDbXeNFT(): any {
         <div className={`content-box content-box-table ${initLoading ? "loading" : ""}`}>
             <SnackbarNotification state={notificationState}
                 setNotificationState={setNotificationState} />
-                {initLoading ? 
-                    <Spinner color={'white'} /> :
-                    chain.chainId == "137" ?
+            {initLoading ?
+                <Spinner color={'white'} /> :
+                (supportedChains.includes(Number(chain.chainId))) ?
                     <div className="table-view table-responsive-xl">
                         <div>
                             <p>Total power in this cycle:&nbsp;
@@ -643,7 +672,7 @@ export function MintDbXeNFT(): any {
                             </p>
                             <p>Next cycle in: <Countdown date={Date.now() + endDate} renderer={renderer} /></p>
                         </div>
-                        { XENFTs.length > 0 ?
+                        {XENFTs.length > 0 ?
                             <table className="table" aria-label="custom pagination table">
                                 <thead>
                                     <tr>
@@ -651,7 +680,7 @@ export function MintDbXeNFT(): any {
                                         {/* <th scope="col">Status</th> */}
                                         <th scope="col">VMUs</th>
                                         <th scope="col">Term (days)</th>
-                                        <th scope="col">Maturiy</th>
+                                        <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
                                     </tr>
@@ -688,9 +717,9 @@ export function MintDbXeNFT(): any {
                                                     </button>
                                                 </td>
                                             </tr>
-                                                <tr className="xenft-details-row">
-                                                    {displayDbxenftDetails && xenftId === data.id ?
-                                                        <td colSpan={12}>
+                                            <tr className="xenft-details-row">
+                                                {displayDbxenftDetails && xenftId === data.id ?
+                                                    <td colSpan={12}>
                                                         {DBXENFT != null ?
                                                             <div className="detailed-view row">
                                                                 <div className="col xenft-container">
@@ -745,7 +774,7 @@ export function MintDbXeNFT(): any {
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                    {isRedeemed ? 
+                                                                    {isRedeemed ?
                                                                         <p className="mb-3">This XENFT is redeemed. You will get a power of 1.</p> :
                                                                         <p className="mb-3">Your Base Power will be calculated at the end of the cycle.</p>
                                                                     }
@@ -756,10 +785,10 @@ export function MintDbXeNFT(): any {
                                                                             variant="contained"
                                                                             type="button"
                                                                             onClick={() => handleWrapXenft(data)}>
-                                                                                { xeNFTWrapApproved ? 
-                                                                                    "WRAP XENFT" : "APPROVE" 
-                                                                                }
-                                                                            
+                                                                            {xeNFTWrapApproved ?
+                                                                                "WRAP XENFT" : "APPROVE"
+                                                                            }
+
                                                                         </LoadingButton>
                                                                     </div>
                                                                 </div>
@@ -768,12 +797,12 @@ export function MintDbXeNFT(): any {
                                                                 <p>Wait for date please</p>
                                                             </div>
                                                         }
-                                                        </td>
-                                                        :
-                                                        <></>
-                                                    }
+                                                    </td>
+                                                    :
+                                                    <></>
+                                                }
 
-                                                </tr>
+                                            </tr>
                                         </>
                                     ))}
                                     {emptyRows > 0 && (
@@ -806,8 +835,8 @@ export function MintDbXeNFT(): any {
                                 <p>You don't have any XENFT</p>
                             </div>
                         }
-                        
-                    </div> : 
+
+                    </div> :
                     <div className="text-container-nft">
                         <div className="upper-container">
                             <div className="card">
@@ -831,7 +860,7 @@ export function MintDbXeNFT(): any {
                             <p>Fair crypto matters.</p>
                         </div>
                     </div>
-                }
+            }
         </div>
     );
 }

@@ -75,8 +75,10 @@ export function DbXeNFTPage(): any {
     }, [unclaimedFees, unclaimedXen])
 
     const startMoralis = () => {
+        if (!Moralis.Core.isStarted) {
         Moralis.start({ apiKey: process.env.REACT_APP_MORALIS_KEY_NFT })
             .catch(() => console.log("moralis error"))
+        }
     }
 
     const getDBXeNFTs = () => {
@@ -135,7 +137,6 @@ export function DbXeNFTPage(): any {
                     setLoading(false)
                 })
                 .catch((error: any) => {
-                    console.log(error)
                     setNotificationState({
                         message: "Contract couldn't be approved for accepting your DXN!", open: true,
                         severity: "error"
@@ -507,63 +508,133 @@ export function DbXeNFTPage(): any {
 
     return (
         <div className="content-box dbxenft-page">
-            <div className="row card-container">
-                <Card className="col-12 col-md-6 stake-card card">
-                    <ToggleButtonGroup
-                        className="button-group"
-                        value={alignment}
-                        exclusive
-                        onChange={handleChange}
-                    >
-                        <ToggleButton className="tab-button" value="stake">Stake</ToggleButton>
-                        <ToggleButton className="tab-button" value="unstake">Unstake</ToggleButton>
-                    </ToggleButtonGroup>
-                    {DBXENFT.map((xenft: any, i: any) => (
-                        <>
-                            <CardContent>
-                                <div className="" key={i}>
-                                    <div className="nft-card">
-                                        <div className="card-row card-header">
-                                            <img src={xenft.image} alt="nft-placeholder" />
-                                        </div>
-                                        <div className="card-details">
-                                            <div className="dbxenft-power">
-                                                <span className="label">DBXENFT base power</span>
-                                                <span className="value">{baseDBXENFTPower}</span>
+            {DBXENFT.length === 0 ?
+                <p className="text-center"> You don't own this NFT</p> :
+                <div className="row card-container">
+                    <Card className="col-12 col-md-6 stake-card card">
+                        <ToggleButtonGroup
+                            className="button-group"
+                            value={alignment}
+                            exclusive
+                            onChange={handleChange}
+                        >
+                            <ToggleButton className="tab-button" value="stake">Stake</ToggleButton>
+                            <ToggleButton className="tab-button" value="unstake">Unstake</ToggleButton>
+                        </ToggleButtonGroup>
+                        {DBXENFT.map((xenft: any, i: any) => (
+                            <>
+                                <CardContent>
+                                    <div className="" key={i}>
+                                        <div className="nft-card">
+                                            <div className="card-row card-header">
+                                                <img src={xenft.image} alt="nft-placeholder" />
                                             </div>
-                                            <div className="dbxenft-power">
-                                                <span className="label">DBXENFT total power</span>
-                                                <span className="value">{dbxenftPower}</span>
-                                            </div>
-                                            <div className="card-row">
-                                                <span className="label">tokenID: </span>
-                                                <span className="value">{xenft.id}</span>
-                                            </div>
-                                            <div className="card-row">
-                                                <span className="label">name: </span>
-                                                <span className="value">{xenft.name}</span>
-                                            </div>
-                                            <div className="card-row">
-                                                <span className="label">matures on: </span>
-                                                <span className="value">{new Date(xenft.maturityDate).toLocaleString()}</span>
+                                            <div className="card-details">
+                                                <div className="dbxenft-power">
+                                                    <span className="label">DBXENFT base power</span>
+                                                    <span className="value">{baseDBXENFTPower}</span>
+                                                </div>
+                                                <div className="dbxenft-power">
+                                                    <span className="label">DBXENFT total power</span>
+                                                    <span className="value">{dbxenftPower}</span>
+                                                </div>
+                                                <div className="card-row">
+                                                    <span className="label">tokenID: </span>
+                                                    <span className="value">{xenft.id}</span>
+                                                </div>
+                                                <div className="card-row">
+                                                    <span className="label">name: </span>
+                                                    <span className="value">{xenft.name}</span>
+                                                </div>
+                                                <div className="card-row">
+                                                    <span className="label">matures on: </span>
+                                                    <span className="value">{new Date(xenft.maturityDate).toLocaleString()}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                            <CardActions>
-                                {alignment === "stake" ?
-                                    <div className="stake-container">
-                                        {approved &&
-                                        <>
+                                </CardContent>
+                                <CardActions>
+                                    {alignment === "stake" ?
+                                        <div className="stake-container">
+                                            {approved &&
+                                            <>
+                                                <div className="tokens-in-wallet">
+                                                    <img className="display-element" src={coinBagLight} alt="wallet" />
+                                                    <p className="label">
+                                                        Your staked amount:
+                                                    </p>
+                                                    <p className="m-0" >
+                                                        <strong>
+                                                            {Number(userStakedAmount).toLocaleString('en-US', {
+                                                                minimumFractionDigits: 4,
+                                                                maximumFractionDigits: 4
+                                                            })} DXN
+                                                        </strong>
+                                                    </p>
+                                                </div>
+                                                <Grid className="amount-row" container>
+                                                    <Grid className="input" item>
+                                                        <OutlinedInput id="outlined-basic"
+                                                            placeholder="amount to stake"
+                                                            type="number"
+                                                            value={amountToStake}
+                                                            inputProps={{ min: 0 }}
+                                                            onChange={e => setAmountToStake(e.target.value)} />
+                                                    </Grid>
+                                                    <Grid className="max-btn-container" item>
+                                                        <Button className="max-btn"
+                                                            size="small" variant="contained" color="error"
+                                                            onClick={() => setAmountToStake(userUnstakedAmount)}>
+                                                            MAX
+                                                        </Button>
+                                                    </Grid>
+                                                </Grid>
+                                            </>
+                                            }
+                                            {approved ?
+                                                <LoadingButton
+                                                    className="stake-btn"
+                                                    loading={loading}
+                                                    variant="contained"
+                                                    type="button"
+                                                    onClick={() => stake(xenft.id)}>
+                                                    Stake
+                                                </LoadingButton> :
+                                                <LoadingButton
+                                                    className="approve-btn"
+                                                    loading={loading}
+                                                    variant="contained"
+                                                    type="button"
+                                                    onClick={() => approveDXN()}>
+                                                    Approve
+                                                </LoadingButton>
+                                            }
+                                            {backButton &&
+                                                <div className="back-to-approve">
+                                                    <LoadingButton
+                                                        className="collect-btn"
+                                                        loading={loading}
+                                                        variant="contained"
+                                                        onClick={backToApprove}>
+                                                        Back
+                                                    </LoadingButton>
+                                                    <span className="text">
+                                                        Your input value is greater than your current approved value!
+                                                        Back to input or approve!
+                                                    </span>
+                                                </div>
+                                            }
+                                        </div> :
+                                        <div className="stake-container">
                                             <div className="tokens-in-wallet">
                                                 <img className="display-element" src={coinBagLight} alt="wallet" />
                                                 <p className="label">
-                                                    Your staked amount:
+                                                    Available to unstake:
                                                 </p>
-                                                <p className="m-0" >
+                                                <p className="mb-0" >
                                                     <strong>
-                                                        {Number(userStakedAmount).toLocaleString('en-US', {
+                                                        {Number(tokensForUnstake).toLocaleString('en-US', {
                                                             minimumFractionDigits: 4,
                                                             maximumFractionDigits: 4
                                                         })} DXN
@@ -572,161 +643,94 @@ export function DbXeNFTPage(): any {
                                             </div>
                                             <Grid className="amount-row" container>
                                                 <Grid className="input" item>
-                                                    <OutlinedInput id="outlined-basic"
-                                                        placeholder="amount to stake"
-                                                        type="number"
-                                                        value={amountToStake}
+                                                    <OutlinedInput value={amountToUnstake}
+                                                        id="outlined-basic"
+                                                        className="max-field"
+                                                        placeholder="amount to unstake"
+                                                        onChange={e => setAmountToUnstake(e.target.value)}
                                                         inputProps={{ min: 0 }}
-                                                        onChange={e => setAmountToStake(e.target.value)} />
+                                                        type="number" />
                                                 </Grid>
                                                 <Grid className="max-btn-container" item>
                                                     <Button className="max-btn"
                                                         size="small" variant="contained" color="error"
-                                                        onClick={() => setAmountToStake(userUnstakedAmount)}>
+                                                        onClick={() => setAmountToUnstake(tokensForUnstake)}>
                                                         MAX
                                                     </Button>
                                                 </Grid>
                                             </Grid>
-                                        </>
-                                        }
-                                        {approved ?
                                             <LoadingButton
-                                                className="stake-btn"
+                                                className="unstake-btn"
                                                 loading={loading}
                                                 variant="contained"
                                                 type="button"
-                                                onClick={() => stake(xenft.id)}>
-                                                Stake
-                                            </LoadingButton> :
-                                            <LoadingButton
-                                                className="approve-btn"
-                                                loading={loading}
-                                                variant="contained"
-                                                type="button"
-                                                onClick={() => approveDXN()}>
-                                                Approve
+                                                onClick={() => unstake(xenft.id, amountToUnstake)}>
+                                                Unstake
                                             </LoadingButton>
-                                        }
-                                        {backButton &&
-                                            <div className="back-to-approve">
-                                                <LoadingButton
-                                                    className="collect-btn"
-                                                    loading={loading}
-                                                    variant="contained"
-                                                    onClick={backToApprove}>
-                                                    Back
-                                                </LoadingButton>
-                                                <span className="text">
-                                                    Your input value is greater than your current approved value!
-                                                    Back to input or approve!
-                                                </span>
-                                            </div>
-                                        }
-                                    </div> :
-                                    <div className="stake-container">
-                                        <div className="tokens-in-wallet">
-                                            <img className="display-element" src={coinBagLight} alt="wallet" />
-                                            <p className="label">
-                                                Available to unstake:
-                                            </p>
-                                            <p className="mb-0" >
-                                                <strong>
-                                                    {Number(tokensForUnstake).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 4,
-                                                        maximumFractionDigits: 4
-                                                    })} DXN
-                                                </strong>
-                                            </p>
                                         </div>
-                                        <Grid className="amount-row" container>
-                                            <Grid className="input" item>
-                                                <OutlinedInput value={amountToUnstake}
-                                                    id="outlined-basic"
-                                                    className="max-field"
-                                                    placeholder="amount to unstake"
-                                                    onChange={e => setAmountToUnstake(e.target.value)}
-                                                    inputProps={{ min: 0 }}
-                                                    type="number" />
-                                            </Grid>
-                                            <Grid className="max-btn-container" item>
-                                                <Button className="max-btn"
-                                                    size="small" variant="contained" color="error"
-                                                    onClick={() => setAmountToUnstake(tokensForUnstake)}>
-                                                    MAX
-                                                </Button>
-                                            </Grid>
-                                        </Grid>
-                                        <LoadingButton
-                                            className="unstake-btn"
-                                            loading={loading}
-                                            variant="contained"
-                                            type="button"
-                                            onClick={() => unstake(xenft.id, amountToUnstake)}>
-                                            Unstake
-                                        </LoadingButton>
-                                    </div>
-                                }
-                            </CardActions>
-                        </>
-                    ))}
-                </Card>
-                <Card className="col-12 col-md-6 reward-card card">
-                    <CardContent>
-                        <div className="tokens-in-wallet">
-                            <img className="display-element" src={walletLight} alt="wallet" />
-                            <p className="mb-0">
-                                DXN tokens in your wallet:
-                            </p>
-                            <p className="m-0" >
-                                <strong>
-                                    {Number(userUnstakedAmount).toLocaleString('en-US', {
-                                        minimumFractionDigits: 4,
-                                        maximumFractionDigits: 4
-                                    })} {chain.dxnTokenName}
-                                </strong>
-                            </p>
-                        </div>
-                        <div className="fees native-fees">
-                            <img className="display-element" src={coinBagLight} alt="coinbag" />
-                            <p className="m-0">
-                                Your unclaimed fees:
-                            </p>
-                            <p className="m-0" >
-                                {unclaimedFees} {chain.currency}
-                            </p>
-                            <LoadingButton
-                                className="collect-btn"
-                                disabled={unclaimedFees == "0.0"}
-                                loading={claimLoading}
-                                variant="contained"
-                                onClick={() => claimFees(id)}>
-                                Claim
-                            </LoadingButton>
-                        </div>
+                                    }
+                                </CardActions>
+                            </>
+                        ))}
+                    </Card>
+                    <Card className="col-12 col-md-6 reward-card card">
+                        <CardContent>
+                            <div className="tokens-in-wallet">
+                                <img className="display-element" src={walletLight} alt="wallet" />
+                                <p className="mb-0">
+                                    DXN tokens in your wallet:
+                                </p>
+                                <p className="m-0" >
+                                    <strong>
+                                        {Number(userUnstakedAmount).toLocaleString('en-US', {
+                                            minimumFractionDigits: 4,
+                                            maximumFractionDigits: 4
+                                        })} {chain.dxnTokenName}
+                                    </strong>
+                                </p>
+                            </div>
+                            <div className="fees native-fees">
+                                <img className="display-element" src={coinBagLight} alt="coinbag" />
+                                <p className="m-0">
+                                    Your unclaimed fees:
+                                </p>
+                                <p className="m-0" >
+                                    {unclaimedFees} {chain.currency}
+                                </p>
+                                <LoadingButton
+                                    className="collect-btn"
+                                    disabled={unclaimedFees == "0.0"}
+                                    loading={claimLoading}
+                                    variant="contained"
+                                    onClick={() => claimFees(id)}>
+                                    Claim
+                                </LoadingButton>
+                            </div>
 
-                        <div className="fees xen-fees">
-                            <img className="display-element" src={coinBagLight} alt="coinbag" />
-                            <p className="m-0">
-                                Your unclaimed XEN:
-                            </p>
-                            <p className="m-0" >
-                                {unclaimedXen}
-                            </p>
-                            <LoadingButton
-                                className="collect-btn"
-                                disabled={nftMaturityDate && new Date(nftMaturityDate) > new Date() || unclaimedXen == "0.0"}
-                                loading={claimXenLoading}
-                                variant="contained"
-                                onClick={() => claimXen(id)}>
-                                Claim
-                            </LoadingButton>
-                        </div>
-                    </CardContent>
-                    <CardActions>
+                            <div className="fees xen-fees">
+                                <img className="display-element" src={coinBagLight} alt="coinbag" />
+                                <p className="m-0">
+                                    Your unclaimed XEN:
+                                </p>
+                                <p className="m-0" >
+                                    {unclaimedXen}
+                                </p>
+                                <LoadingButton
+                                    className="collect-btn"
+                                    disabled={nftMaturityDate && new Date(nftMaturityDate) > new Date() || unclaimedXen == "0.0"}
+                                    loading={claimXenLoading}
+                                    variant="contained"
+                                    onClick={() => claimXen(id)}>
+                                    Claim
+                                </LoadingButton>
+                            </div>
+                        </CardContent>
+                        <CardActions>
 
-                    </CardActions>
-                </Card>
-            </div>
+                        </CardActions>
+                    </Card>
+                </div>
+            }
         </div>
     );
 }

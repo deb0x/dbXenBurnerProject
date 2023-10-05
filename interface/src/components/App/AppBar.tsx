@@ -72,7 +72,7 @@ export function AppBarComponent(props: any): any {
     const dimensions = ScreenSize();
     const navigate = useNavigate();
     const [url, setUrl] = useState(window.location.pathname.split('/').pop())
-
+    const supportedChains = [137,56,250,43114];
     const id = open ? 'simple-popper' : "";
 
     if(library){
@@ -90,7 +90,6 @@ export function AppBarComponent(props: any): any {
 
     useEffect(() => {
         setUrl(window.location.pathname.split('/').pop())
-        console.log("URL", url)
     }, [window.location.pathname]);
 
     useEffect(() => {
@@ -161,7 +160,7 @@ export function AppBarComponent(props: any): any {
     }
 
     async function totalAmountStaked() {
-        const deb0xContract = DBXen(library, chain.deb0xAddress)
+        const deb0xContract =  DBXen(library, chain.deb0xAddress)
         const currentCycle= await deb0xContract.currentStartedCycle()
         const currentStake = await deb0xContract.summedCycleStakes(currentCycle)
         const pendingStakeWithdrawal = await deb0xContract.pendingStakeWithdrawal()
@@ -264,7 +263,7 @@ export function AppBarComponent(props: any): any {
             <SnackbarNotification state={notificationState} setNotificationState={setNotificationState} />
             <>
                 <div className="app-bar--top">
-                    <img className="logo" src={logo} alt="logo" />
+                    <img className="logo" src={window.location.pathname.includes("dbxenft") ? dbxenft : logo} alt="logo" />
                     <Box className="main-menu--left">
                         <button type="button" onClick={() => setShow(!show)} className="donate-btn">
                             <span>Donate</span>
@@ -282,7 +281,7 @@ export function AppBarComponent(props: any): any {
                         </div>
                     </Box>
                     <Box className="main-menu--right d-flex">
-                        {dimensions.width > 768 && chain.chainId == "137" ?
+                        {(dimensions.width > 768 && supportedChains.includes(Number(chain.chainId))) ?
                             <button onClick={ handleSwitchComponent } className="component-switcher">
                                 <img src={window.location.pathname.includes("dbxenft") ? dbxen : dbxenft} alt="logo" />
                                 <img src={arrow} alt="arrow" />

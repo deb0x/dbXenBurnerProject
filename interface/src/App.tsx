@@ -37,13 +37,14 @@ import {
     FEES_ROUTE,
     HOME_ROUTE,
     DBXENFT_LIST_ROUTE,
-    DBXENFT_ROUTE
+    DBXENFT_ROUTE,
+    DBXENFT_EXTERNAL_ROUTE
 } from './components/Common/routes';
 import { AppBarMobile } from './components/App/AppBarMobile';
 import { DbXeNFTPage } from './components/App/DbXeNFTPage';
+import { DbXeNFTExternalView } from './components/App/DbXeNFTExternalView';
 
 const maintenance = process.env.REACT_APP_MAINTENANCE_MODE;
-
 
 enum ConnectorNames { Injected = 'Injected', Network = 'Network' };
 
@@ -251,6 +252,7 @@ function App() {
                                             <Route path={ FEES_ROUTE } element={ <Stake /> } />
                                             <Route path={ DBXENFT_LIST_ROUTE } element={ <DbXeNFTList /> } />
                                             <Route path={ DBXENFT_ROUTE } element={ <DbXeNFTPage /> } />
+                                            <Route path={ DBXENFT_EXTERNAL_ROUTE } element={ <DbXeNFTExternalView /> } />
                                         </Routes>
                                     </Box>
                                 </div>

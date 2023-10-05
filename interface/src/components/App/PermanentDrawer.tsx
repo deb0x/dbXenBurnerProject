@@ -134,7 +134,7 @@ export function PermanentDrawer(props: any): any {
                         anchor='left'
                         className="side-menu">
                         <div className="image-container">
-                            <div className="img"></div>
+                            <div className={`img ${window.location.pathname.includes("dbxenft") ? "dbxenft" : "dbxen"}`}></div>
                         </div>
                         <Box className="main-menu--left">
                             <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp;
@@ -159,7 +159,10 @@ export function PermanentDrawer(props: any): any {
                                 <a href="https://twitter.com/DBXen_crypto" target="_blank" className="logo-text-color">
                                     <FontAwesomeIcon icon={faTwitter} size="xl" />
                                 </a>
-                                <a href="https://dbxen.gitbook.io/dbxen-litepaper/" target="_blank" className="logo-text-color">
+                                <a href={window.location.pathname.includes("dbxenft") ?
+                                    "https://dbxenft-litepaper.gitbook.io/dbxenft/litepaper/" :
+                                    "https://dbxen.gitbook.io/dbxen-litepaper/" }
+                                    target="_blank" className="logo-text-color">
                                     <img src={document} />
                                 </a>
                                 <a href="https://github.com/deb0x/dbXenBurnerProject" target="_blank" className="logo-text-color">
@@ -170,27 +173,48 @@ export function PermanentDrawer(props: any): any {
                                 </a>
                             </div>
                             <div className="contracts">
-                                <div className="row">
-                                    <span className="col-6">DBXen: </span>
-                                    <a className="col-6" target="_blank"
-                                        href={baseUrl + chain.deb0xAddress}>
-                                        {formatAccountName(chain.deb0xAddress)}
-                                    </a>
-                                </div>
-                                <div className="row">
-                                    <span className="col-6">DBXenERC20: </span>
-                                    <a className="col-6" target="_blank"
-                                        href={baseUrl + chain.deb0xERC20Address}>
-                                        {formatAccountName(chain.deb0xERC20Address)}
-                                    </a>
-                                </div>
-                                <div className="row">
-                                    <span className="col-6">DBXenViews:</span>
-                                    <a className="col-6" target="_blank"
-                                        href={baseUrl + chain.deb0xViewsAddress}>
-                                        {formatAccountName(chain.deb0xViewsAddress)}
-                                    </a>
-                                </div>
+                                { window.location.pathname.includes("dbxenft") ?
+                                <>
+                                    <div className="row">
+                                        <span className="col-6">DBXeNFT Factory: </span>
+                                        <a className="col-6" target="_blank"
+                                            href={baseUrl + chain.dbxenftFactoryAddress}>
+                                            {formatAccountName(chain.dbxenftFactoryAddress)}
+                                        </a>
+                                    </div>
+                                    <div className="row">
+                                        <span className="col-6">DBXeNFT: </span>
+                                        <a className="col-6" target="_blank"
+                                            href={baseUrl + chain.dbxenftAddress}>
+                                            {formatAccountName(chain.dbxenftAddress)}
+                                        </a>
+                                    </div>
+                                </>
+                                :
+                                <>
+                                    <div className="row">
+                                        <span className="col-6">DBXen: </span>
+                                        <a className="col-6" target="_blank"
+                                            href={baseUrl + chain.deb0xAddress}>
+                                            {formatAccountName(chain.deb0xAddress)}
+                                        </a>
+                                    </div>
+                                    <div className="row">
+                                        <span className="col-6">DBXenERC20: </span>
+                                        <a className="col-6" target="_blank"
+                                            href={baseUrl + chain.deb0xERC20Address}>
+                                            {formatAccountName(chain.deb0xERC20Address)}
+                                        </a>
+                                    </div>
+                                    <div className="row">
+                                        <span className="col-6">DBXenViews:</span>
+                                        <a className="col-6" target="_blank"
+                                            href={baseUrl + chain.deb0xViewsAddress}>
+                                            {formatAccountName(chain.deb0xViewsAddress)}
+                                        </a>
+                                    </div>
+                                </>
+                                }
                             </div>
                         </div>
                     </Drawer>
