@@ -7,6 +7,7 @@ import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
 import { Spinner } from './Spinner';
+import { ethers } from "ethers";
 
 interface DBXENFTEntry {
     id: string;
@@ -90,6 +91,19 @@ export function DbXeNFTList(): any {
                 })
         } 
     }, [showOGDBXeNFT])
+
+    useEffect(() => {
+        async function getChainId() {
+          try {
+            const chainId = Number(await window.ethereum.request({ method: "eth_chainId" }));
+            const network = ethers.providers.getNetwork(chainId).name;
+            console.log(`Network name: ${network}`);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+        getChainId();
+      }, []);
 
     const getDBXeNFTs = () => {
         let resultArray: any;
