@@ -34,7 +34,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
         METADATA_BUCKET = "deboxnft-minting-fantom";
     }
     if (chainId == 43114) {
-        rpcUrl = "https://avalanche-mainnet.infura.io";
+        rpcUrl = "https://api.avax.network/ext/bc/C/rpc";
         dbxenftFactoryAddress = "0x8c229A2e3178f1BE5F5F4fCdC2D5833c8a60e831";
         METADATA_BUCKET = "deboxnft-minting-avax";
     }
@@ -73,7 +73,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
                 "value": new Date(maturityTs * 1000).toString(),
             }]
         }
-
+        
         const params = {
             Bucket: METADATA_BUCKET,
             Key: fileName,
