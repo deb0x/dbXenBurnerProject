@@ -62,9 +62,9 @@ export function MintDbXeNFT(): any {
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
     const [endDate, setEndDate] = useState<any>();
     const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 17, 48, 8, 0));
-    const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 16, 48, 8, 0));
-    const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 15, 48, 8, 0));
-    const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 17, 48, 8, 0));
+    const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
+    const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
+    const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
     const now: any = Date.now();
 
     useEffect(() => {
