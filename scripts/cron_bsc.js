@@ -10,7 +10,7 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x9495E72348D57A9E8d248793598a3399e3AC0a5c";
+const dbxenftFactoryAddress = "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db";
 const mintInfoAddress = "0xffcbF84650cE02DaFE96926B37a0ac5E34932fa5";
 const xenftAddress = "0x1Ac17FFB8456525BfF46870bba7Ed8772ba063a5";
 
