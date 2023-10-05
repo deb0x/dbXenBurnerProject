@@ -382,7 +382,7 @@ export function MintDbXeNFT(): any {
                     for (let i = 0; i < result.events.length; i++) {
                         if (result.events[i].event == "DBXeNFTMinted") {
                             let currentCycle = await dbxenftFactory.getCurrentCycle();
-                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs, chain.chainId)
+                            writePerCycle(Number(result.events[i].args.DBXENFTId), maturityTs, Number(chain.chainId))
                             setNotificationState({
                                 message: "Your succesfully minted a DBXENFT.", open: true,
                                 severity: "success"
