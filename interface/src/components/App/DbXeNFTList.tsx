@@ -97,7 +97,6 @@ export function DbXeNFTList(): any {
           try {
             const chainId = Number(await window.ethereum.request({ method: "eth_chainId" }));
             const network = ethers.providers.getNetwork(chainId).name;
-            console.log(`Network name: ${network}`);
           } catch (error) {
             console.log(error);
           }
