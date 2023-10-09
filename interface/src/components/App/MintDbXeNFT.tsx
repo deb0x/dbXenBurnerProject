@@ -21,6 +21,8 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
+import test from "../Common/sdk_import";
+
 const chainForGas = [8453,137,250,43114];
 const supportedChains = [8453,137,56,250,43114];
 
@@ -137,6 +139,16 @@ export function MintDbXeNFT(): any {
     const getXENFTs = () => {
         let resultArray: any;
         setInitLoading(true)
+        if(Number(chain.chainId) == 8453){
+            console.log("jeress")
+            let xenftEntries: XENFTEntry[] = [];
+            getNFTsForUserBaseChain(chain.xenftAddress).then(async(result:any) =>{
+                console.log(result);
+            
+                setXENFTs(xenftEntries);
+                setInitLoading(false);
+            })
+     }else {
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
             const results = result.raw.result;
             let cursor = result.raw.cursor;
@@ -279,6 +291,7 @@ export function MintDbXeNFT(): any {
             }
         })
     }
+    }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
         let cursorData;
@@ -294,6 +307,11 @@ export function MintDbXeNFT(): any {
         });
         return response;
     }
+
+    async function getNFTsForUserBaseChain(nftAddress: any){
+        test();
+    }
+
     const daysLeft = (date_1: Date, date_2: Date) => {
 
         let difference = date_1.getTime() - date_2.getTime();
@@ -717,7 +735,7 @@ export function MintDbXeNFT(): any {
                             </p>
                             <p>Next cycle in: <Countdown date={Date.now() + endDate} renderer={renderer} /></p>
                         </div>
-                        {XENFTs.length > 0 ?
+                        {XENFTs!= null && XENFTs.length > 0 ?
                             <table className="table" aria-label="custom pagination table">
                                 <thead>
                                     <tr>
