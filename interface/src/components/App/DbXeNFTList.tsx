@@ -8,6 +8,7 @@ import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+import axios from 'axios';
 
 interface DBXENFTEntry {
     id: string;
@@ -107,6 +108,32 @@ export function DbXeNFTList(): any {
     const getDBXeNFTs = () => {
         let resultArray: any;
         setLoading(true)
+        if(Number(chain.chainId) == 10){
+            const nfts = [];
+            let result = await getNFTsForUserBaseChain(chain.dbxenftAddress);
+            if(result.length> 0){
+            nfts.push({
+                id: result.token_id,
+                name: result.name,
+                description: result.description || "",
+                image: result.raw.image || "",
+                maturity: result.attributes[2].value
+            });
+        }else {
+            nfts.push({
+                id: result.token_id,
+                name: "UNREVEALED ARTWORK",
+                description: "",
+                image: nftImage,
+                maturity: ""
+            });
+            nfts.sort((a, b) => {
+                return parseInt(a.id) - parseInt(b.id)
+            });
+            setDBXENFTs(nfts);
+            setLoading(false);
+        }
+        }else{
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
             const results = getNFTResult.raw.result;
             let cursor = getNFTResult.raw.cursor;
@@ -182,6 +209,7 @@ export function DbXeNFTList(): any {
             setLoading(false);
         })
     }
+    }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
         let cursorData;
@@ -196,6 +224,28 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         });
         return response;
+    }
+
+    async function getNFTsForUserBaseChain(nftAddress: any){
+        const getNftsForOwnerAndCollection = async (account ? account : "", nftAddress) => {
+            // Make a request to the Chainbase API to get the NFTs for the owner and collection
+            const response = await axios.get(
+              "https://api.chainbase.online/v1/account/nfts",
+              {
+                params: {
+                  chain_id: 10, // Base chain ID
+                  address: account,
+                  collection_address: nftAddress,
+                },
+              }
+            );
+          
+            // Parse the JSON response
+            const data = response.data;
+          
+            // Return the NFTs
+            return data.nfts;
+          };
     }
 
     const handleRedirect = (id: any) => {
@@ -293,4 +343,8 @@ export function DbXeNFTList(): any {
             }
         </div>
     );
+}
+
+function async(arg0: string, nftAddress: any) {
+    throw new Error("Function not implemented.");
 }
