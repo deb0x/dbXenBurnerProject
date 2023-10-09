@@ -23,6 +23,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
     let rpcUrl;
     let dbxenftFactoryAddress;
     let METADATA_BUCKET;
+    if (chainId == 10) {
+        rpcUrl = "https://optimism-mainnet.infura.io/v3/831ef58dd0784fee937eb8a5644f7ba6";
+        dbxenftFactoryAddress = "";
+        METADATA_BUCKET = "deboxnft-minting-op";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";

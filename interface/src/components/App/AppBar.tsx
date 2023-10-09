@@ -72,7 +72,7 @@ export function AppBarComponent(props: any): any {
     const dimensions = ScreenSize();
     const navigate = useNavigate();
     const [url, setUrl] = useState(window.location.pathname.split('/').pop())
-    const supportedChains = [137,56,250,43114];
+    const supportedChains = [10,137,56,250,43114];
     const id = open ? 'simple-popper' : "";
 
     if(library){
@@ -294,7 +294,7 @@ export function AppBarComponent(props: any): any {
                             </button>
                             : <></>
                         }
-                        
+
                         <DropdownLanguage />
                         <ChainSetter />
                         <ClickAwayListener onClickAway={handleClickAway}>
