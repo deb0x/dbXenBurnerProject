@@ -11,7 +11,7 @@ import fetch from "node-fetch";
 dotenv.config();           
 
 const dbxenftFactoryAddress = "0x8c229A2e3178f1BE5F5F4fCdC2D5833c8a60e831";
-const mintInfoAddress = "0x49b441334CA6A159f422bFDd62d638f5942332C0";
+const mintInfoAddress = "0xC739d01beb34E380461BBa9ef8ed1a44874382Be";
 const xenftAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
