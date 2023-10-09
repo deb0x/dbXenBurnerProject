@@ -21,8 +21,8 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
-const chainForGas = [137,250,43114];
-const supportedChains = [137,56,250,43114];
+const chainForGas = [1,137,250,43114];
+const supportedChains = [1,137,56,250,43114];
 
 const { BigNumber } = require("ethers");
 
@@ -65,6 +65,7 @@ export function MintDbXeNFT(): any {
     const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
     const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
     const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
     const now: any = Date.now();
 
     useEffect(() => {
@@ -99,6 +100,9 @@ export function MintDbXeNFT(): any {
 
     function timer() {
         switch (Number(chain.chainId)) {
+            case 1:
+                setEndDate(dateETH.getTime() - now);
+                break;
             case 137:
                 setEndDate(datePolygon.getTime() - now);
                 break;
