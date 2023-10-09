@@ -21,7 +21,7 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
-import test from "../Common/sdk_import";
+//import {test} from "../Common/getXENFTsOnBase";
 
 const chainForGas = [8453,137,250,43114];
 const supportedChains = [8453,137,56,250,43114];
@@ -140,14 +140,9 @@ export function MintDbXeNFT(): any {
         let resultArray: any;
         setInitLoading(true)
         if(Number(chain.chainId) == 8453){
-            console.log("jeress")
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsForUserBaseChain(chain.xenftAddress).then(async(result:any) =>{
-                console.log(result);
-            
                 setXENFTs(xenftEntries);
                 setInitLoading(false);
-            })
      }else {
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
             const results = result.raw.result;
@@ -306,10 +301,6 @@ export function MintDbXeNFT(): any {
             address: account ? account : ""
         });
         return response;
-    }
-
-    async function getNFTsForUserBaseChain(nftAddress: any){
-        test();
     }
 
     const daysLeft = (date_1: Date, date_2: Date) => {
