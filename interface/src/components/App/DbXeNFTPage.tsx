@@ -83,32 +83,10 @@ export function DbXeNFTPage(): any {
     }
 
     const getDBXeNFTs = () => {
-        console.log("ggggggggggggggggggggggggg")
         if(Number(chain.chainId) == 8453){
             console.log("jeress")
             let dbxenftEntries: DBXENFTEntry[] = [];
             getNFTsForUserBaseChain(chain.dbxenftAddress).then(async(result:any) =>{
-                console.log(result)
-            // if(result){
-            //     dbxenftEntries.push({
-            //         id: result.token_id,
-            //         name: result.name,
-            //         description: result.description || "",
-            //         image: result.raw.image || "",
-            //     });
-            // } else {
-            //     dbxenftEntries.push({
-            //         id: result.token_id,
-            //         name: "UNREVEALED ARTWORK",
-            //         description: "",
-            //         image: nftImage,
-            //     });
-            // }
-
-            // dbxenftEntries.sort((a, b) => {
-            //     return parseInt(a.id) - parseInt(b.id)
-            // });
-            // setDBXENFT(dbxenftEntries); 
         })
         } else {
 
@@ -152,24 +130,7 @@ export function DbXeNFTPage(): any {
     }
 
     async function getNFTsForUserBaseChain(nftAddress: any){
-        console.log("Sssss")
-            // Make a request to the Chainbase API to get the NFTs for the owner and collection
-            const response = await axios.get(
-            "https://api.chainbase.online/v1/account/nfts",
-            {
-                params: {
-                chain_id: 8453, // Base chain ID
-                address: account,
-                collection_address: nftAddress,
-                },
-            }
-            );
-        
-            // Parse the JSON response
-            const data = response.data;
-        
-            // Return the NFTs
-            return data.nfts;
+
     }
 
     async function approveDXN() {

@@ -111,26 +111,11 @@
             setLoading(true)
             console.log(chain.chainId)
             if(Number(chain.chainId) == 8453){
-                console.log("jeress")
-                const nfts: ((prevState: DBXENFTEntry[]) => DBXENFTEntry[]) | { id: any; name: any; description: any; image: any; maturity: any; }[] = [];
-                getNFTsForUserBaseChain(chain.dbxenftAddress).then(async(result:any) =>{
-                    console.log(result)
-                if(result){
-                    nfts.push({
-                        id: result.token_id,
-                        name: result.name,
-                        description: result.description || "",
-                        image: result.raw.image || "",
-                        maturity: result.attributes[2].value
-                    });
-                }
-
-                nfts.sort((a, b) => {
-                    return parseInt(a.id) - parseInt(b.id)
-                });
-                setDBXENFTs(nfts);
-                setLoading(false);
-            })
+                getNFTsOnBase(account ? account : "",chain.dbxenftAddress).then(result =>{
+                    if(result.length == 0){
+                        setLoading(false);
+                    }
+                })
             } else {
             getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
                 const results = getNFTResult.raw.result;
@@ -224,25 +209,20 @@
             return response;
         }
 
-        async function getNFTsForUserBaseChain(nftAddress: any){
-                // Make a request to the Chainbase API to get the NFTs for the owner and collection
-                const response = await axios.get(
-                "https://api.chainbase.online/v1/account/nfts",
-                {
-                    params: {
-                    chain_id: 8453, // Base chain ID
-                    address: account,
-                    collection_address: nftAddress,
-                    },
-                }
-                );
-                console.log("heres");
-                console.log(response)
-                // Parse the JSON response
-                const data = response.data;
-            
-                // Return the NFTs
-                return data.nfts;
+        async function getNFTsOnBase(accountAddress: any, nftAddress: any){
+            const nfts: never[] = [];
+            let currentPage = 1;
+            const options = {
+                method: 'GET',
+                headers: {accept: 'application/json', 'x-api-key': '2WWwNt4GgaEH2qu1Vbr6r8r3xU2'}
+              };
+             await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
+                .then(response => response.json())
+                .then(async response =>{
+                    console.log(response);
+                })
+                .catch(err => console.error(err));
+            return nfts;
         }
 
         const handleRedirect = (id: any) => {
