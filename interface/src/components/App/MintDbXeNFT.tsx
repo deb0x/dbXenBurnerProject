@@ -21,6 +21,8 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
+import { CovalentClient } from "@covalenthq/client-sdk";
+
 const chainForGas = [137,250,43114];
 const supportedChains = [137,56,250,43114];
 
@@ -133,6 +135,10 @@ export function MintDbXeNFT(): any {
     const getXENFTs = () => {
         let resultArray: any;
         setInitLoading(true)
+        if(Number(chain.chainId)==10){
+                const client = new CovalentClient("ckey_9b934aa88c50438abaef83050c0");
+           
+    }else{
         getWalletNFTsForUser(chain.chainId, chain.xenftAddress, null).then(async (result) => {
             const results = result.raw.result;
             let cursor = result.raw.cursor;
@@ -274,6 +280,7 @@ export function MintDbXeNFT(): any {
                 setInitLoading(false);
             }
         })
+    }
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
