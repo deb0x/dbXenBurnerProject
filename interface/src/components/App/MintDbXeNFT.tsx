@@ -768,7 +768,7 @@ export function MintDbXeNFT(): any {
         axios.request(options).then(async (result) => {
             if (result.data.result != undefined) {
                 if (chainForGas.includes(Number(chain.chainId))) {
-                    gasLimitVal = (BigNumber.from("2000000"));
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
@@ -781,7 +781,7 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 56) {
-                    gasLimitVal = (BigNumber.from("2000000"));
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = 5;
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
@@ -794,15 +794,21 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 8453) {
-                    gasLimitVal = (BigNumber.from("2000000"));
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                     transactionFee = gasLimitVal * price / 100000000;
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFeeBASE(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFeeBASE(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank);
+                    setDBXNFT({
+                        protocolFee: ethers.utils.formatEther(protocolFee),
+                        transactionFee: transactionFee.toString()
+                    })
+                }
+
                 if (Number(chain.chainId) === 1) {
-                    gasLimitVal = (BigNumber.from("1500000"));
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
