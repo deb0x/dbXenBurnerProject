@@ -142,10 +142,8 @@ export function MintDbXeNFT(): any {
             const MintInfoContract = mintInfo(library, chain.mintInfoAddress);
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            console.log(account)
             getNFTsOnBase(account ? account : "",chain.xenftAddress,MintInfoContract,XENFTContract).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
-                    console.log(result[i].image)
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
                     xenftEntries.push({
@@ -328,37 +326,35 @@ export function MintDbXeNFT(): any {
     }
 
     async function getNFTsOnBase(accountAddress: any, nftAddress: any,MintInfoContract: any,XENFTContract: any){
-        console.log(accountAddress);
-        console.log(nftAddress);
         let dataForReturn: any[] = [];
         let currentPage = 1;
+        let callCount =0;
         const options = {
             method: 'GET',
-            headers: {accept: 'application/json', 'x-api-key': '2WWwNt4GgaEH2qu1Vbr6r8r3xU2'}
+            headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
           };
-         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
+         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=1`, options)
             .then(response => response.json())
             .then(async response =>{
-                console.log(response)
                 let arrayOfData = response.data;
+                callCount = response.count;
+                if(response.count != 0)
+                    currentPage++;
                 for(let i=0;i<arrayOfData.length;i++){
                     let base64Data = (await XENFTContract.tokenURI(arrayOfData[i].token_id))
                     const dataWithoutPrefix = base64Data.split(',')[1];
                     const decodedData = atob(dataWithoutPrefix);
                     const decodedObject = JSON.parse(decodedData);
                     decodedObject.token_id = arrayOfData[i].token_id;
-                    console.log(decodedObject)
                     dataForReturn.push(decodedObject);
                 }
-                console.log(response.next_page);
-                while(response.next_page != undefined) {
-                    console.log("heress");
-                    currentPage = Number(response.next_page);
-                    await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
+                while(currentPage <= callCount) {
+                    if(currentPage <= callCount){
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                    await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=1`, options)
                     .then(response => response.json())
                     .then(async response =>{
-                        console.log("heress")
-                        console.log(response)
                         let arrayOfData = response.data;
                         for(let i=0;i<arrayOfData.length;i++){
                             let base64Data = (await XENFTContract.tokenURI(arrayOfData[i].token_id))
@@ -366,10 +362,12 @@ export function MintDbXeNFT(): any {
                             const decodedData = atob(dataWithoutPrefix);
                             const decodedObject = JSON.parse(decodedData);
                             decodedObject.token_id = arrayOfData[i].token_id;
-                            console.log(decodedObject)
                             dataForReturn.push(decodedObject);
                         }
+                        currentPage++;
+                    
                 })
+              
             }
             })
             .catch(err => console.error(err));
@@ -746,10 +744,8 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 8453) {
-                    console.log("heress")
                     gasLimitVal = (BigNumber.from("450000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
-                    console.log(price);
                     transactionFee = gasLimitVal * price / 100000000;
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
