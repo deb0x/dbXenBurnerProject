@@ -655,7 +655,7 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 56) {
-                    gasLimitVal = (BigNumber.from("450000"));
+                    gasLimitVal = (BigNumber.from("1200000"));
                     price = 5;
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
@@ -668,8 +668,8 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 1) {
-                    gasLimitVal = (BigNumber.from("450000"));
-                    price = 5;
+                    gasLimitVal = (BigNumber.from("1200000"));
+                    price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
