@@ -594,7 +594,6 @@ export function MintDbXeNFT(): any {
         return fee.add(fee.div(10))
     }
 
-
     async function calcMintFeeBASE(
         maturityTs: number,
         VMUs: number,
@@ -619,7 +618,7 @@ export function MintDbXeNFT(): any {
         const maxPctReduction = Math.max(difference, 5_000_000)
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
         const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(100_000_000))
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(10_000_000_000))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
         return fee.add(fee.div(10))
