@@ -21,7 +21,7 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
-const chainForGas = [1,137,250,43114];
+const chainForGas = [137,250,43114];
 const supportedChains = [1,137,56,250,43114];
 
 const { BigNumber } = require("ethers");
@@ -363,9 +363,16 @@ export function MintDbXeNFT(): any {
         let fee;
 
         try {
-            // if (claimStatus == "Redeemed") {
-            //     fee = ethers.utils.parseEther("0.01");
-            // } else {
+            if(Number(chain.chainId) == 1){
+                fee = await calcMintFeeETH(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                ) 
+            } else {
             if(Number(chain.chainId) == 56){
                 fee = await calcMintFeeBSC(
                     maturityTs,
@@ -383,9 +390,8 @@ export function MintDbXeNFT(): any {
                     term,
                     AMP,
                     cRank
-                )
-        }
-            // }
+                )}
+            }
             const overrides = {
                 value: fee,
                 gasLimit: (BigNumber.from("7000000"))
@@ -500,6 +506,36 @@ export function MintDbXeNFT(): any {
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
         const minFee = BigNumber.from(1e15)
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(2_000_000_000))
+        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
+
+        return fee.add(fee.div(10))
+    }
+
+    async function calcMintFeeETH(
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string
+    ) {
+        const estReward: any = await getNFTRewardInXen(
+            maturityTs,
+            VMUs,
+            EAA,
+            term,
+            AMP,
+            cRank
+        )
+
+        const maturityDays = calcMaturityDays(term, maturityTs)
+        const daysReduction = 11389 * maturityDays
+        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
+        const difference = 10_000_000 - maxSubtrahend
+        const maxPctReduction = Math.max(difference, 5_000_000)
+        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
+        const minFee = BigNumber.from(1e15)
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(5_000_000_000))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
         return fee.add(fee.div(10))
@@ -622,6 +658,19 @@ export function MintDbXeNFT(): any {
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
                             await calcMintFeeBSC(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                    setDBXNFT({
+                        protocolFee: ethers.utils.formatEther(protocolFee),
+                        transactionFee: transactionFee.toString()
+                    })
+                }
+                if (Number(chain.chainId) === 1) {
+                    gasLimitVal = (BigNumber.from("450000"));
+                    price = 5;
+                    transactionFee = gasLimitVal * price / 1000000000;
+                    let protocolFee =
+                        NFTData.claimStatus == "Redeemed" ?
+                            "0.001" :
+                            await calcMintFeeETH(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
