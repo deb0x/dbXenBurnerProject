@@ -106,13 +106,17 @@
         }, []);
 
         const getDBXeNFTs = () => {
-            console.log("Ssssssssssssssssssss")
+            console.log("sssssssssssssssssssssssssssssss")
             let resultArray: any;
             setLoading(true)
             console.log(chain.chainId)
             if(Number(chain.chainId) == 8453){
                 getNFTsOnBase(account ? account : "",chain.dbxenftAddress).then(result =>{
-                    if(result.length == 0){
+                    if(result.length != 0){
+                        setLoading(false);
+                        console.log(result);
+                        setDBXENFTs(result);
+                    }else{
                         setLoading(false);
                     }
                 })
@@ -210,19 +214,73 @@
         }
 
         async function getNFTsOnBase(accountAddress: any, nftAddress: any){
-            const nfts: never[] = [];
+            let dataForReturn: any[] = [];
             let currentPage = 1;
+            let callCount =0;
             const options = {
                 method: 'GET',
-                headers: {accept: 'application/json', 'x-api-key': '2WWwNt4GgaEH2qu1Vbr6r8r3xU2'}
+                headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
               };
              await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
                 .then(response => response.json())
                 .then(async response =>{
                     console.log(response);
+                    let arrayOfData = response.data;
+                    callCount = response.count;
+                    if(response.count != 0)
+                        currentPage++;
+                    for(let i=0;i<arrayOfData.length;i++){
+                        if(arrayOfData[i].metadata == null){
+                            dataForReturn.push({
+                                id: arrayOfData[i].token_id,
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                                maturity: ""
+                            })
+                        } else {
+                            dataForReturn.push({
+                                id: arrayOfData[i].token_id,
+                                name:arrayOfData[i].name,
+                                description: arrayOfData[i].description || "",
+                                image:arrayOfData[i].image || "",
+                                maturity: arrayOfData[i].attributes[2].value
+                            });
+                        }
+                    }
+                    while(currentPage <= callCount) {
+                        if(currentPage <= callCount){
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
+                        .then(response => response.json())
+                        .then(async response =>{
+                            let arrayOfData = response.data;
+                            for(let i=0;i<arrayOfData.length;i++){
+                                if(arrayOfData[i].metadata == null){
+                                    dataForReturn.push({
+                                        id: arrayOfData[i].token_id,
+                                        name: "UNREVEALED ARTWORK",
+                                        description: "",
+                                        image: nftImage,
+                                        maturity: ""
+                                    })
+                                } else {
+                                    dataForReturn.push({
+                                        id: arrayOfData[i].token_id,
+                                        name:arrayOfData[i].name,
+                                        description: arrayOfData[i].description || "",
+                                        image:arrayOfData[i].image || "",
+                                        maturity: arrayOfData[i].attributes[2].value
+                                    });
+                                }
+                            }
+                            currentPage++;
+                    })
+                }
                 })
                 .catch(err => console.error(err));
-            return nfts;
+            return dataForReturn;
         }
 
         const handleRedirect = (id: any) => {

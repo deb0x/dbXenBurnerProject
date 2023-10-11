@@ -336,7 +336,7 @@ export function MintDbXeNFT(): any {
             method: 'GET',
             headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
           };
-         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=1`, options)
+         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
             .then(response => response.json())
             .then(async response =>{
                 let arrayOfData = response.data;
@@ -355,7 +355,7 @@ export function MintDbXeNFT(): any {
                     if(currentPage <= callCount){
                         await new Promise(resolve => setTimeout(resolve, 500));
                     }
-                    await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=1`, options)
+                    await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
                     .then(response => response.json())
                     .then(async response =>{
                         let arrayOfData = response.data;
