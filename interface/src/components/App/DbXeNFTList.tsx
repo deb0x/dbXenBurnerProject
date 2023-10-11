@@ -125,7 +125,7 @@ export function DbXeNFTList(): any {
                 for (let i = 0; i < resultArray?.length; i++) {
                     let resultArrayElement = resultArray[i];
                     if (resultArray[i].token_id === null ||
-                        results[i].token_id >= "1" && results[i].token_id <= "15" ||
+                        resultArray[i].token_id >= "1" && resultArray[i].token_id <= "15" ||
                         resultArrayElement.normalized_metadata.attributes.length === 0 ||
                         resultArrayElement.normalized_metadata.image === null ||
                         resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
@@ -166,11 +166,11 @@ export function DbXeNFTList(): any {
                         }
                     } else {
                         nfts.push({
-                            id: results[i].token_id,
-                            name: results[i].normalized_metadata.name,
-                            description: results[i].normalized_metadata.description,
-                            image: results[i].normalized_metadata.image,
-                            maturity: results[i].normalized_metadata.attributes[2].value
+                            id: resultArray[i].token_id,
+                            name: resultArray[i].normalized_metadata.name,
+                            description: resultArray[i].normalized_metadata.description,
+                            image: resultArray[i].normalized_metadata.image,
+                            maturity: resultArray[i].normalized_metadata.attributes[2].value
                         });
                     }
                 }
