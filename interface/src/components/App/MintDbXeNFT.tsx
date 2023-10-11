@@ -361,7 +361,7 @@ export function MintDbXeNFT(): any {
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
         const dbxenftInstance = DBXenft(signer, chain.dbxenftAddress)
         let fee;
-
+        let gasLimitForTransaction;
         try {
             if(Number(chain.chainId) == 1){
                 fee = await calcMintFeeETH(
@@ -372,6 +372,7 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 ) 
+                gasLimitForTransaction = BigNumber.from("1500000")
             } else {
             if(Number(chain.chainId) == 56){
                 fee = await calcMintFeeBSC(
@@ -382,6 +383,7 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 )
+                gasLimitForTransaction = BigNumber.from("2000000")
             } else {
                 fee = await calcMintFee(
                     maturityTs,
@@ -390,11 +392,13 @@ export function MintDbXeNFT(): any {
                     term,
                     AMP,
                     cRank
-                )}
-            }
+                )
+                gasLimitForTransaction = BigNumber.from("2000000")
+            }}
+            
             const overrides = {
                 value: fee,
-                gasLimit: (BigNumber.from("7000000"))
+                gasLimit: gasLimitForTransaction
             }
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()

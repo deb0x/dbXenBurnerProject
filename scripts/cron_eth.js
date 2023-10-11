@@ -10,8 +10,8 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();           
 
-const dbxenftFactoryAddress = "0x8c229A2e3178f1BE5F5F4fCdC2D5833c8a60e831";
-const mintInfoAddress = "0xC739d01beb34E380461BBa9ef8ed1a44874382Be";
+const dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+const mintInfoAddress = "0xE8dee287a293F67d53f178cD34815d37E78Ff4e2";
 const xenftAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
