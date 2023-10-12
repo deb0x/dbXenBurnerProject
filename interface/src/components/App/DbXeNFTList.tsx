@@ -219,7 +219,7 @@ export function DbXeNFTList(): any {
             cursor: cursorData,
             normalizeMetadata: true,
             tokenAddresses: [nftAddress],
-            address: "0x5e56300d12807f8145e311acca6c92aa6abd2873"
+            address: account ? account : ""
         });
         return response;
     }
