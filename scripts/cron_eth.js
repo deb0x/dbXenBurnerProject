@@ -10,7 +10,7 @@ import Moralis from "moralis";
 import fetch from "node-fetch";
 dotenv.config();           
 
-const dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+const dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
 const mintInfoAddress = "0xE8dee287a293F67d53f178cD34815d37E78Ff4e2";
 const xenftAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
 
@@ -259,6 +259,6 @@ function getImage(power, counter1, counter2, counter3, counter4, counter5, count
         return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-15000/[15000]_DBXENFT_${counter9}.png`, value: 9 }
 }
 
-cron.schedule('8 48 17 * * *', async() => {
+cron.schedule('11 11 14 * * *', async() => {
     await generateAfterReveal();
 });

@@ -65,7 +65,7 @@ export function MintDbXeNFT(): any {
     const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
     const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
     const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 11, 0));
     const now: any = Date.now();
 
     useEffect(() => {

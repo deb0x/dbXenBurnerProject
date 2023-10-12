@@ -25,7 +25,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
     let METADATA_BUCKET;
     if (chainId == 1) {
         rpcUrl = "https://eth.llamarpc.com";
-        dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+        dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
     if (chainId == 137) {
