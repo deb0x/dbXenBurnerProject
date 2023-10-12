@@ -23,6 +23,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
     let rpcUrl;
     let dbxenftFactoryAddress;
     let METADATA_BUCKET;
+    if (chainId == 1) {
+        rpcUrl = "https://eth.llamarpc.com";
+        dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+        METADATA_BUCKET = "deboxnft-minting-eth";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
