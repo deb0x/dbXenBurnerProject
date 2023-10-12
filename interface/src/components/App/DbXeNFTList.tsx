@@ -10,6 +10,7 @@ import { Spinner } from './Spinner';
 import { ethers } from "ethers";
 
 interface DBXENFTEntry {
+    [x: string]: string;
     id: string;
     description: string
     name: string;
@@ -23,7 +24,7 @@ export function DbXeNFTList(): any {
     const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const [allDBXENFTs, setAllDBXENFTs] = useState<DBXENFTEntry[]>([]);
-    const [actualPageContent, setPageContent] =  useState();
+    const [actualPageContent, setPageContent] =  useState<any>();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
@@ -218,7 +219,7 @@ export function DbXeNFTList(): any {
             cursor: cursorData,
             normalizeMetadata: true,
             tokenAddresses: [nftAddress],
-            address: account ? account : ""
+            address: "0x5e56300d12807f8145e311acca6c92aa6abd2873"
         });
         return response;
     }
@@ -254,7 +255,7 @@ export function DbXeNFTList(): any {
                 lastIndex=resultArray.length
           
             for (let i = startIndex; i < lastIndex; i++) {
-                let resultArrayElement = resultArray[i];
+                let resultArrayElement:any = resultArray[i];
                 if (resultArrayElement.token_id === null ||
                     resultArrayElement.normalized_metadata.attributes.length === 0 ||
                     resultArrayElement.normalized_metadata.image === null ||
@@ -278,19 +279,20 @@ export function DbXeNFTList(): any {
                         continue;
                     }
                     if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                        let data:any = nftMeta.raw.normalized_metadata;
                         nfts.push({
                             id: nftMeta.raw.token_id,
                             name: nftMeta.raw.name,
-                            description: nftMeta.raw.normalized_metadata.description || "",
-                            image: nftMeta.raw.normalized_metadata.image || "",
-                            maturity: nftMeta.raw.normalized_metadata.attributes[2].value
+                            description:data.description || "",
+                            image: data.image || "",
+                            maturity: data.attributes[2].value
                         });
                         currentPageContent.push({
                             id: nftMeta.raw.token_id,
                             name: nftMeta.raw.name,
-                            description: nftMeta.raw.normalized_metadata.description || "",
-                            image: nftMeta.raw.normalized_metadata.image || "",
-                            maturity: nftMeta.raw.normalized_metadata.attributes[2].value
+                            description: data.description || "",
+                            image: data.image || "",
+                            maturity: data.attributes[2].value
                         });
                         
                     } else {
@@ -310,19 +312,20 @@ export function DbXeNFTList(): any {
                         });
                     }
                 } else {
+                    let data:any = resultArray[i].normalized_metadata;
                     nfts.push({
                         id: resultArray[i].token_id,
-                        name: resultArray[i].normalized_metadata.name,
-                        description: resultArray[i].normalized_metadata.description,
-                        image: resultArray[i].normalized_metadata.image,
-                        maturity: resultArray[i].normalized_metadata.attributes[2].value
+                        name:data.name,
+                        description: data.description,
+                        image: data.image,
+                        maturity: data.attributes[2].value
                     });
                     currentPageContent.push({
                         id: resultArray[i].token_id,
-                        name: resultArray[i].normalized_metadata.name,
-                        description: resultArray[i].normalized_metadata.description,
-                        image: resultArray[i].normalized_metadata.image,
-                        maturity: resultArray[i].normalized_metadata.attributes[2].value
+                        name: data.name,
+                        description:data.description,
+                        image: data.image,
+                        maturity: data.attributes[2].value
                     });
                 }
             }
@@ -356,7 +359,7 @@ export function DbXeNFTList(): any {
                 let currentPageContent = [];
                 if (resultArray?.length !== 0 && resultArray !== undefined) {
                     for (let i = 0; i < endIndex; i++) {
-                        let resultArrayElement = resultArray[i];
+                        let resultArrayElement:any = resultArray[i];
                         if (resultArrayElement.token_id === null ||
                             resultArrayElement.normalized_metadata.attributes.length === 0 ||
                             resultArrayElement.normalized_metadata.image === null ||
@@ -411,19 +414,20 @@ export function DbXeNFTList(): any {
                                 });
                             }
                         } else {
+                            let data:any = resultArray[i].normalized_metadata;
                             nfts.push({
                                 id: resultArray[i].token_id,
-                                name: resultArray[i].normalized_metadata.name,
-                                description: resultArray[i].normalized_metadata.description,
-                                image: resultArray[i].normalized_metadata.image,
-                                maturity: resultArray[i].normalized_metadata.attributes[2].value
+                                name: data.name,
+                                description: data.description,
+                                image:data.image,
+                                maturity: data.value
                             });
                             currentPageContent.push({
                                 id: resultArray[i].token_id,
-                                name: resultArray[i].normalized_metadata.name,
-                                description: resultArray[i].normalized_metadata.description,
-                                image: resultArray[i].normalized_metadata.image,
-                                maturity: resultArray[i].normalized_metadata.attributes[2].value
+                                name: data.name,
+                                description: data.description,
+                                image: data.image,
+                                maturity: data.value
                             });
                         }
                     }
