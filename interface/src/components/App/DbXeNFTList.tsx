@@ -30,8 +30,11 @@ export function DbXeNFTList(): any {
 
     useEffect(() => {
         startMoralis();
-        getDBXeNFTs();
     }, [chain, account])
+
+    useEffect(() => {
+        getDBXeNFTs();
+    }, [account])
 
     useEffect(() => {
         if (!orderByTokenID) {
