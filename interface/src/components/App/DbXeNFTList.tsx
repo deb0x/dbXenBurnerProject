@@ -518,7 +518,7 @@ export function DbXeNFTList(): any {
                                 },
                                 actions: {
                                     showFirstButton: true,
-                                    showLastButton: true,
+                                    showLastButton: false,
                                 },
                             }}
                             onPageChange={handleChangePage}
