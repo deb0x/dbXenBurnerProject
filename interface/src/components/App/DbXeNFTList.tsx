@@ -10,6 +10,7 @@ import { Spinner } from './Spinner';
 import { ethers } from "ethers";
 
 interface DBXENFTEntry {
+    [x: string]: string;
     id: string;
     description: string
     name: string;
@@ -22,6 +23,8 @@ export function DbXeNFTList(): any {
     const { account } = context
     const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
+    const [allDBXENFTs, setAllDBXENFTs] = useState<DBXENFTEntry[]>([]);
+    const [actualPageContent, setPageContent] =  useState<any>();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
@@ -30,23 +33,40 @@ export function DbXeNFTList(): any {
 
     useEffect(() => {
         startMoralis();
-        getDBXeNFTs();
     }, [chain, account])
 
     useEffect(() => {
+        getDBXeNFTs();
+    }, [account])
+    
+    useEffect(() => {
+        if(actualPageContent != undefined) {
+        let dataToSort = actualPageContent.currentContent;
+        let allArray = actualPageContent.all;
+        let startIndex = actualPageContent.startIndex;
+        let endIndex = actualPageContent.endIndex;
         if (!orderByTokenID) {
-            const sortedDBXENFTs = [...DBXENFTs].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+            const sortedDBXENFTs = [...dataToSort].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
                 let dateA: Date = new Date(a.maturity);
                 let dateB: Date = new Date(b.maturity);
                 return dateA.getTime() - dateB.getTime();
             });
-            setDBXENFTs(sortedDBXENFTs);
+            const newArray = allArray
+                            .slice(0, startIndex) 
+                            .concat(sortedDBXENFTs) 
+                            .concat(allArray.slice(endIndex + 1));
+            setDBXENFTs(newArray);
         } else {
-            const sortedDBXENFTs = [...DBXENFTs].sort((a, b) =>
-                parseInt(a.id) - parseInt(b.id)
+            const sortedDBXENFTs = [...dataToSort].sort((a:any, b:any) =>
+                 parseInt(a.id) - parseInt(b.id)
             );
-            setDBXENFTs(sortedDBXENFTs);
+            const newArray = allArray
+                            .slice(0, startIndex) 
+                            .concat(sortedDBXENFTs) 
+                            .concat(allArray.slice(endIndex + 1));
+            setDBXENFTs(newArray);
         }
+    }
     }, [orderByTokenID]);
 
     const startMoralis = () => {
@@ -120,9 +140,18 @@ export function DbXeNFTList(): any {
                 }
             }
             resultArray = results?.flat();
+            resultArray.sort((a: any, b: any) => {
+                return parseInt(a.token_id) - parseInt(b.token_id);
+            });
+            setAllDBXENFTs(resultArray);
+            let endIndex;
+            if (resultArray.length < 8)
+                endIndex = resultArray.length;
+            else
+                endIndex = 8;
             const nfts = [];
             if (resultArray?.length != 0 && resultArray != undefined) {
-                for (let i = 0; i < resultArray?.length; i++) {
+                for (let i = 0; i < endIndex; i++) {
                     let resultArrayElement = resultArray[i];
                     if (resultArray[i].token_id === null ||
                         resultArrayElement.normalized_metadata.attributes.length === 0 ||
@@ -174,9 +203,7 @@ export function DbXeNFTList(): any {
                     }
                 }
             }
-            nfts.sort((a, b) => {
-                return parseInt(a.id) - parseInt(b.id)
-            });
+            setPageContent({"all":nfts, "currentContent":nfts, "startIndex":0, "endIndex":7});
             setDBXENFTs(nfts);
             setLoading(false);
         })
@@ -204,18 +231,227 @@ export function DbXeNFTList(): any {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(8);
 
-    const handleChangePage = (
+    const handleChangePage = async (
         event: React.MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
         setPage(newPage);
+        let startIndex = Number(newPage) * rowsPerPage;
+        let resultArray = allDBXENFTs;
+        const nfts = DBXENFTs;
+        if (nfts.length > startIndex) {
+            let lastIndex = startIndex+rowsPerPage;
+            if(lastIndex > resultArray.length)
+                lastIndex=resultArray.length
+            setDBXENFTs(nfts);
+            let currentPageContent = nfts.slice(startIndex,lastIndex);
+            setPageContent({"all":nfts, "currentContent":currentPageContent, "startIndex":startIndex, "endIndex":startIndex+rowsPerPage});
+        }
+        else {
+            if (resultArray?.length !== 0 && resultArray !== undefined) {
+                setLoading(true);
+                let currentPageContent = [];
+                let lastIndex = startIndex+rowsPerPage;
+            if (lastIndex > resultArray.length)
+                lastIndex=resultArray.length
+          
+            for (let i = startIndex; i < lastIndex; i++) {
+                let resultArrayElement:any = resultArray[i];
+                if (resultArrayElement.token_id === null ||
+                    resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                    resultArrayElement.normalized_metadata.image === null ||
+                    resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
+                    const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
+                        chain: chain.chainId,
+                        "flag": "uri",
+                        "mode": "async",
+                        "address": chain.dbxenftAddress,
+                        "tokenId": resultArray[i].token_id
+                    });
+                    const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
+                        chain: chain.chainId,
+                        "format": "decimal",
+                        "normalizeMetadata": true,
+                        "mediaItems": false,
+                        "address": chain.dbxenftAddress,
+                        "tokenId": resultArray[i].token_id
+                    });
+                    if (!nftMeta) {
+                        continue;
+                    }
+                    if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                        let data:any = nftMeta.raw.normalized_metadata;
+                        nfts.push({
+                            id: nftMeta.raw.token_id,
+                            name: nftMeta.raw.name,
+                            description:data.description || "",
+                            image: data.image || "",
+                            maturity: data.attributes[2].value
+                        });
+                        currentPageContent.push({
+                            id: nftMeta.raw.token_id,
+                            name: nftMeta.raw.name,
+                            description: data.description || "",
+                            image: data.image || "",
+                            maturity: data.attributes[2].value
+                        });
+                        
+                    } else {
+                        nfts.push({
+                            id: nftMeta.raw.token_id,
+                            name: "UNREVEALED ARTWORK",
+                            description: "",
+                            image: nftImage,
+                            maturity: ""
+                        });
+                        currentPageContent.push({
+                            id: nftMeta.raw.token_id,
+                            name: "UNREVEALED ARTWORK",
+                            description: "",
+                            image: nftImage,
+                            maturity: ""
+                        });
+                    }
+                } else {
+                    let data:any = resultArray[i].normalized_metadata;
+                    nfts.push({
+                        id: resultArray[i].token_id,
+                        name:data.name,
+                        description: data.description,
+                        image: data.image,
+                        maturity: data.attributes[2].value
+                    });
+                    currentPageContent.push({
+                        id: resultArray[i].token_id,
+                        name: data.name,
+                        description:data.description,
+                        image: data.image,
+                        maturity: data.attributes[2].value
+                    });
+                }
+            }
+            setPageContent({"all":nfts, "currentContent":currentPageContent, "startIndex":startIndex, "endIndex":startIndex+rowsPerPage});
+            setLoading(false);
+        }
+        setDBXENFTs(nfts);
+        }
     };
 
-    const handleChangeRowsPerPage = (
+    const handleChangeRowsPerPage = async (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
+        if((rowsPerPage > Number(event.target.value) && Number(event.target.value) != -1)){
+            let currentPageContent = DBXENFTs.slice(0,  Number(event.target.value));
+            setPageContent({"all":DBXENFTs, "currentContent":currentPageContent, "startIndex":0, "endIndex": Number(event.target.value)});
+            setPage(0);
+        } else {
+            setLoading(true);
+            let endIndex;
+            let arrayLength = Number(event.target.value);
+                if(Number(event.target.value) == -1){
+                    endIndex = allDBXENFTs.length;
+                    arrayLength = allDBXENFTs.length;
+                } else {
+                    if(Number(event.target.value) < allDBXENFTs.length){
+                        endIndex = Number(event.target.value);
+                    } else {
+                        endIndex = allDBXENFTs.length;
+                    }
+                }
+                if(!(DBXENFTs.length >= arrayLength)){
+                let nfts:any = [];
+                let resultArray = allDBXENFTs;   
+                let startIndex = DBXENFTs.length;
+                let currentPageContent = [];
+                if (resultArray?.length !== 0 && resultArray !== undefined) {
+                    const newArray = DBXENFTs.slice(0, startIndex) 
+                    nfts = newArray;
+                    for (let i = startIndex; i < endIndex; i++) {
+                        let resultArrayElement:any = resultArray[i];
+                        if (resultArrayElement.token_id === null ||
+                            resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                            resultArrayElement.normalized_metadata.image === null ||
+                            resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
+                            const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
+                                chain: chain.chainId,
+                                "flag": "uri",
+                                "mode": "async",
+                                "address": chain.dbxenftAddress,
+                                "tokenId": resultArray[i].token_id
+                            });
+                            const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
+                                chain: chain.chainId,
+                                "format": "decimal",
+                                "normalizeMetadata": true,
+                                "mediaItems": false,
+                                "address": chain.dbxenftAddress,
+                                "tokenId": resultArray[i].token_id
+                            });
+                            if (!nftMeta) {
+                                continue;
+                            }
+                            if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                                nfts.push({
+                                    id: nftMeta.raw.token_id,
+                                    name: nftMeta.raw.name,
+                                    description: nftMeta.raw.normalized_metadata.description || "",
+                                    image: nftMeta.raw.normalized_metadata.image || "",
+                                    maturity: nftMeta.raw.normalized_metadata.attributes[2].value
+                                });
+                                currentPageContent.push({
+                                    id: nftMeta.raw.token_id,
+                                    name: nftMeta.raw.name,
+                                    description: nftMeta.raw.normalized_metadata.description || "",
+                                    image: nftMeta.raw.normalized_metadata.image || "",
+                                    maturity: nftMeta.raw.normalized_metadata.attributes[2].value
+                                });
+                            } else {
+                                nfts.push({
+                                    id: nftMeta.raw.token_id,
+                                    name: "UNREVEALED ARTWORK",
+                                    description: "",
+                                    image: nftImage,
+                                    maturity: ""
+                                });
+                                currentPageContent.push({
+                                    id: nftMeta.raw.token_id,
+                                    name: "UNREVEALED ARTWORK",
+                                    description: "",
+                                    image: nftImage,
+                                    maturity: ""
+                                });
+                            }
+                        } else {
+                            let data:any = resultArray[i].normalized_metadata;
+                            nfts.push({
+                                id: resultArray[i].token_id,
+                                name: data.name,
+                                description: data.description,
+                                image:data.image,
+                                maturity: data.value
+                            });
+                            currentPageContent.push({
+                                id: resultArray[i].token_id,
+                                name: data.name,
+                                description: data.description,
+                                image: data.image,
+                                maturity: data.value
+                            });
+                        }
+                    }
+                }
+                setPage(0);
+                setPageContent({"all":nfts, "currentContent":currentPageContent, "startIndex":0, "endIndex":endIndex});
+                setDBXENFTs(nfts);
+                setLoading(false);
+            } else {
+                setPage(0);
+                setPageContent({"all":DBXENFTs, "currentContent":DBXENFTs, "startIndex":0, "endIndex":endIndex});
+                setDBXENFTs(DBXENFTs);
+                setLoading(false); 
+            }
+        }
     };
 
     return (
@@ -269,11 +505,11 @@ export function DbXeNFTList(): any {
                             </div>
                         }
                     </div>
-                    {DBXENFTs.length > 0 &&
+                    {allDBXENFTs.length > 0 &&
                         <TablePagination
                             rowsPerPageOptions={[4, 8, 16, { label: 'All', value: -1 }]}
                             colSpan={3}
-                            count={DBXENFTs.length}
+                            count={allDBXENFTs.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             slotProps={{
@@ -282,7 +518,7 @@ export function DbXeNFTList(): any {
                                 },
                                 actions: {
                                     showFirstButton: true,
-                                    showLastButton: true,
+                                    showLastButton: false,
                                 },
                             }}
                             onPageChange={handleChangePage}
