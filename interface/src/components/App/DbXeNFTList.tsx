@@ -40,7 +40,7 @@ export function DbXeNFTList(): any {
     }, [account])
     
     useEffect(() => {
-        if(actualPageContent != undefined){
+        if(actualPageContent != undefined) {
         let dataToSort = actualPageContent.currentContent;
         let allArray = actualPageContent.all;
         let startIndex = actualPageContent.startIndex;
@@ -52,19 +52,19 @@ export function DbXeNFTList(): any {
                 return dateA.getTime() - dateB.getTime();
             });
             const newArray = allArray
-            .slice(0, startIndex) 
-            .concat(sortedDBXENFTs) 
-            .concat(allArray.slice(endIndex + 1));
-             setDBXENFTs(newArray);
+                            .slice(0, startIndex) 
+                            .concat(sortedDBXENFTs) 
+                            .concat(allArray.slice(endIndex + 1));
+            setDBXENFTs(newArray);
         } else {
             const sortedDBXENFTs = [...dataToSort].sort((a:any, b:any) =>
                  parseInt(a.id) - parseInt(b.id)
             );
             const newArray = allArray
-            .slice(0, startIndex) 
-            .concat(sortedDBXENFTs) 
-            .concat(allArray.slice(endIndex + 1));
-             setDBXENFTs(newArray);
+                            .slice(0, startIndex) 
+                            .concat(sortedDBXENFTs) 
+                            .concat(allArray.slice(endIndex + 1));
+            setDBXENFTs(newArray);
         }
     }
     }, [orderByTokenID]);
@@ -142,10 +142,10 @@ export function DbXeNFTList(): any {
             resultArray = results?.flat();
             resultArray.sort((a: any, b: any) => {
                 return parseInt(a.token_id) - parseInt(b.token_id);
-              });
+            });
             setAllDBXENFTs(resultArray);
             let endIndex;
-            if(resultArray.length < 8)
+            if (resultArray.length < 8)
                 endIndex = resultArray.length;
             else
                 endIndex = 8;
@@ -239,7 +239,7 @@ export function DbXeNFTList(): any {
         let startIndex = Number(newPage) * rowsPerPage;
         let resultArray = allDBXENFTs;
         const nfts = DBXENFTs;
-        if(nfts.length > startIndex){
+        if (nfts.length > startIndex) {
             let lastIndex = startIndex+rowsPerPage;
             if(lastIndex > resultArray.length)
                 lastIndex=resultArray.length
@@ -248,11 +248,11 @@ export function DbXeNFTList(): any {
             setPageContent({"all":nfts, "currentContent":currentPageContent, "startIndex":startIndex, "endIndex":startIndex+rowsPerPage});
         }
         else {
-        if (resultArray?.length !== 0 && resultArray !== undefined) {
-            setLoading(true);
-            let currentPageContent = [];
-            let lastIndex = startIndex+rowsPerPage;
-            if(lastIndex > resultArray.length)
+            if (resultArray?.length !== 0 && resultArray !== undefined) {
+                setLoading(true);
+                let currentPageContent = [];
+                let lastIndex = startIndex+rowsPerPage;
+            if (lastIndex > resultArray.length)
                 lastIndex=resultArray.length
           
             for (let i = startIndex; i < lastIndex; i++) {
