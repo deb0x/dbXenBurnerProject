@@ -28,7 +28,7 @@ export function DbXeNFTList(): any {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
-    const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
+    const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(true)
     let [orderByTokenID, setOrderByMaturity] = useState<boolean>(true)
 
     useEffect(() => {
@@ -37,7 +37,7 @@ export function DbXeNFTList(): any {
 
     useEffect(() => {
         getDBXeNFTs();
-    }, [account])
+    }, [account,showOGDBXeNFT])
     
     useEffect(() => {
         if(actualPageContent != undefined) {
@@ -77,7 +77,7 @@ export function DbXeNFTList(): any {
     }
 
     useEffect(() => {
-        if (chain.chainId == "137") {
+        if (Number(chain.chainId) == 137) {
             showOGDBXeNFT ?
                 setChain({
                     deb0xAddress: "0x4F3ce26D9749C0f36012C9AbB41BF9938476c462",
@@ -468,7 +468,7 @@ export function DbXeNFTList(): any {
                         <button className="btn chain-switcher mb-4"
                             type="button"
                             onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
-                            {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon"}
+                            {!showOGDBXeNFT ? "DBXeNFTs on Polygon" : "OG DBXeNFTs on Polygon"}
                         </button> : <></>
                     }
                     <div className={`row g-5 ${DBXENFTs.length == 0 ? "empty" : ""}`}>
