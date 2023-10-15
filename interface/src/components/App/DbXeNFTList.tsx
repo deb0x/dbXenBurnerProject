@@ -8,6 +8,7 @@ import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+import { DBXENFT_LIST_ROUTE, OG_DBXENFT_LIST_ROUTE } from "../Common/routes";
 
 interface DBXENFTEntry {
     [x: string]: string;
@@ -28,8 +29,23 @@ export function DbXeNFTList(): any {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     let dbxenftEntries: DBXENFTEntry[] = [];
-    const [showOGDBXeNFT, setShowDBXeNFT] = useState<boolean>(false)
+    const [showOGDBXeNFT, setShowOGDBXeNFT] = useState<boolean>()
     let [orderByTokenID, setOrderByMaturity] = useState<boolean>(true)
+
+    useEffect(() => {
+        showOGDBXeNFT === undefined ? setLoading(true) : setLoading(false)
+        window.location.pathname.includes("og") ?
+            setShowOGDBXeNFT(true) :
+            setShowOGDBXeNFT(false)
+        chainSwitcherForOG();
+    }, [])
+
+    useEffect(() => {
+        window.location.pathname.includes("og") ?
+            setShowOGDBXeNFT(true) :
+            setShowOGDBXeNFT(false)
+        chainSwitcherForOG();
+    }, [showOGDBXeNFT])
 
     useEffect(() => {
         startMoralis();
@@ -73,7 +89,7 @@ export function DbXeNFTList(): any {
         }
     }
 
-    useEffect(() => {
+    const chainSwitcherForOG = () => {
         if (chain.chainId == "137") {
             showOGDBXeNFT ?
                 setChain({
@@ -107,7 +123,7 @@ export function DbXeNFTList(): any {
                     dxnTokenName: "mDXN"
                 })
         } 
-    }, [showOGDBXeNFT])
+    }
 
     useEffect(() => {
         async function getChainId() {
@@ -451,6 +467,13 @@ export function DbXeNFTList(): any {
         }
     };
 
+    const handleSwitchList = () => {
+        setShowOGDBXeNFT(!showOGDBXeNFT)
+        window.location.pathname.includes("og") ?
+            navigate(DBXENFT_LIST_ROUTE) :
+            navigate(OG_DBXENFT_LIST_ROUTE)
+    }
+
     return (
         <div className={`content-box ${loading ? "loading" : ""}`}>
             {loading ?
@@ -464,7 +487,7 @@ export function DbXeNFTList(): any {
                     {chain.chainId == "137" ?
                         <button className="btn chain-switcher mb-4"
                             type="button"
-                            onClick={() => setShowDBXeNFT(!showOGDBXeNFT)}>
+                            onClick={handleSwitchList}>
                             {!showOGDBXeNFT ? "OG DBXeNFTs on Polygon" : "DBXeNFTs on Polygon"}
                         </button> : <></>
                     }
