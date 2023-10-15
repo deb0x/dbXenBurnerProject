@@ -392,7 +392,7 @@ export function AppBarComponent(props: any): any {
                     url ?
                         window.location.pathname.includes("your-dbxenfts") && 
                         url.length > 0 && url !== "your-dbxenfts" ?
-                            <button className="back-button btn" onClick={() => navigate(DBXENFT_LIST_ROUTE)}>
+                            <button className="back-button btn" onClick={() => window.history.back()}>
                                 <img src={backButton} alt="backButton" />
                                 back
                             </button> :
