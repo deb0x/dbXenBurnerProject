@@ -23,6 +23,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
     let rpcUrl;
     let dbxenftFactoryAddress;
     let METADATA_BUCKET;
+    if (chainId == 1) {
+        rpcUrl = "https://eth.llamarpc.com";
+        dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
+        METADATA_BUCKET = "deboxnft-minting-eth";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
@@ -30,17 +35,17 @@ export async function writePerCycle(id, maturityTs, chainId) {
     }
     if (chainId == 250) {
         rpcUrl = "https://endpoints.omniatech.io/v1/fantom/mainnet/public";
-        dbxenftFactoryAddress = "0x6Efe5C5E291d86B038B2069BBec1961c6E0104b4";
+        dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-fantom";
     }
     if (chainId == 43114) {
-        rpcUrl = "https://avalanche-mainnet.infura.io";
-        dbxenftFactoryAddress = "0x3a32215fCAf645a45cfC676A98167d50a87FfD9E";
+        rpcUrl = "https://api.avax.network/ext/bc/C/rpc";
+        dbxenftFactoryAddress = "0x8c229A2e3178f1BE5F5F4fCdC2D5833c8a60e831";
         METADATA_BUCKET = "deboxnft-minting-avax";
     }
     if (chainId == 56) {
         rpcUrl = "https://bsc.rpc.blxrbdn.com";
-        dbxenftFactoryAddress = "0x9495E72348D57A9E8d248793598a3399e3AC0a5c";
+        dbxenftFactoryAddress = "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db";
         METADATA_BUCKET = "deboxnft-minting-bsc";
     }
 
@@ -73,7 +78,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
                 "value": new Date(maturityTs * 1000).toString(),
             }]
         }
-
+        
         const params = {
             Bucket: METADATA_BUCKET,
             Key: fileName,

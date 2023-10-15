@@ -8,14 +8,14 @@ import dotenv from 'dotenv';
 import BigNumber from 'bignumber.js';
 import Moralis from "moralis";
 import fetch from "node-fetch";
-dotenv.config();
+dotenv.config();           
 
-const dbxenftFactoryAddress = "0x8c229A2e3178f1BE5F5F4fCdC2D5833c8a60e831";
-const mintInfoAddress = "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6";
-const xenftAddress = "0x94d9E02D115646DFC407ABDE75Fa45256D66E043";
+const dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
+const mintInfoAddress = "0xE8dee287a293F67d53f178cD34815d37E78Ff4e2";
+const xenftAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const METADATA_BUCKET_AVAX = "deboxnft-minting-avax"
+const METADATA_BUCKET_ETH = "deboxnft-minting-eth"
 
 const createApiOptions = (data) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -72,7 +72,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
     if (cursor != null)
         cursorData = cursor.toString()
     const response = await Moralis.EvmApi.events.getContractEvents({
-        "chain": "43114",
+        "chain": "1",
         "topic": "0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78",
         "cursor": cursorData,
         "fromDate": dateForParam,
@@ -106,7 +106,7 @@ async function getIdsFromEvent(cursor, dateForParam) {
 }
 
 async function generateAfterReveal() {
-    const provider = new JsonRpcProvider(`https://avalanche-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
+    const provider = new JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let ids = await getLast24HoursIdsMinted();
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
@@ -149,7 +149,7 @@ async function generateAfterReveal() {
                 "name": `#${ids[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
                 "description": "",
                 "image": result.link,
-                "external_url": `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_AVAX}/${ids[i]}`,
+                "external_url": `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_ETH}/${ids[i]}`,
                 "attributes": attributesValue
             }
 
@@ -215,7 +215,7 @@ async function generateAfterReveal() {
                     break;
             }
             const params = {
-                Bucket: METADATA_BUCKET_AVAX,
+                Bucket: METADATA_BUCKET_ETH,
                 Key: fileName,
                 Body: JSON.stringify(standardMetadata),
                 Tagging: 'public=yes',
@@ -259,6 +259,6 @@ function getImage(power, counter1, counter2, counter3, counter4, counter5, count
         return { link: `https://dbxen-be.prodigy-it-solutions.com/api/assets/deboxnft-assets-15000/[15000]_DBXENFT_${counter9}.png`, value: 9 }
 }
 
-cron.schedule('8 48 17 * * *', async() => {
+cron.schedule('11 11 14 * * *', async() => {
     await generateAfterReveal();
 });
