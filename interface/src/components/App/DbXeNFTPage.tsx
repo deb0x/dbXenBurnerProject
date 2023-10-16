@@ -85,6 +85,11 @@ export function DbXeNFTPage(): any {
 
     const getDBXeNFTs = () => {
         setPageLoading(true)
+        if(Number(chain.chainId) == 8453){
+            getNFTsOnBase(account ? account : "",chain.dbxenftAddress).then((result) =>{
+                console.log(result)
+            })
+        }else {
         Moralis.EvmApi.nft.getWalletNFTs({
             chain: chain.chainId,
             format: "decimal",
@@ -121,6 +126,38 @@ export function DbXeNFTPage(): any {
                 setDBXENFT(dbxenftEntries);
             }
         }).then(() => setPageLoading(false))
+    }
+    }
+
+    async function getNFTsOnBase(accountAddress: any, nftAddress: any){
+        console.log(nftAddress)
+        let dataForReturn: any[] = [];
+        let currentPage = 1;
+        const options = {
+            method: 'GET',
+            headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
+        };
+         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
+            .then(response => response.json())
+            .then(async response =>{
+                if(response.data!=null){
+                    if(response.next_page != undefined && response.next_page > currentPage){
+                        currentPage = response.next_page;
+                    }
+                    dataForReturn.push(response.data)
+                    while(currentPage != undefined && currentPage != 1) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
+                        .then(response => response.json())
+                        .then(async response =>{
+                            dataForReturn.push(response.data)
+                            currentPage = response.next_page;
+                        })
+                    }
+                }
+            })
+            .catch(err => console.error(err));
+        return dataForReturn;
     }
 
     async function approveDXN() {

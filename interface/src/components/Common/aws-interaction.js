@@ -29,8 +29,8 @@ export async function writePerCycle(id, maturityTs, chainId) {
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
     if (chainId == 8453) {
-        rpcUrl = "https://base.meowrpc.com";
-        dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+        rpcUrl = "https://developer-access-mainnet.base.org";
+        dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
         METADATA_BUCKET = "deboxnft-minting-base";
     }
     if (chainId == 137) {
@@ -64,7 +64,10 @@ export async function writePerCycle(id, maturityTs, chainId) {
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
-
+    console.log(rpcUrl)
+    console.log(dbxenftFactoryAddress)
+        console.log(METADATA_BUCKET)
+    console.log(objectData)
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,
@@ -91,7 +94,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
             Tagging: 'public=yes',
             "ContentType": "application/json",
         };
-
+        console.log(params)
         putStorageObject(params)
             .then((result) => {
                 console.log(result)

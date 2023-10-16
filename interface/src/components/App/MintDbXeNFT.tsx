@@ -142,10 +142,9 @@ export function MintDbXeNFT(): any {
         let resultArray: any;
         setInitLoading(true)
         if(Number(chain.chainId) == 8453){
-            const MintInfoContract = mintInfo(library, chain.mintInfoAddress);
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsOnBase(account ? account : "",chain.xenftAddress,MintInfoContract,XENFTContract).then(async (result) =>{
+            getNFTsOnBase(account ? account : "",chain.xenftAddress,XENFTContract).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
@@ -328,14 +327,14 @@ export function MintDbXeNFT(): any {
         return response;
     }
 
-    async function getNFTsOnBase(accountAddress: any, nftAddress: any,MintInfoContract: any,XENFTContract: any){
+    async function getNFTsOnBase(accountAddress: any, nftAddress: any,XENFTContract: any){
         let dataForReturn: any[] = [];
         let currentPage = 1;
         const options = {
             method: 'GET',
             headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
         };
-         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
+         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
             .then(response => response.json())
             .then(async response =>{
                 if(response!=null){
@@ -353,7 +352,7 @@ export function MintDbXeNFT(): any {
                     }
                     while(currentPage != undefined && currentPage != 1) {
                         await new Promise(resolve => setTimeout(resolve, 500));
-                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
+                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
                         .then(response => response.json())
                         .then(async response =>{
                             let arrayOfData = response.data;
