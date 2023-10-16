@@ -123,7 +123,14 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
-        setLoading(true)
+        if(Number(chain.chainId) == 8453){
+            setLoading(true)
+            let dbxenftEntries: DBXENFTEntry[] = [];
+            getNFTsForUserBaseChain(chain.dbxenftAddress).then(async(result:any) =>{
+                console.log(result);
+                setLoading(false)
+            })
+        } else {
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
             const results = getNFTResult.raw.result;
             let cursor = getNFTResult.raw.cursor;
@@ -205,6 +212,7 @@ export function DbXeNFTList(): any {
             setLoading(false);
         })
     }
+    }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
         let cursorData;
@@ -219,6 +227,10 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         });
         return response;
+    }
+
+    async function getNFTsForUserBaseChain(nftAddress: any){
+
     }
 
     const handleRedirect = (id: any) => {

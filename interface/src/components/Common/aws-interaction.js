@@ -28,6 +28,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
+    if (chainId == 8453) {
+        rpcUrl = "https://base.meowrpc.com";
+        dbxenftFactoryAddress = "0xACd2bE0835c22BeCD9a86C3F7ac68Ade6DfD1870";
+        METADATA_BUCKET = "deboxnft-minting-base";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
