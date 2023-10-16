@@ -6,8 +6,16 @@ import { useNavigate } from 'react-router-dom';
 import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
+import DBXENFT from "../../ethereum/DBXENFT";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
+const createApiOptions = (data: any) =>
+    ({ method: "POST", body: JSON.stringify(data) });
+const getStorageObject = (data: any) =>
+    fetch(STORAGE_EP + "GetObjectCommand", createApiOptions(data))
+    .then((result) => result.json());
+
 
 interface DBXENFTEntry {
     [x: string]: string;
@@ -20,7 +28,7 @@ interface DBXENFTEntry {
 
 export function DbXeNFTList(): any {
     const context = useWeb3React();
-    const { account } = context
+    const { library, account } = context
     const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const [allDBXENFTs, setAllDBXENFTs] = useState<DBXENFTEntry[]>([]);
@@ -125,23 +133,28 @@ export function DbXeNFTList(): any {
         let resultArray: any;
         if(Number(chain.chainId) == 8453){
             setLoading(true)
-            getNFTsOnBase(account ? account : "",chain.dbxenftAddress).then((results) =>{
-                resultArray = results?.flat();
-                resultArray.sort((a: any, b: any) => {
-                    return parseInt(a.token_id) - parseInt(b.token_id);
-                });
-                let endIndex;
-                if (resultArray.length < 8)
-                    endIndex = resultArray.length;
-                else
-                    endIndex = 8;
-                const nfts = [];
-                if (resultArray?.length != 0 && resultArray != undefined) {
+            const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+                DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) =>{
+                    setAllDBXENFTs(tokenIds);
+                    let dbxenftEntries: DBXENFTEntry[] = [];
+                    for(let i=0;i<tokenIds.length;i++){
+                        const fileName = `${tokenIds[i]}` + ".json";
+                        const params = {
+                            Bucket: "deboxnft-minting-base",
+                            Key: fileName,
+                        }
+                        let data = await getStorageObject(params);
+                        dbxenftEntries.push({
+                            id: data.id,
+                            name: data.name,
+                            description: data.description,
+                            image: data.image,
+                            maturity: data.attributes[2].value,
+                        });
                 }
-                console.log(resultArray)
-                setAllDBXENFTs(resultArray);
-                setLoading(false);
-            })
+                setDBXENFTs(dbxenftEntries);
+            }) 
+            setLoading(false); 
         } else {
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
             const results = getNFTResult.raw.result;
@@ -159,6 +172,7 @@ export function DbXeNFTList(): any {
             resultArray.sort((a: any, b: any) => {
                 return parseInt(a.token_id) - parseInt(b.token_id);
             });
+            console.log(resultArray)
             setAllDBXENFTs(resultArray);
             let endIndex;
             if (resultArray.length < 8)
@@ -239,37 +253,6 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         });
         return response;
-    }
-
-    async function getNFTsOnBase(accountAddress: any, nftAddress: any){
-        console.log(nftAddress)
-        let dataForReturn: any[] = [];
-        let currentPage = 1;
-        const options = {
-            method: 'GET',
-            headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
-        };
-         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
-            .then(response => response.json())
-            .then(async response =>{
-                if(response.data!=null){
-                    if(response.next_page != undefined && response.next_page > currentPage){
-                        currentPage = response.next_page;
-                    }
-                    dataForReturn.push(response.data)
-                    while(currentPage != undefined && currentPage != 1) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=10`, options)
-                        .then(response => response.json())
-                        .then(async response =>{
-                            dataForReturn.push(response.data)
-                            currentPage = response.next_page;
-                        })
-                    }
-                }
-            })
-            .catch(err => console.error(err));
-        return dataForReturn;
     }
 
     const handleRedirect = (id: any) => {

@@ -190,7 +190,7 @@ const ChainProvider = ( { children }: Props ) => {
                             dbxenftFactoryAddress: "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066",
                             dbxenftAddress: "0x7864a0a6832B488220501E3CC2bc0891e4e11782",
                             xenftAddress: "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6",
-                            mintInfoAddress: "0x39Da4F2b87aCD413315a38478248F85F6c287A9e",
+                            mintInfoAddress: "0x0a252663DBCc0b073063D6420a40319e438Cfa59",
                             chainId: parseInt(result, 16),
                             chainName: "Base",
                             currency: "ETH",
