@@ -28,6 +28,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
+    if (chainId == 10) {
+        rpcUrl = "https://optimism-mainnet.infura.io/v3/831ef58dd0784fee937eb8a5644f7ba6";
+        dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+        METADATA_BUCKET = "deboxnft-minting-op";
+    }
     if (chainId == 8453) {
         rpcUrl = "https://developer-access-mainnet.base.org";
         dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
@@ -94,7 +99,6 @@ export async function writePerCycle(id, maturityTs, chainId) {
             Tagging: 'public=yes',
             "ContentType": "application/json",
         };
-        console.log(params)
         putStorageObject(params)
             .then((result) => {
                 console.log(result)

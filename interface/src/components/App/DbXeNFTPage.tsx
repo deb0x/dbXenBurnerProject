@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import ChainContext from "../Contexts/ChainContext";
 import DBXENFTFactory from "../../ethereum/dbxenftFactory.js";
 import DXN from "../../ethereum/dbxenerc20";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { Button, Card, CardActions, CardContent, Grid, OutlinedInput, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import "../../componentsStyling/dbxenftPage.scss";
@@ -21,13 +21,14 @@ import nftImage from "../../photos/Nft-dbxen.png";
 import MintInfo from "../../ethereum/mintInfo.js";
 import XENFT from "../../ethereum/xenTorrent";
 import { Spinner } from "./Spinner";
+import { Network, Alchemy } from "alchemy-sdk";
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 interface DBXENFTEntry {
     id: number;
-    description: string
-    name: string;
-    image: string;
+    description?: string
+    name?: string;
+    image?: string;
     maturityDate?: Date
 }
 
@@ -90,7 +91,37 @@ export function DbXeNFTPage(): any {
     }
 
     const getDBXeNFTs = () => {
-        if(Number(chain.chainId) == 8453){
+        setLoading(true);
+        if(Number(chain.chainId) == 10) {
+            const settings = {
+                apiKey: process.env.REACT_APP_ALCHEMY_KEY,
+                network: Network.OPT_MAINNET, 
+            };
+            const alchemy = new Alchemy(settings);
+            const tokenId = BigNumber.from(id);
+            let dbxenftEntries: DBXENFTEntry[] = [];
+            alchemy.nft.getNftMetadata(chain.dbxenftAddress,utils.hexValue(tokenId)).then((result) => {
+                if(result != undefined) {
+                    dbxenftEntries.push({
+                        id: +result.tokenId,
+                        name: result.rawMetadata?.name,
+                        description: result.rawMetadata?.description,
+                        image: result.rawMetadata?.image,
+                        maturityDate: result.rawMetadata?.attributes?.[2]?.value,
+                    })
+                 } else {
+                        dbxenftEntries.push({
+                            id: Number(id),
+                            name: "UNREVEALED ARTWORK",
+                            description: "",
+                            image: nftImage,
+                        });
+                    }
+                });
+            setDBXENFT(dbxenftEntries);
+            setLoading(false);
+        } else {
+            if(Number(chain.chainId) == 8453) {
                 let dbxenftEntries: DBXENFTEntry[] = [];
                     const fileName = `${id}` + ".json";
                     const params = {
@@ -118,48 +149,49 @@ export function DbXeNFTPage(): any {
                             });
                         }
                     }
-                setDBXENFT(dbxenftEntries);
-            })
-        }else {
-        setLoading(true)
-        Moralis.EvmApi.nft.getWalletNFTs({
-            chain: chain.chainId,
-            format: "decimal",
-            normalizeMetadata: true,
-            tokenAddresses: [chain.dbxenftAddress],
-            address: account ? account : ""
-        }).then((result) => {
-            const response = result.raw;
-            const resultArray: any = response.result;
-            let dbxenftEntries: DBXENFTEntry[] = [];
-
-            for (let i = 0; i < resultArray?.length; i++) {
-                let result = resultArray[i];
-                const resultAttributes: any[] = result.normalized_metadata;
-                if (result.token_id == id) {
-                    if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
-                        dbxenftEntries.push({
-                            id: result.token_id,
-                            name: "UNREVEALED ARTWORK",
-                            description: "",
-                            image: nftImage,
-                        });
-                    } else {
-                        dbxenftEntries.push({
-                            id: result.token_id,
-                            name: result.normalized_metadata.name,
-                            description: result.normalized_metadata.description,
-                            image: result.normalized_metadata.image,
-                            maturityDate: result.normalized_metadata.attributes[2].value
-                        });
-                        setNftMaturityDate(result.normalized_metadata.attributes[2].value);
+                    setDBXENFT(dbxenftEntries);
+                    })
+            } else {
+                setLoading(true)
+                Moralis.EvmApi.nft.getWalletNFTs({
+                    chain: chain.chainId,
+                    format: "decimal",
+                    normalizeMetadata: true,
+                    tokenAddresses: [chain.dbxenftAddress],
+                    address: account ? account : ""
+                }).then((result) => { 
+                    const response = result.raw;
+                    const resultArray: any = response.result;
+                    let dbxenftEntries: DBXENFTEntry[] = [];
+                    
+                    for (let i = 0; i < resultArray?.length; i++) {
+                        let result = resultArray[i];
+                        const resultAttributes: any[] = result.normalized_metadata;
+                        if (result.token_id == id) {
+                            if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+                                dbxenftEntries.push({
+                                    id: result.token_id,
+                                    name: "UNREVEALED ARTWORK",
+                                    description: "",
+                                    image: nftImage,
+                                });
+                            } else {
+                                    dbxenftEntries.push({
+                                        id: result.token_id,
+                                        name: result.normalized_metadata.name,
+                                        description: result.normalized_metadata.description,
+                                        image: result.normalized_metadata.image,
+                                        maturityDate: result.normalized_metadata.attributes[2].value
+                                    });
+                                    setNftMaturityDate(result.normalized_metadata.attributes[2].value);
+                                }
+                        }
+                        setDBXENFT(dbxenftEntries);
                     }
-                }
-                setDBXENFT(dbxenftEntries);
+                }).then(() => setPageLoading(false))
             }
-        }).then(() => setPageLoading(false))
-    }
-    }
+        }
+    }   
 
     async function approveDXN() {
         setLoading(true);

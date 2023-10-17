@@ -9,6 +9,7 @@ import nftImage from "../../photos/Nft-dbxen.png";
 import DBXENFT from "../../ethereum/DBXENFT";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+import { Network, Alchemy } from "alchemy-sdk";
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
 const createApiOptions = (data: any) =>
     ({ method: "POST", body: JSON.stringify(data) });
@@ -130,6 +131,50 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
+        if(Number(chain.chainId) === 10){
+            setLoading(true);
+            getNFTsOnOP(account ? account : "",chain.dbxenftAddress).then(async (results)=>{
+                resultArray = results?.flat();
+                resultArray.sort((a: any, b: any) => {
+                    return parseInt(a.tokenId) - parseInt(b.tokenId);
+                });
+                setAllDBXENFTs(resultArray);
+                let endIndex;
+                if (resultArray.length < 8)
+                    endIndex = resultArray.length;
+                else
+                    endIndex = 8;
+                const nfts = [];
+                if (resultArray?.length != 0 && resultArray != undefined) {
+                    for (let i = 0; i < endIndex; i++) {
+                        let resultArrayElement = resultArray[i];
+                        if (resultArray[i].tokenId === null ||
+                            resultArrayElement.rawMetadata.attributes.length === 0 ||
+                            resultArrayElement.rawMetadata.image === null ||
+                            resultArrayElement.rawMetadata.image.includes("beforeReveal")) {
+                            nfts.push({
+                                id: resultArrayElement.tokenId,
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                                maturity: ""
+                            });
+                        } else {
+                            nfts.push({
+                                id: resultArrayElement.tokenId,
+                                name:  resultArrayElement.rawMetadata.name,
+                                description:  resultArrayElement.rawMetadata.description,
+                                image:  resultArrayElement.rawMetadata.image,
+                                maturity: resultArrayElement.rawMetadata.attributes[2].value
+                            });
+                        }
+                    }
+                    setPageContent({"all":nfts, "currentContent":nfts, "startIndex":0, "endIndex":7});
+                    setDBXENFTs(nfts);
+                    setLoading(false);
+                }
+            }) 
+        } else {
         if (Number(chain.chainId) === 8453) {
             setLoading(true);
             const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
@@ -249,6 +294,7 @@ export function DbXeNFTList(): any {
             setLoading(false);
         })
     }
+}
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
@@ -264,6 +310,37 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         });
         return response;
+    }
+
+    async function getNFTsOnOP(accountAddress: any, nftAddress: any){
+        let dataForReturn: any[] = [];
+        const settings = {
+            apiKey: process.env.REACT_APP_ALCHEMY_KEY,
+            network: Network.OPT_MAINNET, 
+        };
+        const alchemy = new Alchemy(settings);
+        const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+        };
+        let pageKey = undefined;
+        let firstPage = await alchemy.nft.getNftsForOwner(accountAddress, options);
+        dataForReturn.push(...firstPage.ownedNfts);
+        pageKey = firstPage.pageKey;
+        let pageNumber = Math.ceil(firstPage.totalCount / 100) - 1;
+        
+        while (pageNumber > 0) {
+          const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+            pageKey: pageKey,
+          };
+          let data:any = await alchemy.nft.getNftsForOwner(accountAddress, options);
+          dataForReturn.push(...data.ownedNfts);
+          pageKey = data.pageKey;
+          pageNumber--;
+        }
+        return dataForReturn;
     }
 
     const handleRedirect = (id: any) => {

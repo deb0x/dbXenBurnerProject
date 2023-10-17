@@ -21,8 +21,10 @@ import { arrToBufArr } from "ethereumjs-util";
 import { ethers } from "ethers";
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
-const chainForGas = [8453, 137,250,43114];
-const supportedChains = [1,8453, 137,56,250,43114];
+import { Network, Alchemy } from "alchemy-sdk";
+
+const chainForGas = [137,250,43114];
+const supportedChains = [1,10,8453,137,56,250,43114];
 
 const { BigNumber } = require("ethers");
 
@@ -56,7 +58,7 @@ export function MintDbXeNFT(): any {
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
     const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
-    const [xeNFTWrapApproved, setXeNFTWrapAppeoved] = useState<boolean>();
+    const [xeNFTWrapApproved, setXeNFTWrapApproved] = useState<boolean>();
     const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress);
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
@@ -67,6 +69,7 @@ export function MintDbXeNFT(): any {
     const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
     const dateBase: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
     const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 11, 0));
+    const dateOP: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
     const now: any = Date.now();
 
     useEffect(() => {
@@ -74,15 +77,16 @@ export function MintDbXeNFT(): any {
         getXENFTs();
         isApprovedForAll()
             .then((result: any) => result ?
-                setXeNFTWrapAppeoved(true) :
-                setXeNFTWrapAppeoved(false)
+                setXeNFTWrapApproved(true) :
+                setXeNFTWrapApproved(false)
             )
         currentCycleTotalPower();
     }, [chain, account])
 
     useEffect(() => {
-        getXENFTs();
-    }, [xeNFTWrapped])
+        if (xeNFTWrapped) 
+            getXENFTs();
+    }, [xeNFTWrapped]);
 
     const startMoralis = () => {
         if (!Moralis.Core.isStarted) {
@@ -106,6 +110,9 @@ export function MintDbXeNFT(): any {
                 break;
             case 8453:
                 setEndDate(dateBase.getTime() - now);
+                break;
+            case 10:
+                setEndDate(dateOP.getTime() - now);
                 break;
             case 137:
                 setEndDate(datePolygon.getTime() - now);
@@ -141,6 +148,63 @@ export function MintDbXeNFT(): any {
     const getXENFTs = () => {
         let resultArray: any;
         setInitLoading(true)
+        if(Number(chain.chainId) == 10){
+            getNFTsOnOP(account ? account : "",chain.xenftAddress).then(async (results)=>{
+                resultArray = results?.flat();
+                if (resultArray?.length != 0 && resultArray != undefined) {
+                    let xenftEntries: XENFTEntry[] = [];
+                    const thisDate = new Date();
+                    let dataForCompare = thisDate.getTime();
+                    for (let i = 0; i < resultArray?.length; i++) {
+                        let result = resultArray[i];
+                        let resultAttributes: any[] = [];
+                        if (result.rawMetadata?.attributes?.length != undefined) {
+                            if (result.rawMetadata?.attributes != null) {
+                            const maturityDateObject = result.rawMetadata?.attributes.find(
+                                (item: { trait_type: string; }) => item.trait_type == "Maturity DateTime"
+                            );
+                            resultAttributes = result.rawMetadata.attributes;
+                            const maturityDate = new Date(maturityDateObject.value);
+                            let timevalue;
+                            let blackoutTerm = 604800000;
+                            if (dataForCompare > maturityDate.getTime())
+                                timevalue = dataForCompare - maturityDate.getTime();
+                            else
+                                timevalue = maturityDate.getTime() - dataForCompare;
+                            let boolVal = timevalue > blackoutTerm;
+                            let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
+                                if (boolVal) {
+                                    try {
+                                        let claimStatus = "";
+                                        xenftEntries.push({
+                                            id: +result.tokenId,
+                                            claimStatus: claimStatus,
+                                            class: resultAttributes[0].value,
+                                            VMUs: parseInt(resultAttributes[1].value),
+                                            cRank: resultAttributes[2].value,
+                                            AMP: parseInt(resultAttributes[3].value),
+                                            EAA: resultAttributes[4].value,
+                                            maturityDateTime: resultAttributes[7].value,
+                                            term: parseInt(resultAttributes[8].value),
+                                            xenBurned: resultAttributes[9].value,
+                                            estimatedXen: (ethers.utils.formatEther(xenEstimated)),
+                                            category: resultAttributes[10].value,
+                                            image: result.rawMetadata.image
+                                        });
+                                    } catch (err) {
+                                        console.log(err);
+                                    }
+                                }
+                        }
+                    }
+                   }
+                   setXENFTs(xenftEntries);
+                   setInitLoading(false);
+                } else {
+                   setInitLoading(false);
+                }
+            })
+        } else {
         if(Number(chain.chainId) == 8453){
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
@@ -204,7 +268,7 @@ export function MintDbXeNFT(): any {
                                 "normalizeMetadata": true,
                                 "mediaItems": false,
                                 "address": chain.xenftAddress,
-                                "tokenId": resultArray[i].token_idFs
+                                "tokenId": resultArray[i].token_id
                             })
                             if (responseMetadata?.raw.normalized_metadata?.attributes != undefined) {
                                 resultAttributes = responseMetadata?.raw.normalized_metadata?.attributes;
@@ -310,6 +374,7 @@ export function MintDbXeNFT(): any {
             }
         })
     }
+}
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
@@ -375,6 +440,37 @@ export function MintDbXeNFT(): any {
         return dataForReturn;
     }
 
+    async function getNFTsOnOP(accountAddress: any, nftAddress: any){
+        let dataForReturn: any[] = [];
+        const settings = {
+            apiKey: process.env.REACT_APP_ALCHEMY_KEY,
+            network: Network.OPT_MAINNET, 
+        };
+        const alchemy = new Alchemy(settings);
+        const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+        };
+        let pageKey = undefined;
+        let firstPage = await alchemy.nft.getNftsForOwner(accountAddress, options);
+        dataForReturn.push(...firstPage.ownedNfts);
+        pageKey = firstPage.pageKey;
+        let pageNumber = Math.ceil(firstPage.totalCount / 100) - 1;
+        
+        while (pageNumber > 0) {
+          const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+            pageKey: pageKey,
+          };
+          let data:any = await alchemy.nft.getNftsForOwner(accountAddress, options);
+          dataForReturn.push(...data.ownedNfts);
+          pageKey = data.pageKey;
+          pageNumber--;
+        }
+        return dataForReturn;
+    }
+
     const daysLeft = (date_1: Date, date_2: Date) => {
 
         let difference = date_1.getTime() - date_2.getTime();
@@ -408,7 +504,7 @@ export function MintDbXeNFT(): any {
                         message: "Your succesfully approved contract for handling your XENFTs.", open: true,
                         severity: "success"
                     })
-                    setXeNFTWrapAppeoved(true)
+                    setXeNFTWrapApproved(true)
                     setLoading(false)
                 })
                 .catch((error: any) => {
@@ -467,7 +563,16 @@ export function MintDbXeNFT(): any {
                 )
                 gasLimitForTransaction = BigNumber.from("2000000")
             } 
-
+            if((Number(chain.chainId) == 10)){
+                fee = await calcMintFeeOP(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                )
+            }
             if(Number(chain.chainId) == 56){
                 fee = await calcMintFeeBSC(
                     maturityTs,
@@ -634,6 +739,36 @@ export function MintDbXeNFT(): any {
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
         const minFee = BigNumber.from(1e15)
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(5_000_000_000))
+        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
+
+        return fee.add(fee.div(10))
+    }
+
+    async function calcMintFeeOP(
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string
+    ) {
+        const estReward: any = await getNFTRewardInXen(
+            maturityTs,
+            VMUs,
+            EAA,
+            term,
+            AMP,
+            cRank
+        )
+
+        const maturityDays = calcMaturityDays(term, maturityTs)
+        const daysReduction = 11389 * maturityDays
+        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
+        const difference = 10_000_000 - maxSubtrahend
+        const maxPctReduction = Math.max(difference, 5_000_000)
+        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
+        const minFee = BigNumber.from(1e15)
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(10_000_000_000))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
         return fee.add(fee.div(10))
@@ -812,6 +947,19 @@ export function MintDbXeNFT(): any {
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
                             await calcMintFeeBASE(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank);
+                    setDBXNFT({
+                        protocolFee: ethers.utils.formatEther(protocolFee),
+                        transactionFee: transactionFee.toString()
+                    })
+                }
+                if (Number(chain.chainId) === 10) {
+                    gasLimitVal = (BigNumber.from("1200000"));
+                    price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
+                    transactionFee = gasLimitVal * price / 100000000;
+                    let protocolFee =
+                    NFTData.claimStatus == "Redeemed" ?
+                        "0.001" :
+                        await calcMintFeeOP(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1098,4 +1246,8 @@ export function MintDbXeNFT(): any {
             }
         </div>
     );
+}
+
+function async(arg0: string) {
+    throw new Error("Function not implemented.");
 }
