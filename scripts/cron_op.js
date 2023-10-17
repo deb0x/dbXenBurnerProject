@@ -193,6 +193,6 @@ function getImage(power, id) {
     }
   }
 
-// cron.schedule('8 48 17 * * *', async() => {
+cron.schedule('8 48 17 * * *', async() => {
     await generateAfterReveal();
-// });
+});
