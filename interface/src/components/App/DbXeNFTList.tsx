@@ -6,8 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
+import DBXENFT from "../../ethereum/DBXENFT";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
+const createApiOptions = (data: any) =>
+    ({ method: "POST", body: JSON.stringify(data) });
+const getStorageObject = (data: any) =>
+    fetch(STORAGE_EP + "GetObjectCommand", createApiOptions(data))
+    .then((result) => result.json());
 
 interface DBXENFTEntry {
     [x: string]: string;
@@ -20,7 +27,7 @@ interface DBXENFTEntry {
 
 export function DbXeNFTList(): any {
     const context = useWeb3React();
-    const { account } = context
+    const { library, account } = context
     const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const [allDBXENFTs, setAllDBXENFTs] = useState<DBXENFTEntry[]>([]);
@@ -123,7 +130,44 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
-        setLoading(true)
+        if (Number(chain.chainId) === 8453) {
+            setLoading(true);
+            const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+            DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                setAllDBXENFTs(tokenIds);
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                for (let i = 0; i < tokenIds.length; i++) {
+                    const fileName = `${tokenIds[i]}` + ".json";
+                    const params = {
+                        Bucket: "deboxnft-minting-base",
+                        Key: fileName,
+                    }
+                    let data = await getStorageObject(params);
+                    if (data.client_error == undefined) {
+                        dbxenftEntries.push({
+                            id: data.id,
+                            name: data.name,
+                            description: data.description,
+                            image: data.image,
+                            maturity: data.attributes[2].value,
+                        });
+                    } else {
+                        if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                            dbxenftEntries.push({
+                                id: tokenIds[i],
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                                maturity: ""
+                            });
+                        }
+                    }
+                }
+                setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+                setDBXENFTs(dbxenftEntries);
+                setLoading(false);
+            });
+        } else {
         getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
             const results = getNFTResult.raw.result;
             let cursor = getNFTResult.raw.cursor;
@@ -204,6 +248,7 @@ export function DbXeNFTList(): any {
             setDBXENFTs(nfts);
             setLoading(false);
         })
+    }
     }
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {

@@ -28,6 +28,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
+    if (chainId == 8453) {
+        rpcUrl = "https://developer-access-mainnet.base.org";
+        dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
+        METADATA_BUCKET = "deboxnft-minting-base";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
@@ -59,7 +64,10 @@ export async function writePerCycle(id, maturityTs, chainId) {
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
-
+    console.log(rpcUrl)
+    console.log(dbxenftFactoryAddress)
+        console.log(METADATA_BUCKET)
+    console.log(objectData)
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,
@@ -86,7 +94,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
             Tagging: 'public=yes',
             "ContentType": "application/json",
         };
-
+        console.log(params)
         putStorageObject(params)
             .then((result) => {
                 console.log(result)

@@ -55,6 +55,12 @@ export function DbXeNFTPage(): any {
     const [dbxenftPower, setDBXENFTPower] = useState("");
     const [unclaimedXen, setUnclaimedXen] = useState("0.0");
     const [nftMaturityDate, setNftMaturityDate] = useState<Date>();
+    const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
+    const createApiOptions = (data: any) =>
+        ({ method: "POST", body: JSON.stringify(data) });
+    const getStorageObject = (data: any) =>
+        fetch(STORAGE_EP + "GetObjectCommand", createApiOptions(data))
+        .then((result) => result.json());
 
     useEffect(() => {
         startMoralis();
@@ -84,7 +90,38 @@ export function DbXeNFTPage(): any {
     }
 
     const getDBXeNFTs = () => {
-        setPageLoading(true)
+        if(Number(chain.chainId) == 8453){
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                    const fileName = `${id}` + ".json";
+                    const params = {
+                        Bucket: "deboxnft-minting-base",
+                        Key: fileName,
+                    }
+                    getStorageObject(params).then((result) =>{
+                    if (result.client_error == undefined) {
+                        setLoading(false);
+                        dbxenftEntries.push({
+                            id: result.id,
+                            name: result.name,
+                            description: result.description,
+                            image: result.image,
+                            maturityDate: result.attributes[2].value,
+                        });
+                        setDBXENFT(dbxenftEntries);
+                    } else {
+                        if (result.client_error.Code == "NoSuchKey" && result.client_error!= undefined) {
+                            dbxenftEntries.push({
+                                id: Number(id),
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                            });
+                        }
+                    }
+                setDBXENFT(dbxenftEntries);
+            })
+        }else {
+        setLoading(true)
         Moralis.EvmApi.nft.getWalletNFTs({
             chain: chain.chainId,
             format: "decimal",
@@ -121,6 +158,7 @@ export function DbXeNFTPage(): any {
                 setDBXENFT(dbxenftEntries);
             }
         }).then(() => setPageLoading(false))
+    }
     }
 
     async function approveDXN() {
@@ -312,7 +350,6 @@ export function DbXeNFTPage(): any {
         const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
         const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
 
-
         const contractCallContext: ContractCallContext[] = [
             {
                 reference: 'DBXENFTFactory',
@@ -452,7 +489,6 @@ export function DbXeNFTPage(): any {
                 unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
             }
         }
-
         dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
         setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
         setUserStakedAmount(ethers.utils.formatEther(totalStaked))
