@@ -12,7 +12,7 @@ import Web3 from 'web3';
 dotenv.config();
 
 const dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
-const mintInfoAddress = "0x39Da4F2b87aCD413315a38478248F85F6c287A9e";
+const mintInfoAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
 const xenftAddress = "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
@@ -53,7 +53,7 @@ async function generateAfterReveal() {
     const web3 = new Web3(`https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
 
     const currentBlock = await web3.eth.getBlockNumber();
-    const secondsPerBlock = 15;
+    const secondsPerBlock = 2;
     const blocksPerHour = 3600 / secondsPerBlock;
     const blocksPerDay = 24 * blocksPerHour;
     const fromBlock = currentBlock - blocksPerDay;
