@@ -11,12 +11,12 @@ import Web3 from 'web3';
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
-const mintInfoAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
-const xenftAddress = "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6";
+const dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+const mintInfoAddress = "0x498EfB575Eb28313ef12E2Fb7D88d0c67c5e2F11";
+const xenftAddress = "0x4c4CF206465AbFE5cECb3b581fa1b508Ec514692";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const METADATA_BUCKET_BASE = "deboxnft-minting-base";
+const METADATA_BUCKET_EVMOS = "deboxnft-minting-evmos";
 
 const createApiOptions = (data) => ({
   method: "POST",
@@ -43,22 +43,29 @@ function mulDiv(x, y, denominator) {
   return result.toString();
 }
 
-async function generateAfterReveal() {
+async function generateAfterReveal(callNumber) {
   try {
-    const provider = new JsonRpcProvider(
-      `https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
-    );
+    const provider = new JsonRpcProvider(`https://evmos-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
 
     const eventSignature = '0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78';
-    const web3 = new Web3(`https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
+    const web3 = new Web3(`https://evmos-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
 
+    let fromBlock;
+    let toBlock;
     const currentBlock = await web3.eth.getBlockNumber();
-    
-    const secondsPerBlock = 2;
+    const secondsPerBlock = 7;
     const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
-    const blocksPerDay = Math.ceil(25 * blocksPerHour);
-    const fromBlock = Math.floor(currentBlock - blocksPerDay);
-    const toBlock = 'latest';
+    const blocksPer12Hour = Math.ceil(12 * blocksPerHour);
+
+    if(callNumber == 1) {
+        fromBlock = Math.floor(currentBlock - (2 * blocksPer12Hour));
+        toBlock = currentBlock - blocksPer12Hour;
+    } else {
+        if (callNumber == 2) {
+            fromBlock =currentBlock - blocksPer12Hour;;
+            toBlock = 'latest';
+        }
+    }
 
     const filter = {
       address: dbxenftFactoryAddress,
@@ -82,7 +89,6 @@ async function generateAfterReveal() {
         { type: 'uint256', name: 'fee' },
         { type: 'address', name: 'minter', indexed: true },
       ];
-
       const decodedData = web3.eth.abi.decodeLog(
         eventABI,
         log.data,
@@ -90,7 +96,6 @@ async function generateAfterReveal() {
       );
       mintedIds.push(Number(decodedData.DBXENFTId));
     }
-
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
@@ -105,7 +110,6 @@ async function generateAfterReveal() {
       let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle));
       let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle));
       let newPower = mulDiv(dbxenftEntryPower.toString(),rewardPerCycle.toString(),totalEntryPowerPerCycle.toString());
-
       try {
         let attributesValue = [{
           trait_type: "DBXEN NFT POWER",
@@ -118,20 +122,19 @@ async function generateAfterReveal() {
           value: new Date(maturityTs * 1000).toString(),
         }];
       let result = getImage(newPower, mintedIds[i]);
-      console.log(result)
       let standardMetadata = {
         id: `${mintedIds[i]}`,
         name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
         description: "",
         image: result,
-        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_BASE}/${mintedIds[i]}`,
+        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_EVMOS}/${mintedIds[i]}`,
         attributes: attributesValue,
       };
 
       console.log(JSON.stringify(standardMetadata));
 
       const params = {
-        Bucket: METADATA_BUCKET_BASE,
+        Bucket: METADATA_BUCKET_EVMOS,
         Key: fileName,
         Body: JSON.stringify(standardMetadata),
         Tagging: "public=yes",
@@ -198,5 +201,6 @@ function getImage(power, id) {
 }
 
 cron.schedule("8 48 17 * * *", async () => {
-  await generateAfterReveal();
+  await generateAfterReveal(1);
+  await generateAfterReveal(2);
 });

@@ -11,12 +11,12 @@ import Web3 from 'web3';
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
-const mintInfoAddress = "0x0a252663DBCc0b073063D6420a40319e438Cfa59";
-const xenftAddress = "0x379002701BF6f2862e3dFdd1f96d3C5E1BF450B6";
+const dbxenftFactoryAddress = "0xF8755609b6596CEE3A8CeAF8D9cFD90E7479C46A";
+const mintInfoAddress = "0xC3DDC8bD5028dd3541b3D25B4F623697B261c90B";
+const xenftAddress = "0x94d9E02D115646DFC407ABDE75Fa45256D66E043";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const METADATA_BUCKET_BASE = "deboxnft-minting-base";
+const METADATA_BUCKET_GLMR = "deboxnft-minting-moonbeam";
 
 const createApiOptions = (data) => ({
   method: "POST",
@@ -46,15 +46,14 @@ function mulDiv(x, y, denominator) {
 async function generateAfterReveal() {
   try {
     const provider = new JsonRpcProvider(
-      `https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
+      `https://moonbeam-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
     );
 
     const eventSignature = '0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78';
-    const web3 = new Web3(`https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
+    const web3 = new Web3(`https://moonbeam-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
 
     const currentBlock = await web3.eth.getBlockNumber();
-    
-    const secondsPerBlock = 2;
+    const secondsPerBlock = 6;
     const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
     const blocksPerDay = Math.ceil(25 * blocksPerHour);
     const fromBlock = Math.floor(currentBlock - blocksPerDay);
@@ -90,7 +89,6 @@ async function generateAfterReveal() {
       );
       mintedIds.push(Number(decodedData.DBXENFTId));
     }
-
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
@@ -118,20 +116,19 @@ async function generateAfterReveal() {
           value: new Date(maturityTs * 1000).toString(),
         }];
       let result = getImage(newPower, mintedIds[i]);
-      console.log(result)
       let standardMetadata = {
         id: `${mintedIds[i]}`,
         name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
         description: "",
         image: result,
-        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_BASE}/${mintedIds[i]}`,
+        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_GLMR}/${mintedIds[i]}`,
         attributes: attributesValue,
       };
 
       console.log(JSON.stringify(standardMetadata));
 
       const params = {
-        Bucket: METADATA_BUCKET_BASE,
+        Bucket: METADATA_BUCKET_GLMR,
         Key: fileName,
         Body: JSON.stringify(standardMetadata),
         Tagging: "public=yes",

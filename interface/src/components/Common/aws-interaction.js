@@ -58,7 +58,21 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db";
         METADATA_BUCKET = "deboxnft-minting-bsc";
     }
-
+    if (chainId == 9001) {
+        rpcUrl = "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+        METADATA_BUCKET = "deboxnft-minting-evmos";
+    }
+    if (chainId == 1284) {
+        rpcUrl = "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        dbxenftFactoryAddress = "0xF8755609b6596CEE3A8CeAF8D9cFD90E7479C46A";
+        METADATA_BUCKET = "deboxnft-minting-moonbeam";
+    }
+    if (chainId == 10001) {
+        rpcUrl = "https://mainnet.ethereumpow.org";
+        dbxenftFactoryAddress = "0xa9BEB4Df728FD91be0c115e174135BFbe748AcFF";
+        METADATA_BUCKET = "deboxnft-minting-ethpow";
+    }
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let dbxenftEntryPower = ethers.utils.formatEther((await factory.dbxenftEntryPower(id)));
@@ -69,10 +83,6 @@ export async function writePerCycle(id, maturityTs, chainId) {
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
-    console.log(rpcUrl)
-    console.log(dbxenftFactoryAddress)
-        console.log(METADATA_BUCKET)
-    console.log(objectData)
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,

@@ -51,9 +51,9 @@ async function generateAfterReveal() {
   
       const currentBlock = await web3.eth.getBlockNumber();
       const secondsPerBlock = 2;
-      const blocksPerHour = 3600 / secondsPerBlock;
-      const blocksPerDay = 24 * blocksPerHour;
-      const fromBlock = currentBlock - blocksPerDay;
+      const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
+      const blocksPerDay = Math.ceil(25 * blocksPerHour);
+      const fromBlock = Math.floor(currentBlock - blocksPerDay);
       const toBlock = 'latest';
   
       const filter = {
