@@ -6,8 +6,16 @@ import { useNavigate } from 'react-router-dom';
 import "../../componentsStyling/dbXeNFTList.scss";
 import { TablePagination } from '@mui/base/TablePagination';
 import nftImage from "../../photos/Nft-dbxen.png";
+import DBXENFT from "../../ethereum/DBXENFT";
 import { Spinner } from './Spinner';
 import { ethers } from "ethers";
+import { Network, Alchemy } from "alchemy-sdk";
+const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
+const createApiOptions = (data: any) =>
+    ({ method: "POST", body: JSON.stringify(data) });
+const getStorageObject = (data: any) =>
+    fetch(STORAGE_EP + "GetObjectCommand", createApiOptions(data))
+    .then((result) => result.json());
 
 interface DBXENFTEntry {
     [x: string]: string;
@@ -20,7 +28,7 @@ interface DBXENFTEntry {
 
 export function DbXeNFTList(): any {
     const context = useWeb3React();
-    const { account } = context
+    const { library, account } = context
     const { chain, setChain } = useContext(ChainContext);
     const [DBXENFTs, setDBXENFTs] = useState<DBXENFTEntry[]>([]);
     const [allDBXENFTs, setAllDBXENFTs] = useState<DBXENFTEntry[]>([]);
@@ -38,32 +46,32 @@ export function DbXeNFTList(): any {
     
     useEffect(() => {
         if(actualPageContent != undefined) {
-        let dataToSort = actualPageContent.currentContent;
-        let allArray = actualPageContent.all;
-        let startIndex = actualPageContent.startIndex;
-        let endIndex = actualPageContent.endIndex;
-        if (!orderByTokenID) {
-            const sortedDBXENFTs = [...dataToSort].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
-                let dateA: Date = new Date(a.maturity);
-                let dateB: Date = new Date(b.maturity);
-                return dateA.getTime() - dateB.getTime();
-            });
-            const newArray = allArray
+            let dataToSort = actualPageContent.currentContent;
+            let allArray = actualPageContent.all;
+            let startIndex = actualPageContent.startIndex;
+            let endIndex = actualPageContent.endIndex;
+            if (!orderByTokenID) {
+                const sortedDBXENFTs = [...dataToSort].sort((a: DBXENFTEntry, b: DBXENFTEntry) => {
+                    let dateA: Date = new Date(a.maturity);
+                    let dateB: Date = new Date(b.maturity);
+                    return dateA.getTime() - dateB.getTime();
+                });
+                const newArray = allArray
                             .slice(0, startIndex) 
                             .concat(sortedDBXENFTs) 
                             .concat(allArray.slice(endIndex + 1));
-            setDBXENFTs(newArray);
-        } else {
-            const sortedDBXENFTs = [...dataToSort].sort((a:any, b:any) =>
-                 parseInt(a.id) - parseInt(b.id)
-            );
-            const newArray = allArray
+                setDBXENFTs(newArray);
+            } else {
+                const sortedDBXENFTs = [...dataToSort].sort((a:any, b:any) =>
+                    parseInt(a.id) - parseInt(b.id)
+                );
+                const newArray = allArray
                             .slice(0, startIndex) 
                             .concat(sortedDBXENFTs) 
                             .concat(allArray.slice(endIndex + 1));
-            setDBXENFTs(newArray);
+                setDBXENFTs(newArray);
+            }
         }
-    }
     }, [orderByTokenID]);
 
     const startMoralis = () => {
@@ -123,88 +131,288 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
-        setLoading(true)
-        getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
-            const results = getNFTResult.raw.result;
-            let cursor = getNFTResult.raw.cursor;
-            if (cursor != null) {
-                while (cursor != null) {
-                    let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
-                    cursor = newPage.raw.cursor;
-                    if (newPage.result?.length != 0 && newPage.result != undefined) {
-                        results?.push(newPage?.raw.result);
+        if(Number(chain.chainId) == 10001){
+            setLoading(true);
+            const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+            DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                setAllDBXENFTs(tokenIds);
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                for (let i = 0; i < tokenIds.length; i++) {
+                    const fileName = `${tokenIds[i]}` + ".json";
+                    const params = {
+                        Bucket: "deboxnft-minting-ethpow",
+                        Key: fileName,
                     }
-                }
-            }
-            resultArray = results?.flat();
-            resultArray.sort((a: any, b: any) => {
-                return parseInt(a.token_id) - parseInt(b.token_id);
-            });
-            setAllDBXENFTs(resultArray);
-            let endIndex;
-            if (resultArray.length < 8)
-                endIndex = resultArray.length;
-            else
-                endIndex = 8;
-            const nfts = [];
-            if (resultArray?.length != 0 && resultArray != undefined) {
-                for (let i = 0; i < endIndex; i++) {
-                    let resultArrayElement = resultArray[i];
-                    if (resultArray[i].token_id === null ||
-                        resultArrayElement.normalized_metadata.attributes.length === 0 ||
-                        resultArrayElement.normalized_metadata.image === null ||
-                        resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
-                        const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
-                            chain: chain.chainId,
-                            "flag": "uri",
-                            "mode": "async",
-                            "address": chain.dbxenftAddress,
-                            "tokenId": resultArray[i].token_id
+                    let data = await getStorageObject(params);
+                    if (data.client_error == undefined) {
+                        dbxenftEntries.push({
+                            id: data.id,
+                            name: data.name,
+                            description: data.description,
+                            image: data.image,
+                            maturity: data.attributes[2].value,
                         });
-                        const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
-                            chain: chain.chainId,
-                            "format": "decimal",
-                            "normalizeMetadata": true,
-                            "mediaItems": false,
-                            "address": chain.dbxenftAddress,
-                            "tokenId": resultArray[i].token_id
-                        });
-                        if (!nftMeta) {
-                            continue;
-                        }
-                        if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
-                            nfts.push({
-                                id: nftMeta.raw.token_id,
-                                name: nftMeta.raw.name,
-                                description: nftMeta.raw.normalized_metadata.description || "",
-                                image: nftMeta.raw.normalized_metadata.image || "",
-                                maturity: nftMeta.raw.normalized_metadata.attributes[2].value
-                            });
-                        } else {
-                            nfts.push({
-                                id: nftMeta.raw.token_id,
+                    } else {
+                        if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                            dbxenftEntries.push({
+                                id: tokenIds[i],
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
                                 image: nftImage,
                                 maturity: ""
                             });
                         }
-                    } else {
-                        nfts.push({
-                            id: resultArray[i].token_id,
-                            name: resultArray[i].normalized_metadata.name,
-                            description: resultArray[i].normalized_metadata.description,
-                            image: resultArray[i].normalized_metadata.image,
-                            maturity: resultArray[i].normalized_metadata.attributes[2].value
-                        });
                     }
                 }
-            }
-            setPageContent({"all":nfts, "currentContent":nfts, "startIndex":0, "endIndex":7});
-            setDBXENFTs(nfts);
+            setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+            setDBXENFTs(dbxenftEntries);
             setLoading(false);
-        })
+            });
+        } else {
+            if(Number(chain.chainId) == 9001) {
+                setLoading(true);
+                const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+                DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                    setAllDBXENFTs(tokenIds);
+                    let dbxenftEntries: DBXENFTEntry[] = [];
+                    for (let i = 0; i < tokenIds.length; i++) {
+                        const fileName = `${tokenIds[i]}` + ".json";
+                        const params = {
+                            Bucket: "deboxnft-minting-evmos",
+                            Key: fileName,
+                        }
+                        let data = await getStorageObject(params);
+                        if (data.client_error == undefined) {
+                            dbxenftEntries.push({
+                                id: data.id,
+                                name: data.name,
+                                description: data.description,
+                                image: data.image,
+                                maturity: data.attributes[2].value,
+                            });
+                        } else {
+                            if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                                dbxenftEntries.push({
+                                    id: tokenIds[i],
+                                    name: "UNREVEALED ARTWORK",
+                                    description: "",
+                                    image: nftImage,
+                                    maturity: ""
+                                });
+                            }
+                        }
+                    }
+                setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+                setDBXENFTs(dbxenftEntries);
+                setLoading(false);
+                });
+            } else {
+                if(Number(chain.chainId) == 1284) {
+                    setLoading(true);
+                    const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+                    DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                        setAllDBXENFTs(tokenIds);
+                        let dbxenftEntries: DBXENFTEntry[] = [];
+                        for (let i = 0; i < tokenIds.length; i++) {
+                            const fileName = `${tokenIds[i]}` + ".json";
+                            const params = {
+                                Bucket: "deboxnft-minting-moonbeam",
+                                Key: fileName,
+                            }
+                            let data = await getStorageObject(params);
+                            if (data.client_error == undefined) {
+                                dbxenftEntries.push({
+                                    id: data.id,
+                                    name: data.name,
+                                    description: data.description,
+                                    image: data.image,
+                                    maturity: data.attributes[2].value,
+                                });
+                            } else {
+                                if(data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                                    dbxenftEntries.push({
+                                        id: tokenIds[i],
+                                        name: "UNREVEALED ARTWORK",
+                                        description: "",
+                                        image: nftImage,
+                                        maturity: ""
+                                    });
+                                }
+                            }
+                        }
+                    setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+                    setDBXENFTs(dbxenftEntries);
+                    setLoading(false);
+                    });
+                } else {
+                    if(Number(chain.chainId) === 10) {
+                        setLoading(true);
+                        getNFTsOnOP(account ? account : "",chain.dbxenftAddress).then(async (results)=>{
+                            resultArray = results?.flat();
+                            resultArray.sort((a: any, b: any) => {
+                            return parseInt(a.tokenId) - parseInt(b.tokenId);
+                            });
+                            setAllDBXENFTs(resultArray);
+                            let endIndex;
+                            if (resultArray.length < 8)
+                                endIndex = resultArray.length;
+                            else
+                                endIndex = 8;
+                            const nfts = [];
+                            if (resultArray?.length != 0 && resultArray != undefined) {
+                                for (let i = 0; i < endIndex; i++) {
+                                    let resultArrayElement = resultArray[i];
+                                    if (resultArray[i].tokenId === null ||
+                                        resultArrayElement.rawMetadata.attributes.length === 0 ||
+                                        resultArrayElement.rawMetadata.image === null ||
+                                        resultArrayElement.rawMetadata.image.includes("beforeReveal")) {
+                                        nfts.push({
+                                            id: resultArrayElement.tokenId,
+                                            name: "UNREVEALED ARTWORK",
+                                            description: "",
+                                            image: nftImage,
+                                            maturity: ""
+                                        });
+                                    } else {
+                                        nfts.push({
+                                            id: resultArrayElement.tokenId,
+                                            name:  resultArrayElement.rawMetadata.name,
+                                            description:  resultArrayElement.rawMetadata.description,
+                                            image:  resultArrayElement.rawMetadata.image,
+                                            maturity: resultArrayElement.rawMetadata.attributes[2].value
+                                        });
+                                    }   
+                                }
+                            setPageContent({"all":nfts, "currentContent":nfts, "startIndex":0, "endIndex":7});
+                            setDBXENFTs(nfts);
+                            setLoading(false);
+                            }
+                        }) 
+                    } else {
+                        if (Number(chain.chainId) === 8453) {
+                            setLoading(true);
+                            const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+                            DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                                setAllDBXENFTs(tokenIds);
+                                let dbxenftEntries: DBXENFTEntry[] = [];
+                                for (let i = 0; i < tokenIds.length; i++) {
+                                    const fileName = `${tokenIds[i]}` + ".json";
+                                    const params = {
+                                        Bucket: "deboxnft-minting-base",
+                                        Key: fileName,
+                                    }
+                                    let data = await getStorageObject(params);
+                                    if (data.client_error == undefined) {
+                                        dbxenftEntries.push({
+                                            id: data.id,
+                                            name: data.name,
+                                            description: data.description,
+                                            image: data.image,
+                                            maturity: data.attributes[2].value,
+                                        });
+                                    } else {
+                                        if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                                            dbxenftEntries.push({
+                                                id: tokenIds[i],
+                                                name: "UNREVEALED ARTWORK",
+                                                description: "",
+                                                image: nftImage,
+                                                maturity: ""
+                                            });
+                                        }
+                                    }
+                                }
+                            setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+                            setDBXENFTs(dbxenftEntries);
+                            setLoading(false);
+                            });
+                } else {
+                    getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, null).then(async (getNFTResult: any) => {
+                        const results = getNFTResult.raw.result;
+                        let cursor = getNFTResult.raw.cursor;
+                        if (cursor != null) {
+                            while (cursor != null) {
+                                let newPage: any = await getWalletNFTsForUser(chain.chainId, chain.dbxenftAddress, cursor);
+                                cursor = newPage.raw.cursor;
+                                    if (newPage.result?.length != 0 && newPage.result != undefined) {
+                                        results?.push(newPage?.raw.result);
+                                    }
+                            }
+                        }
+                        resultArray = results?.flat();
+                        resultArray.sort((a: any, b: any) => {
+                            return parseInt(a.token_id) - parseInt(b.token_id);
+                        });
+                        setAllDBXENFTs(resultArray);
+                        let endIndex;
+                        if (resultArray.length < 8)
+                            endIndex = resultArray.length;
+                        else
+                            endIndex = 8;
+                        const nfts = [];
+                        if (resultArray?.length != 0 && resultArray != undefined) {
+                            for (let i = 0; i < endIndex; i++) {
+                                let resultArrayElement = resultArray[i];
+                                if (resultArray[i].token_id === null ||
+                                    resultArrayElement.normalized_metadata.attributes.length === 0 ||
+                                    resultArrayElement.normalized_metadata.image === null ||
+                                    resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
+                                    const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
+                                        chain: chain.chainId,
+                                        "flag": "uri",
+                                        "mode": "async",
+                                        "address": chain.dbxenftAddress,
+                                        "tokenId": resultArray[i].token_id
+                                    });
+                                    const nftMeta = await Moralis.EvmApi.nft.getNFTMetadata({
+                                        chain: chain.chainId,
+                                        "format": "decimal",
+                                        "normalizeMetadata": true,
+                                        "mediaItems": false,
+                                        "address": chain.dbxenftAddress,
+                                        "tokenId": resultArray[i].token_id
+                                    });
+                                    if (!nftMeta) {
+                                        continue;
+                                    }
+                                    if (nftMeta?.raw?.normalized_metadata?.attributes && nftMeta?.raw?.normalized_metadata?.attributes?.length > 0) {
+                                        nfts.push({
+                                            id: nftMeta.raw.token_id,
+                                            name: nftMeta.raw.name,
+                                            description: nftMeta.raw.normalized_metadata.description || "",
+                                            image: nftMeta.raw.normalized_metadata.image || "",
+                                            maturity: nftMeta.raw.normalized_metadata.attributes[2].value
+                                        });
+                                    } else {
+                                        nfts.push({
+                                            id: nftMeta.raw.token_id,
+                                            name: "UNREVEALED ARTWORK",
+                                            description: "",
+                                            image: nftImage,
+                                            maturity: ""
+                                        });
+                                    }
+                                } else {
+                                    nfts.push({
+                                        id: resultArray[i].token_id,
+                                        name: resultArray[i].normalized_metadata.name,
+                                        description: resultArray[i].normalized_metadata.description,
+                                        image: resultArray[i].normalized_metadata.image,
+                                        maturity: resultArray[i].normalized_metadata.attributes[2].value
+                                    });
+                                }
+                            }
+                        }
+                    setPageContent({"all":nfts, "currentContent":nfts, "startIndex":0, "endIndex":7});
+                    setDBXENFTs(nfts);
+                    setLoading(false);
+                    })
+                }
+            }
+        }
+        }
     }
+}
 
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
         let cursorData;
@@ -219,6 +427,37 @@ export function DbXeNFTList(): any {
             address: account ? account : ""
         });
         return response;
+    }
+
+    async function getNFTsOnOP(accountAddress: any, nftAddress: any){
+        let dataForReturn: any[] = [];
+        const settings = {
+            apiKey: process.env.REACT_APP_ALCHEMY_KEY,
+            network: Network.OPT_MAINNET, 
+        };
+        const alchemy = new Alchemy(settings);
+        const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+        };
+        let pageKey = undefined;
+        let firstPage = await alchemy.nft.getNftsForOwner(accountAddress, options);
+        dataForReturn.push(...firstPage.ownedNfts);
+        pageKey = firstPage.pageKey;
+        let pageNumber = Math.ceil(firstPage.totalCount / 100) - 1;
+        
+        while (pageNumber > 0) {
+          const options = {
+            omitMetadata: false,
+            contractAddresses: [nftAddress],
+            pageKey: pageKey,
+          };
+          let data:any = await alchemy.nft.getNftsForOwner(accountAddress, options);
+          dataForReturn.push(...data.ownedNfts);
+          pageKey = data.pageKey;
+          pageNumber--;
+        }
+        return dataForReturn;
     }
 
     const handleRedirect = (id: any) => {

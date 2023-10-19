@@ -26,6 +26,7 @@
     "@web3-react/network-connector": "^6.1.9",
     "@web3-react/walletconnect-connector": "^6.2.13",
     "@web3-react/walletlink-connector": "^6.2.14",
+    "alchemy-sdk": "^2.10.1",
     "assert": "^2.0.0",
     "axios": "^0.24.0",
     "bootstrap": "^5.1.3",
