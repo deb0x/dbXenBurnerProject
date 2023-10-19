@@ -60,7 +60,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
     }
     if (chainId == 9001) {
         rpcUrl = "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
-        dbxenftFactoryAddress = "0x30782c020FE90614f08a863B41CbB07A2D2D94fF";
+        dbxenftFactoryAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
         METADATA_BUCKET = "deboxnft-minting-evmos";
     }
     if (chainId == 1284) {
