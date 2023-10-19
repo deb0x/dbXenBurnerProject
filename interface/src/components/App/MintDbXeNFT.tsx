@@ -575,7 +575,7 @@ export function MintDbXeNFT(): any {
     async function getNFTsOnGLMR(userAddress:any, XENFTContract:any,startIndex:any,endIndex:any) {
         let dataForReturn: any[] = [];
         if(startIndex == 0 && endIndex == 10) {
-            let tokenIds = await XENFTContract.ownedTokens({ from: "0xdf6a9ed807f84040f0e7d9ccd8440d031076cb00"});
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
             setAllXENFTs(tokenIds);
             if(tokenIds.length < 10)
                 endIndex = tokenIds.length;
