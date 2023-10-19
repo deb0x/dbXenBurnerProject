@@ -92,7 +92,6 @@ export function DbXeNFTExternalView(): any {
     const getDBXeNFTs = () => {
         getStorageObject(params).then((result) => {
             let dbxenftEntries: DBXENFTEntry[] = [];
-
             dbxenftEntries.push({
                 id: result.id,
                 name: result.name,
@@ -101,7 +100,6 @@ export function DbXeNFTExternalView(): any {
                 maturityDate: result.attributes[2].value
             });
             setDBXENFT(dbxenftEntries);
-
         })
     }
 
@@ -118,7 +116,6 @@ export function DbXeNFTExternalView(): any {
 
         const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
         const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
-
 
         const contractCallContext: ContractCallContext[] = [
             {
@@ -196,15 +193,12 @@ export function DbXeNFTExternalView(): any {
         const CFPPSLastFeeUpdateCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[3].returnValues[0])
         const CFPPSStakeCycleFirstStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[4].returnValues[0])
         const cycleAccruedFees = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[5].returnValues[0])
-        //const pendingDXN = BigNumber.from("100000000000000000000")
         const pendingDXN = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[6].returnValues[0])
         const dbxenftFirstStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[7].returnValues[0])
         const dbxenfSecondStakeCycle = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[8].returnValues[0])
         let dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
         const CFPPSStakeCycleSecondStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
     
-        
-
         if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
             const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
             .div(summedCyclePowers)
