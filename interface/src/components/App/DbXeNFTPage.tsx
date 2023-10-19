@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import ChainContext from "../Contexts/ChainContext";
 import DBXENFTFactory from "../../ethereum/dbxenftFactory.js";
 import DXN from "../../ethereum/dbxenerc20";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { Button, Card, CardActions, CardContent, Grid, OutlinedInput, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import "../../componentsStyling/dbxenftPage.scss";
@@ -21,13 +21,14 @@ import nftImage from "../../photos/Nft-dbxen.png";
 import MintInfo from "../../ethereum/mintInfo.js";
 import XENFT from "../../ethereum/xenTorrent";
 import { Spinner } from "./Spinner";
+import { Network, Alchemy } from "alchemy-sdk";
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 interface DBXENFTEntry {
     id: number;
-    description: string
-    name: string;
-    image: string;
+    description?: string
+    name?: string;
+    image?: string;
     maturityDate?: Date
 }
 
@@ -55,6 +56,12 @@ export function DbXeNFTPage(): any {
     const [dbxenftPower, setDBXENFTPower] = useState("");
     const [unclaimedXen, setUnclaimedXen] = useState("0.0");
     const [nftMaturityDate, setNftMaturityDate] = useState<Date>();
+    const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
+    const createApiOptions = (data: any) =>
+        ({ method: "POST", body: JSON.stringify(data) });
+    const getStorageObject = (data: any) =>
+        fetch(STORAGE_EP + "GetObjectCommand", createApiOptions(data))
+        .then((result) => result.json());
 
     useEffect(() => {
         startMoralis();
@@ -84,44 +91,203 @@ export function DbXeNFTPage(): any {
     }
 
     const getDBXeNFTs = () => {
-        setPageLoading(true)
-        Moralis.EvmApi.nft.getWalletNFTs({
-            chain: chain.chainId,
-            format: "decimal",
-            normalizeMetadata: true,
-            tokenAddresses: [chain.dbxenftAddress],
-            address: account ? account : ""
-        }).then((result) => {
-            const response = result.raw;
-            const resultArray: any = response.result;
+        setLoading(true);
+        if(Number(chain.chainId) == 10001) {
             let dbxenftEntries: DBXENFTEntry[] = [];
-
-            for (let i = 0; i < resultArray?.length; i++) {
-                let result = resultArray[i];
-                const resultAttributes: any[] = result.normalized_metadata;
-                if (result.token_id == id) {
-                    if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+            const fileName = `${id}` + ".json";
+            const params = {
+                Bucket: "deboxnft-minting-ethpow",
+                Key: fileName,
+            }
+            getStorageObject(params).then((result) =>{
+            if (result.client_error == undefined) {
+                setLoading(false);
+                dbxenftEntries.push({
+                    id: result.id,
+                    name: result.name,
+                    description: result.description,
+                    image: result.image,
+                    maturityDate: result.attributes[2].value,
+                });
+                setDBXENFT(dbxenftEntries);
+            } else {
+                if (result.client_error.Code == "NoSuchKey" && result.client_error!= undefined) {
+                    dbxenftEntries.push({
+                        id: Number(id),
+                        name: "UNREVEALED ARTWORK",
+                        description: "",
+                        image: nftImage,
+                    });
+                }
+            }
+            setDBXENFT(dbxenftEntries);
+            })
+        } else {
+        if(Number(chain.chainId) == 9001) {
+            let dbxenftEntries: DBXENFTEntry[] = [];
+            const fileName = `${id}` + ".json";
+            const params = {
+                Bucket: "deboxnft-minting-evmos",
+                Key: fileName,
+            }
+            getStorageObject(params).then((result) =>{
+            if (result.client_error == undefined) {
+                setLoading(false);
+                dbxenftEntries.push({
+                    id: result.id,
+                    name: result.name,
+                    description: result.description,
+                    image: result.image,
+                    maturityDate: result.attributes[2].value,
+                });
+                setDBXENFT(dbxenftEntries);
+            } else {
+                if (result.client_error.Code == "NoSuchKey" && result.client_error!= undefined) {
+                    dbxenftEntries.push({
+                        id: Number(id),
+                        name: "UNREVEALED ARTWORK",
+                        description: "",
+                        image: nftImage,
+                    });
+                }
+            }
+            setDBXENFT(dbxenftEntries);
+            })
+        } else {
+        if(Number(chain.chainId) == 1284) {
+            let dbxenftEntries: DBXENFTEntry[] = [];
+            const fileName = `${id}` + ".json";
+            const params = {
+                Bucket: "deboxnft-minting-moonbeam",
+                Key: fileName,
+            }
+            getStorageObject(params).then((result) =>{
+            if (result.client_error == undefined) {
+                setLoading(false);
+                dbxenftEntries.push({
+                    id: result.id,
+                    name: result.name,
+                    description: result.description,
+                    image: result.image,
+                    maturityDate: result.attributes[2].value,
+                });
+                setDBXENFT(dbxenftEntries);
+            } else {
+                if (result.client_error.Code == "NoSuchKey" && result.client_error!= undefined) {
+                    dbxenftEntries.push({
+                        id: Number(id),
+                        name: "UNREVEALED ARTWORK",
+                        description: "",
+                        image: nftImage,
+                    });
+                }
+            }
+            setDBXENFT(dbxenftEntries);
+            })
+        } else {
+        if(Number(chain.chainId) == 10) {
+            const settings = {
+                apiKey: process.env.REACT_APP_ALCHEMY_KEY,
+                network: Network.OPT_MAINNET, 
+            };
+            const alchemy = new Alchemy(settings);
+            const tokenId = BigNumber.from(id);
+            let dbxenftEntries: DBXENFTEntry[] = [];
+            alchemy.nft.getNftMetadata(chain.dbxenftAddress,utils.hexValue(tokenId)).then((result) => {
+                if(result != undefined) {
+                    dbxenftEntries.push({
+                        id: +result.tokenId,
+                        name: result.rawMetadata?.name,
+                        description: result.rawMetadata?.description,
+                        image: result.rawMetadata?.image,
+                        maturityDate: result.rawMetadata?.attributes?.[2]?.value,
+                    })
+                 } else {
                         dbxenftEntries.push({
-                            id: result.token_id,
+                            id: Number(id),
                             name: "UNREVEALED ARTWORK",
                             description: "",
                             image: nftImage,
                         });
-                    } else {
-                        dbxenftEntries.push({
-                            id: result.token_id,
-                            name: result.normalized_metadata.name,
-                            description: result.normalized_metadata.description,
-                            image: result.normalized_metadata.image,
-                            maturityDate: result.normalized_metadata.attributes[2].value
-                        });
-                        setNftMaturityDate(result.normalized_metadata.attributes[2].value);
                     }
-                }
-                setDBXENFT(dbxenftEntries);
+                });
+            setDBXENFT(dbxenftEntries);
+            setLoading(false);
+        } else {
+            if(Number(chain.chainId) == 8453) {
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                    const fileName = `${id}` + ".json";
+                    const params = {
+                        Bucket: "deboxnft-minting-base",
+                        Key: fileName,
+                    }
+                    getStorageObject(params).then((result) =>{
+                    if (result.client_error == undefined) {
+                        setLoading(false);
+                        dbxenftEntries.push({
+                            id: result.id,
+                            name: result.name,
+                            description: result.description,
+                            image: result.image,
+                            maturityDate: result.attributes[2].value,
+                        });
+                        setDBXENFT(dbxenftEntries);
+                    } else {
+                        if (result.client_error.Code == "NoSuchKey" && result.client_error!= undefined) {
+                            dbxenftEntries.push({
+                                id: Number(id),
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                            });
+                        }
+                    }
+                    setDBXENFT(dbxenftEntries);
+                    })
+            } else {
+                setLoading(true)
+                Moralis.EvmApi.nft.getWalletNFTs({
+                    chain: chain.chainId,
+                    format: "decimal",
+                    normalizeMetadata: true,
+                    tokenAddresses: [chain.dbxenftAddress],
+                    address: account ? account : ""
+                }).then((result) => { 
+                    const response = result.raw;
+                    const resultArray: any = response.result;
+                    let dbxenftEntries: DBXENFTEntry[] = [];
+                    
+                    for (let i = 0; i < resultArray?.length; i++) {
+                        let result = resultArray[i];
+                        const resultAttributes: any[] = result.normalized_metadata;
+                        if (result.token_id == id) {
+                            if(result.normalized_metadata.attributes === null || result.normalized_metadata.attributes.length === 0) {
+                                dbxenftEntries.push({
+                                    id: result.token_id,
+                                    name: "UNREVEALED ARTWORK",
+                                    description: "",
+                                    image: nftImage,
+                                });
+                            } else {
+                                    dbxenftEntries.push({
+                                        id: result.token_id,
+                                        name: result.normalized_metadata.name,
+                                        description: result.normalized_metadata.description,
+                                        image: result.normalized_metadata.image,
+                                        maturityDate: result.normalized_metadata.attributes[2].value
+                                    });
+                                    setNftMaturityDate(result.normalized_metadata.attributes[2].value);
+                                }
+                        }
+                        setDBXENFT(dbxenftEntries);
+                    }
+                }).then(() => setPageLoading(false))
             }
-        }).then(() => setPageLoading(false))
+        }
     }
+}
+    }   
+}
 
     async function approveDXN() {
         setLoading(true);
@@ -307,11 +473,11 @@ export function DbXeNFTPage(): any {
     };
 
     async function getUpdatedDBXENFTData(tokenId: any) {
+        if(Number(chain.chainId) != 10001){
         const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
 
         const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
         const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
-
 
         const contractCallContext: ContractCallContext[] = [
             {
@@ -396,8 +562,6 @@ export function DbXeNFTPage(): any {
         let dbxenftWithdrawableStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[9].returnValues[0])
         const CFPPSStakeCycleSecondStake = BigNumber.from(response2.results.DBXENFTFactory.callsReturnContext[10].returnValues[0])
     
-        
-
         if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
             const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
             .div(summedCyclePowers)
@@ -452,7 +616,6 @@ export function DbXeNFTPage(): any {
                 unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
             }
         }
-
         dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
         setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
         setUserStakedAmount(ethers.utils.formatEther(totalStaked))
@@ -460,6 +623,105 @@ export function DbXeNFTPage(): any {
         setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
         setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
         isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+    }else {
+        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
+        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+      
+        let currentCycle = BigNumber.from(await dbxenftFactory.getCurrentCycle());
+        let dbxenftAccruedFees = BigNumber.from(await dbxenftFactory.dbxenftAccruedFees(tokenId));
+        let previousStartedCycle = BigNumber.from(await dbxenftFactory.previousStartedCycle())
+        let lastStartedCycle = BigNumber.from(await dbxenftFactory.lastStartedCycle())
+        const currentStartedCycle = BigNumber.from(await dbxenftFactory.currentStartedCycle())
+        const pendingFees = BigNumber.from(await dbxenftFactory.pendingFees())
+        const dbxenftEntryPower = BigNumber.from(await dbxenftFactory.dbxenftEntryPower(tokenId))
+        const entryCycleReward = BigNumber.from(await dbxenftFactory.rewardPerCycle(entryCycle))
+        const totalEntryCycleEntryPower = BigNumber.from(await dbxenftFactory.totalEntryPowerPerCycle(entryCycle))
+        let baseDBXENFTPower = BigNumber.from(await dbxenftFactory.baseDBXeNFTPower(tokenId))
+        let dbxenftPower = BigNumber.from(await dbxenftFactory.dbxenftPower(tokenId))
+        const lastFeeUpdateCycle = BigNumber.from(await dbxenftFactory.lastFeeUpdateCycle(tokenId))
+        const dbxenftFirstStake = BigNumber.from(await dbxenftFactory.dbxenftFirstStake(tokenId))
+        const dbxenftSecondStake = BigNumber.from(await dbxenftFactory.dbxenftSecondStake(tokenId))
+        const lastPowerUpdateCycle = BigNumber.from(await dbxenftFactory.lastPowerUpdateCycle(tokenId))
+
+        if(!currentCycle.eq(currentStartedCycle)) {
+            previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
+            lastStartedCycle = currentStartedCycle
+        }
+
+        const summedCyclePowers = BigNumber.from(await dbxenftFactory.summedCyclePowers(lastStartedCycle))
+        let CFPPSLastStartedCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(lastStartedCycle.add(BigNumber.from("1"))))
+        const CFPPSPreviousStartedCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(previousStartedCycle))
+        const CFPPSLastFeeUpdateCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(lastFeeUpdateCycle))
+        const CFPPSStakeCycleFirstStake = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(dbxenftFirstStake))
+        const cycleAccruedFees = BigNumber.from(await dbxenftFactory.cycleAccruedFees(dbxenftFirstStake))
+        const pendingDXN = BigNumber.from(await dbxenftFactory.pendingDXN(tokenId))
+        const dbxenftFirstStakeCycle = BigNumber.from(await dbxenftFactory.dbxenftStakeCycle(tokenId, dbxenftFirstStake))
+        const dbxenfSecondStakeCycle = BigNumber.from(await dbxenftFactory.dbxenftStakeCycle(tokenId, dbxenftSecondStake))
+        let dbxenftWithdrawableStake = BigNumber.from(await dbxenftFactory.dbxenftWithdrawableStake(tokenId))
+        const CFPPSStakeCycleSecondStake = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(dbxenftSecondStake))
+    
+        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
+            const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
+            .div(summedCyclePowers)
+
+            CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
+        }
+
+        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
+            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
+        }
+
+        let extraPower = BigNumber.from(0)
+        const dbxenftPowerBeforeExtraPower = dbxenftPower 
+        if(currentCycle.gt(lastPowerUpdateCycle) && !pendingDXN.isZero()) {
+            extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+            dbxenftPower = dbxenftPower.add(extraPower)
+        }
+
+        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
+            dbxenftAccruedFees = dbxenftAccruedFees.add(
+                dbxenftPowerBeforeExtraPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
+                .div(BigNumber.from("10000000000000000000000000000000000000000"))
+            )
+
+            if(!pendingDXN.isZero()) {
+                let stakeCycle, CFPPSStakeCycle
+                if(!dbxenftSecondStake.isZero()) {
+                    stakeCycle = dbxenftSecondStake
+                    CFPPSStakeCycle = CFPPSStakeCycleSecondStake
+                } else {
+                    stakeCycle = dbxenftFirstStake
+                    CFPPSStakeCycle = CFPPSStakeCycleFirstStake
+                }
+                
+
+                if(lastStartedCycle.gt(stakeCycle.sub(BigNumber.from("1")))) {
+                    dbxenftAccruedFees = dbxenftAccruedFees.add(
+                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle))
+                        .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                    )
+                }
+            }
+        }
+        let unlockedStake = BigNumber.from(0)
+        let totalStaked = dbxenftFirstStakeCycle.add(dbxenfSecondStakeCycle).add(dbxenftWithdrawableStake)
+
+        if(!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
+            unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
+
+            if(!dbxenftSecondStake.isZero() && currentCycle.gt(dbxenftSecondStake)) {
+                unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
+            }
+        }
+        dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
+        setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
+        setUserStakedAmount(ethers.utils.formatEther(totalStaked))
+        setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
+        setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
+        setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
+        isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+    }
     }
 
     async function claimXen(tokenId: any) {

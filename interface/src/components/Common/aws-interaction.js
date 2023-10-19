@@ -28,6 +28,16 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0xA06735da049041eb523Ccf0b8c3fB9D36216c646";
         METADATA_BUCKET = "deboxnft-minting-eth";
     }
+    if (chainId == 10) {
+        rpcUrl = "https://optimism-mainnet.infura.io/v3/831ef58dd0784fee937eb8a5644f7ba6";
+        dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
+        METADATA_BUCKET = "deboxnft-minting-op";
+    }
+    if (chainId == 8453) {
+        rpcUrl = "https://developer-access-mainnet.base.org";
+        dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
+        METADATA_BUCKET = "deboxnft-minting-base";
+    }
     if (chainId == 137) {
         rpcUrl = "https://rpc-mainnet.maticvigil.com";
         dbxenftFactoryAddress = "0xDeD0C0cBE8c36A41892C489fcbE659773D137C0e";
@@ -48,7 +58,21 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db";
         METADATA_BUCKET = "deboxnft-minting-bsc";
     }
-
+    if (chainId == 9001) {
+        rpcUrl = "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        dbxenftFactoryAddress = "0x30782c020FE90614f08a863B41CbB07A2D2D94fF";
+        METADATA_BUCKET = "deboxnft-minting-evmos";
+    }
+    if (chainId == 1284) {
+        rpcUrl = "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
+        METADATA_BUCKET = "deboxnft-minting-moonbeam";
+    }
+    if (chainId == 10001) {
+        rpcUrl = "https://mainnet.ethereumpow.org";
+        dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
+        METADATA_BUCKET = "deboxnft-minting-ethpow";
+    }
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let dbxenftEntryPower = ethers.utils.formatEther((await factory.dbxenftEntryPower(id)));
@@ -59,7 +83,6 @@ export async function writePerCycle(id, maturityTs, chainId) {
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
-
     if (objectData.client_error.Code === "NoSuchKey") {
         const standardMetadata = {
             "id": `${id}`,
@@ -86,7 +109,6 @@ export async function writePerCycle(id, maturityTs, chainId) {
             Tagging: 'public=yes',
             "ContentType": "application/json",
         };
-
         putStorageObject(params)
             .then((result) => {
                 console.log(result)
