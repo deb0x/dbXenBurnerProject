@@ -68,7 +68,7 @@ const networks: any = {
             symbol: 'GLMR',
             decimals: 18
         },
-        rpcUrls: ['https://moonbeam.api.onfinality.io/public'],
+        rpcUrls: ['https://rpc.ankr.com/moonbeam '],
         blockExplorerUrls: ['https://moonscan.io'] 
     },
     okx:{
@@ -90,7 +90,7 @@ const networks: any = {
                 symbol: 'EVMOS',
                 decimals: 18
             },
-            rpcUrls: ['https://eth.bd.evmos.org:8545'],
+            rpcUrls: ['https://evmos-evm.publicnode.com'],
             blockExplorerUrls: ['https://escan.live'] 
     },
     doge: {

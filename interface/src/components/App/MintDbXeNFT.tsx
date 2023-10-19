@@ -25,6 +25,7 @@ import { Network, Alchemy } from "alchemy-sdk";
 
 const chainForGas = [137,250,43114,1284,10001];
 const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001];
+const chainsForPagination = [1284,9001,10001];
 
 const { BigNumber } = require("ethers");
 
@@ -56,6 +57,7 @@ export function MintDbXeNFT(): any {
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
+    const [allXENFTs, setAllXENFTs] = useState<any[]>([]); 
     const [DBXENFT, setDBXNFT] = useState<DBXENFT>();
     const [xeNFTWrapped, setXeNFTWrapped] = useState<boolean>(false);
     const [xeNFTWrapApproved, setXeNFTWrapApproved] = useState<boolean>();
@@ -163,7 +165,7 @@ export function MintDbXeNFT(): any {
         if(Number(chain.chainId) == 10001) {
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsOnETHPOW(account ? account : "",XENFTContract).then(async (result) =>{
+            getNFTsOnETHPOW(account ? account : "",XENFTContract,0,10).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
@@ -190,7 +192,7 @@ export function MintDbXeNFT(): any {
         if(Number(chain.chainId) == 9001) {
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsOnEVMOS(account ? account : "",XENFTContract).then(async (result) =>{
+            getNFTsOnEVMOS(account ? account : "",XENFTContract,0,10).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
@@ -217,7 +219,7 @@ export function MintDbXeNFT(): any {
         if(Number(chain.chainId) == 1284){
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsOnGLMR(account ? account : "",XENFTContract).then(async (result) =>{
+            getNFTsOnGLMR(account ? account : "",XENFTContract,0,10).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
@@ -338,6 +340,7 @@ export function MintDbXeNFT(): any {
                 }
             }
             resultArray = results?.flat();
+            setAllXENFTs(resultArray);
             if (resultArray?.length != 0 && resultArray != undefined) {
                 let xenftEntries: XENFTEntry[] = [];
                 const thisDate = new Date();
@@ -532,7 +535,8 @@ export function MintDbXeNFT(): any {
                     }
                 }
             })
-            .catch(err => console.error(err));
+            .catch(err => console.error(err)); 
+            setAllXENFTs(dataForReturn);
         return dataForReturn;
     }
 
@@ -564,47 +568,90 @@ export function MintDbXeNFT(): any {
           pageKey = data.pageKey;
           pageNumber--;
         }
+        setAllXENFTs(dataForReturn);
         return dataForReturn;
     }
 
-    async function getNFTsOnGLMR(userAddress:any, XENFTContract:any) {
-        let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+    async function getNFTsOnGLMR(userAddress:any, XENFTContract:any,startIndex:any,endIndex:any) {
         let dataForReturn: any[] = [];
-        for(let i=0;i<tokenIds.length;i++) { 
-            let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
+        if(startIndex == 0 && endIndex == 10) {
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+            setAllXENFTs(tokenIds);
+            if(tokenIds.length < 10)
+                endIndex = tokenIds.length;
+            for(let i=startIndex; i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = tokenIds[i];
+                dataForReturn.push(decodedObject);
+            }
+        } else {
+        for(let i= startIndex;i<endIndex;i++) { 
+            let base64Data = (await XENFTContract.tokenURI(Number(allXENFTs[i])))
             const dataWithoutPrefix = base64Data.split(',')[1];
             const decodedData = atob(dataWithoutPrefix);
             const decodedObject = JSON.parse(decodedData);
-            decodedObject.token_id = tokenIds[i];
+            decodedObject.token_id = allXENFTs[i];
             dataForReturn.push(decodedObject);
         }
+    }
         return dataForReturn;
     }
 
-    async function getNFTsOnEVMOS(userAddress:any, XENFTContract:any) {
-        let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+    async function getNFTsOnEVMOS(userAddress:any, XENFTContract:any,startIndex:any,endIndex:any) {
         let dataForReturn: any[] = [];
-        for(let i=0;i<tokenIds.length;i++) { 
-            let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
-            const dataWithoutPrefix = base64Data.split(',')[1];
-            const decodedData = atob(dataWithoutPrefix);
-            const decodedObject = JSON.parse(decodedData);
-            decodedObject.token_id = tokenIds[i];
-            dataForReturn.push(decodedObject);
+        if(startIndex == 0 && endIndex == 10) {
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+            setAllXENFTs(tokenIds);
+            if(tokenIds.length < 10)
+                endIndex = tokenIds.length;
+            for(let i=startIndex; i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = tokenIds[i];
+                dataForReturn.push(decodedObject);
+            }
+        } else {
+            for(let i= startIndex;i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(allXENFTs[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = allXENFTs[i];
+                dataForReturn.push(decodedObject);
+            }
         }
-        return dataForReturn;
+            return dataForReturn;
     }
 
-    async function getNFTsOnETHPOW(userAddress:any, XENFTContract:any) {
-        let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+    async function getNFTsOnETHPOW(userAddress:any, XENFTContract:any,startIndex:any,endIndex:any) {
         let dataForReturn: any[] = [];
-        for(let i=0;i<tokenIds.length;i++) { 
-            let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
-            const dataWithoutPrefix = base64Data.split(',')[1];
-            const decodedData = atob(dataWithoutPrefix);
-            const decodedObject = JSON.parse(decodedData);
-            decodedObject.token_id = tokenIds[i];
-            dataForReturn.push(decodedObject);
+        if(startIndex == 0 && endIndex == 10) {
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+            setAllXENFTs(tokenIds);
+            if(tokenIds.length < 10)
+                endIndex = tokenIds.length;
+            for(let i=startIndex; i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = tokenIds[i];
+                dataForReturn.push(decodedObject);
+            }
+        } else {
+            for(let i= startIndex;i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(allXENFTs[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = allXENFTs[i];
+                dataForReturn.push(decodedObject);
+            }
         }
         return dataForReturn;
     }
@@ -1148,7 +1195,6 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 9001) {
-                    console.log("jere????");
                     gasLimitVal = (BigNumber.from("1200000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
                     transactionFee = gasLimitVal * price / 100000000;
@@ -1203,12 +1249,353 @@ export function MintDbXeNFT(): any {
         event: React.MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
-        setPage(newPage);
+        if(chainsForPagination.includes(Number(chain.chainId))) {
+            setInitLoading(true);
+            const XENFTContract = XENFT(library, chain.xenftAddress);
+            let xenftEntries: XENFTEntry[] = [];
+            let startIndex =  Number(newPage) * rowsPerPage;
+            if (XENFTs.length > startIndex) {
+                let lastIndex = startIndex+rowsPerPage;
+                if(lastIndex > allXENFTs.length)
+                    lastIndex=allXENFTs.length;
+                    let currentPageContent = XENFTs.slice(startIndex,lastIndex);
+                    const newArray = XENFTs
+                                    .slice(0, startIndex) 
+                                    .concat(currentPageContent) 
+                                    .concat(XENFTs.slice(lastIndex));
+                    setXENFTs(newArray);
+                    setInitLoading(false);
+            } else {
+                if (allXENFTs?.length !== 0 && allXENFTs !== undefined) {
+                    let lastIndex = startIndex+rowsPerPage;
+                if (lastIndex > allXENFTs.length)
+                    lastIndex=allXENFTs.length
+                if(Number(chain.chainId) == 1284) {
+            getNFTsOnGLMR(account ? account : "",XENFTContract,startIndex,lastIndex).then(async (result) =>{
+                setInitLoading(true);
+                let currentPageContent = [];
+                for(let i=0;i<result.length;i++){
+                    const maturityDate = new Date(result[i].attributes[7].value);
+                    let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                    xenftEntries.push({
+                        id: +result[i].token_id,
+                        claimStatus: "",
+                        class: result[i].attributes[0].value,
+                        VMUs: parseInt(result[i].attributes[1].value),
+                        cRank: result[i].attributes[2].value,
+                        AMP: parseInt(result[i].attributes[3].value),
+                        EAA: result[i].attributes[4].value,
+                        maturityDateTime: result[i].attributes[7].value,
+                        term: result[i].attributes[8].value,
+                        xenBurned: result[i].attributes[9].value,
+                        estimatedXen: ethers.utils.formatEther(xenEstimated),
+                        category: result[i].attributes[10].value,
+                        image: result[i].image
+                    });
+                    currentPageContent.push({
+                        id: +result[i].token_id,
+                        claimStatus: "",
+                        class: result[i].attributes[0].value,
+                        VMUs: parseInt(result[i].attributes[1].value),
+                        cRank: result[i].attributes[2].value,
+                        AMP: parseInt(result[i].attributes[3].value),
+                        EAA: result[i].attributes[4].value,
+                        maturityDateTime: result[i].attributes[7].value,
+                        term: result[i].attributes[8].value,
+                        xenBurned: result[i].attributes[9].value,
+                        estimatedXen: ethers.utils.formatEther(xenEstimated),
+                        category: result[i].attributes[10].value,
+                        image: result[i].image
+                    });
+                }
+                const newArray = XENFTs
+                            .slice(0, startIndex) 
+                            .concat(currentPageContent) 
+                            .concat(XENFTs.slice(startIndex+rowsPerPage + 1));
+                setXENFTs(newArray);
+                setInitLoading(false);
+            })
+        } else {
+            if(Number(chain.chainId) == 9001){
+                getNFTsOnEVMOS(account ? account : "",XENFTContract,startIndex,lastIndex).then(async (result) =>{
+                    setInitLoading(true);
+                    let currentPageContent = [];
+                    for(let i=0;i<result.length;i++){
+                        const maturityDate = new Date(result[i].attributes[7].value);
+                        let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                        xenftEntries.push({
+                            id: +result[i].token_id,
+                            claimStatus: "",
+                            class: result[i].attributes[0].value,
+                            VMUs: parseInt(result[i].attributes[1].value),
+                            cRank: result[i].attributes[2].value,
+                            AMP: parseInt(result[i].attributes[3].value),
+                            EAA: result[i].attributes[4].value,
+                            maturityDateTime: result[i].attributes[7].value,
+                            term: result[i].attributes[8].value,
+                            xenBurned: result[i].attributes[9].value,
+                            estimatedXen: ethers.utils.formatEther(xenEstimated),
+                            category: result[i].attributes[10].value,
+                            image: result[i].image
+                        });
+                        currentPageContent.push({
+                            id: +result[i].token_id,
+                            claimStatus: "",
+                            class: result[i].attributes[0].value,
+                            VMUs: parseInt(result[i].attributes[1].value),
+                            cRank: result[i].attributes[2].value,
+                            AMP: parseInt(result[i].attributes[3].value),
+                            EAA: result[i].attributes[4].value,
+                            maturityDateTime: result[i].attributes[7].value,
+                            term: result[i].attributes[8].value,
+                            xenBurned: result[i].attributes[9].value,
+                            estimatedXen: ethers.utils.formatEther(xenEstimated),
+                            category: result[i].attributes[10].value,
+                            image: result[i].image
+                        });
+                    }
+                    const newArray = XENFTs
+                                .slice(0, startIndex) 
+                                .concat(currentPageContent) 
+                                .concat(XENFTs.slice(startIndex+rowsPerPage + 1));
+                    setXENFTs(newArray);
+                    setInitLoading(false);
+                })
+            }
+         else {
+            if(Number(chain.chainId) == 10001){
+                getNFTsOnETHPOW(account ? account : "",XENFTContract,startIndex,lastIndex).then(async (result) =>{
+                    setInitLoading(true);
+                    let currentPageContent = [];
+                    for(let i=0;i<result.length;i++){
+                        const maturityDate = new Date(result[i].attributes[7].value);
+                        let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                        xenftEntries.push({
+                            id: +result[i].token_id,
+                            claimStatus: "",
+                            class: result[i].attributes[0].value,
+                            VMUs: parseInt(result[i].attributes[1].value),
+                            cRank: result[i].attributes[2].value,
+                            AMP: parseInt(result[i].attributes[3].value),
+                            EAA: result[i].attributes[4].value,
+                            maturityDateTime: result[i].attributes[7].value,
+                            term: result[i].attributes[8].value,
+                            xenBurned: result[i].attributes[9].value,
+                            estimatedXen: ethers.utils.formatEther(xenEstimated),
+                            category: result[i].attributes[10].value,
+                            image: result[i].image
+                        });
+                        currentPageContent.push({
+                            id: +result[i].token_id,
+                            claimStatus: "",
+                            class: result[i].attributes[0].value,
+                            VMUs: parseInt(result[i].attributes[1].value),
+                            cRank: result[i].attributes[2].value,
+                            AMP: parseInt(result[i].attributes[3].value),
+                            EAA: result[i].attributes[4].value,
+                            maturityDateTime: result[i].attributes[7].value,
+                            term: result[i].attributes[8].value,
+                            xenBurned: result[i].attributes[9].value,
+                            estimatedXen: ethers.utils.formatEther(xenEstimated),
+                            category: result[i].attributes[10].value,
+                            image: result[i].image
+                        });
+                    }
+                    const newArray = XENFTs
+                                .slice(0, startIndex) 
+                                .concat(currentPageContent) 
+                                .concat(XENFTs.slice(startIndex+rowsPerPage + 1));
+                    setXENFTs(newArray);
+                    setInitLoading(false);
+                })
+            }
+        }
+        }
+    }
+        }
     };
+    setPage(newPage);
+}
 
     const handleChangeRowsPerPage = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        if((rowsPerPage > Number(event.target.value) && Number(event.target.value) != -1)){
+            let currentPageContent = XENFTs.slice(0,  Number(event.target.value));
+            const newArray = XENFTs
+                            .slice(0, 0) 
+                            .concat(currentPageContent) 
+                            .concat(XENFTs.slice(Number(event.target.value)));
+            setXENFTs(newArray);
+            setPage(0);
+        } else {
+            let xenftEntries: XENFTEntry[] = [];
+            const XENFTContract = XENFT(library, chain.xenftAddress);
+            setLoading(true);
+            let endIndex: number | undefined;
+            let arrayLength = Number(event.target.value);
+                if(Number(event.target.value) == -1){
+                    endIndex = allXENFTs.length;
+                    arrayLength = allXENFTs.length;
+                } else {
+                    if(Number(event.target.value) < allXENFTs.length){
+                        endIndex = Number(event.target.value);
+                    } else {
+                        endIndex = allXENFTs.length;
+                    }
+                }
+            
+                if(!(XENFTs.length >= arrayLength)){
+                let startIndex = XENFTs.length;
+                if (allXENFTs?.length !== 0 && allXENFTs !== undefined) {
+                    const newArray = XENFTs.slice(0, startIndex) 
+                    xenftEntries = newArray;
+                if(Number(chain.chainId) == 1284) {
+                    setInitLoading(true);
+                    getNFTsOnGLMR(account ? account : "",XENFTContract,startIndex,endIndex).then(async (result) =>{
+                        let currentPageContent = [];
+                        for(let i=0;i<result.length;i++){
+                            const maturityDate = new Date(result[i].attributes[7].value);
+                            let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                            xenftEntries.push({
+                                id: +result[i].token_id,
+                                claimStatus: "",
+                                class: result[i].attributes[0].value,
+                                VMUs: parseInt(result[i].attributes[1].value),
+                                cRank: result[i].attributes[2].value,
+                                AMP: parseInt(result[i].attributes[3].value),
+                                EAA: result[i].attributes[4].value,
+                                maturityDateTime: result[i].attributes[7].value,
+                                term: result[i].attributes[8].value,
+                                xenBurned: result[i].attributes[9].value,
+                                estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                category: result[i].attributes[10].value,
+                                image: result[i].image
+                            });
+                            currentPageContent.push({
+                                id: +result[i].token_id,
+                                claimStatus: "",
+                                class: result[i].attributes[0].value,
+                                VMUs: parseInt(result[i].attributes[1].value),
+                                cRank: result[i].attributes[2].value,
+                                AMP: parseInt(result[i].attributes[3].value),
+                                EAA: result[i].attributes[4].value,
+                                maturityDateTime: result[i].attributes[7].value,
+                                term: result[i].attributes[8].value,
+                                xenBurned: result[i].attributes[9].value,
+                                estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                category: result[i].attributes[10].value,
+                                image: result[i].image
+                            });
+                        }
+                        const newArray = xenftEntries
+                                    .slice(0, startIndex) 
+                                    .concat(currentPageContent) 
+                                    .concat(xenftEntries.slice(endIndex));
+                        setXENFTs(newArray);
+                        setInitLoading(false);
+                    })
+                } else {
+                    if(Number(chain.chainId) == 9001){
+                        setInitLoading(true);
+                        getNFTsOnEVMOS(account ? account : "",XENFTContract,startIndex,endIndex).then(async (result) =>{
+                            let currentPageContent = [];
+                            for(let i=0;i<result.length;i++){
+                                const maturityDate = new Date(result[i].attributes[7].value);
+                                let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                                xenftEntries.push({
+                                    id: +result[i].token_id,
+                                    claimStatus: "",
+                                    class: result[i].attributes[0].value,
+                                    VMUs: parseInt(result[i].attributes[1].value),
+                                    cRank: result[i].attributes[2].value,
+                                    AMP: parseInt(result[i].attributes[3].value),
+                                    EAA: result[i].attributes[4].value,
+                                    maturityDateTime: result[i].attributes[7].value,
+                                    term: result[i].attributes[8].value,
+                                    xenBurned: result[i].attributes[9].value,
+                                    estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                    category: result[i].attributes[10].value,
+                                    image: result[i].image
+                                });
+                                currentPageContent.push({
+                                    id: +result[i].token_id,
+                                    claimStatus: "",
+                                    class: result[i].attributes[0].value,
+                                    VMUs: parseInt(result[i].attributes[1].value),
+                                    cRank: result[i].attributes[2].value,
+                                    AMP: parseInt(result[i].attributes[3].value),
+                                    EAA: result[i].attributes[4].value,
+                                    maturityDateTime: result[i].attributes[7].value,
+                                    term: result[i].attributes[8].value,
+                                    xenBurned: result[i].attributes[9].value,
+                                    estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                    category: result[i].attributes[10].value,
+                                    image: result[i].image
+                                });
+                            }
+                            const newArray = xenftEntries
+                                        .slice(0, startIndex) 
+                                        .concat(currentPageContent) 
+                                        .concat(xenftEntries.slice(endIndex));
+                            setXENFTs(newArray);
+                            setInitLoading(false);
+                        })
+                    } else {
+                        setInitLoading(true);
+                        getNFTsOnETHPOW(account ? account : "",XENFTContract,startIndex,endIndex).then(async (result) =>{
+                            let currentPageContent = [];
+                            for(let i=0;i<result.length;i++){
+                                const maturityDate = new Date(result[i].attributes[7].value);
+                                let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
+                                xenftEntries.push({
+                                    id: +result[i].token_id,
+                                    claimStatus: "",
+                                    class: result[i].attributes[0].value,
+                                    VMUs: parseInt(result[i].attributes[1].value),
+                                    cRank: result[i].attributes[2].value,
+                                    AMP: parseInt(result[i].attributes[3].value),
+                                    EAA: result[i].attributes[4].value,
+                                    maturityDateTime: result[i].attributes[7].value,
+                                    term: result[i].attributes[8].value,
+                                    xenBurned: result[i].attributes[9].value,
+                                    estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                    category: result[i].attributes[10].value,
+                                    image: result[i].image
+                                });
+                                currentPageContent.push({
+                                    id: +result[i].token_id,
+                                    claimStatus: "",
+                                    class: result[i].attributes[0].value,
+                                    VMUs: parseInt(result[i].attributes[1].value),
+                                    cRank: result[i].attributes[2].value,
+                                    AMP: parseInt(result[i].attributes[3].value),
+                                    EAA: result[i].attributes[4].value,
+                                    maturityDateTime: result[i].attributes[7].value,
+                                    term: result[i].attributes[8].value,
+                                    xenBurned: result[i].attributes[9].value,
+                                    estimatedXen: ethers.utils.formatEther(xenEstimated),
+                                    category: result[i].attributes[10].value,
+                                    image: result[i].image
+                                });
+                            }
+                            const newArray = xenftEntries
+                                        .slice(0, startIndex) 
+                                        .concat(currentPageContent) 
+                                        .concat(xenftEntries.slice(endIndex));
+                            setXENFTs(newArray);
+                            setInitLoading(false);
+                        })
+                    }
+                }
+            }
+            } else {
+                setPage(0);
+                setXENFTs(XENFTs);
+                setLoading(false); 
+            }
+        }
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
@@ -1394,7 +1781,7 @@ export function MintDbXeNFT(): any {
                                     <TablePagination
                                         rowsPerPageOptions={[10, 25, { label: 'All', value: -1 }]}
                                         colSpan={3}
-                                        count={XENFTs.length}
+                                        count={allXENFTs.length}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         slotProps={{
@@ -1403,7 +1790,7 @@ export function MintDbXeNFT(): any {
                                             },
                                             actions: {
                                                 showFirstButton: true,
-                                                showLastButton: true,
+                                                showLastButton: false,
                                             },
                                         }}
                                         onPageChange={handleChangePage}
@@ -1442,8 +1829,4 @@ export function MintDbXeNFT(): any {
             }
         </div>
     );
-}
-
-function async(arg0: string) {
-    throw new Error("Function not implemented.");
 }
