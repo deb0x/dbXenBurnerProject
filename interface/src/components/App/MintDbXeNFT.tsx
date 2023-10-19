@@ -69,14 +69,13 @@ export function MintDbXeNFT(): any {
     const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
     const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
     const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateBase: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateBase: any = new Date(Date.UTC(2023, 12, 13, 14, 57, 43, 0));
     const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 11, 0));
-    const dateOP: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateOP: any = new Date(Date.UTC(2023, 12, 13, 14, 46, 53, 0));
+    const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 14, 24, 4, 0));
+    const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 36, 6, 0));
+    const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
     const now: any = Date.now();
-
     useEffect(() => {
         startMoralis();
         getXENFTs();

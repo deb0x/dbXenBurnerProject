@@ -287,6 +287,7 @@ export function DbXeNFTList(): any {
                             setDBXENFTs(nfts);
                             setLoading(false);
                             }
+                            setLoading(false);
                         }) 
                     } else {
                         if (Number(chain.chainId) === 8453) {

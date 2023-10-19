@@ -10,7 +10,7 @@ import fetch from "node-fetch";
 import Web3 from 'web3';
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+const dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
 const mintInfoAddress = "0x498EfB575Eb28313ef12E2Fb7D88d0c67c5e2F11";
 const xenftAddress = "0xAF18644083151cf57F914CCCc23c42A1892C218e";
 

@@ -30,12 +30,12 @@ export async function writePerCycle(id, maturityTs, chainId) {
     }
     if (chainId == 10) {
         rpcUrl = "https://optimism-mainnet.infura.io/v3/831ef58dd0784fee937eb8a5644f7ba6";
-        dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+        dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
         METADATA_BUCKET = "deboxnft-minting-op";
     }
     if (chainId == 8453) {
         rpcUrl = "https://developer-access-mainnet.base.org";
-        dbxenftFactoryAddress = "0x8535A1b9066253dfA8BFd2fccec5e2A20bDE7066";
+        dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
         METADATA_BUCKET = "deboxnft-minting-base";
     }
     if (chainId == 137) {
@@ -60,17 +60,17 @@ export async function writePerCycle(id, maturityTs, chainId) {
     }
     if (chainId == 9001) {
         rpcUrl = "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
-        dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+        dbxenftFactoryAddress = "0x30782c020FE90614f08a863B41CbB07A2D2D94fF";
         METADATA_BUCKET = "deboxnft-minting-evmos";
     }
     if (chainId == 1284) {
         rpcUrl = "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
-        dbxenftFactoryAddress = "0xF8755609b6596CEE3A8CeAF8D9cFD90E7479C46A";
+        dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-moonbeam";
     }
     if (chainId == 10001) {
         rpcUrl = "https://mainnet.ethereumpow.org";
-        dbxenftFactoryAddress = "0xa9BEB4Df728FD91be0c115e174135BFbe748AcFF";
+        dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-ethpow";
     }
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
