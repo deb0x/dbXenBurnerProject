@@ -303,7 +303,7 @@ export function MintDbXeNFT(): any {
         if(Number(chain.chainId) == 8453){
             const XENFTContract = XENFT(library, chain.xenftAddress);
             let xenftEntries: XENFTEntry[] = [];
-            getNFTsOnBase(account ? account : "",chain.xenftAddress,XENFTContract).then(async (result) =>{
+            getNFTsOnBase(account ? account : "",XENFTContract,0,10).then(async (result) =>{
                 for(let i=0;i<result.length;i++){
                     const maturityDate = new Date(result[i].attributes[7].value);
                     let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result[i].attributes[1].value), result[i].attributes[4].value, result[i].attributes[8].value, result[i].attributes[3].value, result[i].attributes[2].value);
@@ -491,52 +491,31 @@ export function MintDbXeNFT(): any {
         return response;
     }
 
-    async function getNFTsOnBase(accountAddress: any, nftAddress: any,XENFTContract: any){
+    async function getNFTsOnBase(userAddress: any,XENFTContract: any,startIndex:any,endIndex:any){
         let dataForReturn: any[] = [];
-        let currentPage = 1;
-        const options = {
-            method: 'GET',
-            headers: {accept: 'application/json', 'x-api-key': `${process.env.REACT_APP_COINBASE_KEY}`}
-        };
-         await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
-            .then(response => response.json())
-            .then(async response =>{
-                if(response!=null){
-                    let arrayOfData = response.data;
-                    if(response.next_page != undefined && response.next_page > currentPage){
-                        currentPage = response.next_page;
-                    }
-                    for(let i=0;i<arrayOfData.length;i++){
-                        let base64Data = (await XENFTContract.tokenURI(arrayOfData[i].token_id))
-                        const dataWithoutPrefix = base64Data.split(',')[1];
-                        const decodedData = atob(dataWithoutPrefix);
-                        const decodedObject = JSON.parse(decodedData);
-                        decodedObject.token_id = arrayOfData[i].token_id;
-                        dataForReturn.push(decodedObject);
-                    }
-                    while(currentPage != undefined && currentPage != 1) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        await fetch(`https://api.chainbase.online/v1/account/nfts?chain_id=8453&address=${accountAddress}&contract_address=${nftAddress}&page=${currentPage}&limit=100`, options)
-                        .then(response => response.json())
-                        .then(async response =>{
-                            let arrayOfData = response.data;
-                            if(arrayOfData!=null){
-                                for(let i=0;i<arrayOfData.length;i++){
-                                    let base64Data = (await XENFTContract.tokenURI(arrayOfData[i].token_id))
-                                    const dataWithoutPrefix = base64Data.split(',')[1];
-                                    const decodedData = atob(dataWithoutPrefix);
-                                    const decodedObject = JSON.parse(decodedData);
-                                    decodedObject.token_id = arrayOfData[i].token_id;
-                                    dataForReturn.push(decodedObject);
-                                }
-                                currentPage = response.next_page;
-                            }
-                        })
-                    }
-                }
-            })
-            .catch(err => console.error(err)); 
-            setAllXENFTs(dataForReturn);
+        if(startIndex == 0 && endIndex == 10) {
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
+            setAllXENFTs(tokenIds);
+            if(tokenIds.length < 10)
+                endIndex = tokenIds.length;
+            for(let i=startIndex; i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(tokenIds[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = tokenIds[i];
+                dataForReturn.push(decodedObject);
+            }
+        } else {
+            for(let i= startIndex;i<endIndex;i++) { 
+                let base64Data = (await XENFTContract.tokenURI(Number(allXENFTs[i])))
+                const dataWithoutPrefix = base64Data.split(',')[1];
+                const decodedData = atob(dataWithoutPrefix);
+                const decodedObject = JSON.parse(decodedData);
+                decodedObject.token_id = allXENFTs[i];
+                dataForReturn.push(decodedObject);
+            }
+        }
         return dataForReturn;
     }
 
