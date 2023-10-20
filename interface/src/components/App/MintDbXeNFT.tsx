@@ -705,7 +705,6 @@ export function MintDbXeNFT(): any {
 
         try {
             if(Number(chain.chainId) == 1) {
-                console.log("A")
                 fee = await calcMintFeeETH(
                     maturityTs,
                     VMUs,
@@ -717,7 +716,6 @@ export function MintDbXeNFT(): any {
                 gasLimitForTransaction = BigNumber.from("1500000")
             } else {
                 if(Number(chain.chainId) == 9001) {
-                    console.log("A")
                     fee = await calcMintFeeEVMOS(
                         maturityTs,
                         VMUs,
@@ -729,7 +727,6 @@ export function MintDbXeNFT(): any {
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if(Number(chain.chainId) == 8453) {
-                        console.log("A")
                         fee = await calcMintFeeBASE(
                         maturityTs,
                         VMUs,
@@ -741,7 +738,6 @@ export function MintDbXeNFT(): any {
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if((Number(chain.chainId) == 10)) {
-                        console.log("A")
                         fee = await calcMintFeeOP(
                         maturityTs,
                         VMUs,
@@ -752,7 +748,6 @@ export function MintDbXeNFT(): any {
                     )
                 } else {
                     if(Number(chain.chainId) == 56) {
-                        console.log("A")
                         fee = await calcMintFeeBSC(
                         maturityTs,
                         VMUs,
@@ -763,7 +758,6 @@ export function MintDbXeNFT(): any {
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
-                    console.log("A")
                     fee = await calcMintFee(
                         maturityTs,
                         VMUs,

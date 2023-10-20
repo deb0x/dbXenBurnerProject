@@ -100,7 +100,7 @@ export function DbXeNFTPage(): any {
             const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
             let tokenIds = await dbxenft.walletOfOwner(account);
             const integerArray = tokenIds.map((hexString: string) => {
-                return parseInt(hexString, 16);
+                return  Number(hexString);;
               });
             if(integerArray.includes(Number(id))) {
             let dbxenftEntries: DBXENFTEntry[] = [];
@@ -142,7 +142,7 @@ export function DbXeNFTPage(): any {
             const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
             let tokenIds = await dbxenft.walletOfOwner(account);
             const integerArray = tokenIds.map((hexString: string) => {
-                return parseInt(hexString, 16);
+                return Number(hexString);
               });
             if(integerArray.includes(Number(id))) {
             const params = {
@@ -182,7 +182,7 @@ export function DbXeNFTPage(): any {
             const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
             let tokenIds = await dbxenft.walletOfOwner(account);
             const integerArray = tokenIds.map((hexString: string) => {
-                return parseInt(hexString, 16);
+                return Number(hexString);
               });
             if(integerArray.includes(Number(id))) {
             const params = {
@@ -251,7 +251,7 @@ export function DbXeNFTPage(): any {
                     const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
                     let tokenIds = await dbxenft.walletOfOwner(account);
                     const integerArray = tokenIds.map((hexString: string) => {
-                        return parseInt(hexString, 16);
+                        return Number(hexString);
                       });
                     if(integerArray.includes(Number(id))) {
                     const params = {
