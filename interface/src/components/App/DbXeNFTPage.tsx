@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import ChainContext from "../Contexts/ChainContext";
 import DBXENFTFactory from "../../ethereum/dbxenftFactory.js";
 import DXN from "../../ethereum/dbxenerc20";
+import DBXENFTCONTRACT from "../../ethereum/DBXENFT";
 import { BigNumber, ethers, utils } from "ethers";
 import { Button, Card, CardActions, CardContent, Grid, OutlinedInput, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -90,9 +91,17 @@ export function DbXeNFTPage(): any {
         }
     }
 
-    const getDBXeNFTs = () => {
+    const getDBXeNFTs = async () => {
         setLoading(true);
+        
+        
         if(Number(chain.chainId) == 10001) {
+            const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
+            let tokenIds = await dbxenft.walletOfOwner(account);
+            const integerArray = tokenIds.map((hexString: string) => {
+                return parseInt(hexString, 16);
+              });
+            if(integerArray.includes(Number(id))) {
             let dbxenftEntries: DBXENFTEntry[] = [];
             const fileName = `${id}` + ".json";
             const params = {
@@ -123,9 +132,18 @@ export function DbXeNFTPage(): any {
             setDBXENFT(dbxenftEntries);
             })
         } else {
+            setDBXENFT([]);
+        }
+        } else {
         if(Number(chain.chainId) == 9001) {
             let dbxenftEntries: DBXENFTEntry[] = [];
             const fileName = `${id}` + ".json";
+            const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
+            let tokenIds = await dbxenft.walletOfOwner(account);
+            const integerArray = tokenIds.map((hexString: string) => {
+                return parseInt(hexString, 16);
+              });
+            if(integerArray.includes(Number(id))) {
             const params = {
                 Bucket: "deboxnft-minting-evmos",
                 Key: fileName,
@@ -154,9 +172,18 @@ export function DbXeNFTPage(): any {
             setDBXENFT(dbxenftEntries);
             })
         } else {
+            setDBXENFT([]);
+        }
+        } else {
         if(Number(chain.chainId) == 1284) {
             let dbxenftEntries: DBXENFTEntry[] = [];
             const fileName = `${id}` + ".json";
+            const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
+            let tokenIds = await dbxenft.walletOfOwner(account);
+            const integerArray = tokenIds.map((hexString: string) => {
+                return parseInt(hexString, 16);
+              });
+            if(integerArray.includes(Number(id))) {
             const params = {
                 Bucket: "deboxnft-minting-moonbeam",
                 Key: fileName,
@@ -184,6 +211,9 @@ export function DbXeNFTPage(): any {
             }
             setDBXENFT(dbxenftEntries);
             })
+        } else {
+            setDBXENFT([]);
+        }
         } else {
         if(Number(chain.chainId) == 10) {
             const settings = {
@@ -217,6 +247,12 @@ export function DbXeNFTPage(): any {
             if(Number(chain.chainId) == 8453) {
                 let dbxenftEntries: DBXENFTEntry[] = [];
                     const fileName = `${id}` + ".json";
+                    const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
+                    let tokenIds = await dbxenft.walletOfOwner(account);
+                    const integerArray = tokenIds.map((hexString: string) => {
+                        return parseInt(hexString, 16);
+                      });
+                    if(integerArray.includes(Number(id))) {
                     const params = {
                         Bucket: "deboxnft-minting-base",
                         Key: fileName,
@@ -244,6 +280,9 @@ export function DbXeNFTPage(): any {
                     }
                     setDBXENFT(dbxenftEntries);
                     })
+                }else {
+                    setDBXENFT([]);
+                }
             } else {
                 setLoading(true)
                 Moralis.EvmApi.nft.getWalletNFTs({
