@@ -11,7 +11,7 @@ import Web3 from 'web3';
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x2Fb802F1FD59e6f3A55B18F35d2Be384533c0E02";
+const dbxenftFactoryAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
 const mintInfoAddress = "0x498EfB575Eb28313ef12E2Fb7D88d0c67c5e2F11";
 const xenftAddress = "0x4c4CF206465AbFE5cECb3b581fa1b508Ec514692";
 

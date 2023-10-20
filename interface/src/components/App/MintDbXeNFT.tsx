@@ -69,14 +69,13 @@ export function MintDbXeNFT(): any {
     const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
     const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
     const dateFantom: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateBase: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateBase: any = new Date(Date.UTC(2023, 12, 13, 14, 57, 43, 0));
     const dateETH: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 11, 0));
-    const dateOP: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
-    const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 8, 55, 0));
+    const dateOP: any = new Date(Date.UTC(2023, 12, 13, 14, 46, 53, 0));
+    const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 16, 3, 25, 0));
+    const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 36, 6, 0));
+    const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
     const now: any = Date.now();
-
     useEffect(() => {
         startMoralis();
         getXENFTs();
@@ -706,6 +705,7 @@ export function MintDbXeNFT(): any {
 
         try {
             if(Number(chain.chainId) == 1) {
+                console.log("A")
                 fee = await calcMintFeeETH(
                     maturityTs,
                     VMUs,
@@ -717,6 +717,7 @@ export function MintDbXeNFT(): any {
                 gasLimitForTransaction = BigNumber.from("1500000")
             } else {
                 if(Number(chain.chainId) == 9001) {
+                    console.log("A")
                     fee = await calcMintFeeEVMOS(
                         maturityTs,
                         VMUs,
@@ -728,6 +729,7 @@ export function MintDbXeNFT(): any {
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if(Number(chain.chainId) == 8453) {
+                        console.log("A")
                         fee = await calcMintFeeBASE(
                         maturityTs,
                         VMUs,
@@ -739,6 +741,7 @@ export function MintDbXeNFT(): any {
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if((Number(chain.chainId) == 10)) {
+                        console.log("A")
                         fee = await calcMintFeeOP(
                         maturityTs,
                         VMUs,
@@ -749,6 +752,7 @@ export function MintDbXeNFT(): any {
                     )
                 } else {
                     if(Number(chain.chainId) == 56) {
+                        console.log("A")
                         fee = await calcMintFeeBSC(
                         maturityTs,
                         VMUs,
@@ -759,6 +763,7 @@ export function MintDbXeNFT(): any {
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
+                    console.log("A")
                     fee = await calcMintFee(
                         maturityTs,
                         VMUs,
@@ -773,6 +778,7 @@ export function MintDbXeNFT(): any {
         }
     }
 }
+
             const overrides = {
                 value: fee,
                 gasLimit: gasLimitForTransaction
