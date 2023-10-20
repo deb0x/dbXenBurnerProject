@@ -39,6 +39,7 @@ export function DbXeNFTPage(): any {
     const [DBXENFT, setDBXENFT] = useState<DBXENFTEntry[]>([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
+    const [stakeLoading, setStakeLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(false);
     const [claimLoading, setClaimLoading] = useState(false);
     const [claimXenLoading, setClaimXenLoading] = useState(false);
@@ -323,7 +324,7 @@ export function DbXeNFTPage(): any {
     }
 
     const stake = (tokenId: any) => {
-        setLoading(true)
+        setStakeLoading(true)
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress);
 
@@ -353,13 +354,13 @@ export function DbXeNFTPage(): any {
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
                 severity: "info"
             })
-            setLoading(false)
+            setStakeLoading(false)
         })
         setTimeout(() => setNotificationState({}), 5000)
     }
 
     async function unstake(tokenId: any, amount: any) {
-        setLoading(true)
+        setStakeLoading(true)
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress)
 
@@ -387,7 +388,7 @@ export function DbXeNFTPage(): any {
                 message: "You rejected the transaction. Your DXN haven't been unstaked.", open: true,
                 severity: "info"
             })
-            setLoading(false)
+            setStakeLoading(false)
         }
         setTimeout(() => setNotificationState({}), 5000)
     }
@@ -862,7 +863,7 @@ export function DbXeNFTPage(): any {
                                                 {approved ?
                                                     <LoadingButton
                                                         className="stake-btn"
-                                                        loading={loading}
+                                                        loading={stakeLoading}
                                                         variant="contained"
                                                         type="button"
                                                         onClick={() => stake(xenft.id)}>
@@ -928,7 +929,7 @@ export function DbXeNFTPage(): any {
                                                 </Grid>
                                                 <LoadingButton
                                                     className="unstake-btn"
-                                                    loading={loading}
+                                                    loading={stakeLoading}
                                                     variant="contained"
                                                     type="button"
                                                     onClick={() => unstake(xenft.id, amountToUnstake)}>
