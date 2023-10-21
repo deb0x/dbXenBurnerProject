@@ -247,7 +247,7 @@ export function DbXeNFTList(): any {
                 } else {
                     if(Number(chain.chainId) === 10) {
                         setLoading(true);
-                        getNFTsOnOP("0xaE6686600f0019b56B4C890225cE7526690b83C1",chain.dbxenftAddress).then(async (results)=>{
+                        getNFTsOnOP(account ? account : "",chain.dbxenftAddress).then(async (results)=>{
                             resultArray = results?.flat();
                             resultArray.sort((a: any, b: any) => {
                             return parseInt(a.tokenId) - parseInt(b.tokenId);
