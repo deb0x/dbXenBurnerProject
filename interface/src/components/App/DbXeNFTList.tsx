@@ -494,10 +494,14 @@ export function DbXeNFTList(): any {
           
             for (let i = startIndex; i < lastIndex; i++) {
                 let resultArrayElement:any = resultArray[i];
+                let metadata;
+                resultArrayElement.normalized_metadata ? 
+                    metadata = resultArrayElement.normalized_metadata :
+                    metadata = resultArrayElement.rawMetadata;
                 if (resultArrayElement.token_id === null ||
-                    resultArrayElement.normalized_metadata.attributes.length === 0 ||
-                    resultArrayElement.normalized_metadata.image === null ||
-                    resultArrayElement.normalized_metadata.image.includes("beforeReveal")) {
+                    metadata.attributes.length === 0 ||
+                    metadata.image === null ||
+                    metadata.image.includes("beforeReveal")) {
                     const syncMeta = await Moralis.EvmApi.nft.reSyncMetadata({
                         chain: chain.chainId,
                         "flag": "uri",
@@ -550,7 +554,9 @@ export function DbXeNFTList(): any {
                         });
                     }
                 } else {
-                    let data:any = resultArray[i].normalized_metadata;
+                    let data:any = resultArray[i].normalized_metadata ?
+                        resultArray[i].normalized_metadata :
+                        resultArray[i].rawMetadata;
                     nfts.push({
                         id: resultArray[i].token_id,
                         name:data.name,
