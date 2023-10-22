@@ -513,7 +513,7 @@ export function DbXeNFTPage(): any {
     };
 
     async function getUpdatedDBXENFTData(tokenId: any) {
-        if (Number(chain.chainId) != 10001) {
+        if (Number(chain.chainId) != 10001 && Number(chain.chainId) != 8453) {
             const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
 
             const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
