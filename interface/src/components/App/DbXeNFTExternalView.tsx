@@ -112,11 +112,10 @@ export function DbXeNFTExternalView(): any {
     }
 
     async function getUpdatedDBXENFTData(tokenId: any) {
+     if (Number(chain.chainId) != 10001 && Number(chain.chainId) != 8453) {
         const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
-
         const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
         const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
-
         const contractCallContext: ContractCallContext[] = [
             {
                 reference: 'DBXENFTFactory',
@@ -260,7 +259,106 @@ export function DbXeNFTExternalView(): any {
         setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
         setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
         isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+    } else {
+        const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
+        const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+
+        let currentCycle = BigNumber.from(await dbxenftFactory.getCurrentCycle());
+        let dbxenftAccruedFees = BigNumber.from(await dbxenftFactory.dbxenftAccruedFees(tokenId));
+        let previousStartedCycle = BigNumber.from(await dbxenftFactory.previousStartedCycle())
+        let lastStartedCycle = BigNumber.from(await dbxenftFactory.lastStartedCycle())
+        const currentStartedCycle = BigNumber.from(await dbxenftFactory.currentStartedCycle())
+        const pendingFees = BigNumber.from(await dbxenftFactory.pendingFees())
+        const dbxenftEntryPower = BigNumber.from(await dbxenftFactory.dbxenftEntryPower(tokenId))
+        const entryCycleReward = BigNumber.from(await dbxenftFactory.rewardPerCycle(entryCycle))
+        const totalEntryCycleEntryPower = BigNumber.from(await dbxenftFactory.totalEntryPowerPerCycle(entryCycle))
+        let baseDBXENFTPower = BigNumber.from(await dbxenftFactory.baseDBXeNFTPower(tokenId))
+        let dbxenftPower = BigNumber.from(await dbxenftFactory.dbxenftPower(tokenId))
+        const lastFeeUpdateCycle = BigNumber.from(await dbxenftFactory.lastFeeUpdateCycle(tokenId))
+        const dbxenftFirstStake = BigNumber.from(await dbxenftFactory.dbxenftFirstStake(tokenId))
+        const dbxenftSecondStake = BigNumber.from(await dbxenftFactory.dbxenftSecondStake(tokenId))
+        const lastPowerUpdateCycle = BigNumber.from(await dbxenftFactory.lastPowerUpdateCycle(tokenId))
+
+        if(!currentCycle.eq(currentStartedCycle)) {
+            previousStartedCycle = lastStartedCycle.add(BigNumber.from("1"))
+            lastStartedCycle = currentStartedCycle
+        }
+    
+        const summedCyclePowers = BigNumber.from(await dbxenftFactory.summedCyclePowers(lastStartedCycle))
+        let CFPPSLastStartedCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(lastStartedCycle.add(BigNumber.from("1"))))
+        const CFPPSPreviousStartedCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(previousStartedCycle))
+        const CFPPSLastFeeUpdateCycle = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(lastFeeUpdateCycle))
+        const CFPPSStakeCycleFirstStake = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(dbxenftFirstStake))
+        const cycleAccruedFees = BigNumber.from(await dbxenftFactory.cycleAccruedFees(lastStartedCycle))
+        const pendingDXN = BigNumber.from(await dbxenftFactory.pendingDXN(tokenId))
+        const dbxenftFirstStakeCycle = BigNumber.from(await dbxenftFactory.dbxenftStakeCycle(tokenId, dbxenftFirstStake))
+        const dbxenfSecondStakeCycle = BigNumber.from(await dbxenftFactory.dbxenftStakeCycle(tokenId, dbxenftSecondStake))
+        let dbxenftWithdrawableStake = BigNumber.from(await dbxenftFactory.dbxenftWithdrawableStake(tokenId))
+        const CFPPSStakeCycleSecondStake = BigNumber.from(await dbxenftFactory.cycleFeesPerPowerSummed(dbxenftSecondStake))
+
+        if(currentCycle.gt(lastStartedCycle) && CFPPSLastStartedCycle.isZero()) { 
+            const feePerStake = (cycleAccruedFees.mul(BigNumber.from("10000000000000000000000000000000000000000")))
+            .div(summedCyclePowers)
+
+            CFPPSLastStartedCycle = CFPPSPreviousStartedCycle.add(feePerStake)
+        }
+
+        if(baseDBXENFTPower.isZero() && currentCycle.gt(entryCycle)) {
+            baseDBXENFTPower = dbxenftEntryPower.mul(entryCycleReward).div(totalEntryCycleEntryPower)
+            dbxenftPower = dbxenftPower.add(baseDBXENFTPower)
+        }
+
+        let extraPower = BigNumber.from(0)
+        const dbxenftPowerBeforeExtraPower = dbxenftPower 
+        if(currentCycle.gt(lastPowerUpdateCycle) && !pendingDXN.isZero()) {
+            extraPower = baseDBXENFTPower.mul(pendingDXN).div(ethers.utils.parseEther("100"))
+            dbxenftPower = dbxenftPower.add(extraPower)
+        }
+
+        if(currentCycle.gt(lastStartedCycle) && (!lastFeeUpdateCycle.eq(lastStartedCycle.add(BigNumber.from("1"))))) {
+            dbxenftAccruedFees = dbxenftAccruedFees.add(
+                dbxenftPowerBeforeExtraPower.mul(CFPPSLastStartedCycle.sub(CFPPSLastFeeUpdateCycle))
+                .div(BigNumber.from("10000000000000000000000000000000000000000"))
+            )
+
+            if(!pendingDXN.isZero()) {
+                let stakeCycle, CFPPSStakeCycle
+                if(!dbxenftSecondStake.isZero()) {
+                    stakeCycle = dbxenftSecondStake
+                    CFPPSStakeCycle = CFPPSStakeCycleSecondStake
+                } else {
+                    stakeCycle = dbxenftFirstStake
+                    CFPPSStakeCycle = CFPPSStakeCycleFirstStake
+                }
+                
+
+                if(lastStartedCycle.gt(stakeCycle.sub(BigNumber.from("1")))) {
+                    dbxenftAccruedFees = dbxenftAccruedFees.add(
+                        extraPower.mul(CFPPSLastStartedCycle.sub(CFPPSStakeCycle))
+                        .div(BigNumber.from("10000000000000000000000000000000000000000"))
+                    )
+                }
+            }
+        }
+        let unlockedStake = BigNumber.from(0)
+        let totalStaked = dbxenftFirstStakeCycle.add(dbxenfSecondStakeCycle).add(dbxenftWithdrawableStake)
+
+        if(!dbxenftFirstStake.isZero() && currentCycle.gt(dbxenftFirstStake)) {
+            unlockedStake = unlockedStake.add(dbxenftFirstStakeCycle)
+
+            if(!dbxenftSecondStake.isZero() && currentCycle.gt(dbxenftSecondStake)) {
+                unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
+            }
+        }
+
+        dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
+        setUserStakedAmount(ethers.utils.formatEther(totalStaked))
+        setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
+        setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
+        setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
+        isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
     }
+}
 
     async function isXenftRedeemed(dbxenftId: any) {
         const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress);
