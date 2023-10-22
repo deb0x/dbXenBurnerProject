@@ -108,7 +108,8 @@ export function PermanentDrawer(props: any): any {
         const deb0xContract = DBXen(signer, chain.deb0xAddress)
         let numberBatchesBurnedInCurrentCycle = await deb0xContract.totalNumberOfBatchesBurned();
         let batchBurned = numberBatchesBurnedInCurrentCycle.toNumber();
-        return batchBurned * 2500000;
+        let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
+        return batchBurned * batchSize;
     }
 
     function floorPrecised(number: any) {

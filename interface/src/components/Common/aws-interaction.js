@@ -75,7 +75,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
     }
     if (chainId == 369) {
         rpcUrl = "https://rpc.pulsechain.com";
-        dbxenftFactoryAddress = "";
+        dbxenftFactoryAddress = "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044";
         METADATA_BUCKET = "deboxnft-minting-pulse";
     }
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);

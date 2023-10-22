@@ -147,12 +147,12 @@ export function Stake(props: any): any {
         async function getTotalXenBurnedInPreviusCycle() {
             const signer = await library.getSigner(0)
             const deb0xContract = DBXen(signer, chain.deb0xAddress)
-
+            let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
             await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
                 if (currentCycle != 0) {
                     await deb0xContract.cycleTotalBatchesBurned(currentCycle)
                         .then((numberBatchesBurnedInCurrentCycle: any) => {
-                            return numberBatchesBurnedInCurrentCycle.toNumber() * 2500000;
+                            return numberBatchesBurnedInCurrentCycle.toNumber() * batchSize;
                         })
                 }
             })
