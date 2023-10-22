@@ -24,8 +24,8 @@ import Countdown, { zeroPad } from "react-countdown";
 import { Network, Alchemy } from "alchemy-sdk";
 
 const chainForGas = [137,250,43114,1284,10001];
-const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001];
-const chainsForPagination = [1284,9001,10001];
+const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369];
+const chainsForPagination = [1284,9001,10001,369];
 
 const { BigNumber } = require("ethers");
 
@@ -75,6 +75,7 @@ export function MintDbXeNFT(): any {
     const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 16, 3, 25, 0));
     const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 36, 6, 0));
     const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
+    const datePLS: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
     const now: any = Date.now();
     useEffect(() => {
         startMoralis();
@@ -138,6 +139,9 @@ export function MintDbXeNFT(): any {
                 break;
             case 10001:
                 setEndDate(dateETHPOW.getTime() - now);
+                break;
+            case 369:
+                setEndDate(datePLS.getTime() - now);
                 break;
         }
     }
@@ -703,7 +707,19 @@ export function MintDbXeNFT(): any {
         let fee;
         let gasLimitForTransaction;
 
+
         try {
+            if(Number(chain.chainId) == 369) {
+                fee = await calcMintFeePLS(
+                    maturityTs,
+                    VMUs,
+                    EAA,
+                    term,
+                    AMP,
+                    cRank
+                ) 
+                gasLimitForTransaction = BigNumber.from("1500000")
+            } else {
             if(Number(chain.chainId) == 1) {
                 fee = await calcMintFeeETH(
                     maturityTs,
@@ -771,6 +787,7 @@ export function MintDbXeNFT(): any {
             }
         }
     }
+}
 }
 
             const overrides = {
@@ -1012,6 +1029,35 @@ export function MintDbXeNFT(): any {
         return fee.add(fee.div(10))
     }
 
+    async function calcMintFeePLS(
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string
+    ) {
+        const estReward: any = await getNFTRewardInXen(
+            maturityTs,
+            VMUs,
+            EAA,
+            term,
+            AMP,
+            cRank
+        )
+
+        const maturityDays = calcMaturityDays(term, maturityTs)
+        const daysReduction = 11389 * maturityDays
+        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
+        const difference = 10_000_000 - maxSubtrahend
+        const maxPctReduction = Math.max(difference, 5_000_000)
+        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
+        const minFee = BigNumber.from(1e15)
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(100))
+        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
+
+        return fee.add(fee.div(10))
+    }
 
     async function getNFTRewardInXen(
         maturityTs: number,
@@ -1181,6 +1227,19 @@ export function MintDbXeNFT(): any {
                     NFTData.claimStatus == "Redeemed" ?
                         "0.001" :
                         await calcMintFeeEVMOS(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                        setDBXNFT({
+                        protocolFee: ethers.utils.formatEther(protocolFee),
+                        transactionFee: transactionFee.toString()
+                    })
+                }
+                if (Number(chain.chainId) === 369) {
+                    gasLimitVal = (BigNumber.from("1200000"));
+                    price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
+                    transactionFee = gasLimitVal * price / 1000000000;
+                    let protocolFee =
+                    NFTData.claimStatus == "Redeemed" ?
+                        "10000" :
+                        await calcMintFeePLS(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
                         setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
