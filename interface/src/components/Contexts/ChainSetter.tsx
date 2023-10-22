@@ -424,7 +424,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "PulseChain",
                             currency: "PLS",
-                            priceURL: "",
+                            priceURL: "https://rpc.pulsechain.com",
                             dxnTokenName: "pDXN"
                         })
                         break;
@@ -557,7 +557,7 @@ export default function ChainSetter(props: any) {
                         className="btn"
                     >
                         <img alt="pulse" src={pulse} className="pulse"/>
-                        Switch to Optimism
+                        Switch to Pulse
                     </button>
                 </Popper>
             </div>

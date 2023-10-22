@@ -240,7 +240,7 @@ const ChainProvider = ( { children }: Props ) => {
                             chainId: parseInt(result, 16),
                             chainName: "PulseChain",
                             currency: "PLS",
-                            priceURL: "",
+                            priceURL: "https://rpc.pulsechain.com",
                             dxnTokenName: "pDXN"
                         })
                         break;
