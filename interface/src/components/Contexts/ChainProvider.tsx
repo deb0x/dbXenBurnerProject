@@ -227,6 +227,23 @@ const ChainProvider = ( { children }: Props ) => {
                             dxnTokenName: "opDXN"
                         })
                         break;
+                    case 369:
+                        setChain({
+                            deb0xAddress: "",
+                            deb0xViewsAddress: "",
+                            deb0xERC20Address: "",
+                            xenCryptoAddress: "",
+                            dbxenftFactoryAddress: "",
+                            dbxenftAddress: "",
+                            xenftAddress: "",
+                            mintInfoAddress: "",
+                            chainId: parseInt(result, 16),
+                            chainName: "PulseChain",
+                            currency: "PLS",
+                            priceURL: "",
+                            dxnTokenName: "pDXN"
+                        })
+                        break;
                 }
             });
         },

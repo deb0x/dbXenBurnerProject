@@ -13,6 +13,7 @@ import ethpow from "../../photos/icons/ethpow.svg";
 import eth from "../../photos/icons/eth.svg";
 import base from "../../photos/icons/base.png";
 import optimism from "../../photos/icons/op.png";
+import pulse from "../../photos/icons/pulse.png";
 import { ClickAwayListener } from '@mui/material';
 
 const networks: any = {
@@ -158,6 +159,17 @@ const networks: any = {
         },
         rpcUrls: ['https://optimism.llamarpc.com'],
         blockExplorerUrls: ['https://optimistic.etherscan.io'] 
+    },
+    pulse: {
+        chainId: `0x${Number(369).toString(16)}`,
+        chainName: 'PulseChain',
+        nativeCurrency: {
+            name: 'PulseChain',
+            symbol: 'PLS',
+            decimals: 18
+        },
+        rpcUrls: ['https://rpc.pulsechain.com'],
+        blockExplorerUrls: ['https://otter.PulseChain.com'] 
     }
 };
 
@@ -399,6 +411,23 @@ export default function ChainSetter(props: any) {
                             dxnTokenName: "opDXN"
                         })
                         break;
+                    case 369:
+                        setChain({
+                            deb0xAddress: "",
+                            deb0xViewsAddress: "",
+                            deb0xERC20Address: "",
+                            xenCryptoAddress: "",
+                            dbxenftFactoryAddress: "",
+                            dbxenftAddress: "",
+                            xenftAddress: "",
+                            mintInfoAddress: "",
+                            chainId: parseInt(result, 16),
+                            chainName: "PulseChain",
+                            currency: "PLS",
+                            priceURL: "",
+                            dxnTokenName: "pDXN"
+                        })
+                        break;
                 }
             });
         } catch (err: any) {
@@ -521,6 +550,13 @@ export default function ChainSetter(props: any) {
                         className="btn"
                     >
                         <img alt="optimism" src={optimism} className="optimism"/>
+                        Switch to Optimism
+                    </button>
+                    <button
+                        onClick={() => handleNetworkSwitch("pulse")}
+                        className="btn"
+                    >
+                        <img alt="pulse" src={pulse} className="pulse"/>
                         Switch to Optimism
                     </button>
                 </Popper>
