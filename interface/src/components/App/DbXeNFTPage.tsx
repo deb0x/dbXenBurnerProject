@@ -95,7 +95,46 @@ export function DbXeNFTPage(): any {
     const getDBXeNFTs = async () => {
         setLoading(true);
 
-
+        if (Number(chain.chainId) == 369) {
+            const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
+            let tokenIds = await dbxenft.walletOfOwner(account);
+            const integerArray = tokenIds.map((hexString: string) => {
+                return Number(hexString);;
+            });
+            if (integerArray.includes(Number(id))) {
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                const fileName = `${id}` + ".json";
+                const params = {
+                    Bucket: "deboxnft-minting-pulse",
+                    Key: fileName,
+                }
+                getStorageObject(params).then((result) => {
+                    if (result.client_error == undefined) {
+                        setLoading(false);
+                        dbxenftEntries.push({
+                            id: result.id,
+                            name: result.name,
+                            description: result.description,
+                            image: result.image,
+                            maturityDate: result.attributes[2].value,
+                        });
+                        setDBXENFT(dbxenftEntries);
+                    } else {
+                        if (result.client_error.Code == "NoSuchKey" && result.client_error != undefined) {
+                            dbxenftEntries.push({
+                                id: Number(id),
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                            });
+                        }
+                    }
+                    setDBXENFT(dbxenftEntries);
+                })
+            } else {
+                setDBXENFT([]);
+            }
+        } else {
         if (Number(chain.chainId) == 10001) {
             const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
             let tokenIds = await dbxenft.walletOfOwner(account);
@@ -328,6 +367,7 @@ export function DbXeNFTPage(): any {
             }
         }
     }
+    }
 
     async function approveDXN() {
         setLoading(true);
@@ -513,7 +553,7 @@ export function DbXeNFTPage(): any {
     };
 
     async function getUpdatedDBXENFTData(tokenId: any) {
-        if (Number(chain.chainId) != 10001 && Number(chain.chainId) != 8453) {
+        if (Number(chain.chainId) != 10001 && Number(chain.chainId) != 8453 && Number(chain.chainId) != 369) {
             const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
 
             const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)

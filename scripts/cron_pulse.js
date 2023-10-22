@@ -11,8 +11,8 @@ import Web3 from 'web3';
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "";
-const mintInfoAddress = "0xab0f3084e8404E8198884631453aBD728DC27565";
+const dbxenftFactoryAddress = "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044";
+const mintInfoAddress = "0xf758E628F59C6092579DC5e30160d73B64350042";
 const xenftAddress = "0xfEa13BF27493f04DEac94f67a46441a68EfD32F8";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
@@ -44,6 +44,7 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
+  console.log("Start cron on pulse-chain")
   try {
     const provider = new JsonRpcProvider("https://rpc.pulsechain.com");
 
@@ -52,7 +53,7 @@ async function generateAfterReveal() {
 
     const currentBlock = await web3.eth.getBlockNumber();
     
-    const secondsPerBlock = 2;
+    const secondsPerBlock = 15;
     const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
     const blocksPerDay = Math.ceil(25 * blocksPerHour);
     const fromBlock = Math.floor(currentBlock - blocksPerDay);
