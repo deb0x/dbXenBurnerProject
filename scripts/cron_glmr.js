@@ -95,14 +95,11 @@ async function generateAfterReveal() {
             mintedIds.push(i);
           }
     }
-
-    for (let i = myLastId; i <= Number(lastMintedId); i++) {
-        mintedIds.push(i);
-    }
+  
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
-    for (let i = 0; i < mintedIds.length -1; i++) {
+    for (let i = 0; i < mintedIds.length; i++) {
       let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
       let mintInforesult = await XENFTContract.mintInfo(XENFTID);
       let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);

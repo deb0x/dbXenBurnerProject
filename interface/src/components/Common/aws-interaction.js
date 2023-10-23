@@ -64,7 +64,7 @@ export async function writePerCycle(id, maturityTs, chainId) {
         METADATA_BUCKET = "deboxnft-minting-evmos";
     }
     if (chainId == 1284) {
-        rpcUrl = "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        rpcUrl = "https://rpc.ankr.com/moonbeam ";
         dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-moonbeam";
     }
