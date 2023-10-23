@@ -406,11 +406,16 @@ export function DbXeNFTPage(): any {
         setStakeLoading(true)
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress);
-
-        const overrides = {
-            value: ethers.utils.parseEther((Number(amountToStake) * 0.001).toString())
+        let overrides;
+        if(Number(chain.chainId) != 369){
+            overrides = {
+                value: ethers.utils.parseEther((Number(amountToStake) * 0.001).toString())
+            }
+        } else {
+            overrides = {
+                value: ethers.utils.parseEther((Number(amountToStake) * 10000).toString())
+            }
         }
-
         dbxenftFactory.stake(ethers.utils.parseEther(amountToStake).toString(), tokenId, overrides).then((tx: any) => {
             tx.wait()
                 .then((result: any) => {
