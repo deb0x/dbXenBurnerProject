@@ -57,7 +57,6 @@ export function Burn(): any {
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) => {
             let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
-            console.log(batchSize)
             let batchApproved = Number(ethers.utils.formatEther(amount)) / batchSize;
             setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * batchSize ?
