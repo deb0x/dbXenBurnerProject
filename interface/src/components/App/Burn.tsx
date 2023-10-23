@@ -110,8 +110,8 @@ export function Burn(): any {
                                 let gasLimitVal = 0;
                                 if (Number(chain.chainId) === 369) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
-                                    gasLimitVal = (BigNumber.from("200000")) :
-                                    gasLimitVal = (BigNumber.from("300000"))
+                                    gasLimitVal = (BigNumber.from("150000")) :
+                                    gasLimitVal = (BigNumber.from("210000"))
                                 } else {
                                 if (Number(chain.chainId) === 8453) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
@@ -135,8 +135,7 @@ export function Burn(): any {
                                 let fee;
                                 let totalValue;
                                 if (Number(chain.chainId) === 369) {
-                                    //here must modify the multiplicator!!!
-                                    fee = gasLimitVal * price * 100 * protocol_fee / 1000000000;
+                                    fee = gasLimitVal * price * 300 * protocol_fee / 1000000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
                                     setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
                                     setMaticValue(fee.toFixed(4));

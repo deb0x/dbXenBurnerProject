@@ -413,9 +413,9 @@ export default function ChainSetter(props: any) {
                         break;
                     case 369:
                         setChain({
-                            deb0xAddress: "0xa9BEB4Df728FD91be0c115e174135BFbe748AcFF",
-                            deb0xViewsAddress: "0x82C5A02A120FDA074059C0a446831Cc4134B7a74",
-                            deb0xERC20Address: "0xd77C15AA6750b80b3551E4f6b5f046FfB1294a4E",
+                            deb0xAddress: "0xc7d8FaA64229B963577Dd1E9915f1d6f44F00cca",
+                            deb0xViewsAddress: "0xCe94829367A2D347d05FbD86d68F5725Ba33C1e4",
+                            deb0xERC20Address: "0x56105EDCE3bD67EB76a45296918c02F5811C2330",
                             xenCryptoAddress: "0x8a7FDcA264e87b6da72D000f22186B4403081A2a",
                             dbxenftFactoryAddress: "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044",
                             dbxenftAddress: "0x88bc12840433622b6D26D436004F553607b4C784",
