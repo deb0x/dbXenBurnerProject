@@ -51,6 +51,7 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
+  console.log("Start running on base");
   try {
     const provider = new JsonRpcProvider(
       `https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
@@ -162,6 +163,7 @@ async function generateAfterReveal() {
   } catch (error) {
     console.error('Error:', error);
   }
+  console.log("Finish task on base");
 }
 
 function getImage(power, id) {

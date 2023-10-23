@@ -36,11 +36,6 @@ const putStorageObject = (data) =>
     createApiOptions(data)
   ).then((result) => result.json());
 
-function subMinutes(date, minutes) {
-  date.setMinutes(date.getMinutes() - minutes);
-  return date;
-}
-
 function mulDiv(x, y, denominator) {
   const bx = new BigNumber(x);
   const by = new BigNumber(y);
@@ -51,6 +46,7 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
+  console.log("Start running on moonbeam");
   try {
     const provider = new JsonRpcProvider("https://rpc.ankr.com/moonbeam");
     let fileName ="lastId.json";
@@ -158,6 +154,7 @@ async function generateAfterReveal() {
 } catch (error) {
   console.error('Error:', error);
 }
+console.log("Finish task on moonbeam");
 }
 
 function getImage(power, id) {
