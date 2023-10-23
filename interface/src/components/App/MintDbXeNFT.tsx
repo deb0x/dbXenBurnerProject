@@ -75,7 +75,7 @@ export function MintDbXeNFT(): any {
     const dateEVMOS: any = new Date(Date.UTC(2023, 12, 13, 16, 3, 25, 0));
     const dateGLMR: any = new Date(Date.UTC(2023, 12, 13, 14, 36, 6, 0));
     const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
-    const datePLS: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
+    const datePLS: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 25, 0));
     const now: any = Date.now();
     useEffect(() => {
         startMoralis();
