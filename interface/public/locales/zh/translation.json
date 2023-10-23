@@ -18,7 +18,8 @@
         }
     },
     "burn": {
-        "label": "请选择销毁XEN的批次数量",
+        "label1": "请选择销毁",
+        "label2": "的批次数量",
         "batch": "1 批次 = 2 500 000 XEN",
         "max": "最大",
         "protocol_fee": "协议费",
