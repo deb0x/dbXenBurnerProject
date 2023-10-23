@@ -1552,7 +1552,7 @@ export function MintDbXeNFT(): any {
                     let lastIndex = startIndex+rowsPerPage;
                 if (lastIndex > allXENFTs.length)
                     lastIndex=allXENFTs.length
-                    if(Number(chain.chainId) == 389) {
+                    if(Number(chain.chainId) == 369) {
                         getNFTsOnPLS(account ? account : "",XENFTContract,startIndex,lastIndex).then(async (result) =>{
                         setInitLoading(true);
                         let currentPageContent = [];
