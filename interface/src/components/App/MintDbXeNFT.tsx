@@ -850,6 +850,7 @@ export function MintDbXeNFT(): any {
                 value: fee,
                 gasLimit: gasLimitForTransaction
             }
+
             const tx = await dbxenftFactory.mintDBXENFT(tokenId, overrides)
             await tx.wait()
                 .then(async (result: any) => {
@@ -1109,7 +1110,9 @@ export function MintDbXeNFT(): any {
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000));
         const minFee = BigNumber.from('10000000000000000000000'); // Represent 1e22 as a string
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(100));
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction;
+        const minFeeBigNumber = BigNumber.from(minFee);
+        const rewardWithReductionBigNumber = BigNumber.from(rewardWithReduction);
+        const fee = minFeeBigNumber.gt(rewardWithReductionBigNumber) ? minFeeBigNumber : rewardWithReductionBigNumber;
         return fee.add(fee.div(10));
     }
 
