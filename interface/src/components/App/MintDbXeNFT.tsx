@@ -774,7 +774,7 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 ) 
-                gasLimitForTransaction = BigNumber.from("2000000")
+                gasLimitForTransaction = BigNumber.from("2500000")
             } else {
             if(Number(chain.chainId) == 1) {
                 fee = await calcMintFeeETH(
@@ -1290,7 +1290,7 @@ export function MintDbXeNFT(): any {
                     })
                 }
                 if (Number(chain.chainId) === 369) {
-                    gasLimitVal = (BigNumber.from("1200000"));
+                    gasLimitVal = (BigNumber.from("1900000"));
                     price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));;
                     transactionFee = gasLimitVal * price / 1000000000;
                     let protocolFee =

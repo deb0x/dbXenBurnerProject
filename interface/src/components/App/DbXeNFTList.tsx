@@ -138,7 +138,7 @@ export function DbXeNFTList(): any {
                 setAllDBXENFTs(tokenIds);
                 let dbxenftEntries: DBXENFTEntry[] = [];
                 for (let i = 0; i < tokenIds.length; i++) {
-                    const fileName = `${tokenIds[i]}` + ".json";
+                    const fileName = `${Number(tokenIds[i])}` + ".json";
                     const params = {
                         Bucket: "deboxnft-minting-pulse",
                         Key: fileName,
@@ -155,7 +155,7 @@ export function DbXeNFTList(): any {
                     } else {
                         if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
                             dbxenftEntries.push({
-                                id: tokenIds[i],
+                                id: (Number(tokenIds[i])).toString(),
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
                                 image: nftImage,
@@ -176,7 +176,7 @@ export function DbXeNFTList(): any {
                 setAllDBXENFTs(tokenIds);
                 let dbxenftEntries: DBXENFTEntry[] = [];
                 for (let i = 0; i < tokenIds.length; i++) {
-                    const fileName = `${tokenIds[i]}` + ".json";
+                    const fileName = `${Number(tokenIds[i])}` + ".json";
                     const params = {
                         Bucket: "deboxnft-minting-ethpow",
                         Key: fileName,
@@ -193,7 +193,7 @@ export function DbXeNFTList(): any {
                     } else {
                         if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
                             dbxenftEntries.push({
-                                id: tokenIds[i],
+                                id: (Number(tokenIds[i])).toString(),
                                 name: "UNREVEALED ARTWORK",
                                 description: "",
                                 image: nftImage,
@@ -214,7 +214,7 @@ export function DbXeNFTList(): any {
                     setAllDBXENFTs(tokenIds);
                     let dbxenftEntries: DBXENFTEntry[] = [];
                     for (let i = 0; i < tokenIds.length; i++) {
-                        const fileName = `${tokenIds[i]}` + ".json";
+                        const fileName = `${Number(tokenIds[i])}` + ".json";
                         const params = {
                             Bucket: "deboxnft-minting-evmos",
                             Key: fileName,
@@ -231,7 +231,7 @@ export function DbXeNFTList(): any {
                         } else {
                             if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
                                 dbxenftEntries.push({
-                                    id: tokenIds[i],
+                                    id: (Number(tokenIds[i])).toString(),
                                     name: "UNREVEALED ARTWORK",
                                     description: "",
                                     image: nftImage,
@@ -252,7 +252,7 @@ export function DbXeNFTList(): any {
                         setAllDBXENFTs(tokenIds);
                         let dbxenftEntries: DBXENFTEntry[] = [];
                         for (let i = 0; i < tokenIds.length; i++) {
-                            const fileName = `${tokenIds[i]}` + ".json";
+                            const fileName = `${Number(tokenIds[i])}` + ".json";
                             const params = {
                                 Bucket: "deboxnft-minting-moonbeam",
                                 Key: fileName,
@@ -269,7 +269,7 @@ export function DbXeNFTList(): any {
                             } else {
                                 if(data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
                                     dbxenftEntries.push({
-                                        id: tokenIds[i],
+                                        id: (Number(tokenIds[i])).toString(),
                                         name: "UNREVEALED ARTWORK",
                                         description: "",
                                         image: nftImage,
