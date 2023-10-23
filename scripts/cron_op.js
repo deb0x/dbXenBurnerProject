@@ -7,10 +7,11 @@ import XENFT from "./DBXENFT.js";
 import dotenv from 'dotenv';
 import BigNumber from 'bignumber.js';
 import fetch from "node-fetch";
-import Web3 from 'web3';
+import DBXENFTABI from "./DBXENFTABI.js";
 dotenv.config();
 
 const dbxenftFactoryAddress = "0x4480297506c3c8888fd351A8C2aC5EFEca05806C";
+const dbxenftAddress = "0xBB4D362B518F36350515BA921006c78661C58E97";
 const mintInfoAddress = "0x498EfB575Eb28313ef12E2Fb7D88d0c67c5e2F11";
 const xenftAddress = "0xAF18644083151cf57F914CCCc23c42A1892C218e";
 
@@ -28,11 +29,6 @@ const putStorageObject = (data) =>
     fetch(STORAGE_EP + "PutObjectCommand", createApiOptions(data))
     .then((result) => result.json());
 
-function subMinutes(date, minutes) {
-    date.setMinutes(date.getMinutes() - minutes);
-    return date;
-}
-
 function mulDiv(x, y, denominator) {
     const bx = new BigNumber(x);
     const by = new BigNumber(y);
@@ -46,51 +42,52 @@ async function generateAfterReveal() {
     console.log("Start running on optimism");
     try {
       const provider = new JsonRpcProvider(`https://optimism-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
-      const eventSignature = '0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78';
-      const web3 = new Web3(`https://optimism-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
-  
-      const currentBlock = await web3.eth.getBlockNumber();
-      const secondsPerBlock = 2;
-      const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
-      const blocksPerDay = Math.ceil(25 * blocksPerHour);
-      const fromBlock = Math.floor(currentBlock - blocksPerDay);
-      const toBlock = 'latest';
-  
-      const filter = {
-        address: dbxenftFactoryAddress,
-        topics: [eventSignature],
-      };
-  
-      const mintedIds = [];
-  
-      const logs = await web3.eth.getPastLogs({
-        fromBlock: fromBlock,
-        toBlock: toBlock,
-        topics: filter.topics,
-        address: filter.address,
-      });
-  
-      for (const log of logs) {
-        const eventABI = [
-          { type: 'uint256', name: 'cycle', indexed: true },
-          { type: 'uint256', name: 'DBXENFTId' },
-          { type: 'uint256', name: 'XENFTID' },
-          { type: 'uint256', name: 'fee' },
-          { type: 'address', name: 'minter', indexed: true },
-        ];
-  
-        const decodedData = web3.eth.abi.decodeLog(
-          eventABI,
-          log.data,
-          log.topics.slice(1)
-        );
-        mintedIds.push(Number(decodedData.DBXENFTId));
+      let fileName ="lastId.json";
+      const dbxenft = DBXENFTABI(provider, dbxenftAddress);
+      let lastMintedId = await dbxenft.totalSupply();
+      let currentId = {"lastId" : Number(lastMintedId)}
+      let myLastId;
+      let mintedIds = [];
+      const params = {
+        Bucket: METADATA_BUCKET_OP,
+        Key: fileName,
       }
-  
+      let objectData = await getStorageObject(params);
+      if(objectData.client_error != undefined ) {
+       if (objectData.client_error.Code === "NoSuchKey") {
+          const params = {
+            Bucket: METADATA_BUCKET_OP,
+            Key: fileName,
+            Body: JSON.stringify(currentId),
+            Tagging: 'public=yes',
+            "ContentType": "application/json",
+          };
+        putStorageObject(params)
+          .then((result) => {
+              console.log(result)
+          }).catch((error) => console.log(error));
+        } 
+      } else {
+        myLastId = Number(objectData.lastId);
+        const params = {
+          Bucket: METADATA_BUCKET_OP,
+          Key: fileName,
+          Body: JSON.stringify(currentId),
+          Tagging: 'public=yes',
+          "ContentType": "application/json",
+      };
+      putStorageObject(params)
+          .then((result) => {
+              console.log(result)
+          }).catch((error) => console.log(error));
+        for (let i = myLastId; i <= Number(lastMintedId); i++) {
+          mintedIds.push(i);
+        }
+    }
       const MintInfoContract = mintInfo(provider, mintInfoAddress);
       const XENFTContract = XENFT(provider, xenftAddress);
       const factory = Factory(provider, dbxenftFactoryAddress);
-      for (let i = mintedIds.length - 1; i >= 0; i--) {
+      for (let i = 0; i < mintedIds.length; i++) {
         let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
         let mintInforesult = await XENFTContract.mintInfo(XENFTID);
         let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
@@ -194,5 +191,5 @@ function getImage(power, id) {
   }
 
 cron.schedule('8 48 17 * * *', async() => {
-    await generateAfterReveal();
+     await generateAfterReveal();
 });
