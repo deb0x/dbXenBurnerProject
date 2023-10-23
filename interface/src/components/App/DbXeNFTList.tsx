@@ -131,6 +131,44 @@ export function DbXeNFTList(): any {
 
     const getDBXeNFTs = () => {
         let resultArray: any;
+        if(Number(chain.chainId) == 369){
+            setLoading(true);
+            const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
+            DBXENFTContract.walletOfOwner(account).then(async (tokenIds: any) => {
+                setAllDBXENFTs(tokenIds);
+                let dbxenftEntries: DBXENFTEntry[] = [];
+                for (let i = 0; i < tokenIds.length; i++) {
+                    const fileName = `${tokenIds[i]}` + ".json";
+                    const params = {
+                        Bucket: "deboxnft-minting-pulse",
+                        Key: fileName,
+                    }
+                    let data = await getStorageObject(params);
+                    if (data.client_error == undefined) {
+                        dbxenftEntries.push({
+                            id: data.id,
+                            name: data.name,
+                            description: data.description,
+                            image: data.image,
+                            maturity: data.attributes[2].value,
+                        });
+                    } else {
+                        if (data.client_error.Code == "NoSuchKey" && data.client_error!= undefined) {
+                            dbxenftEntries.push({
+                                id: tokenIds[i],
+                                name: "UNREVEALED ARTWORK",
+                                description: "",
+                                image: nftImage,
+                                maturity: ""
+                            });
+                        }
+                    }
+                }
+            setPageContent({"all":dbxenftEntries, "currentContent":dbxenftEntries, "startIndex":0, "endIndex":7});
+            setDBXENFTs(dbxenftEntries);
+            setLoading(false);
+            });
+        } else {
         if(Number(chain.chainId) == 10001){
             setLoading(true);
             const DBXENFTContract = DBXENFT(library, chain.dbxenftAddress);
@@ -412,6 +450,7 @@ export function DbXeNFTList(): any {
             }
         }
         }
+    }
     }
 }
 
