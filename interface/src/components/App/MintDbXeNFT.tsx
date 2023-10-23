@@ -773,7 +773,7 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 ) 
-                gasLimitForTransaction = BigNumber.from("1500000")
+                gasLimitForTransaction = BigNumber.from("2000000")
             } else {
             if(Number(chain.chainId) == 1) {
                 fee = await calcMintFeeETH(
@@ -1107,7 +1107,7 @@ export function MintDbXeNFT(): any {
         const difference = 10_000_000 - maxSubtrahend
         const maxPctReduction = Math.max(difference, 5_000_000)
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
+        const minFee = BigNumber.from(1e22)
         const rewardWithReduction = xenMulReduction.div(BigNumber.from(100))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
