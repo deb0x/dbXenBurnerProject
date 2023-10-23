@@ -73,6 +73,11 @@ export async function writePerCycle(id, maturityTs, chainId) {
         dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-ethpow";
     }
+    if (chainId == 369) {
+        rpcUrl = "https://rpc.pulsechain.com";
+        dbxenftFactoryAddress = "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044";
+        METADATA_BUCKET = "deboxnft-minting-pulse";
+    }
     const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     let factory = Factory(provider, dbxenftFactoryAddress);
     let dbxenftEntryPower = ethers.utils.formatEther((await factory.dbxenftEntryPower(id)));

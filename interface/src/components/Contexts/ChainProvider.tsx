@@ -227,6 +227,23 @@ const ChainProvider = ( { children }: Props ) => {
                             dxnTokenName: "opDXN"
                         })
                         break;
+                    case 369:
+                        setChain({
+                            deb0xAddress: "0x6d38Ab9f5b5Edfb22e57a44c3c747f9584de1f1a",
+                            deb0xViewsAddress: "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db",
+                            deb0xERC20Address: "0x6fE0ae3D5c993a3073333134db70613B0cb88a31",
+                            xenCryptoAddress: "0x8a7FDcA264e87b6da72D000f22186B4403081A2a",
+                            dbxenftFactoryAddress: "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044",
+                            dbxenftAddress: "0x88bc12840433622b6D26D436004F553607b4C784",
+                            xenftAddress: "0xfEa13BF27493f04DEac94f67a46441a68EfD32F8",
+                            mintInfoAddress: "0xf758E628F59C6092579DC5e30160d73B64350042",
+                            chainId: parseInt(result, 16),
+                            chainName: "PulseChain",
+                            currency: "PLS",
+                            priceURL: "https://rpc.pulsechain.com",
+                            dxnTokenName: "pDXN"
+                        })
+                        break;
                 }
             });
         },

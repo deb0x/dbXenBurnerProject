@@ -50,6 +50,7 @@ export function Stake(props: any): any {
     const dateEthereumPow: any = new Date(Date.UTC(2023, 12, 17, 12, 24, 59, 0));
     const dateBase: any = new Date(Date.UTC(2023, 12, 17, 19, 0, 43, 0));
     const dateOP: any = new Date(Date.UTC(2023, 12, 17, 14, 0, 23, 0));
+    const datePLS : any = new Date(Date.UTC(2023, 12, 17, 13, 9, 45, 0));
     const now: any = Date.now();
     const { t } = useTranslation();
     const [endDate, setEndDate] = useState<any>();
@@ -118,6 +119,9 @@ export function Stake(props: any): any {
             case 10:
                 setEndDate(dateOP.getTime() - now);
                 break;
+            case 369:
+                setEndDate(datePLS.getTime() - now);
+                break;
         }
     }
 
@@ -143,12 +147,12 @@ export function Stake(props: any): any {
         async function getTotalXenBurnedInPreviusCycle() {
             const signer = await library.getSigner(0)
             const deb0xContract = DBXen(signer, chain.deb0xAddress)
-
+            let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
             await deb0xContract.getCurrentCycle().then(async (currentCycle: any) => {
                 if (currentCycle != 0) {
                     await deb0xContract.cycleTotalBatchesBurned(currentCycle)
                         .then((numberBatchesBurnedInCurrentCycle: any) => {
-                            return numberBatchesBurnedInCurrentCycle.toNumber() * 2500000;
+                            return numberBatchesBurnedInCurrentCycle.toNumber() * batchSize;
                         })
                 }
             })

@@ -41,7 +41,9 @@ export function Burn(): any {
 
     useEffect(() => {
         getAllowanceForAccount();
-        setXENAmount(value * 2500000);
+        Number(chain.chainId) != 369 ?
+            setXENAmount(value * 2500000) :
+            setXENAmount(value * 250000000)
         estimationValues();
         setBalance();
     }, [value]);
@@ -54,9 +56,10 @@ export function Burn(): any {
         const signer = library.getSigner(0)
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) => {
-            let batchApproved = Number(ethers.utils.formatEther(amount)) / 2500000;
+            let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
+            let batchApproved = Number(ethers.utils.formatEther(amount)) / batchSize;
             setBatchApproved(Math.trunc(batchApproved));
-            Number(ethers.utils.formatEther(amount)) < value * 2500000 ?
+            Number(ethers.utils.formatEther(amount)) < value * batchSize ?
                 setApproveBurn(false) :
                 setApproveBurn(true)
             setBalance();
@@ -72,7 +75,8 @@ export function Burn(): any {
 
         await xenContract.balanceOf(account).then((balance: any) => {
             number = ethers.utils.formatEther(balance);
-            setMaxBatch(Math.trunc(Number(number) / 2500000))
+            let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
+            setMaxBatch(Math.trunc(Number(number) / batchSize))
             checkBalance(number.toString())
             setLoading(false);
         })
@@ -103,6 +107,11 @@ export function Burn(): any {
                                 let price = Number(web3.utils.fromWei(result.data.result.toString(), "Gwei"));
                                 let protocol_fee = value * (1 - 0.00005 * value);
                                 let gasLimitVal = 0;
+                                if (Number(chain.chainId) === 369) {
+                                    numberBatchesBurnedInCurrentCycle != 0 ?
+                                    gasLimitVal = (BigNumber.from("150000")) :
+                                    gasLimitVal = (BigNumber.from("210000"))
+                                } else {
                                 if (Number(chain.chainId) === 8453) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
                                         gasLimitVal = (BigNumber.from("500000")) :
@@ -120,9 +129,17 @@ export function Burn(): any {
                                         gasLimitVal = (BigNumber.from("500000")) :
                                         gasLimitVal = (BigNumber.from("700000"))
                                 }
+                            }
                                 setCurrentGasLimit(gasLimitVal);
                                 let fee;
                                 let totalValue;
+                                if (Number(chain.chainId) === 369) {
+                                    fee = gasLimitVal * price * 300 * protocol_fee / 1000000000;
+                                    totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
+                                    setValueAndFee({ fee: fee.toFixed(4), total: totalValue.toFixed(4) })
+                                    setMaticValue(fee.toFixed(4));
+                                    setTotalCost(totalValue.toFixed(4));
+                                } else {
                                 if (Number(chain.chainId) === 8453) {
                                     fee = gasLimitVal * price * protocol_fee / 100000000;
                                     totalValue = fee + (fee / ((1 - 0.00005 * value) * value));
@@ -143,6 +160,7 @@ export function Burn(): any {
                                     setTotalCost(totalValue.toFixed(4));
                                 }
                             }
+                        }
                         })
                     } else {
                         if (Number(chain.chainId) === 56) {
@@ -206,7 +224,8 @@ export function Burn(): any {
             }
         }
         try {
-            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove * 2500000).toString()))
+            let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
+            const tx = await xenContract.increaseAllowance(chain.deb0xAddress, ethers.utils.parseEther(Number(amountToApprove * batchSize).toString()))
             tx.wait()
                 .then((result: any) => {
                     getAllowanceForAccount();
@@ -318,7 +337,7 @@ export function Burn(): any {
             <div className="side-menu--bottom burn-container">
                 <div className="row">
                     <p className="text-center mb-0">{t("burn.label")}</p>
-                    <p className="text-center">(1 batch = 2,500,000 XEN)</p>
+                    <p className="text-center">({Number(chain.chainId) != 369 ? "1 batch = 2,500,000 XEN" :"1 batch = 250,000,000 XEN" })</p>
                 </div>
                 <div className="row">
                     <div className="col input-col">
