@@ -28,6 +28,7 @@ const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369];
 const chainsForPagination = [1284,9001,10001,369];
 
 const { BigNumber } = require("ethers");
+const Decimal = require('decimal.js');
 
 interface XENFTEntry {
     id: number;
@@ -1100,18 +1101,16 @@ export function MintDbXeNFT(): any {
             AMP,
             cRank
         )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e22)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(100))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
+        const maturityDays = calcMaturityDays(term, maturityTs);
+        const daysReduction = 11389 * maturityDays;
+        const maxSubtrahend = Math.min(daysReduction, 5_000_000);
+        const difference = 10_000_000 - maxSubtrahend;
+        const maxPctReduction = Math.max(difference, 5_000_000);
+        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000));
+        const minFee = BigNumber.from('10000000000000000000000'); // Represent 1e22 as a string
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(100));
+        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction;
+        return fee.add(fee.div(10));
     }
 
     async function getNFTRewardInXen(
