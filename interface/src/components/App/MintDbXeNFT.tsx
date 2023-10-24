@@ -57,7 +57,6 @@ export function MintDbXeNFT(): any {
     const [notificationState, setNotificationState] = useState({});
     const [loading, setLoading] = useState(false);
     const [loadingApprove, setLoadingApprove] = useState(false);
-    const [loadingWrap, setLoadingWrap] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [allXENFTs, setAllXENFTs] = useState<any[]>([]); 
@@ -1309,7 +1308,7 @@ export function MintDbXeNFT(): any {
     }
 
     const handleWrapXenft = async (NFTData: any) => {
-        setLoadingWrap(true);
+        setLoadingApprove(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -1333,7 +1332,7 @@ export function MintDbXeNFT(): any {
                         NFTData.cRank, NFTData.claimStatus
                     ).then(() => {
                         setXeNFTWrapped(true);
-                        setLoadingWrap(false);
+                        setLoadingApprove(false);
                     }) :
                     approveForAll()
             })
@@ -2127,7 +2126,7 @@ export function MintDbXeNFT(): any {
                                                                     <div className="burn-button-container">
                                                                         <LoadingButton
                                                                             className="btn burn-button"
-                                                                            loading={xeNFTWrapApproved ? loadingWrap : loadingApprove}
+                                                                            loading={loadingApprove}
                                                                             variant="contained"
                                                                             type="button"
                                                                             onClick={() => handleWrapXenft(data)}>
