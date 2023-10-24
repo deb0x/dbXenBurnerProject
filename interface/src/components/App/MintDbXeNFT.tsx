@@ -456,7 +456,7 @@ export function MintDbXeNFT(): any {
     async function getNFTsWithRPC(userAddress:any, XENFTContract:any,startIndex:any,endIndex:any) {
         let dataForReturn: any[] = [];
         if(startIndex == 0 && endIndex == 10) {
-            let tokenIds = await XENFTContract.ownedTokens({ from: "userAddress"});
+            let tokenIds = await XENFTContract.ownedTokens({ from: userAddress});
             setAllXENFTs(tokenIds);
             if(tokenIds.length < 10)
                 endIndex = tokenIds.length;
