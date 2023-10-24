@@ -56,6 +56,7 @@ export function MintDbXeNFT(): any {
     const { chain } = useContext(ChainContext)
     const [notificationState, setNotificationState] = useState({});
     const [loading, setLoading] = useState(false);
+    const [loadingApprove, setLoadingApprove] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [XENFTs, setXENFTs] = useState<XENFTEntry[]>([]);
     const [allXENFTs, setAllXENFTs] = useState<any[]>([]); 
@@ -692,7 +693,7 @@ export function MintDbXeNFT(): any {
     }
 
     async function approveForAll() {
-        setLoading(true);
+        setLoadingApprove(true);
         const signer = library.getSigner(0)
         const xenftContract = XENFT(signer, chain.xenftAddress);
 
@@ -705,21 +706,21 @@ export function MintDbXeNFT(): any {
                         severity: "success"
                     })
                     setXeNFTWrapApproved(true)
-                    setLoading(false)
+                    setLoadingApprove(false)
                 })
                 .catch((error: any) => {
                     setNotificationState({
                         message: "Contract couldn't be approved for handling your XENFTs!", open: true,
                         severity: "error"
                     })
-                    setLoading(false)
+                    setLoadingApprove(false)
                 })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for burn.", open: true,
                 severity: "info"
             })
-            setLoading(false)
+            setLoadingApprove(false)
         }
         setTimeout(() => setNotificationState({}), 5000)
     }
@@ -1284,7 +1285,7 @@ export function MintDbXeNFT(): any {
     }
 
     const handleWrapXenft = async (NFTData: any) => {
-        setLoading(true);
+        setLoadingApprove(true);
         const signer = library.getSigner(0);
         const MintInfoContract = mintInfo(signer, chain.mintInfoAddress);
         const XENFTContract = XENFT(signer, chain.xenftAddress);
@@ -1308,7 +1309,7 @@ export function MintDbXeNFT(): any {
                         NFTData.cRank, NFTData.claimStatus
                     ).then(() => {
                         setXeNFTWrapped(true);
-                        setLoading(false);
+                        setLoadingApprove(false);
                     }) :
                     approveForAll()
             })
@@ -2246,7 +2247,7 @@ export function MintDbXeNFT(): any {
                                                                     <div className="burn-button-container">
                                                                         <LoadingButton
                                                                             className="btn burn-button"
-                                                                            loading={loading}
+                                                                            loading={loadingApprove}
                                                                             variant="contained"
                                                                             type="button"
                                                                             disabled={data.claimStatus === "Blackout period"}
