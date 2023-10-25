@@ -40,6 +40,7 @@ export function DbXeNFTPage(): any {
     const [DBXENFT, setDBXENFT] = useState<DBXENFTEntry[]>([]);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
+    const [loadingApprove, setLoadingApprove] = useState(false);
     const [stakeLoading, setStakeLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(false);
     const [claimLoading, setClaimLoading] = useState(false);
@@ -370,7 +371,7 @@ export function DbXeNFTPage(): any {
     }
 
     async function approveDXN() {
-        setLoading(true);
+        setLoadingApprove(true);
         const signer = library.getSigner(0)
         const xenftContract = DXN(signer, chain.deb0xERC20Address);
 
@@ -383,21 +384,21 @@ export function DbXeNFTPage(): any {
                         severity: "success"
                     })
                     setApproved(true)
-                    setLoading(false)
+                    setLoadingApprove(false)
                 })
                 .catch((error: any) => {
                     setNotificationState({
                         message: "Contract couldn't be approved for accepting your DXN!", open: true,
                         severity: "error"
                     })
-                    setLoading(false)
+                    setLoadingApprove(false)
                 })
         } catch (error) {
             setNotificationState({
                 message: "You rejected the transaction. Contract hasn't been approved for accepting DXN.", open: true,
                 severity: "info"
             })
-            setLoading(false)
+            setLoadingApprove(false)
         }
         setTimeout(() => setNotificationState({}), 5000)
     }
@@ -406,11 +407,16 @@ export function DbXeNFTPage(): any {
         setStakeLoading(true)
         const signer = library.getSigner(0)
         const dbxenftFactory = DBXENFTFactory(signer, chain.dbxenftFactoryAddress);
-
-        const overrides = {
-            value: ethers.utils.parseEther((Number(amountToStake) * 0.001).toString())
+        let overrides;
+        if(Number(chain.chainId) != 369){
+            overrides = {
+                value: ethers.utils.parseEther((Number(amountToStake) * 0.001).toString())
+            }
+        } else {
+            overrides = {
+                value: ethers.utils.parseEther((Number(amountToStake) * 10000).toString())
+            }
         }
-
         dbxenftFactory.stake(ethers.utils.parseEther(amountToStake).toString(), tokenId, overrides).then((tx: any) => {
             tx.wait()
                 .then((result: any) => {
@@ -950,7 +956,7 @@ export function DbXeNFTPage(): any {
                                                     </LoadingButton> :
                                                     <LoadingButton
                                                         className="approve-btn"
-                                                        loading={loading}
+                                                        loading={loadingApprove}
                                                         variant="contained"
                                                         type="button"
                                                         onClick={() => approveDXN()}>

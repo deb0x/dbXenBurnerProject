@@ -57,7 +57,6 @@ export function Burn(): any {
         const xenContract = XENCrypto(signer, chain.xenCryptoAddress);
         await xenContract.allowance(account, chain.deb0xAddress).then((amount: any) => {
             let batchSize = Number(chain.chainId) != 369 ? 2500000 : 250000000;
-            console.log(batchSize)
             let batchApproved = Number(ethers.utils.formatEther(amount)) / batchSize;
             setBatchApproved(Math.trunc(batchApproved));
             Number(ethers.utils.formatEther(amount)) < value * batchSize ?
@@ -337,7 +336,7 @@ export function Burn(): any {
                 setNotificationState={setNotificationState} />
             <div className="side-menu--bottom burn-container">
                 <div className="row">
-                    <p className="text-center mb-0">{t("burn.label")}</p>
+                    <p className="text-center mb-0">{t("burn.label1")} {chain.xenTokenName} {t("burn.label2")}</p>
                     <p className="text-center">({Number(chain.chainId) != 369 ? "1 batch = 2,500,000 XEN" :"1 batch = 250,000,000 XEN" })</p>
                 </div>
                 <div className="row">

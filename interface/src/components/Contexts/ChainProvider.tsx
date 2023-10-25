@@ -28,7 +28,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Ethereum",
                             currency: "ETH",
                             priceURL: "https://mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-                            dxnTokenName: "DXN"
+                            dxnTokenName: "DXN",
+                            xenTokenName: "XEN"
                         })
                         break;
                     case 137: 
@@ -45,7 +46,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "polygon",
                             currency: "MATIC",
                             priceURL: "https://polygon-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-                            dxnTokenName: "mDXN"
+                            dxnTokenName: "mDXN",
+                            xenTokenName: "mXEN"
                         })
                         break;
                     case 43114: 
@@ -62,7 +64,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "avalanche",
                             currency: "AVAX",
                             priceURL: "https://avalanche-mainnet.infura.io/v3/6010818c577b4531b1886965421a91d3",
-                            dxnTokenName: "aDXN"
+                            dxnTokenName: "aDXN",
+                            xenTokenName: "aXEN"
                         })
                         break;
                     case 56:
@@ -79,7 +82,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "binance",
                             currency: "BNB",
                             priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "bDXN"
+                            dxnTokenName: "bDXN",
+                            xenTokenName: "bXEN"
                         })
                         break;
                     case 250:
@@ -96,7 +100,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "fantom",
                             currency: "FTM",
                             priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "fmDXN"
+                            dxnTokenName: "fmDXN",
+                            xenTokenName: "fmXEN"
                         })
                         break;
                     case 1284:
@@ -113,7 +118,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "moonbeam",
                             currency: "GLMR",
                             priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "mbDXN"
+                            dxnTokenName: "mbDXN",
+                            xenTokenName: "mbXEN"
                         })
                         break;
                     case 66:
@@ -126,7 +132,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "okx",
                             currency: "OKT",
                             priceURL: "https://oKc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "okDXN"
+                            dxnTokenName: "okDXN",
+                            xenTokenName: "okXEN"
                         })
                         break;
                     case 9001:
@@ -143,7 +150,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Evmos",
                             currency: "EVMOS",
                             priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "coDXN"
+                            dxnTokenName: "coDXN",
+                            xenTokenName: "coXEN"
                         })
                         break;
                     case 2000:
@@ -156,7 +164,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Dogechain",
                             currency: "DOGE",
                             priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "dcDXN"
+                            dxnTokenName: "dcDXN",
+                            xenTokenName: "dcXEN"
                         })
                         break;
                     case 10001:
@@ -173,7 +182,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "EthereumPoW",
                             currency: "ETHW",
                             priceURL: "https://mainnet.ethereumpow.org",
-                            dxnTokenName: "vvDXN"
+                            dxnTokenName: "vvDXN",
+                            xenTokenName: "vvXEN"
                         })
                         break;
                     case 80001:
@@ -190,7 +200,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Mumbai",
                             currency: "MATIC",
                             priceURL: "https://polygon-mumbai.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "mumDXN"
+                            dxnTokenName: "mumDXN",
+                            xenTokenName: "mumXEN"
                         })
                         break;
                     case 8453:
@@ -207,7 +218,8 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Base",
                             currency: "ETH",
                             priceURL: "https://base-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "cbDXN"
+                            dxnTokenName: "cbDXN",
+                            xenTokenName: "cbXEN"
                         })
                         break;
                     case 10:
@@ -224,7 +236,26 @@ const ChainProvider = ( { children }: Props ) => {
                             chainName: "Optimism",
                             currency: "ETH",
                             priceURL: "https://optimism-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
-                            dxnTokenName: "opDXN"
+                            dxnTokenName: "opDXN",
+                            xenTokenName: "opXEN"
+                        })
+                        break;
+                    case 369:
+                        setChain({
+                            deb0xAddress: "0x6d38Ab9f5b5Edfb22e57a44c3c747f9584de1f1a",
+                            deb0xViewsAddress: "0x9B560853787B0fB6126F7ad53b63313D2Aa625Db",
+                            deb0xERC20Address: "0x6fE0ae3D5c993a3073333134db70613B0cb88a31",
+                            xenCryptoAddress: "0x8a7FDcA264e87b6da72D000f22186B4403081A2a",
+                            dbxenftFactoryAddress: "0x8F94c0193C3c63EFF990Ac386B855A396750032F",
+                            dbxenftAddress: "0x92067D4b555828CB8b78153aDAa0039cFe757a91",
+                            xenftAddress: "0xfEa13BF27493f04DEac94f67a46441a68EfD32F8",
+                            mintInfoAddress: "0x43cA57CC111458C928506024b0Df8fB22a2767C3",
+                            chainId: parseInt(result, 16),
+                            chainName: "PulseChain",
+                            currency: "PLS",
+                            priceURL: "https://rpc.pulsechain.com",
+                            dxnTokenName: "pDXN",
+                            xenTokenName: "pXEN"
                         })
                         break;
                     case 369:

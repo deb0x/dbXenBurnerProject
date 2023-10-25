@@ -18,7 +18,8 @@
         }
     },
     "burn": {
-        "label": "Choose the number of XEN batches you want to burn",
+        "label1": "Choose the number of ",
+        "label2": " batches you want to burn",
         "batch": "1 batch = 2 500 000 XEN",
         "max": "MAX",
         "protocol_fee": "Protocol Fee",

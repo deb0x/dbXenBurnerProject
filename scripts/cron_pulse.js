@@ -11,9 +11,9 @@ import DBXENFTABI from "./DBXENFTABI.js";
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "0xdFd373C3e3064E1D71F6E2aEDeCFE7E20B9B6044";
-const dbxenftAddress = "0x88bc12840433622b6D26D436004F553607b4C784";
-const mintInfoAddress = "0xf758E628F59C6092579DC5e30160d73B64350042";
+const dbxenftFactoryAddress = "0x8F94c0193C3c63EFF990Ac386B855A396750032F";
+const dbxenftAddress = "0x92067D4b555828CB8b78153aDAa0039cFe757a91";
+const mintInfoAddress = "0x43cA57CC111458C928506024b0Df8fB22a2767C3";
 const xenftAddress = "0xfEa13BF27493f04DEac94f67a46441a68EfD32F8";
 
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
@@ -52,8 +52,9 @@ async function generateAfterReveal() {
 
     let fileName ="lastId.json";
     const dbxenft = DBXENFTABI(provider, dbxenftAddress);
-    let lastMintedId = await dbxenft.totalSupply();
-    let currentId = {"lastId" : Number(lastMintedId)}
+    let lastMintedId = Number(await dbxenft.totalSupply());
+    let dataForBucket = lastMintedId - 10;
+    let currentId = {"lastId" : dataForBucket}
     let myLastId;
     let mintedIds = [];
     const params = {
@@ -88,11 +89,10 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
-          for (let i = myLastId; i <= Number(lastMintedId); i++) {
-            mintedIds.push(i);
-          }
     }
-
+    for (let i = myLastId; i <= lastMintedId; i++) {
+      mintedIds.push(i);
+    }
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
@@ -131,7 +131,6 @@ async function generateAfterReveal() {
       };
 
       console.log(JSON.stringify(standardMetadata));
-
       const params = {
         Bucket: METADATA_BUCKET_PULSE,
         Key: fileName,
