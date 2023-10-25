@@ -44,8 +44,9 @@ async function generateAfterReveal() {
       const provider = new JsonRpcProvider(`https://optimism-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
       let fileName ="lastId.json";
       const dbxenft = DBXENFTABI(provider, dbxenftAddress);
-      let lastMintedId = await dbxenft.totalSupply();
-      let currentId = {"lastId" : Number(lastMintedId)}
+      let lastMintedId = Number(await dbxenft.totalSupply());
+      let dataForBucket = lastMintedId - 10;
+      let currentId = {"lastId" : dataForBucket}
       let myLastId;
       let mintedIds = [];
       const params = {
@@ -66,6 +67,7 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
+        myLastId = 1;
         } 
       } else {
         myLastId = Number(objectData.lastId);
@@ -80,70 +82,74 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
-        for (let i = myLastId; i <= Number(lastMintedId); i++) {
-          mintedIds.push(i);
-        }
     }
-      const MintInfoContract = mintInfo(provider, mintInfoAddress);
-      const XENFTContract = XENFT(provider, xenftAddress);
-      const factory = Factory(provider, dbxenftFactoryAddress);
-      for (let i = 0; i < mintedIds.length; i++) {
-        let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
-        let mintInforesult = await XENFTContract.mintInfo(XENFTID);
-        let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
-        let maturityTs = Number(mintInfoData[1]);
-        let fileName = mintedIds[i] + ".json";
-        let tokenEntryCycle = Number(await factory.tokenEntryCycle(mintedIds[i]));
-        let dbxenftEntryPower = formatEther(await factory.dbxenftEntryPower(mintedIds[i]));
-        let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle));
-        let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle));
-        let newPower = mulDiv(dbxenftEntryPower.toString(),rewardPerCycle.toString(),totalEntryPowerPerCycle.toString());
+
+    for (let i = myLastId; i <= Number(lastMintedId); i++) {
+      mintedIds.push(i);
+    }
+    const MintInfoContract = mintInfo(provider, mintInfoAddress);
+    const XENFTContract = XENFT(provider, xenftAddress);
+    const factory = Factory(provider, dbxenftFactoryAddress);
+    for (let i = 0; i < mintedIds.length; i++) {
+      let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
+      let mintInforesult = await XENFTContract.mintInfo(XENFTID);
+      let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
+      let maturityTs = Number(mintInfoData[1]);
+      let fileName = mintedIds[i] + ".json";
+      let tokenEntryCycle = Number(await factory.tokenEntryCycle(mintedIds[i]));
+      let dbxenftEntryPower = formatEther(await factory.dbxenftEntryPower(mintedIds[i]));
+      let rewardPerCycle = formatEther(await factory.rewardPerCycle(tokenEntryCycle));
+      let totalEntryPowerPerCycle = formatEther(await factory.totalEntryPowerPerCycle(tokenEntryCycle));
+      let newPower = mulDiv(dbxenftEntryPower.toString(),rewardPerCycle.toString(),totalEntryPowerPerCycle.toString());
   
-        try {
-          let attributesValue = [{
-            trait_type: "DBXEN NFT POWER",
-            value: newPower.toString(),
-          },{
-            trait_type: "ESTIMATED XEN",
-            value: dbxenftEntryPower.toString(),
-          },{
-            trait_type: "MATURITY DATE",
-            value: new Date(maturityTs * 1000).toString(),
-          }];
-        let result = getImage(newPower, mintedIds[i]);
-        console.log(result)
-        let standardMetadata = {
-          id: `${mintedIds[i]}`,
-          name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
-          description: "",
-          image: result,
-          external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_OP}/${mintedIds[i]}`,
-          attributes: attributesValue,
-        };
-        console.log(JSON.stringify(standardMetadata));
+      try {
+        let attributesValue = [{
+          trait_type: "DBXEN NFT POWER",
+          value: newPower.toString(),
+        },{
+          trait_type: "ESTIMATED XEN",
+          value: dbxenftEntryPower.toString(),
+        },{
+          trait_type: "MATURITY DATE",
+          value: new Date(maturityTs * 1000).toString(),
+        }];
+      let result = getImage(newPower, mintedIds[i]);
+      console.log(result)
+      let standardMetadata = {
+        id: `${mintedIds[i]}`,
+        name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
+        description: "",
+        image: result,
+        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_OP}/${mintedIds[i]}`,
+        attributes: attributesValue,
+      };
+
+      console.log("Metadata for id: "+mintedIds[i]);
+      console.log(JSON.stringify(standardMetadata));
+      console.log();
+
   
-        const params = {
-          Bucket: METADATA_BUCKET_OP,
-          Key: fileName,
-          Body: JSON.stringify(standardMetadata),
-          Tagging: "public=yes",
-          ContentType: "application/json",
-        };
+      const params = {
+        Bucket: METADATA_BUCKET_OP,
+        Key: fileName,
+        Body: JSON.stringify(standardMetadata),
+        Tagging: "public=yes",
+        ContentType: "application/json",
+      };
   
-        putStorageObject(params)
-          .then((result) => {
-            console.log(result);
-          }).catch((error) => console.log(error));
-        } catch (err) {
-          console.error(err);
-          if (err.client_error && err.client_error.Code === "NoSuchKey") {
-            console.log("ERROR AT UPDATE!!!");
-          } else {
-            throw err;
-          }
+      putStorageObject(params)
+        .then((result) => {
+          console.log(result);
+        }).catch((error) => console.log(error));
+      } catch (err) {
+        console.error(err);
+        if (err.client_error && err.client_error.Code === "NoSuchKey") {
+          console.log("ERROR AT UPDATE!!!");
+        } else {
+          throw err;
         }
       }
-  
+    }
     } catch (error) {
       console.error('Error:', error);
     }
@@ -190,6 +196,6 @@ function getImage(power, id) {
     }
   }
 
-cron.schedule('8 48 17 * * *', async() => {
-     await generateAfterReveal();
+cron.schedule('53 46 14 * * *', async() => {
+ await generateAfterReveal();
 });

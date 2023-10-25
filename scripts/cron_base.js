@@ -30,16 +30,12 @@ const getStorageObject = (data) =>
     createApiOptions(data)
   ).then((result) => result.json());
   
+
 const putStorageObject = (data) =>
   fetch(
     STORAGE_EP + "PutObjectCommand",
     createApiOptions(data)
   ).then((result) => result.json());
-
-function subMinutes(date, minutes) {
-  date.setMinutes(date.getMinutes() - minutes);
-  return date;
-}
 
 function mulDiv(x, y, denominator) {
   const bx = new BigNumber(x);
@@ -51,16 +47,15 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
-  console.log("Start running on base");
-  try {
-    const provider = new JsonRpcProvider(
-      `https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
-    );
+    console.log("Start running on base")
 
+  try {
+    const provider = new JsonRpcProvider(`https://base-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
     let fileName ="lastId.json";
     const dbxenft = DBXENFTABI(provider, dbxenftAddress);
-    let lastMintedId = await dbxenft.totalSupply();
-    let currentId = {"lastId" : Number(lastMintedId)}
+    let lastMintedId = Number(await dbxenft.totalSupply());
+    let dataForBucket = lastMintedId - 10;
+    let currentId = {"lastId" : dataForBucket}
     let myLastId;
     let mintedIds = [];
     const params = {
@@ -81,6 +76,7 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
+          myLastId = 1;
       } 
     } else {
         myLastId = Number(objectData.lastId);
@@ -95,9 +91,10 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
-          for (let i = myLastId; i <= Number(lastMintedId); i++) {
-            mintedIds.push(i);
-          }
+    }
+
+    for (let i = myLastId; i <= Number(lastMintedId); i++) {
+      mintedIds.push(i);
     }
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
@@ -126,7 +123,6 @@ async function generateAfterReveal() {
           value: new Date(maturityTs * 1000).toString(),
         }];
       let result = getImage(newPower, mintedIds[i]);
-      console.log(result)
       let standardMetadata = {
         id: `${mintedIds[i]}`,
         name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
@@ -136,7 +132,9 @@ async function generateAfterReveal() {
         attributes: attributesValue,
       };
 
+      console.log("Metadata for id: "+mintedIds[i]);
       console.log(JSON.stringify(standardMetadata));
+      console.log();
 
       const params = {
         Bucket: METADATA_BUCKET_BASE,
@@ -206,6 +204,6 @@ function getImage(power, id) {
   }
 }
 
-cron.schedule("8 48 17 * * *", async () => {
-  await generateAfterReveal();
+cron.schedule("43 57 14 * * *", async () => {
+ await generateAfterReveal();
 });

@@ -1,15 +1,11 @@
-import cron from "node-cron";
 import { JsonRpcProvider } from "ethers";
 import { formatEther } from "ethers";
 import Factory from "./dbxenftFactory.js";
 import mintInfo from "./mintInfo.js";
 import XENFT from "./DBXENFT.js";
-import dotenv from "dotenv";
 import BigNumber from "bignumber.js";
 import fetch from "node-fetch";
 import DBXENFTABI from "./DBXENFTABI.js";
-
-dotenv.config();
 
 const dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
 const dbxenftAddress = "0x00261A16442bc063573D2CBb0B5f398f9e1e14B9";
@@ -51,8 +47,9 @@ async function generateAfterReveal() {
     const provider = new JsonRpcProvider("https://rpc.ankr.com/moonbeam");
     let fileName ="lastId.json";
     const dbxenft = DBXENFTABI(provider, dbxenftAddress);
-    let lastMintedId = await dbxenft.totalSupply();
-    let currentId = {"lastId" : Number(lastMintedId)}
+    let lastMintedId = Number(await dbxenft.totalSupply());
+    let dataForBucket = lastMintedId - 10;
+    let currentId = {"lastId" : dataForBucket}
     let myLastId;
     let mintedIds = [];
     const params = {
@@ -73,6 +70,7 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
+        myLastId = 1;
       } 
     } else {
         myLastId = Number(objectData.lastId);
@@ -87,14 +85,16 @@ async function generateAfterReveal() {
           .then((result) => {
               console.log(result)
           }).catch((error) => console.log(error));
-          for (let i = myLastId; i <= Number(lastMintedId); i++) {
-            mintedIds.push(i);
-          }
     }
-  
+    
+    for (let i = myLastId; i <= Number(lastMintedId); i++) {
+      mintedIds.push(i);
+    }
+
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
+
     for (let i = 0; i < mintedIds.length; i++) {
       let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
       let mintInforesult = await XENFTContract.mintInfo(XENFTID);
@@ -128,7 +128,9 @@ async function generateAfterReveal() {
         attributes: attributesValue,
       };
 
+      console.log("Metadata for id: "+mintedIds[i]);
       console.log(JSON.stringify(standardMetadata));
+      console.log();
 
       const params = {
         Bucket: METADATA_BUCKET_GLMR,
@@ -197,6 +199,6 @@ function getImage(power, id) {
   }
 }
 
-cron.schedule("8 48 17 * * *", async () => {
+cron.schedule("6 36 14 * * *", async () => {
   await generateAfterReveal();
 });
