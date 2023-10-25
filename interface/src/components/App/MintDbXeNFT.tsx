@@ -564,56 +564,61 @@ export function MintDbXeNFT(): any {
                 gasLimitForTransaction = BigNumber.from("3500000")
             } else {
             if(Number(chain.chainId) == 1) {
-                fee = await calcMintFeeETH(
+                fee = await calcMintFee(
                     maturityTs,
                     VMUs,
                     EAA,
                     term,
                     AMP,
-                    cRank
+                    cRank,
+                    5_000_000_000
                 ) 
                 gasLimitForTransaction = BigNumber.from("1500000")
             } else {
                 if(Number(chain.chainId) == 9001) {
-                    fee = await calcMintFeeEVMOS(
+                    fee = await calcMintFee(
                         maturityTs,
                         VMUs,
                         EAA,
                         term,
                         AMP,
-                        cRank
+                        cRank,
+                        100_000_000
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if(Number(chain.chainId) == 8453) {
-                        fee = await calcMintFeeBASE(
+                        fee = await calcMintFee(
                         maturityTs,
                         VMUs,
                         EAA,
                         term,
                         AMP,
-                        cRank
+                        cRank,
+                        10_000_000_000
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
                     if((Number(chain.chainId) == 10)) {
-                        fee = await calcMintFeeOP(
+                        fee = await calcMintFee(
                         maturityTs,
                         VMUs,
                         EAA,
                         term,
                         AMP,
-                        cRank
+                        cRank,
+                        10_000_000_000
                     )
                 } else {
                     if(Number(chain.chainId) == 56) {
-                        fee = await calcMintFeeBSC(
+                        fee = await calcMintFee(
                         maturityTs,
                         VMUs,
                         EAA,
                         term,
                         AMP,
-                        cRank
+                        cRank,
+                        2_000_000_000
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 } else {
@@ -623,7 +628,8 @@ export function MintDbXeNFT(): any {
                         EAA,
                         term,
                         AMP,
-                        cRank
+                        cRank,
+                        1_000_000_000
                     )
                     gasLimitForTransaction = BigNumber.from("2000000")
                 }
@@ -632,7 +638,6 @@ export function MintDbXeNFT(): any {
     }
 }
 }
-
             const overrides = {
                 value: fee,
                 gasLimit: gasLimitForTransaction
@@ -699,7 +704,8 @@ export function MintDbXeNFT(): any {
         EAA: string,
         term: number,
         AMP: number,
-        cRank: string
+        cRank: string,
+        baseXen:number
     ) {
         const estReward: any = await getNFTRewardInXen(
             maturityTs,
@@ -717,157 +723,7 @@ export function MintDbXeNFT(): any {
         const maxPctReduction = Math.max(difference, 5_000_000)
         const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
         const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(1_000_000_000))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
-    }
-
-    async function calcMintFeeEVMOS(
-        maturityTs: number,
-        VMUs: number,
-        EAA: string,
-        term: number,
-        AMP: number,
-        cRank: string
-    ) {
-        const estReward: any = await getNFTRewardInXen(
-            maturityTs,
-            VMUs,
-            EAA,
-            term,
-            AMP,
-            cRank
-        )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(100_000_000))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
-    }
-
-    async function calcMintFeeBSC(
-        maturityTs: number,
-        VMUs: number,
-        EAA: string,
-        term: number,
-        AMP: number,
-        cRank: string
-    ) {
-        const estReward: any = await getNFTRewardInXen(
-            maturityTs,
-            VMUs,
-            EAA,
-            term,
-            AMP,
-            cRank
-        )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(2_000_000_000))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
-    }
-
-    async function calcMintFeeETH(
-        maturityTs: number,
-        VMUs: number,
-        EAA: string,
-        term: number,
-        AMP: number,
-        cRank: string
-    ) {
-        const estReward: any = await getNFTRewardInXen(
-            maturityTs,
-            VMUs,
-            EAA,
-            term,
-            AMP,
-            cRank
-        )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(5_000_000_000))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
-    }
-
-    async function calcMintFeeOP(
-        maturityTs: number,
-        VMUs: number,
-        EAA: string,
-        term: number,
-        AMP: number,
-        cRank: string
-    ) {
-        const estReward: any = await getNFTRewardInXen(
-            maturityTs,
-            VMUs,
-            EAA,
-            term,
-            AMP,
-            cRank
-        )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(10_000_000_000))
-        const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
-
-        return fee.add(fee.div(10))
-    }
-
-    async function calcMintFeeBASE(
-        maturityTs: number,
-        VMUs: number,
-        EAA: string,
-        term: number,
-        AMP: number,
-        cRank: string
-    ) {
-        const estReward: any = await getNFTRewardInXen(
-            maturityTs,
-            VMUs,
-            EAA,
-            term,
-            AMP,
-            cRank
-        )
-
-        const maturityDays = calcMaturityDays(term, maturityTs)
-        const daysReduction = 11389 * maturityDays
-        const maxSubtrahend = Math.min(daysReduction, 5_000_000)
-        const difference = 10_000_000 - maxSubtrahend
-        const maxPctReduction = Math.max(difference, 5_000_000)
-        const xenMulReduction = estReward.mul(BigNumber.from(maxPctReduction)).div(BigNumber.from(10_000_000))
-        const minFee = BigNumber.from(1e15)
-        const rewardWithReduction = xenMulReduction.div(BigNumber.from(10_000_000_000))
+        const rewardWithReduction = xenMulReduction.div(BigNumber.from(baseXen))
         const fee = minFee.gt(rewardWithReduction) ? minFee : rewardWithReduction
 
         return fee.add(fee.div(10))
@@ -1005,7 +861,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank,1_000_000_000)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1018,7 +874,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFeeBSC(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank,2_000_000_000)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1031,7 +887,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFeeETH(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank, 5_000_000_000)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1044,7 +900,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                         NFTData.claimStatus == "Redeemed" ?
                             "0.001" :
-                            await calcMintFeeBASE(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank);
+                            await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank,10_000_000_000);
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1057,7 +913,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                     NFTData.claimStatus == "Redeemed" ?
                         "0.001" :
-                        await calcMintFeeOP(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                        await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank,10_000_000_000)
                     setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
@@ -1070,7 +926,7 @@ export function MintDbXeNFT(): any {
                     let protocolFee =
                     NFTData.claimStatus == "Redeemed" ?
                         "0.001" :
-                        await calcMintFeeEVMOS(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank)
+                        await calcMintFee(Number(maturityTs), Number(NFTData.VMUs), eea.toString(), Number(term), Number(amp), NFTData.cRank,100_000_000)
                         setDBXNFT({
                         protocolFee: ethers.utils.formatEther(protocolFee),
                         transactionFee: transactionFee.toString()
