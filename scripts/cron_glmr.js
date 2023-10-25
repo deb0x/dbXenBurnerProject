@@ -1,17 +1,14 @@
-import cron from "node-cron";
 import { JsonRpcProvider } from "ethers";
 import { formatEther } from "ethers";
 import Factory from "./dbxenftFactory.js";
 import mintInfo from "./mintInfo.js";
 import XENFT from "./DBXENFT.js";
-import dotenv from "dotenv";
 import BigNumber from "bignumber.js";
 import fetch from "node-fetch";
-import Web3 from 'web3';
-
-dotenv.config();
+import DBXENFTABI from "./DBXENFTABI.js";
 
 const dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
+const dbxenftAddress = "0x00261A16442bc063573D2CBb0B5f398f9e1e14B9";
 const mintInfoAddress = "0xC3DDC8bD5028dd3541b3D25B4F623697B261c90B";
 const xenftAddress = "0x94d9E02D115646DFC407ABDE75Fa45256D66E043";
 
@@ -23,16 +20,17 @@ const createApiOptions = (data) => ({
   body: JSON.stringify(data),
 });
 
+const getStorageObject = (data) =>
+  fetch(
+    STORAGE_EP + "GetObjectCommand",
+    createApiOptions(data)
+  ).then((result) => result.json());
+
 const putStorageObject = (data) =>
   fetch(
     STORAGE_EP + "PutObjectCommand",
     createApiOptions(data)
   ).then((result) => result.json());
-
-function subMinutes(date, minutes) {
-  date.setMinutes(date.getMinutes() - minutes);
-  return date;
-}
 
 function mulDiv(x, y, denominator) {
   const bx = new BigNumber(x);
@@ -44,55 +42,60 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
+  console.log("Start running on moonbeam");
   try {
-    const provider = new JsonRpcProvider(
-      `https://moonbeam-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`
-    );
-
-    const eventSignature = '0x351a36c9c7d284a243725ea280c7ca2b2b1b02bf301dd57d03cbc43956164e78';
-    const web3 = new Web3(`https://moonbeam-mainnet.gateway.pokt.network/v1/lb/${process.env.REACT_APP_POKT_KEY}`);
-
-    const currentBlock = await web3.eth.getBlockNumber();
-    const secondsPerBlock = 6;
-    const blocksPerHour = Math.ceil(3600 / secondsPerBlock);
-    const blocksPerDay = Math.ceil(25 * blocksPerHour);
-    const fromBlock = Math.floor(currentBlock - blocksPerDay);
-    const toBlock = 'latest';
-
-    const filter = {
-      address: dbxenftFactoryAddress,
-      topics: [eventSignature],
-    };
-
-    const mintedIds = [];
-
-    const logs = await web3.eth.getPastLogs({
-      fromBlock: fromBlock,
-      toBlock: toBlock,
-      topics: filter.topics,
-      address: filter.address,
-    });
-
-    for (const log of logs) {
-      const eventABI = [
-        { type: 'uint256', name: 'cycle', indexed: true },
-        { type: 'uint256', name: 'DBXENFTId' },
-        { type: 'uint256', name: 'XENFTID' },
-        { type: 'uint256', name: 'fee' },
-        { type: 'address', name: 'minter', indexed: true },
-      ];
-
-      const decodedData = web3.eth.abi.decodeLog(
-        eventABI,
-        log.data,
-        log.topics.slice(1)
-      );
-      mintedIds.push(Number(decodedData.DBXENFTId));
+    const provider = new JsonRpcProvider("https://rpc.ankr.com/moonbeam");
+    let fileName ="lastId.json";
+    const dbxenft = DBXENFTABI(provider, dbxenftAddress);
+    let lastMintedId = Number(await dbxenft.totalSupply());
+    let dataForBucket = lastMintedId - 10;
+    let currentId = {"lastId" : dataForBucket}
+    let myLastId;
+    let mintedIds = [];
+    const params = {
+        Bucket: METADATA_BUCKET_GLMR,
+        Key: fileName,
     }
+    let objectData = await getStorageObject(params);
+    if(objectData.client_error != undefined ) {
+      if (objectData.client_error.Code === "NoSuchKey") {
+        const params = {
+            Bucket: METADATA_BUCKET_GLMR,
+            Key: fileName,
+            Body: JSON.stringify(currentId),
+            Tagging: 'public=yes',
+            "ContentType": "application/json",
+        };
+        putStorageObject(params)
+          .then((result) => {
+              console.log(result)
+          }).catch((error) => console.log(error));
+        myLastId = 1;
+      } 
+    } else {
+        myLastId = Number(objectData.lastId);
+        const params = {
+          Bucket: METADATA_BUCKET_GLMR,
+          Key: fileName,
+          Body: JSON.stringify(currentId),
+          Tagging: 'public=yes',
+          "ContentType": "application/json",
+      };
+      putStorageObject(params)
+          .then((result) => {
+              console.log(result)
+          }).catch((error) => console.log(error));
+    }
+    
+    for (let i = myLastId; i <= Number(lastMintedId); i++) {
+      mintedIds.push(i);
+    }
+
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
-    for (let i = mintedIds.length - 1; i >= 0; i--) {
+
+    for (let i = 0; i < mintedIds.length; i++) {
       let XENFTID = Number(await factory.dbxenftUnderlyingXENFT(mintedIds[i]));
       let mintInforesult = await XENFTContract.mintInfo(XENFTID);
       let mintInfoData = await MintInfoContract.decodeMintInfo(mintInforesult);
@@ -125,7 +128,9 @@ async function generateAfterReveal() {
         attributes: attributesValue,
       };
 
+      console.log("Metadata for id: "+mintedIds[i]);
       console.log(JSON.stringify(standardMetadata));
+      console.log();
 
       const params = {
         Bucket: METADATA_BUCKET_GLMR,
@@ -134,24 +139,24 @@ async function generateAfterReveal() {
         Tagging: "public=yes",
         ContentType: "application/json",
       };
-
+      
       putStorageObject(params)
-        .then((result) => {
-          console.log(result);
-        }).catch((error) => console.log(error));
-      } catch (err) {
-        console.error(err);
-        if (err.client_error && err.client_error.Code === "NoSuchKey") {
-          console.log("ERROR AT UPDATE!!!");
-        } else {
-          throw err;
-        }
+      .then((result) => {
+        console.log(result);
+      }).catch((error) => console.log(error));
+    } catch (err) {
+      console.error(err);
+      if (err.client_error && err.client_error.Code === "NoSuchKey") {
+        console.log("ERROR AT UPDATE!!!");
+      } else {
+        throw err;
       }
     }
-
-  } catch (error) {
-    console.error('Error:', error);
   }
+} catch (error) {
+  console.error('Error:', error);
+}
+console.log("Finish task on moonbeam");
 }
 
 function getImage(power, id) {
@@ -194,6 +199,6 @@ function getImage(power, id) {
   }
 }
 
-cron.schedule("8 48 17 * * *", async () => {
+cron.schedule("6 36 14 * * *", async () => {
   await generateAfterReveal();
 });

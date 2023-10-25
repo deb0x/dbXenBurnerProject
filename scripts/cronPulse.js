@@ -11,12 +11,13 @@ import DBXENFTABI from "./DBXENFTABI.js";
 
 dotenv.config();
 
-const dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
-const dbxenftAddress = "0x00261A16442bc063573D2CBb0B5f398f9e1e14B9";
-const mintInfoAddress = "0x21944508ad88A90577Fb73aA9B389b14fD39Aea4";
-const xenftAddress = "0x94d9E02D115646DFC407ABDE75Fa45256D66E043";
+const dbxenftFactoryAddress = "0x8F94c0193C3c63EFF990Ac386B855A396750032F";
+const dbxenftAddress = "0x92067D4b555828CB8b78153aDAa0039cFe757a91";
+const mintInfoAddress = "0x43cA57CC111458C928506024b0Df8fB22a2767C3";
+const xenftAddress = "0xfEa13BF27493f04DEac94f67a46441a68EfD32F8";
+
 const STORAGE_EP = "https://dbxen-be.prodigy-it-solutions.com/api/storage/";
-const METADATA_BUCKET_ETHPOW = "deboxnft-minting-ethpow";
+const METADATA_BUCKET_PULSE = "deboxnft-minting-pulse";
 
 const createApiOptions = (data) => ({
   method: "POST",
@@ -35,7 +36,7 @@ const putStorageObject = (data) =>
     createApiOptions(data)
   ).then((result) => result.json());
 
-function mulDiv(x, y, denominator) {
+  function mulDiv(x, y, denominator) {
   const bx = new BigNumber(x);
   const by = new BigNumber(y);
   const bDenominator = new BigNumber(denominator);
@@ -45,9 +46,9 @@ function mulDiv(x, y, denominator) {
 }
 
 async function generateAfterReveal() {
-    console.log("Start running on ethpow")
+  console.log("Start running on pulse");
   try {
-    const provider = new JsonRpcProvider("https://mainnet.ethereumpow.org");
+    const provider = new JsonRpcProvider("https://rpc.pulsechain.com");
     let fileName ="lastId.json";
     const dbxenft = DBXENFTABI(provider, dbxenftAddress);
     let lastMintedId = Number(await dbxenft.totalSupply());
@@ -56,14 +57,14 @@ async function generateAfterReveal() {
     let myLastId;
     let mintedIds = [];
     const params = {
-        Bucket: METADATA_BUCKET_ETHPOW,
+        Bucket: METADATA_BUCKET_PULSE,
         Key: fileName,
     }
     let objectData = await getStorageObject(params);
     if(objectData.client_error != undefined ) {
       if (objectData.client_error.Code === "NoSuchKey") {
         const params = {
-            Bucket: METADATA_BUCKET_ETHPOW,
+            Bucket: METADATA_BUCKET_PULSE,
             Key: fileName,
             Body: JSON.stringify(currentId),
             Tagging: 'public=yes',
@@ -78,7 +79,7 @@ async function generateAfterReveal() {
     } else {
         myLastId = Number(objectData.lastId);
         const params = {
-          Bucket: METADATA_BUCKET_ETHPOW,
+          Bucket: METADATA_BUCKET_PULSE,
           Key: fileName,
           Body: JSON.stringify(currentId),
           Tagging: 'public=yes',
@@ -90,9 +91,10 @@ async function generateAfterReveal() {
           }).catch((error) => console.log(error));
     }
 
-    for (let i = myLastId; i <= Number(lastMintedId); i++) {
+    for (let i = myLastId; i <= lastMintedId; i++) {
       mintedIds.push(i);
     }
+    console.log(mintedIds)
     const MintInfoContract = mintInfo(provider, mintInfoAddress);
     const XENFTContract = XENFT(provider, xenftAddress);
     const factory = Factory(provider, dbxenftFactoryAddress);
@@ -120,12 +122,13 @@ async function generateAfterReveal() {
           value: new Date(maturityTs * 1000).toString(),
         }];
       let result = getImage(newPower, mintedIds[i]);
+      console.log(result)
       let standardMetadata = {
         id: `${mintedIds[i]}`,
         name: `#${mintedIds[i]} DBXeNFT: Cool art & Trustless Daily Yield`,
         description: "",
         image: result,
-        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_ETHPOW}/${mintedIds[i]}`,
+        external_url: `https://dbxen.org/your-dbxenfts/${METADATA_BUCKET_PULSE}/${mintedIds[i]}`,
         attributes: attributesValue,
       };
 
@@ -134,7 +137,7 @@ async function generateAfterReveal() {
       console.log();
 
       const params = {
-        Bucket: METADATA_BUCKET_ETHPOW,
+        Bucket: METADATA_BUCKET_PULSE,
         Key: fileName,
         Body: JSON.stringify(standardMetadata),
         Tagging: "public=yes",
@@ -158,7 +161,7 @@ async function generateAfterReveal() {
   } catch (error) {
     console.error('Error:', error);
   }
-  console.log("Finish task on ethpow");
+  console.log("Finish task on pulse");
 }
 
 function getImage(power, id) {
@@ -201,6 +204,6 @@ function getImage(power, id) {
   }
 }
 
-cron.schedule("43 02 14 * * *", async () => {
-     await generateAfterReveal();
+cron.schedule("25 11 14 * * *", async () => {
+  await generateAfterReveal();
 });
