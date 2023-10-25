@@ -109,8 +109,8 @@ export function Burn(): any {
                                 let gasLimitVal = 0;
                                 if (Number(chain.chainId) === 369) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
-                                    gasLimitVal = (BigNumber.from("150000")) :
-                                    gasLimitVal = (BigNumber.from("210000"))
+                                    gasLimitVal = (BigNumber.from("180000")) :
+                                    gasLimitVal = (BigNumber.from("240000"))
                                 } else {
                                 if (Number(chain.chainId) === 8453) {
                                     numberBatchesBurnedInCurrentCycle != 0 ?
