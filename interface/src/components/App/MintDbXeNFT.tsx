@@ -561,7 +561,7 @@ export function MintDbXeNFT(): any {
                     AMP,
                     cRank
                 ) 
-                gasLimitForTransaction = BigNumber.from("2500000")
+                gasLimitForTransaction = BigNumber.from("3500000")
             } else {
             if(Number(chain.chainId) == 1) {
                 fee = await calcMintFeeETH(
