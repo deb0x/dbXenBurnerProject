@@ -708,14 +708,13 @@ export function DbXeNFTPage(): any {
             let result = await getNFTsWithRPC(xenftContract, xenftTokenId);
             const maturityDate = new Date(result.attributes[7].value);
             let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result.attributes[1].value), result.attributes[4].value, result.attributes[8].value, result.attributes[3].value, result.attributes[2].value);
-            console.log(ethers.utils.formatEther(xenEstimated))
             dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
             setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
             setUserStakedAmount(ethers.utils.formatEther(totalStaked))
             setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
             setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
             setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
-            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(xenEstimated)))
         } else {
             const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
             const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
@@ -814,14 +813,12 @@ export function DbXeNFTPage(): any {
             let result = await getNFTsWithRPC(xenftContract, xenftTokenId);
             const maturityDate = new Date(result.attributes[7].value);
             let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result.attributes[1].value), result.attributes[4].value, result.attributes[8].value, result.attributes[3].value, result.attributes[2].value);
-            console.log("from here")
-            console.log(ethers.utils.formatEther(xenEstimated))
             setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
             setUserStakedAmount(ethers.utils.formatEther(totalStaked))
             setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
             setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
             setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
-            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(xenEstimated)))
         }
     }
 
@@ -922,7 +919,7 @@ export function DbXeNFTPage(): any {
         const isRedeemed = await MintInfoContract.getRedeemed(
             await XENFTContract.mintInfo(xenftId)
         );
-
+        
         return isRedeemed
     }
 
