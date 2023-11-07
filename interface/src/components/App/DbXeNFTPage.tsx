@@ -6,7 +6,7 @@ import ChainContext from "../Contexts/ChainContext";
 import DBXENFTFactory from "../../ethereum/dbxenftFactory.js";
 import DXN from "../../ethereum/dbxenerc20";
 import DBXENFTCONTRACT from "../../ethereum/DBXENFT";
-import { BigNumber, ethers, utils } from "ethers";
+import { ethers, utils } from "ethers";
 import { Button, Card, CardActions, CardContent, Grid, OutlinedInput, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import "../../componentsStyling/dbxenftPage.scss";
@@ -21,8 +21,10 @@ import {
 import nftImage from "../../photos/Nft-dbxen.png";
 import MintInfo from "../../ethereum/mintInfo.js";
 import XENFT from "../../ethereum/xenTorrent";
+import XENCrypto from "../../ethereum/XENCrypto";
 import { Spinner } from "./Spinner";
 import { Network, Alchemy } from "alchemy-sdk";
+const { BigNumber } = require("ethers");
 
 const { abi } = require("../../ethereum/DBXeNFTFactory.json");
 interface DBXENFTEntry {
@@ -95,7 +97,6 @@ export function DbXeNFTPage(): any {
 
     const getDBXeNFTs = async () => {
         setLoading(true);
-
         if (Number(chain.chainId) == 369) {
             const dbxenft = DBXENFTCONTRACT(library, chain.dbxenftAddress);
             let tokenIds = await dbxenft.walletOfOwner(account);
@@ -561,7 +562,7 @@ export function DbXeNFTPage(): any {
     async function getUpdatedDBXENFTData(tokenId: any) {
         if (Number(chain.chainId) != 10001 && Number(chain.chainId) != 8453 && Number(chain.chainId) != 369) {
             const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
-
+            const xenftContract = XENFT(library, chain.xenftAddress);
             const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
             const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
 
@@ -702,16 +703,22 @@ export function DbXeNFTPage(): any {
                     unlockedStake = unlockedStake.add(dbxenfSecondStakeCycle)
                 }
             }
+
+            let xenftTokenId = await dbxenftFactory.dbxenftUnderlyingXENFT(tokenId);
+            let result = await getNFTsWithRPC(xenftContract, xenftTokenId);
+            const maturityDate = new Date(result.attributes[7].value);
+            let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result.attributes[1].value), result.attributes[4].value, result.attributes[8].value, result.attributes[3].value, result.attributes[2].value);
             dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
             setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
             setUserStakedAmount(ethers.utils.formatEther(totalStaked))
             setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
             setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
             setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
-            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(xenEstimated)))
         } else {
             const dbxenftFactory = DBXENFTFactory(library, chain.dbxenftFactoryAddress)
             const entryCycle = await dbxenftFactory.tokenEntryCycle(tokenId)
+            const xenftContract = XENFT(library, chain.xenftAddress);
 
             let currentCycle = BigNumber.from(await dbxenftFactory.getCurrentCycle());
             let dbxenftAccruedFees = BigNumber.from(await dbxenftFactory.dbxenftAccruedFees(tokenId));
@@ -801,13 +808,72 @@ export function DbXeNFTPage(): any {
                 }
             }
             dbxenftWithdrawableStake = dbxenftWithdrawableStake.add(unlockedStake)
+
+            let xenftTokenId = await dbxenftFactory.dbxenftUnderlyingXENFT(tokenId);
+            let result = await getNFTsWithRPC(xenftContract, xenftTokenId);
+            const maturityDate = new Date(result.attributes[7].value);
+            let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(result.attributes[1].value), result.attributes[4].value, result.attributes[8].value, result.attributes[3].value, result.attributes[2].value);
             setTokenForUnstake(ethers.utils.formatEther(dbxenftWithdrawableStake))
             setUserStakedAmount(ethers.utils.formatEther(totalStaked))
             setBaseDBXENFTPower(ethers.utils.formatEther(baseDBXENFTPower))
             setDBXENFTPower(ethers.utils.formatEther(dbxenftPower))
             setUnclaimedFees(ethers.utils.formatEther(dbxenftAccruedFees))
-            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(dbxenftEntryPower)))
+            isXenftRedeemed(id).then((redeemed) => redeemed ? setUnclaimedXen("0.0") : setUnclaimedXen(ethers.utils.formatEther(xenEstimated)))
         }
+    }
+
+    async function getNFTsWithRPC(XENFTContract:any, tokenId:any) {
+        let base64Data = (await XENFTContract.tokenURI(Number(tokenId)))
+        const dataWithoutPrefix = base64Data.split(',')[1];
+        const decodedData = atob(dataWithoutPrefix);
+        const decodedObject = JSON.parse(decodedData);
+        decodedObject.token_id = tokenId;
+        return decodedObject;
+    }
+
+    async function getNFTRewardInXen(
+        maturityTs: number,
+        VMUs: number,
+        EAA: string,
+        term: number,
+        AMP: number,
+        cRank: string
+    ): Promise<number> {
+        const XENContract = XENCrypto(library, chain.xenCryptoAddress)
+        const globalRank = await XENContract.globalRank();
+        const cRankDelta = Math.max((globalRank.sub(BigNumber.from(cRank))).toNumber(), 2);
+
+        const factor = 10_000;
+        const reward = Math.floor(
+            AMP
+            * (Math.floor(Math.max(Math.log2(cRankDelta), 1) * factor) / factor)
+            * (Number.isFinite(term) ? term : term)
+            * (1 + parseInt(EAA) / 1_000)
+        )
+
+        let pen = 0
+        const currentTimestamp = getTimestampInSeconds()
+        if (currentTimestamp > maturityTs) {
+            pen = calcPenalty(currentTimestamp - maturityTs)
+        }
+        const rew = Math.floor((reward * (100 - pen)) / 100);
+        return BigNumber.from(rew).mul(BigNumber.from(VMUs)).mul(BigNumber.from(1e18.toString()))
+    }
+
+    function getTimestampInSeconds() {
+        return Math.floor(Date.now() / 1000)
+    }
+
+    function calcPenalty(secsLate: number) {
+        const daysLate = Math.floor(secsLate / 86400)
+        if (daysLate > 6) {
+            return 99
+        }
+        const penalty = ((BigNumber.from(1).shl(daysLate + 3)).div(BigNumber.from(7)).sub(BigNumber.from(1))).toNumber()
+        if (penalty < 99) {
+            return penalty
+        }
+        return 99
     }
 
     async function claimXen(tokenId: any) {
@@ -853,7 +919,7 @@ export function DbXeNFTPage(): any {
         const isRedeemed = await MintInfoContract.getRedeemed(
             await XENFTContract.mintInfo(xenftId)
         );
-
+        
         return isRedeemed
     }
 
