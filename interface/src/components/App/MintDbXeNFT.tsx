@@ -390,8 +390,16 @@ export function MintDbXeNFT(): any {
         setInitLoading(false);
     }
     function getClaimStatus(resultAttributes5:any, resultAttributes7:any){
-        let formattedMaturityDate = new
-        Date(resultAttributes5 +resultAttributes7)
+        let year = new Date(resultAttributes5);
+        let monthDateTime = new Date(resultAttributes5);
+        let formattedMaturityDate = new Date(
+                year.getFullYear(),
+                monthDateTime.getMonth(),
+                monthDateTime.getDate(),
+                monthDateTime.getHours(),
+                monthDateTime.getMinutes(),
+                monthDateTime.getSeconds()
+            )
         let calculatedClaimStatus;
         if (resultAttributes7 === "no" && formattedMaturityDate < new Date()) {
             calculatedClaimStatus = "Claimable";
