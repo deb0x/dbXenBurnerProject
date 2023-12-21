@@ -1162,10 +1162,11 @@ export function Stake(props: any): any {
                 <div className="cards-grid">
                     <div className='row'>
                         <Grid item className="col col-12 col-md-6 ">
-                            <FeesPanel />
+                        //TODO: BUY AND BURN
                         </Grid>
                         <Grid item className="col col-12 col-md-6">
                             <CyclePanel />
+                            <FeesPanel />
                         </Grid>
                     </div>
                     <div className='row'>

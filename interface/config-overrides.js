@@ -6,6 +6,16 @@ module.exports = function override(config, env) {
         ...config.resolve.fallback,
         stream: require.resolve("stream-browserify"),
         buffer: require.resolve("buffer"),
+        "fs": false,
+        "tls": false,
+        "net": false,
+        "path": false,
+        "zlib": false,
+        "http": false,
+        "https": false,
+        "stream": false,
+        "crypto": false,
+        "crypto-browserify": false,
     }
     config.resolve.extensions = [...config.resolve.extensions, ".ts", ".js"]
     config.plugins = [

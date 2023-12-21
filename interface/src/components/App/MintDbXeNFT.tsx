@@ -1,3 +1,7 @@
+//TODO: display the error message if reward is less than cost
+//move the redeemed message in the function
+//CHANGE THE BUTTON COLOR
+//css for reward data
 import "../../componentsStyling/dbxenft.scss";
 import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
 import nftImage from "../../photos/Nft-dbxen.png";
@@ -86,26 +90,39 @@ export function MintDbXeNFT(): any {
     const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
     const datePLS: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 25, 0));
     const now: any = Date.now();
+    const [displayGaslessClaim, setDisplayGaslessClaim] = 
+        useState<boolean>(false)
 
-    const QuoterContract: any = Quoter(library, chain.Quoter)
 
     let preferredRelays: any[];
 
-    if(chain.chainId == "137") {
-        preferredRelays = ["https://relay.starfish.technology/"]
-    } else if(chain.chainId == "56") {
-        preferredRelays = ["https://relay-bsc.starfish.technology/"]
-    } else if(chain.chainId == "43114") {
-        preferredRelays = ["https://relay-avax.starfish.technology/"]
-    } else if(chain.chainId == "1") {
-        preferredRelays = ["https://relay-eth.starfish.technology/"]
-    } else {
-        preferredRelays = [
-            "https://mumbai.v3.relays.bwl.gg/"
-            
-        ]
-        console.log("chose preferred")
-    }
+    useEffect(() => {
+        if(chain.chainId == "80001") {
+            preferredRelays = [
+                "https://mumbai.v3.relays.bwl.gg/"
+            ]
+            setDisplayGaslessClaim(true)
+        } else
+        if(chain.chainId == "137") {
+            preferredRelays = ["https://relay.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else  if(chain.chainId == "56") {
+            preferredRelays = ["https://relay-bsc.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else if(chain.chainId == "43114") {
+            preferredRelays = ["https://relay-avax.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else if(chain.chainId == "1") {
+            preferredRelays = ["https://relay-eth.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else {
+            preferredRelays = [
+                "https://mumbai.v3.relays.bwl.gg/"
+            ]
+            setDisplayGaslessClaim(false)
+            console.log("chose preferred")
+        }
+    }, [chain.chainId])
 
     const configTokenPaymaster: any = {
         paymasterAddress: chain.tokenPaymasterAddress,
@@ -1011,6 +1028,8 @@ export function MintDbXeNFT(): any {
     }
 
     async function calcTxCost(xenftId: number) {
+        const QuoterContract: any = Quoter(library, chain.Quoter)
+
         const signer = xenftCall.signer
         const gasEstimate = await xenftCall.estimateGas.bulkClaimMintReward(
             xenftId,
@@ -2145,7 +2164,7 @@ export function MintDbXeNFT(): any {
                                                         PREVIEW DBXENFT
                                                     </button>
                                                 </td>
-                                                {data.claimStatus === "Claimable" &&
+                                                {data.claimStatus === "Claimable" && displayGaslessClaim ?
                                                     <td>
                                                     <button
                                                         className="detail-btn"
@@ -2166,7 +2185,7 @@ export function MintDbXeNFT(): any {
                                                     >
                                                         Gasless claim
                                                     </button>
-                                                </td>}
+                                                </td> : <></>}
                                             </tr>
                                             <tr className="xenft-details-row">
                                                 {displayDbxenftDetails && xenftId === data.id ?
