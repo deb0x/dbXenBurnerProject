@@ -1,7 +1,3 @@
-//TODO: display the error message if reward is less than cost
-//move the redeemed message in the function
-//CHANGE THE BUTTON COLOR
-//css for reward data
 import "../../componentsStyling/dbxenft.scss";
 import nftPlaceholder from "../../photos/icons/nft-placeholder.png";
 import nftImage from "../../photos/Nft-dbxen.png";
@@ -27,6 +23,7 @@ import { RelayProvider } from '@opengsn/provider';
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
 import { Network, Alchemy } from "alchemy-sdk";
+import xenonLogo from "../../photos/xenon_logo.svg";
 
 const chainForGas = [137,250,43114,1284,10001];
 const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369,80001];
@@ -2057,20 +2054,22 @@ export function MintDbXeNFT(): any {
 
                     //setClaimSpinnerId(0);
                 });
-        } catch (error) {
-            console.log(error);
-            // await handleError(`${error.toString().slice(0,60)} ...`)
-
-            setNotificationState({
-                message: `XENFT claim failed. Check console for details.(ctrl + shift + i)`, open: true,
-                severity: "error"
-            })
-
-            // await handleError(`${error.message.reason}`)
-            // setClaimSpinnerId(0);
+        } catch (error: unknown) {
+            if (error instanceof Error && 'message' in error && typeof error.message === 'string') {
+              if (error.message.includes('Reward less than tx cost')) {
+                setNotificationState({
+                    message: `Reward less than tx cost`, open: true,
+                    severity: "error"
+                })
+              }
+            } else {
+                setNotificationState({
+                    message: `XENFT claim failed. Check console for details.(ctrl + shift + i)`, open: true,
+                    severity: "error"
+                })
+            }
         }
-
-        //setClaimSpinnerId(0);
+        setTimeout(() => setNotificationState({}), 5000)
     }
 
     async function isAlreadyRedeemed(xenftId: any) {
@@ -2079,6 +2078,21 @@ export function MintDbXeNFT(): any {
         let mintInforesult = await XENFTContract.mintInfo(xenftId)
         let redeemed = await MintInfoContract.getRedeemed(mintInforesult);
         return redeemed;
+    }
+
+    const handleAlreadyRedeemed = async (data: any) => {
+        let redeemed = await isAlreadyRedeemed(data.id)
+        if(redeemed) {
+            setNotificationState({
+                message: `This XENFT has already been redeemed.`, open: true,
+                severity: "warning"
+            })
+            setTimeout(() => setNotificationState({}), 5000)
+        } else {
+            setXenftId(data.id);
+            calcTxCost(data.id)
+            setClaimDetails(true)
+        }
     }
      
     const emptyRows =
@@ -2130,7 +2144,9 @@ export function MintDbXeNFT(): any {
                                         <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
-                                        <th scope="col"></th>
+                                        <th scope="col">
+                                            <img src={xenonLogo} alt="xenonLogo" />
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2167,21 +2183,9 @@ export function MintDbXeNFT(): any {
                                                 {data.claimStatus === "Claimable" && displayGaslessClaim ?
                                                     <td>
                                                     <button
-                                                        className="detail-btn"
+                                                        className="gasless-btn"
                                                         type="button"
-                                                        onClick={async () => {
-                                                            let redeemed = await isAlreadyRedeemed(data.id)
-                                                            if(redeemed) {
-                                                                setNotificationState({
-                                                                    message: `This XENFT has already been redeemed.`, open: true,
-                                                                    severity: "warning"
-                                                                })
-                                                            } else {
-                                                                setXenftId(data.id);
-                                                                calcTxCost(data.id)
-                                                                setClaimDetails(true)
-                                                            }
-                                                        }}
+                                                        onClick={() => handleAlreadyRedeemed(data)}
                                                     >
                                                         Gasless claim
                                                     </button>
@@ -2274,29 +2278,51 @@ export function MintDbXeNFT(): any {
                                                 }
 
                                             </tr>
-                                            <tr className="xenft-details-row">
+                                            <tr className="gasless-details-row">
                                                 {displayClaimDetails && xenftId === data.id ?
                                                     <td colSpan={12}>
-                                                        <h4>Reward Data</h4>
-                                                        <div className="reward-row">
-                                                            <span className="label">Reward: </span>
-                                                            <span className="value">{data.estimatedXen} XEN</span>
+                                                        <h4 className="pb-2">Reward Data</h4>
+                                                        <div className="details-container">
+                                                            <div className="reward-row">
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Reward
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.estimatedXen} XEN
+                                                                    </p>
+                                                                </div>
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Transaction cost
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        -{txCost} XEN
+                                                                    </p>
+                                                                </div>
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Service fee:
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        -{serviceCost} XEN
+                                                                    </p>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div className="reward-row">
-                                                            <span className="label">Tx cost:</span>
-                                                            <span className="value"> -{txCost} XEN</span>
+                                                        <div className="reward-row total-row row">
+                                                            <div className="col-12">
+                                                                <p className="label">
+                                                                    Total received: 
+                                                                </p>
+                                                                <p className="value">
+                                                                    {data.estimatedXen - txCost - serviceCost}  XEN
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div className="reward-row">
-                                                            <span className="label">Service fee:</span>
-                                                            <span className="value"> -{serviceCost} XEN</span>
-                                                        </div>
-                                                        <div className="reward-row total-row">
-                                                            <span className="label">Total received: </span>
-                                                            <span className="value">{data.estimatedXen - txCost - serviceCost}  XEN</span>
-                                                        </div>
-                                                        <small>
+                                                        <p className="small-details">
                                                             *calculated at current gas price. ({gasPrice} Gwei)
-                                                        </small>
+                                                        </p>
                                                         <div className="reward-row">
                                                             <button className="btn claim-btn"
                                                                 type="button"

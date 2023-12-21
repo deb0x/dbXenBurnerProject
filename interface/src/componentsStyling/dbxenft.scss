@@ -26,6 +26,9 @@
                     padding-bottom: 25px;
                     white-space: nowrap;
                     font-weight: 400;
+                    img {
+                        height: 25px;
+                    }
                 }
             }
         }
@@ -50,6 +53,11 @@
                     text-transform: uppercase;
                     border: 0;
                     font-size: 12px;
+                }
+                .gasless-btn {
+                    background-color: #D742F3;
+                    color: #fff;
+                    box-shadow: inset 0px 3px 10px #3F10CD, 0px 0px 10px #3F10CD;
                 }
             }
         }
@@ -118,6 +126,32 @@
                     }
                 }
             }
+        }
+    }
+    .gasless-details-row {
+        font-family: "Manrope";
+        .label {
+            font-weight: 100;
+            opacity: 0.4;
+        }
+        .reward-row {
+            display: flex;
+            justify-content: space-evenly;
+            width: 50%;
+            align-items: center;
+            margin: 0 auto;
+            padding-bottom: 10px;
+        }
+        .total-row {
+            padding-top: 10px;
+        }
+        .small-details {
+            padding-top: 15px;
+            padding-bottom: 0;
+            font-size: 12px;
+        }
+        button {
+            margin: 15px 0;
         }
     }
 }
