@@ -9,6 +9,7 @@ import DBXenft from "../../ethereum/DBXENFT";
 import XENFT from "../../ethereum/xenTorrent";
 import XENCrypto from "../../ethereum/XENCrypto";
 import mintInfo from "../../ethereum/mintInfo";
+import Quoter from "../../ethereum/quoter";
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Spinner } from './Spinner';
 import SnackbarNotification from './Snackbar';
@@ -17,18 +18,20 @@ import web3 from 'web3';
 import Moralis from "moralis";
 import formatAccountName from '../Common/AccountName';
 import { writePerCycle } from "../Common/aws-interaction";
-import { arrToBufArr } from "ethereumjs-util";
-import { ethers } from "ethers";
+import { ethers, providers} from "ethers";
+import { RelayProvider } from '@opengsn/provider';
 import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
 import { Network, Alchemy } from "alchemy-sdk";
+import xenonLogo from "../../photos/xenon_logo.svg";
 
 const chainForGas = [137,250,43114,1284,10001];
-const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369];
+const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369,80001];
 const chainsForPagination = [1284,9001,10001,369,8453];
 
 const { BigNumber } = require("ethers");
 const Decimal = require('decimal.js');
+const { abi } = require("../../ethereum/XENTorrent.json");
 
 interface XENFTEntry {
     id: number;
@@ -67,6 +70,11 @@ export function MintDbXeNFT(): any {
     const [currentRewardPower, setCurrentRewardPower] = useState<any>();
     const [isRedeemed, setIsRedeemed] = useState<boolean>();
     const [endDate, setEndDate] = useState<any>();
+    const [gsnProvider, setGsnProvider] = useState<any>();
+    const [xenftCall, setXenftCall] = useState<any>();
+    const [txCost, setTxCost] = useState(0);
+    const [gasPrice, setGasPrice] = useState("")
+    const [serviceCost, setServiceCost] = useState(0);
     const datePolygon: any = new Date(Date.UTC(2023, 12, 17, 17, 48, 8, 0));
     const dateAvax: any = new Date(Date.UTC(2023, 12, 17, 14, 17, 12, 0));
     const dateBsc: any = new Date(Date.UTC(2023, 12, 17, 14, 32, 44, 0));
@@ -79,6 +87,44 @@ export function MintDbXeNFT(): any {
     const dateETHPOW: any = new Date(Date.UTC(2023, 12, 13, 14, 2, 43, 0));
     const datePLS: any = new Date(Date.UTC(2023, 12, 13, 14, 11, 25, 0));
     const now: any = Date.now();
+    const [displayGaslessClaim, setDisplayGaslessClaim] = 
+        useState<boolean>(false)
+
+
+    let preferredRelays: any[];
+
+    useEffect(() => {
+        if(chain.chainId == "80001") {
+            preferredRelays = [
+                "https://mumbai.v3.relays.bwl.gg/"
+            ]
+            setDisplayGaslessClaim(true)
+        } else
+        if(chain.chainId == "137") {
+            preferredRelays = ["https://relay.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else  if(chain.chainId == "56") {
+            preferredRelays = ["https://relay-bsc.starfish.technology/"]
+        } else if(chain.chainId == "43114") {
+            preferredRelays = ["https://relay-avax.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else if(chain.chainId == "1") {
+            preferredRelays = ["https://relay-eth.starfish.technology/"]
+            setDisplayGaslessClaim(true)
+        } else {
+            preferredRelays = [
+                "https://mumbai.v3.relays.bwl.gg/"
+            ]
+            setDisplayGaslessClaim(false)
+            console.log("chose preferred")
+        }
+    }, [chain.chainId])
+
+    const configTokenPaymaster: any = {
+        paymasterAddress: chain.tokenPaymasterAddress,
+        auditorsCount: 0
+    }
+
     useEffect(() => {
         startMoralis();
         getXENFTs();
@@ -109,6 +155,35 @@ export function MintDbXeNFT(): any {
     useEffect(() => {
         timer();
     }, [chain.chainId])
+
+    useEffect(() => {
+        async function init() {
+            try {
+
+                await initProvider();
+                console.log("opengsn initiated")
+            } catch (err) {
+                console.log("error")
+                console.log(err);
+            }
+        }
+        init();
+    }, [chain])
+
+    async function initProvider() {
+        const web3Provider: any = window.ethereum;
+
+        console.log(configTokenPaymaster.paymasterAddress)
+        const gsnp = RelayProvider.newProvider({ provider: web3Provider, config: configTokenPaymaster })
+        await gsnp.init();
+
+        const etherProviderTP = new ethers.providers.Web3Provider(gsnp as any as providers.ExternalProvider)
+
+        let xenC = new ethers.Contract(chain.xenftAddress, abi, etherProviderTP.getSigner(0));
+
+        setXenftCall(xenC);
+        setGsnProvider(gsnp);
+    }
 
     function timer() {
         switch (Number(chain.chainId)) {
@@ -293,6 +368,7 @@ export function MintDbXeNFT(): any {
                         let xenEstimated = await getNFTRewardInXen(Number(maturityDate) / 1000, Number(resultAttributes[1].value), resultAttributes[4].value, resultAttributes[8].value, resultAttributes[3].value, resultAttributes[2].value);
                         
                         if (chain.chainId == "80001") {
+                            console.log(resultAttributes[7].value)
                                 xenftEntries.push({
                                     id: +result.token_id,
                                     claimStatus:getClaimStatus(resultAttributes[5].value,resultAttributes[7].value),
@@ -392,7 +468,7 @@ export function MintDbXeNFT(): any {
     function getClaimStatus(resultAttributes5:any, resultAttributes7:any){
         let formattedMaturityDate = new Date(resultAttributes7)
         let calculatedClaimStatus;
-        if (resultAttributes7 === "no" && formattedMaturityDate < new Date()) {
+        if (formattedMaturityDate < new Date()) {
             calculatedClaimStatus = "Claimable";
         } else {
             let daysDifference = daysLeft(formattedMaturityDate,new Date());
@@ -947,7 +1023,34 @@ export function MintDbXeNFT(): any {
         return Math.floor(Date.now() / 1000)
     }
 
+    async function calcTxCost(xenftId: number) {
+        const QuoterContract: any = Quoter(library, chain.Quoter)
+
+        const signer = xenftCall.signer
+        const gasEstimate = await xenftCall.estimateGas.bulkClaimMintReward(
+            xenftId,
+            chain.tokenPaymasterAddress
+        )
+        const gsnGasOverhead = BigNumber.from("360000")
+        const gasPrice = await signer.getGasPrice()
+        const txCost = (gasEstimate.add(gsnGasOverhead)).mul(gasPrice)
+        console.log(ethers.utils.formatUnits(gasEstimate))
+
+        const xenQuote = ethers.utils.formatEther(await QuoterContract.getQuote(
+            txCost,
+            chain.UniPoolXen,
+            chain.WNATIVETKN,
+            chain.xenCryptoAddress,
+            1
+        ))
+        
+        setTxCost(parseInt(xenQuote))
+        setServiceCost(Math.floor(parseInt(xenQuote) * 0.20))
+        setGasPrice(ethers.utils.formatUnits(gasPrice, "gwei"))
+    }
+
     const [displayDbxenftDetails, setDisplayDbxenftDetails] = useState(false);
+    const [displayClaimDetails, setClaimDetails] = useState(false);
     const [xenftId, setXenftId] = useState();
 
     const handleExpandRow = (id: any) => {
@@ -1908,6 +2011,89 @@ export function MintDbXeNFT(): any {
         setPage(0);
     };
 
+    async function handleClaim(xenftId: any) {
+        //setClaimSpinnerId(xenftId);
+        try {
+            // console.log("claiming....")
+            // console.log(xenftId)
+            // console.log(contractData.TokenPaymasterAdd)
+            // { gasLimit: 300000 }
+            const tx = await xenftCall.bulkClaimMintReward(
+                xenftId,
+                chain.tokenPaymasterAddress
+            );
+            console.log(tx)
+            await tx
+                .wait()
+                .then(async (result: any) => {
+                    const submissionDetails = await gsnProvider._getSubmissionDetailsForRelayRequestId(tx.hash);
+                    const transactionHash = await gsnProvider._getTransactionIdFromRequestId(tx.hash, submissionDetails);
+                    console.log(transactionHash)
+                    //xenftRedeemed(xenftId);
+                    if (chain.chainId == "80001") {
+                        setNotificationState({
+                            message: `Transaction success! Check it out in the <a href="https://mumbai.polygonscan.com/tx/${transactionHash.toString()}" target="_blank" rel="noopener noreferrer" className="alert-link">explorer</a>.`, open: true,
+                            severity: "success"
+                        })
+                    } else {
+                        setNotificationState({
+                            message: `Transaction success! Check it out in the <a href="https://polygonscan.com/tx/${transactionHash.toString()}" target="_blank" rel="noopener noreferrer" className="alert-link">explorer</a>.`, open: true,
+                            severity: "success"
+                        })
+                    }
+                    //setClaimSpinnerId(0);
+                })
+                .catch(async (error: any) => {
+                    console.log(error);
+                    // await handleError(`transaction error: ${error.toString().slice(0,60)}...`);
+                    setNotificationState({
+                        message: `transaction error... please try again`, open: true,
+                        severity: "error"
+                    })
+
+                    //setClaimSpinnerId(0);
+                });
+        } catch (error: unknown) {
+            if (error instanceof Error && 'message' in error && typeof error.message === 'string') {
+              if (error.message.includes('Reward less than tx cost')) {
+                setNotificationState({
+                    message: `Reward less than tx cost`, open: true,
+                    severity: "error"
+                })
+              }
+            } else {
+                setNotificationState({
+                    message: `XENFT claim failed. Check console for details.(ctrl + shift + i)`, open: true,
+                    severity: "error"
+                })
+            }
+        }
+        setTimeout(() => setNotificationState({}), 5000)
+    }
+
+    async function isAlreadyRedeemed(xenftId: any) {
+        const MintInfoContract = mintInfo(library, chain.mintInfoAddress);
+        const XENFTContract = XENFT(library, chain.xenftAddress);
+        let mintInforesult = await XENFTContract.mintInfo(xenftId)
+        let redeemed = await MintInfoContract.getRedeemed(mintInforesult);
+        return redeemed;
+    }
+
+    const handleAlreadyRedeemed = async (data: any) => {
+        let redeemed = await isAlreadyRedeemed(data.id)
+        if(redeemed) {
+            setNotificationState({
+                message: `This XENFT has already been redeemed.`, open: true,
+                severity: "warning"
+            })
+            setTimeout(() => setNotificationState({}), 5000)
+        } else {
+            setXenftId(data.id);
+            calcTxCost(data.id)
+            setClaimDetails(true)
+        }
+    }
+     
     const emptyRows =
         page > 0 ? Math.max(0, (1 + page) * rowsPerPage - XENFTs.length) : 0;
 
@@ -1957,6 +2143,9 @@ export function MintDbXeNFT(): any {
                                         <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
+                                        <th scope="col">
+                                            <img src={xenonLogo} alt="xenonLogo" />
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1990,6 +2179,16 @@ export function MintDbXeNFT(): any {
                                                         PREVIEW DBXENFT
                                                     </button>
                                                 </td>
+                                                {data.claimStatus === "Claimable" && displayGaslessClaim ?
+                                                    <td>
+                                                    <button
+                                                        className="gasless-btn"
+                                                        type="button"
+                                                        onClick={() => handleAlreadyRedeemed(data)}
+                                                    >
+                                                        Gasless claim
+                                                    </button>
+                                                </td> : <></>}
                                             </tr>
                                             <tr className="xenft-details-row">
                                                 {displayDbxenftDetails && xenftId === data.id ?
@@ -2072,6 +2271,69 @@ export function MintDbXeNFT(): any {
                                                                 <p>Wait for date please</p>
                                                             </div>
                                                         }
+                                                    </td>
+                                                    :
+                                                    <></>
+                                                }
+
+                                            </tr>
+                                            <tr className="gasless-details-row">
+                                                {displayClaimDetails && xenftId === data.id ?
+                                                    <td colSpan={12}>
+                                                        <h4 className="pb-2">Reward Data</h4>
+                                                        <div className="details-container">
+                                                            <div className="reward-row">
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Reward
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        {data.estimatedXen} XEN
+                                                                    </p>
+                                                                </div>
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Transaction cost
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        -{txCost} XEN
+                                                                    </p>
+                                                                </div>
+                                                                <div className="reward-details">
+                                                                    <p className="label">
+                                                                        Service fee:
+                                                                    </p>
+                                                                    <p className="value">
+                                                                        -{serviceCost} XEN
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="reward-row total-row row">
+                                                            <div className="col-12">
+                                                                <p className="label">
+                                                                    Total received: 
+                                                                </p>
+                                                                <p className="value">
+                                                                    {data.estimatedXen - txCost - serviceCost}  XEN
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <p className="small-details">
+                                                            *calculated at current gas price. ({gasPrice} Gwei)
+                                                        </p>
+                                                        <div className="reward-row">
+                                                            <button className="btn claim-btn"
+                                                                type="button"
+                                                                disabled={data.estimatedXen - txCost - serviceCost< 0}
+                                                                onClick={() => {
+                                                                    handleClaim(data.id);
+                                                                }}
+                                                            >
+                                                                {data.estimatedXen - txCost - serviceCost > 0  ? "Claim" : "Not enough XEN"}
+                                                                
+                                                            </button> 
+                                                        </div>
                                                     </td>
                                                     :
                                                     <></>

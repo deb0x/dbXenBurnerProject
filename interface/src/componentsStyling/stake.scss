@@ -86,6 +86,22 @@
                             background-color: transparent;
                         }
                     }
+
+                    &.buy-and-burn-container {
+                        box-shadow: 0 0 10px #ea3d7a;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        .collect-btn {
+                            background-color: #160554;
+                            border: 1px solid #ea3d7a;
+                            box-shadow: 0 0 10px #ea3d7a;
+                            color: #fff;
+                            font-family: Manrope;
+                            font-size: 14px;
+                            letter-spacing: .7px;
+                        }
+                    }
                 }
                 .submit-btn {
                     font-size: 2vh;
