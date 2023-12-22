@@ -1039,7 +1039,7 @@ export function MintDbXeNFT(): any {
 
         const xenQuote = ethers.utils.formatEther(await QuoterContract.getQuote(
             txCost,
-            chain.UniPool,
+            chain.UniPoolXen,
             chain.WNATIVETKN,
             chain.xenCryptoAddress,
             1

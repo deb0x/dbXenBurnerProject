@@ -332,7 +332,7 @@ export function Stake(props: any): any {
             const QuoterContract: any = Quoter(library, chain.Quoter)
             const nativeToDXNQuote = await QuoterContract._getQuote(
                 fundsToBurn,
-                chain.UniPool,
+                chain.UniPoolDXN,
                 chain.WNATIVETKN,
                 chain.deb0xERC20Address,
                 1
