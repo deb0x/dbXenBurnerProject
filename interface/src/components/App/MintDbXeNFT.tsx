@@ -105,7 +105,6 @@ export function MintDbXeNFT(): any {
             setDisplayGaslessClaim(true)
         } else  if(chain.chainId == "56") {
             preferredRelays = ["https://relay-bsc.starfish.technology/"]
-            setDisplayGaslessClaim(true)
         } else if(chain.chainId == "43114") {
             preferredRelays = ["https://relay-avax.starfish.technology/"]
             setDisplayGaslessClaim(true)
