@@ -11,6 +11,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/dbxenViews";
 import DBXenERC20 from "../../ethereum/dbxenerc20"
+import Quoter from "../../ethereum/quoter";
+import DXNBurn from "../../ethereum/dxnBurn";
 import SnackbarNotification from './Snackbar';
 import { BigNumber, ethers } from "ethers";
 import "../../componentsStyling/stake.scss";
@@ -314,6 +316,70 @@ export function Stake(props: any): any {
 
     function BuyAndBurnPanel() {
         const [loading, setLoading] = useState(false)
+        const [availableFunds, setAvailableFunds] = useState("")
+        const [earnableFunds, setEarnableFunds] = useState("")
+        const [nativeToDXNQuoteMax, setNativeToDXNQuoteMax] = useState("")
+        const [nativeToDXNQuoteMin, setNativeToDXNQuoteMin] = useState("")
+        
+        useEffect(() => {
+            getData()
+        }, [chain.chainId])
+
+        async function getData() {
+            const balance = await library.getBalance(chain.dxnBurnAddress)
+            const fundsToBurn = balance.mul(BigNumber.from(98)).div(BigNumber.from(100))
+
+            const QuoterContract: any = Quoter(library, chain.Quoter)
+            const nativeToDXNQuote = await QuoterContract._getQuote(
+                fundsToBurn,
+                chain.UniPool,
+                chain.WNATIVETKN,
+                chain.deb0xERC20Address,
+                1
+            )
+
+            setNativeToDXNQuoteMax(ethers.utils.formatEther(nativeToDXNQuote))
+            setNativeToDXNQuoteMin(ethers.utils.formatEther(nativeToDXNQuote.sub(nativeToDXNQuote.div(BigNumber.from(10)))))
+            setAvailableFunds(ethers.utils.formatEther(fundsToBurn))
+            setEarnableFunds(ethers.utils.formatEther(fundsToBurn.div(BigNumber.from(100))))
+        }
+
+        async function buyAndBurn() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+            const deb0xERC20Contract = DXNBurn(signer, chain.dxnBurnAddress)
+
+            try {
+                const tx = await deb0xERC20Contract.burnDXN()
+                tx.wait()
+                    .then((result: any) => {
+                        setNotificationState({
+                            message: t("stake.toastify.success"), open: true,
+                            severity: "success"
+                        })
+                        setLoading(false)
+
+                        gaEventTracker("Success: DXN Buy and Burn");
+
+                    })
+                    .catch((error: any) => {
+                        setNotificationState({
+                            message: t("stake.toastify.error"), open: true,
+                            severity: "error"
+                        })
+                        setLoading(false)
+                        gaEventTracker("Error: DXN Buy and Burn");
+                    })
+            } catch (error) {
+                setNotificationState({
+                    message: t("stake.toastify.info"), open: true,
+                    severity: "info"
+                })
+                setLoading(false)
+                gaEventTracker("Rejected: DXN Buy and Burn");
+            }
+        }
 
         return (
             <>
@@ -326,19 +392,31 @@ export function Stake(props: any): any {
                             <Typography className="data-height">
                                 Available funds for buy and burn {chain.dxnTokenName}:&nbsp;
                                 <strong>
-                                    /*values*/
+                                    {availableFunds}
                                 </strong>
                             </Typography>
                             <Typography className="data-height">
                                 Burn DXN and earn 1% of the buy and burn fund:&nbsp;
                                 <strong>
-                                    /*values*/
+                                    {earnableFunds}
+                                </strong>
+                            </Typography>
+                            <Typography className="data-height">
+                                Max DXN amount burned:&nbsp;
+                                <strong>
+                                    {nativeToDXNQuoteMax}
+                                </strong>
+                            </Typography>
+                            <Typography className="data-height">
+                                Min DXN amount burned:&nbsp;
+                                <strong>
+                                    {nativeToDXNQuoteMin}
                                 </strong>
                             </Typography>
                         </div>
                     </CardContent>
                     <CardActions className='button-container px-3'>
-                        <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={() => {}}>
+                        <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
                             Buy & Burn & Earn
                         </LoadingButton>
                     </CardActions>

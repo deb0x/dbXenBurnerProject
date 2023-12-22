@@ -37,7 +37,7 @@
           "type": "uint32"
         }
       ],
-      "name": "getQuote",
+      "name": "_getQuote",
       "outputs": [
         {
           "internalType": "uint256",
