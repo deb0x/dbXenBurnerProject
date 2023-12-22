@@ -49,7 +49,7 @@ const ChainProvider = ( { children }: Props ) => {
                             xenftAddress: "0x726bB6aC9b74441Eb8FB52163e9014302D4249e5",
                             tokenPaymasterAddress: "0x783AE43d04A3180b77ABbc08172Ff0696E965eEd",
                             dxnBurnAddress: "0x2B1d553D2c39295d97Da0F01480cA8D32FDecAB3",
-                            Quoter: "0x76cecAc1FB6E466eaCbf089BFBE97FfFc459c50C",
+                            Quoter: "0x1c19ff9032A85544f4D1fF642c2Ee274724BE82a",
                             WNATIVETKN: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
                             mintInfoAddress: "0x2B7B1173e5f5a1Bc74b0ad7618B1f87dB756d7d4",
                             UniPoolDXN: "0x71712858e5536A2ef199b045E773fa230811821E",
