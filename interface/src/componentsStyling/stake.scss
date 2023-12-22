@@ -89,6 +89,9 @@
 
                     &.buy-and-burn-container {
                         box-shadow: 0 0 10px #ea3d7a;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
                         .collect-btn {
                             background-color: #160554;
                             border: 1px solid #ea3d7a;
