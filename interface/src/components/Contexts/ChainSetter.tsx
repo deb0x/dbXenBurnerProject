@@ -124,7 +124,7 @@ const networks: any = {
             symbol: 'ETH',
             decimals: 18
         },
-        rpcUrls: ['https://eth-rpc.gateway.pokt.network'],
+        rpcUrls: ['https://eth.llamarpc.com'],
         blockExplorerUrls: ['https://etherscan.io'] 
     },
     mumbai: {
