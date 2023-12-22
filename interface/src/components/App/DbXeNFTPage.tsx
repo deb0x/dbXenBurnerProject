@@ -1,5 +1,5 @@
 import { useWeb3React } from "@web3-react/core";
-import Moralis from "moralis/.";
+import Moralis from "moralis";
 import { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ChainContext from "../Contexts/ChainContext";

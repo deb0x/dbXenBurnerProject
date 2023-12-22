@@ -138,7 +138,14 @@ export function PermanentDrawer(props: any): any {
                         anchor='left'
                         className="side-menu">
                         <div className="image-container">
-                            <div className={`img ${window.location.pathname.includes("dbxenft") ? "dbxenft" : "dbxen"}`}></div>
+                            {
+                                window.location.pathname.includes("mint-dbxenft") ?
+                                    <div className="img xenft"></div> :
+                                    window.location.pathname.includes("your-dbxenfts") ?
+                                    <div className="img dbxenft"></div> :
+                                    <div className="img dbxen"></div>
+                            }
+                            
                         </div>
                         <Box className="main-menu--left">
                             <p className="mb-0">{t("app_bar.tokens_staked")}:&nbsp;

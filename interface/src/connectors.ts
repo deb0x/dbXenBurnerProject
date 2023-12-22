@@ -20,10 +20,10 @@ const RPC_URLS: { [chainId: number]: string } = {
     369:'https://rpc.pulsechain.com'
 }
 
-export const injected = new InjectedConnector({ supportedChainIds: [1, 137, 43114, 56, 250, 1284, 66, 9001, 2000, 10001, 8453, 10, 369] })
+export const injected = new InjectedConnector({ supportedChainIds: [1, 137, 43114, 56, 250, 1284, 66, 9001, 2000, 10001, 8453, 10, 369, 80001] })
 
 export const network = new NetworkConnector({
-    urls: {1: RPC_URLS[1], 137: RPC_URLS[137], 43114: RPC_URLS[43114], 56: RPC_URLS[56],  250: RPC_URLS[250], 1284: RPC_URLS[1284],
+    urls: {1: RPC_URLS[1], 137: RPC_URLS[137], 43114: RPC_URLS[43114], 56: RPC_URLS[56],  250: RPC_URLS[250], 1284: RPC_URLS[1284], 80001: RPC_URLS[80001],
         66: RPC_URLS[66],  9001: RPC_URLS[9001],  2000: RPC_URLS[2000], 10001: RPC_URLS[10001], 8453: RPC_URLS[8453],10: RPC_URLS[10],369: RPC_URLS[369]},
     defaultChainId: 137
 })
