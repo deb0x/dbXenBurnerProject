@@ -54,6 +54,14 @@ $randomNumber: random(4);
         background-color: #030328;
         color: #F2E9DC;
         border: 1px solid #19D2D2;
+        img{
+            width: 100%;
+        }
+    }
+    .dashboard-btn {
+        width: 15%;
+        padding: 5px 15px;
+        border: 1px solid #D742F3;
     }
     .main-row,
     .side-menu-container {
@@ -644,10 +652,9 @@ $randomNumber: random(4);
                             color: #19D2D2;
                         }
                         &.dashboard {
-                            fill: #fff;
-                        }
-                        &.dashboard {
-                            fill: #19D2D2;
+                            img {
+                                width: 100%;
+                            }
                         }
                     }
                     div:last-child {

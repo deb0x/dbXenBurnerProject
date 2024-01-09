@@ -6,11 +6,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import {
     BURN_ROUTE,
-    DASHBOARD_ROUTE,
     MINTDBXENFT_ROUTE,
     FEES_ROUTE,
-    DBXENFT_LIST_ROUTE
+    DBXENFT_LIST_ROUTE,
+    XENON_ROUTE
 } from "../Common/routes";
+import xenonLogo from "../../photos/xenon_logo.svg";
 
 export function AppBarMobile(): any {
     const { t } = useTranslation();
@@ -25,13 +26,11 @@ export function AppBarMobile(): any {
                 onClick={() => navigate(BURN_ROUTE)}>
                     {t("mobile.mint")}
             </div>
-            { Number(window.ethereum.networkVersion) === 1 ?
-                <div className={`navigation-item dashboard ${location === DASHBOARD_ROUTE ? "active" : ""}`}
-                    onClick={() => navigate(DASHBOARD_ROUTE)}>
-                    <FontAwesomeIcon icon={faChartLine as IconProp} />
-                </div> :
-                <></>
-            }
+            
+            <div className={`navigation-item dashboard ${location === XENON_ROUTE ? "active" : ""}`}
+                onClick={() => navigate(XENON_ROUTE)}>
+                <img src={xenonLogo} alt="xenonLogo" />
+            </div>
             <div className={`navigation-item ${location === FEES_ROUTE ? "active" : ""}`}
                 onClick={() => navigate(FEES_ROUTE)}>
                     {t("mobile.fees")}

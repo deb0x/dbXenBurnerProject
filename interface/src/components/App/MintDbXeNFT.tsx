@@ -24,6 +24,7 @@ import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
 import { Network, Alchemy } from "alchemy-sdk";
 import xenonLogo from "../../photos/xenon_logo.svg";
+import { MINTDBXENFT_ROUTE } from "../Common/routes";
 
 const chainForGas = [137,250,43114,1284,10001];
 const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369,80001];
@@ -2143,9 +2144,6 @@ export function MintDbXeNFT(): any {
                                         <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
-                                        <th scope="col">
-                                            <img src={xenonLogo} alt="xenonLogo" />
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2161,34 +2159,36 @@ export function MintDbXeNFT(): any {
                                                 <td>{data.term}</td>
                                                 <td>{data.maturityDateTime}</td>
                                                 <td>{data.estimatedXen}</td>
-                                                <td>
-                                                    <button
-                                                        className="detail-btn"
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setXenftId(data.id);
-                                                            setDisplayDbxenftDetails(!displayDbxenftDetails);
-                                                            setDBXNFT({
-                                                                protocolFee: "0",
-                                                                transactionFee: "0"
-                                                            })
-                                                            previewData(data)
-                                                            // setXenftId(data.id)
-                                                        }}
-                                                    >
-                                                        PREVIEW DBXENFT
-                                                    </button>
-                                                </td>
-                                                {data.claimStatus === "Claimable" && displayGaslessClaim ?
+                                                {window.location.pathname === MINTDBXENFT_ROUTE ?
                                                     <td>
-                                                    <button
-                                                        className="gasless-btn"
-                                                        type="button"
-                                                        onClick={() => handleAlreadyRedeemed(data)}
-                                                    >
-                                                        Gasless claim
-                                                    </button>
-                                                </td> : <></>}
+                                                        <button
+                                                            className="detail-btn"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setXenftId(data.id);
+                                                                setDisplayDbxenftDetails(!displayDbxenftDetails);
+                                                                setDBXNFT({
+                                                                    protocolFee: "0",
+                                                                    transactionFee: "0"
+                                                                })
+                                                                previewData(data)
+                                                                // setXenftId(data.id)
+                                                            }}
+                                                        >
+                                                            PREVIEW DBXENFT
+                                                        </button>
+                                                    </td> :
+                                                    data.claimStatus === "Claimable" && displayGaslessClaim ?
+                                                        <td>
+                                                        <button
+                                                            className="gasless-btn"
+                                                            type="button"
+                                                            onClick={() => handleAlreadyRedeemed(data)}
+                                                        >
+                                                            Gasless claim
+                                                        </button>
+                                                    </td> : <></>
+                                                }
                                             </tr>
                                             <tr className="xenft-details-row">
                                                 {displayDbxenftDetails && xenftId === data.id ?
