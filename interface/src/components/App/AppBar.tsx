@@ -291,7 +291,10 @@ export function AppBarComponent(props: any): any {
                             </button>
                             : <></>
                         }
-                        {dimensions.width > 768 ?
+                        {dimensions.width > 768 &&
+                            chain.chainId == "137" || 
+                            chain.chainId == "56" ||
+                            chain.chainId == "1" ?
                             <button onClick={() => navigate(XENON_ROUTE)} className="dashboard-btn">
                                 <img src={xenonLogo} alt="xenonLogo" />
                             </button>
