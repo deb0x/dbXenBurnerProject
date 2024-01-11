@@ -16,6 +16,8 @@ export const initialChain = {
         UniPoolDXN: "0xf233d8cAD91808AcbdF7dA48fcdF9F1f704872F1",
         UniPoolXen: "0x97FFB2574257280e0FB2FA522345F0E81fAae711",
         WNATIVETKN: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+        token1: "0x2AB0e9e4eE70FFf1fB9D67031E44F6410170d00e",
+        token2: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
         chainId: "137",
         chainName: "polygon",
         currency: "MATIC",

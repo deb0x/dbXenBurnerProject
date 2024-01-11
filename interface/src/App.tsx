@@ -38,7 +38,8 @@ import {
     HOME_ROUTE,
     DBXENFT_LIST_ROUTE,
     DBXENFT_ROUTE,
-    DBXENFT_EXTERNAL_ROUTE
+    DBXENFT_EXTERNAL_ROUTE,
+    XENON_ROUTE
 } from './components/Common/routes';
 import { AppBarMobile } from './components/App/AppBarMobile';
 import { DbXeNFTPage } from './components/App/DbXeNFTPage';
@@ -254,6 +255,7 @@ function App() {
                                             <Route path={ DBXENFT_LIST_ROUTE } element={ <DbXeNFTList /> } />
                                             <Route path={ DBXENFT_ROUTE } element={ <DbXeNFTPage /> } />
                                             <Route path={ DBXENFT_EXTERNAL_ROUTE } element={ <DbXeNFTExternalView /> } />
+                                            <Route path={ XENON_ROUTE } element={ <MintDbXeNFT /> } />
                                         </Routes>
                                     </Box>
                                 </div>

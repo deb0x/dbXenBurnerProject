@@ -17,6 +17,9 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
     .img.xenft {
         background-image: url('../photos/icons/xenft-logo.svg');
     }
+    .img.xenon {
+        background-image: url('../photos/xenon_logo.svg');
+    }
 }
 
 .theme {
@@ -27,7 +30,8 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
         background-position: center;
     }
     .img.dbxenft,
-    .img.xenft {
+    .img.xenft,
+    .img.xenon {
         background-size: contain;
     }
 }
@@ -129,11 +133,24 @@ $box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
             text-align: center;
             justify-content: center;
             align-items: center;
-            a {
-                color: #ECBA3F;
-                font-weight: 800;
-                font-size: 18px;
-                letter-spacing: 0.5px;
+            button {
+                font-family: "Karla";
+                padding: 5px 15px;
+                border-radius: 25px;
+                background-color: #030328;
+                color: #F2E9DC;
+                border: 1px solid #19D2D2;
+                max-width: 250px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                white-space: nowrap;
+                margin-bottom: 15px;
+                img {
+                    margin-left: 15px;
+                    max-height: 15px;
+                    width: auto;
+                }
             }
         }
 

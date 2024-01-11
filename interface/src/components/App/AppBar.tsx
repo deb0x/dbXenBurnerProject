@@ -37,9 +37,11 @@ import {
     DASHBOARD_ROUTE,
     MINTDBXENFT_ROUTE,
     HOME_ROUTE,
-    DBXENFT_LIST_ROUTE
+    DBXENFT_LIST_ROUTE,
+    XENON_ROUTE
 } from '../Common/routes';
 import backButton from "../../photos/icons/back-button.svg";
+import xenonLogo from "../../photos/xenon_logo.svg";
 
 
 const tokenDecimals = 18;
@@ -289,9 +291,12 @@ export function AppBarComponent(props: any): any {
                             </button>
                             : <></>
                         }
-                        {Number(chain.chainId) === 1 && dimensions.width > 768 ?
-                            <button onClick={() => navigate(DASHBOARD_ROUTE)} className="dashboard-btn">
-                                Dashboard
+                        {dimensions.width > 768 &&
+                            chain.chainId == "137" || 
+                            chain.chainId == "56" ||
+                            chain.chainId == "1" ?
+                            <button onClick={() => navigate(XENON_ROUTE)} className="dashboard-btn">
+                                <img src={xenonLogo} alt="xenonLogo" />
                             </button>
                             : <></>
                         }

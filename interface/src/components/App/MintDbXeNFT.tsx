@@ -24,6 +24,13 @@ import { TablePagination } from '@mui/base/TablePagination';
 import Countdown, { zeroPad } from "react-countdown";
 import { Network, Alchemy } from "alchemy-sdk";
 import xenonLogo from "../../photos/xenon_logo.svg";
+import { MINTDBXENFT_ROUTE } from "../Common/routes";
+import {
+    ContractCallContext,
+    ContractCallResults,
+    Multicall
+} from "ethereum-multicall";
+
 
 const chainForGas = [137,250,43114,1284,10001];
 const supportedChains = [1,10,8453,137,56,250,43114,9001,1284,10001,369,80001];
@@ -32,6 +39,7 @@ const chainsForPagination = [1284,9001,10001,369,8453];
 const { BigNumber } = require("ethers");
 const Decimal = require('decimal.js');
 const { abi } = require("../../ethereum/XENTorrent.json");
+const { abi: mintInfoABI } = require("../../ethereum/MintInfo.json");
 
 interface XENFTEntry {
     id: number;
@@ -333,6 +341,8 @@ export function MintDbXeNFT(): any {
             }
             resultArray = results?.flat();
             setAllXENFTs(resultArray);
+            resultArray = await addXENFTRedeemedStatus(resultArray)
+            
             if (resultArray?.length != 0 && resultArray != undefined) {
                 let xenftEntries: XENFTEntry[] = [];
                 for (let i = 0; i < resultArray?.length; i++) {
@@ -480,6 +490,60 @@ export function MintDbXeNFT(): any {
         }
         return calculatedClaimStatus;
     }
+
+    async function addXENFTRedeemedStatus(xenftArray: any) {
+        const multicall = new Multicall({ ethersProvider: library, tryAggregate: true });
+
+        //console.log(xenftArray)
+        const arrayLen = xenftArray.length
+        let calls = []
+
+        for(let i = 0; i < arrayLen; i++){
+            calls.push(
+                { reference: 'getMintInfo', methodName: 'mintInfo', methodParameters: [xenftArray[i].token_id] },
+            )
+        }
+
+        const contractCallContext: ContractCallContext[] = [
+            {
+                reference: 'XENTorrent',
+                contractAddress: chain.xenftAddress,
+                abi,
+                calls
+            }
+        ]
+
+        const response: ContractCallResults = await multicall.call(contractCallContext);
+        //console.log(response)
+
+        let calls2 = []
+        for(let i = 0; i < arrayLen; i++){
+            calls2.push(
+                { reference: 'isRedeemed', methodName: 'getRedeemed', methodParameters: [response.results.XENTorrent.callsReturnContext[i].returnValues[0]] },
+            )
+        }
+
+        const contractCallContext2: ContractCallContext[] = [
+            {
+                reference: 'MintInfo',
+                contractAddress: chain.mintInfoAddress,
+                abi: mintInfoABI,
+                calls: calls2
+            }
+        ]
+
+        const response2: ContractCallResults = await multicall.call(contractCallContext2);
+        //console.log(response2)
+
+        for(let i = 0; i < arrayLen; i++) {
+            xenftArray[i].redeemed = response2.results.MintInfo.callsReturnContext[i].returnValues[0]
+        }
+
+        //console.log(xenftArray)
+
+        return xenftArray
+    }
+
     async function getWalletNFTsForUser(chain: any, nftAddress: any, cursor: any) {
         let cursorData;
         if (cursor != null)
@@ -1026,21 +1090,21 @@ export function MintDbXeNFT(): any {
     async function calcTxCost(xenftId: number) {
         const QuoterContract: any = Quoter(library, chain.Quoter)
 
-        const signer = xenftCall.signer
-        const gasEstimate = await xenftCall.estimateGas.bulkClaimMintReward(
+        const signer = library.getSigner(0);
+        const XENFTContract = XENFT(signer, chain.xenftAddress);
+        const gasEstimate = await XENFTContract.estimateGas.bulkClaimMintReward(
             xenftId,
             chain.tokenPaymasterAddress
         )
         const gsnGasOverhead = BigNumber.from("360000")
         const gasPrice = await signer.getGasPrice()
         const txCost = (gasEstimate.add(gsnGasOverhead)).mul(gasPrice)
-        console.log(ethers.utils.formatUnits(gasEstimate))
 
-        const xenQuote = ethers.utils.formatEther(await QuoterContract.getQuote(
+        const xenQuote = ethers.utils.formatEther(await QuoterContract._getQuote(
             txCost,
             chain.UniPoolXen,
-            chain.WNATIVETKN,
-            chain.xenCryptoAddress,
+            chain.token1,
+            chain.token2,
             1
         ))
         
@@ -2143,9 +2207,6 @@ export function MintDbXeNFT(): any {
                                         <th scope="col">Maturity</th>
                                         <th scope="col">Estimated XEN</th>
                                         <th scope="col"></th>
-                                        <th scope="col">
-                                            <img src={xenonLogo} alt="xenonLogo" />
-                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2161,34 +2222,40 @@ export function MintDbXeNFT(): any {
                                                 <td>{data.term}</td>
                                                 <td>{data.maturityDateTime}</td>
                                                 <td>{data.estimatedXen}</td>
-                                                <td>
-                                                    <button
-                                                        className="detail-btn"
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setXenftId(data.id);
-                                                            setDisplayDbxenftDetails(!displayDbxenftDetails);
-                                                            setDBXNFT({
-                                                                protocolFee: "0",
-                                                                transactionFee: "0"
-                                                            })
-                                                            previewData(data)
-                                                            // setXenftId(data.id)
-                                                        }}
-                                                    >
-                                                        PREVIEW DBXENFT
-                                                    </button>
-                                                </td>
-                                                {data.claimStatus === "Claimable" && displayGaslessClaim ?
+                                                {window.location.pathname === MINTDBXENFT_ROUTE ?
                                                     <td>
-                                                    <button
-                                                        className="gasless-btn"
-                                                        type="button"
-                                                        onClick={() => handleAlreadyRedeemed(data)}
-                                                    >
-                                                        Gasless claim
-                                                    </button>
-                                                </td> : <></>}
+                                                        <button
+                                                            className="detail-btn"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setXenftId(data.id);
+                                                                setDisplayDbxenftDetails(!displayDbxenftDetails);
+                                                                setDBXNFT({
+                                                                    protocolFee: "0",
+                                                                    transactionFee: "0"
+                                                                })
+                                                                previewData(data)
+                                                                // setXenftId(data.id)
+                                                            }}
+                                                        >
+                                                            PREVIEW DBXENFT
+                                                        </button>
+                                                    </td> :
+                                                    data.claimStatus === "Claimable" && !data.redeemed && displayGaslessClaim ?
+                                                        <td>
+                                                        <button
+                                                            className="gasless-btn"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setXenftId(data.id);
+                                                                calcTxCost(data.id)
+                                                                setClaimDetails(true)
+                                                            }}
+                                                        >
+                                                            Gasless claim
+                                                        </button>
+                                                    </td> : <></>
+                                                }
                                             </tr>
                                             <tr className="xenft-details-row">
                                                 {displayDbxenftDetails && xenftId === data.id ?

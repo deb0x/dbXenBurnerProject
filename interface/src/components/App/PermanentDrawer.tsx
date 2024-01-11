@@ -16,7 +16,9 @@ import ChainContext from '../Contexts/ChainContext';
 import "i18next";
 import { useTranslation } from 'react-i18next';
 import DBXen from "../../ethereum/dbxen"
-import { DBXENFT_LIST_ROUTE, FEES_ROUTE, HOME_ROUTE, MINTDBXENFT_ROUTE } from '../Common/routes';
+import { DBXENFT_LIST_ROUTE, FEES_ROUTE, HOME_ROUTE, MINTDBXENFT_ROUTE, XENON_ROUTE } from '../Common/routes';
+import arrow from '../../photos/icons/arrow-right.svg';
+import { useNavigate } from 'react-router-dom';
 
 declare global {
     interface Window {
@@ -36,6 +38,7 @@ export function PermanentDrawer(props: any): any {
     const { t } = useTranslation();
     const [totalStaked, setTotalStaked] = useState("")
     const [totalXENBurned, setTotalXENBurned] = useState<any>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         injected.supportedChainIds?.forEach(chainId =>
@@ -143,6 +146,8 @@ export function PermanentDrawer(props: any): any {
                                     <div className="img xenft"></div> :
                                     window.location.pathname.includes("your-dbxenfts") ?
                                     <div className="img dbxenft"></div> :
+                                    window.location.pathname === XENON_ROUTE ?
+                                    <div className="img xenon"></div> :
                                     <div className="img dbxen"></div>
                             }
                             
@@ -160,8 +165,14 @@ export function PermanentDrawer(props: any): any {
                         {window.location.pathname === HOME_ROUTE || window.location.pathname === FEES_ROUTE ?
                             <Burn /> :
                             <div className="dbxenft-menu">
-                                <a href={MINTDBXENFT_ROUTE}>XENFTs LIST</a>
-                                <a href={DBXENFT_LIST_ROUTE}> YOUR DBXENFTs</a>
+                                <button onClick={() => navigate(MINTDBXENFT_ROUTE)}>
+                                    XENFTs LIST
+                                    <img src={arrow} alt="arrow" />
+                                </button>
+                                <button onClick={() => navigate(DBXENFT_LIST_ROUTE)}>
+                                    YOUR DBXENFTs
+                                    <img src={arrow} alt="arrow" />
+                                </button>
                             </div>
                         }
 

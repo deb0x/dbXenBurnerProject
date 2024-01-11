@@ -379,6 +379,7 @@ export function Stake(props: any): any {
                 setLoading(false)
                 gaEventTracker("Rejected: DXN Buy and Burn");
             }
+            setTimeout(() => setNotificationState({}), 5000)
         }
 
         return (
@@ -1276,7 +1277,6 @@ export function Stake(props: any): any {
                     <div className='row'>
                     {chain.chainId == "137" || 
                     chain.chainId == "56" ||
-                    chain.chainId == "43114" ||
                     chain.chainId == "1" ?
                         <>
                             <Grid item className="col col-12 col-md-6 ">
