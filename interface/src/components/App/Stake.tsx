@@ -314,22 +314,28 @@ export function Stake(props: any): any {
         )
     }
 
-    function BuyAndBurnOfXenPanel() {
+    function BuyAndBurnPanel() {
         const [loading, setLoading] = useState(false)
         const [availableFunds, setAvailableFunds] = useState("")
-        const [xenToDXNQuote, setXenToDXNQuote] = useState("")
         const [earnableFunds, setEarnableFunds] = useState("")
+        const [nativeToDXNQuote, setNativeToDXNQuote] = useState("")
         const [insufficientFunds, setInsufficientFunds] = useState(false)
+        const [loadingXen, setLoadingXen] = useState(false)
+        const [availableFundsXen, setAvailableFundsXen] = useState("")
+        const [xenToDXNQuote, setXenToDXNQuote] = useState("")
+        const [earnableFundsXen, setEarnableFundsXen] = useState("")
+        const [insufficientFundsXen, setInsufficientFundsXen] = useState(false)
 
         useEffect(() => {
-            getData()
+            getDataXen();
+            getData();
         }, [chain.chainId])
 
-        async function getData() {
+        async function getDataXen() {
             const XENCryptoContract = ERC20(library, chain.xenCryptoAddress)
             const balance = await XENCryptoContract.balanceOf(chain.dxnBurnAddress)
             if(balance.lt(ethers.utils.parseEther("1"))) {
-                setInsufficientFunds(true)
+                setInsufficientFundsXen(true)
             } else {
                 const fundsToBurn = balance.mul(BigNumber.from(99)).div(BigNumber.from(100))
             
@@ -345,17 +351,17 @@ export function Stake(props: any): any {
                     )
 
                     setXenToDXNQuote(ethers.utils.formatEther(xenToDXNQuote))
-                    setAvailableFunds(ethers.utils.formatEther(fundsToBurn))
-                    setEarnableFunds(ethers.utils.formatEther(balance.div(BigNumber.from(100))))
+                    setAvailableFundsXen(ethers.utils.formatEther(fundsToBurn))
+                    setEarnableFundsXen(ethers.utils.formatEther(balance.div(BigNumber.from(100))))
                 } catch(error) {
-                    setInsufficientFunds(true)
+                    setInsufficientFundsXen(true)
                 }
             }
             
         }
 
-        async function buyAndBurn() {
-            setLoading(true)
+        async function buyAndBurnXen() {
+            setLoadingXen(true)
 
             const signer = await library.getSigner(0)
             const XENCryptoContract = ERC20(library, chain.xenCryptoAddress)
@@ -370,7 +376,7 @@ export function Stake(props: any): any {
                             message: t("stake.toastify.success"), open: true,
                             severity: "success"
                         })
-                        setLoading(false)
+                        setLoadingXen(false)
 
                         gaEventTracker("Success: DXN Buy and Burn");
 
@@ -380,7 +386,7 @@ export function Stake(props: any): any {
                             message: t("stake.toastify.error"), open: true,
                             severity: "error"
                         })
-                        setLoading(false)
+                        setLoadingXen(false)
                         gaEventTracker("Error: DXN Buy and Burn");
                     })
             } catch (error) {
@@ -389,73 +395,11 @@ export function Stake(props: any): any {
                     message: t("stake.toastify.info"), open: true,
                     severity: "info"
                 })
-                setLoading(false)
+                setLoadingXen(false)
                 gaEventTracker("Rejected: DXN Buy and Burn");
             }
             setTimeout(() => setNotificationState({}), 5000)
         }
-
-        return (
-            <>
-                <Card variant="outlined" className="card-container buy-and-burn-container">
-                    <CardContent className="row">
-                        <div className="col-12 col-md-12 mb-2">
-                            <Typography variant="h4" component="div" className="rewards mb-3">
-                                Buy and Burn and Earn
-                            </Typography>
-                            {!insufficientFunds ? 
-                            <>
-                            <Typography className="data-height">
-                                Available funds for buy and burn {chain.dxnTokenName}:&nbsp;
-                                <strong>
-                                    {availableFunds +" XEN"}
-                                </strong>
-                            </Typography>
-                            <Typography className="data-height">
-                                Burn DXN and earn 1% of the buy and burn fund:&nbsp;
-                                <strong>
-                                    {earnableFunds + " XEN"}
-                                </strong>
-                            </Typography>
-                            <Typography className="data-height">
-                                Estimated amount burned:&nbsp;
-                                <strong>
-                                    {xenToDXNQuote  + " " + chain.dxnTokenName}
-                                </strong>
-                            </Typography>
-                            </> :
-                            <Typography className="data-height">
-                                <strong>
-                                    Not enough Xen funds to Buy & Burn.
-                                    Please wait for enough XEN to accumulate.
-                                </strong>
-                            </Typography>
-                        }
-                        </div>
-                    </CardContent>
-                    <CardActions className='button-container px-3'>
-                        {
-                            !insufficientFunds &&
-                                <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
-                                    Buy & Burn & Earn
-                                </LoadingButton>
-                        }
-                    </CardActions>
-                </Card>
-            </>
-        )
-    }
-
-    function BuyAndBurnPanel() {
-        const [loading, setLoading] = useState(false)
-        const [availableFunds, setAvailableFunds] = useState("")
-        const [earnableFunds, setEarnableFunds] = useState("")
-        const [nativeToDXNQuote, setNativeToDXNQuote] = useState("")
-        const [insufficientFunds, setInsufficientFunds] = useState(false)
-
-        useEffect(() => {
-            getData()
-        }, [chain.chainId])
 
         async function getData() {
             let balance = await library.getBalance(chain.dxnBurnAddress)
@@ -562,13 +506,56 @@ export function Stake(props: any): any {
                                 </Typography>
                             }
                         </div>
+                        <CardActions className='button-container px-3'>
+                        {
+                            !insufficientFunds &&
+                            <LoadingButton className="collect-btn" loading={loading}
+                                variant="contained"
+                                onClick={async () => {buyAndBurn()}}>
+                                Buy & Burn & Earn {chain.dxnTokenName}
+                            </LoadingButton>
+                        }
+                    </CardActions>
+                        <hr />
+                        <div className="col-12 col-md-12 mb-2">
+                            {!insufficientFundsXen ? 
+                            <>
+                            <Typography className="data-height">
+                                Available funds for buy and burn {chain.xenTokenName}:&nbsp;
+                                <strong>
+                                    {availableFundsXen + " " + chain.xenTokenName}
+                                </strong>
+                            </Typography>
+                            <Typography className="data-height">
+                                Burn DXN and earn 1% of the buy and burn fund:&nbsp;
+                                <strong>
+                                    {earnableFundsXen + " " + chain.xenTokenName}
+                                </strong>
+                            </Typography>
+                            <Typography className="data-height">
+                                Estimated amount burned:&nbsp;
+                                <strong>
+                                    {xenToDXNQuote  + " " + chain.dxnTokenName}
+                                </strong>
+                            </Typography>
+                            </> :
+                            <Typography className="data-height">
+                                <strong>
+                                    Not enough {chain.xenTokenName} funds to Buy & Burn.
+                                    Please wait for enough {chain.xenTokenName} to accumulate.
+                                </strong>
+                            </Typography>
+                        }
+                        </div>
                     </CardContent>
                     <CardActions className='button-container px-3'>
                         {
-                            !insufficientFunds &&
-                            <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
-                                Buy & Burn & Earn
-                            </LoadingButton>
+                            !insufficientFundsXen &&
+                                <LoadingButton className="collect-btn" loading={loadingXen}
+                                    variant="contained"
+                                    onClick={async () => {buyAndBurnXen()}}>
+                                    Buy & Burn & Earn {chain.xenTokenName}
+                                </LoadingButton>
                         }
                     </CardActions>
                 </Card>
@@ -1430,7 +1417,6 @@ export function Stake(props: any): any {
                         <>
                             <Grid item className="col col-12 col-md-6 ">
                                 <BuyAndBurnPanel/>
-                                <BuyAndBurnOfXenPanel/>
                             </Grid>
                             <Grid item className="col col-12 col-md-6">
                                 <CyclePanel />
