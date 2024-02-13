@@ -10,7 +10,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import LoadingButton from '@mui/lab/LoadingButton';
 import DBXen from "../../ethereum/dbxen"
 import DBXenViews from "../../ethereum/dbxenViews";
-import DBXenERC20 from "../../ethereum/dbxenerc20"
+import ERC20 from "../../ethereum/dbxenerc20"
 import Quoter from "../../ethereum/quoter";
 import DXNBurn from "../../ethereum/dxnBurn";
 import SnackbarNotification from './Snackbar';
@@ -314,44 +314,56 @@ export function Stake(props: any): any {
         )
     }
 
-    function BuyAndBurnPanel() {
+    function BuyAndBurnOfXenPanel() {
         const [loading, setLoading] = useState(false)
         const [availableFunds, setAvailableFunds] = useState("")
+        const [xenToDXNQuote, setXenToDXNQuote] = useState("")
         const [earnableFunds, setEarnableFunds] = useState("")
-        const [nativeToDXNQuoteMax, setNativeToDXNQuoteMax] = useState("")
-        const [nativeToDXNQuoteMin, setNativeToDXNQuoteMin] = useState("")
-        
+        const [insufficientFunds, setInsufficientFunds] = useState(false)
+
         useEffect(() => {
             getData()
         }, [chain.chainId])
 
         async function getData() {
-            const balance = await library.getBalance(chain.dxnBurnAddress)
-            const fundsToBurn = balance.mul(BigNumber.from(98)).div(BigNumber.from(100))
+            const XENCryptoContract = ERC20(library, chain.xenCryptoAddress)
+            const balance = await XENCryptoContract.balanceOf(chain.dxnBurnAddress)
+            if(balance.lt(ethers.utils.parseEther("1"))) {
+                setInsufficientFunds(true)
+            } else {
+                const fundsToBurn = balance.mul(BigNumber.from(99)).div(BigNumber.from(100))
+            
+                const QuoterContract: any = Quoter(library, chain.UniswapQuoter)
+                
+                const path = ethers.utils.solidityPack(["address", "uint24", "address", "uint24", "address"],
+                [chain.xenCryptoAddress, 10000, chain.WNATIVETKN, 10000, chain.deb0xERC20Address])
 
-            const QuoterContract: any = Quoter(library, chain.Quoter)
-            const nativeToDXNQuote = await QuoterContract._getQuote(
-                fundsToBurn,
-                chain.UniPoolDXN,
-                chain.WNATIVETKN,
-                chain.deb0xERC20Address,
-                1
-            )
+                try {
+                    const xenToDXNQuote = await QuoterContract.callStatic.quoteExactInput(
+                        path,
+                        fundsToBurn
+                    )
 
-            setNativeToDXNQuoteMax(ethers.utils.formatEther(nativeToDXNQuote))
-            setNativeToDXNQuoteMin(ethers.utils.formatEther(nativeToDXNQuote.sub(nativeToDXNQuote.div(BigNumber.from(10)))))
-            setAvailableFunds(ethers.utils.formatEther(fundsToBurn))
-            setEarnableFunds(ethers.utils.formatEther(fundsToBurn.div(BigNumber.from(100))))
+                    setXenToDXNQuote(ethers.utils.formatEther(xenToDXNQuote))
+                    setAvailableFunds(ethers.utils.formatEther(fundsToBurn))
+                    setEarnableFunds(ethers.utils.formatEther(balance.div(BigNumber.from(100))))
+                } catch(error) {
+                    setInsufficientFunds(true)
+                }
+            }
+            
         }
 
         async function buyAndBurn() {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-            const deb0xERC20Contract = DXNBurn(signer, chain.dxnBurnAddress)
+            const XENCryptoContract = ERC20(library, chain.xenCryptoAddress)
+            const dxnBuyBurnContract = DXNBurn(signer, chain.dxnBurnAddress)
+            const buyBurnBalance = await XENCryptoContract.balanceOf(chain.dxnBurnAddress)
 
             try {
-                const tx = await deb0xERC20Contract.burnDXN()
+                const tx = await dxnBuyBurnContract.swapXENtoDXN(buyBurnBalance)
                 tx.wait()
                     .then((result: any) => {
                         setNotificationState({
@@ -372,6 +384,7 @@ export function Stake(props: any): any {
                         gaEventTracker("Error: DXN Buy and Burn");
                     })
             } catch (error) {
+                console.log(error)
                 setNotificationState({
                     message: t("stake.toastify.info"), open: true,
                     severity: "info"
@@ -390,36 +403,173 @@ export function Stake(props: any): any {
                             <Typography variant="h4" component="div" className="rewards mb-3">
                                 Buy and Burn and Earn
                             </Typography>
+                            {!insufficientFunds ? 
+                            <>
                             <Typography className="data-height">
                                 Available funds for buy and burn {chain.dxnTokenName}:&nbsp;
                                 <strong>
-                                    {availableFunds}
+                                    {availableFunds +" XEN"}
                                 </strong>
                             </Typography>
                             <Typography className="data-height">
                                 Burn DXN and earn 1% of the buy and burn fund:&nbsp;
                                 <strong>
-                                    {earnableFunds}
+                                    {earnableFunds + " XEN"}
                                 </strong>
                             </Typography>
                             <Typography className="data-height">
-                                Max DXN amount burned:&nbsp;
+                                Estimated amount burned:&nbsp;
                                 <strong>
-                                    {nativeToDXNQuoteMax}
+                                    {xenToDXNQuote  + " " + chain.dxnTokenName}
                                 </strong>
                             </Typography>
+                            </> :
                             <Typography className="data-height">
-                                Min DXN amount burned:&nbsp;
                                 <strong>
-                                    {nativeToDXNQuoteMin}
+                                    Not enough Xen funds to Buy & Burn.
+                                    Please wait for enough XEN to accumulate.
                                 </strong>
                             </Typography>
+                        }
                         </div>
                     </CardContent>
                     <CardActions className='button-container px-3'>
-                        <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
-                            Buy & Burn & Earn
-                        </LoadingButton>
+                        {
+                            !insufficientFunds &&
+                                <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
+                                    Buy & Burn & Earn
+                                </LoadingButton>
+                        }
+                    </CardActions>
+                </Card>
+            </>
+        )
+    }
+
+    function BuyAndBurnPanel() {
+        const [loading, setLoading] = useState(false)
+        const [availableFunds, setAvailableFunds] = useState("")
+        const [earnableFunds, setEarnableFunds] = useState("")
+        const [nativeToDXNQuote, setNativeToDXNQuote] = useState("")
+        const [insufficientFunds, setInsufficientFunds] = useState(false)
+
+        useEffect(() => {
+            getData()
+        }, [chain.chainId])
+
+        async function getData() {
+            let balance = await library.getBalance(chain.dxnBurnAddress)
+            if(balance.lt(ethers.utils.parseEther("0.1"))){
+                setInsufficientFunds(true)
+            } else {
+                balance = balance.mul(BigNumber.from(99)).div(BigNumber.from(100))
+                const fundsToBurn = balance.mul(BigNumber.from(99)).div(BigNumber.from(100))
+                const QuoterContract: any = Quoter(library, chain.UniswapQuoter)
+            
+                const path = ethers.utils.solidityPack(["address", "uint24", "address"], [chain.WNATIVETKN, 10000, chain.deb0xERC20Address])
+                
+                try {
+                    const nativeToDXNQuote = await QuoterContract.callStatic.quoteExactInput(
+                        path,
+                        fundsToBurn
+                    )
+
+                    setNativeToDXNQuote(ethers.utils.formatEther(nativeToDXNQuote))
+                    setAvailableFunds(ethers.utils.formatEther(fundsToBurn))
+                    setEarnableFunds(ethers.utils.formatEther(balance.div(BigNumber.from(100))))
+                } catch(error) {
+                    setInsufficientFunds(true)
+                }
+            }
+        }
+
+        async function buyAndBurn() {
+            setLoading(true)
+
+            const signer = await library.getSigner(0)
+            const dxnBuyBurnContract = DXNBurn(signer, chain.dxnBurnAddress)
+            const buyBurnBalance = await library.getBalance(chain.dxnBurnAddress)
+
+            try {
+                const tx = await dxnBuyBurnContract.swapETHERtoDXN(buyBurnBalance.sub(buyBurnBalance.div(100)),{gasLimit: 160000})
+                tx.wait()
+                    .then((result: any) => {
+                        setNotificationState({
+                            message: t("stake.toastify.success"), open: true,
+                            severity: "success"
+                        })
+                        setLoading(false)
+
+                        gaEventTracker("Success: DXN Buy and Burn");
+
+                    })
+                    .catch((error: any) => {
+                        setNotificationState({
+                            message: t("stake.toastify.error"), open: true,
+                            severity: "error"
+                        })
+                        setLoading(false)
+                        gaEventTracker("Error: DXN Buy and Burn");
+                    })
+            } catch (error) {
+                console.log(error)
+                setNotificationState({
+                    message: t("stake.toastify.info"), open: true,
+                    severity: "info"
+                })
+                setLoading(false)
+                gaEventTracker("Rejected: DXN Buy and Burn");
+            }
+            setTimeout(() => setNotificationState({}), 5000)
+        }
+
+        return (
+            <>
+                <Card variant="outlined" className="card-container buy-and-burn-container">
+                    <CardContent className="row">
+                        <div className="col-12 col-md-12 mb-2">
+                            <Typography variant="h4" component="div" className="rewards mb-3">
+                                Buy and Burn and Earn
+                            </Typography>
+                            {
+                                !insufficientFunds ?
+                                <>
+                                    <Typography className="data-height">
+                                        Available funds for buy and burn {chain.dxnTokenName}:&nbsp;
+                                        <strong>
+                                            {availableFunds + " " + chain.currency}
+                                        </strong>
+                                    </Typography>
+                                    <Typography className="data-height">
+                                        Burn DXN and earn 1% of the buy and burn fund:&nbsp;
+                                        <strong>
+                                            {earnableFunds + " " + chain.currency}
+                                        </strong>
+                                    </Typography>
+                                    <Typography className="data-height">
+                                        Estimated amount burned:&nbsp;
+                                        <strong>
+                                            {nativeToDXNQuote + " " + chain.dxnTokenName}
+                                        </strong>
+                                    </Typography>
+                                </>
+                                :
+                                <Typography className="data-height">
+                                    <strong>
+                                        Not enough {chain.currency} funds to Buy & Burn.
+                                        Please wait for enough {chain.currency} to accumulate.
+                                    </strong>
+                                </Typography>
+                            }
+                        </div>
+                    </CardContent>
+                    <CardActions className='button-container px-3'>
+                        {
+                            !insufficientFunds &&
+                            <LoadingButton className="collect-btn" loading={loading} variant="contained" onClick={async () => {buyAndBurn()}}>
+                                Buy & Burn & Earn
+                            </LoadingButton>
+                        }
                     </CardActions>
                 </Card>
             </>
@@ -746,7 +896,7 @@ export function Stake(props: any): any {
         }, [amountToStake]);
 
         async function setStakeAmount() {
-            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+            const deb0xERC20Contract = ERC20(library, chain.deb0xERC20Address)
             await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance: any) => {
                 let allowanceValue = ethers.utils.formatEther(allowance.toString());
                 if (Number(amountToStake) > 0.0) {
@@ -788,7 +938,7 @@ export function Stake(props: any): any {
         }
 
         async function setUnstakedAmount() {
-            const deb0xERC20Contract = await DBXenERC20(library, chain.deb0xERC20Address)
+            const deb0xERC20Contract = await ERC20(library, chain.deb0xERC20Address)
             const balance = await deb0xERC20Contract.balanceOf(account).then((balance: any) => {
                 let number = ethers.utils.formatEther(balance);
                 setUserUnstakedAmount(parseFloat(number.slice(0, (number.indexOf(".")) + 3)).toString())
@@ -796,7 +946,7 @@ export function Stake(props: any): any {
         }
 
         async function setApproval() {
-            const deb0xERC20Contract = DBXenERC20(library, chain.deb0xERC20Address)
+            const deb0xERC20Contract = ERC20(library, chain.deb0xERC20Address)
 
             await deb0xERC20Contract.allowance(account, chain.deb0xAddress).then((allowance: any) =>
                 allowance > 0 ? setApproved(true) : setApproved(false)
@@ -818,7 +968,7 @@ export function Stake(props: any): any {
             setLoading(true)
 
             const signer = await library.getSigner(0)
-            const deb0xERC20Contract = DBXenERC20(signer, chain.deb0xERC20Address)
+            const deb0xERC20Contract = ERC20(signer, chain.deb0xERC20Address)
 
             try {
                 const tx = await deb0xERC20Contract.approve(chain.deb0xAddress, ethers.utils.parseEther("5010000"))
@@ -1275,12 +1425,12 @@ export function Stake(props: any): any {
             <Box className="content-box stake-content">
                 <div className="cards-grid">
                     <div className='row'>
-                    {chain.chainId == "137" || 
-                    chain.chainId == "56" ||
+                    {chain.chainId == "137" ||
                     chain.chainId == "1" ?
                         <>
                             <Grid item className="col col-12 col-md-6 ">
                                 <BuyAndBurnPanel/>
+                                <BuyAndBurnOfXenPanel/>
                             </Grid>
                             <Grid item className="col col-12 col-md-6">
                                 <CyclePanel />
