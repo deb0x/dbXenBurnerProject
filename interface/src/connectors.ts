@@ -11,7 +11,7 @@ const RPC_URLS: { [chainId: number]: string } = {
     250: 'https://endpoints.omniatech.io/v1/fantom/mainnet/public',
     1284: 'https://moonbeam.api.onfinality.io/public',
     66: 'https://exchainrpc.okex.org',
-    9001:'https://evmos-evm.publicnode.com',
+    9001:'https://evmos.lava.build',
     2000:'https://rpc.dogechain.dog',
     10001:'https://mainnet.ethereumpow.org',
     80001:'https://polygon-mumbai.g.alchemy.com/v2/mHR3HgJxtdjCrBdRznKLgvpjpMsmWB0T',
