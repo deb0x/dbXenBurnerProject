@@ -293,7 +293,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "binance",
                             currency: "BNB",
-                            priceURL: "https://bsc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://bsc-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "bDXN",
                             xenTokenName: "bXEN"
                         })
@@ -311,7 +311,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "fantom",
                             currency: "FTM",
-                            priceURL: "https://fantom-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://fantom-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "fmDXN",
                             xenTokenName: "fmXEN"
                         })
@@ -329,7 +329,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "moonbeam",
                             currency: "GLMR",
-                            priceURL: "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://moonbeam-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "mbDXN",
                             xenTokenName: "mbXEN"
                         })
@@ -343,7 +343,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "okx",
                             currency: "OKT",
-                            priceURL: "https://oKc-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://oKc-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "okDXN",
                             xenTokenName: "okXEN"
                         })
@@ -361,7 +361,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Evmos",
                             currency: "EVMOS",
-                            priceURL: "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://evmos-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "coDXN",
                             xenTokenName: "coXEN"
                         })
@@ -375,7 +375,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Dogechain",
                             currency: "DOGE",
-                            priceURL: "https://dogechain-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://dogechain-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "dcDXN",
                             xenTokenName: "dcXEN"
                         })
@@ -433,7 +433,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Base",
                             currency: "ETH",
-                            priceURL: "https://base-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://base-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "cbDXN",
                             xenTokenName: "cbXEN"
                         })
@@ -451,7 +451,7 @@ export default function ChainSetter(props: any) {
                             chainId: parseInt(result, 16),
                             chainName: "Optimism",
                             currency: "ETH",
-                            priceURL: "https://optimism-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d",
+                            priceURL: "https://optimism-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d",
                             dxnTokenName: "opDXN",
                             xenTokenName: "opXEN"
                         })
