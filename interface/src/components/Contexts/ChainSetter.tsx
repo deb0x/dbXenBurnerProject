@@ -91,7 +91,7 @@ const networks: any = {
                 symbol: 'EVMOS',
                 decimals: 18
             },
-            rpcUrls: ['https://evmos.lava.build'],
+            rpcUrls: ['https://evmos-jsonrpc.theamsolutions.info'],
             blockExplorerUrls: ['https://escan.live'] 
     },
     doge: {
