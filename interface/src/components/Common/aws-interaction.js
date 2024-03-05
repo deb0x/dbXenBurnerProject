@@ -59,12 +59,12 @@ export async function writePerCycle(id, maturityTs, chainId) {
         METADATA_BUCKET = "deboxnft-minting-bsc";
     }
     if (chainId == 9001) {
-        rpcUrl = "https://evmos-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        rpcUrl = "https://evmos-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d";
         dbxenftFactoryAddress = "0xf032f7FB8258728A1938473B2115BB163d5Da593";
         METADATA_BUCKET = "deboxnft-minting-evmos";
     }
     if (chainId == 1284) {
-        rpcUrl = "https://moonbeam-mainnet.gateway.pokt.network/v1/lb/b1ad9a15615e95af1a87f86d";
+        rpcUrl = "https://moonbeam-mainnet.rpc.grove.city/v1/b1ad9a15615e95af1a87f86d";
         dbxenftFactoryAddress = "0x4bD737C3104100d175d0b3B8F17d095f2718faC0";
         METADATA_BUCKET = "deboxnft-minting-moonbeam";
     }
